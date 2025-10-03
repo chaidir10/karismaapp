@@ -306,7 +306,7 @@
                 <div class="flex items-center space-x-4">
                     <div class="text-sm text-gray-600">{{ Auth::user()->name }}</div>
                     @if(Auth::user()->foto_profil)
-                    <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
+                    <img src="{{ asset('storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
                     @else
                     <div class="user-avatar bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold">
                         {{ substr(Auth::user()->name,0,1) }}
