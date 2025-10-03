@@ -427,7 +427,7 @@ function initializeCamera(){
         showError("Browser tidak mendukung akses kamera."); 
         return; 
     }
-    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment', width:{ideal:1920}, height:{ideal:1080}}})
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:1920}, height:{ideal:1080}}})
     .then(stream=>{ videoStream=stream; video.srcObject=stream; })
     .catch(err=>{ 
         console.error(err); 
