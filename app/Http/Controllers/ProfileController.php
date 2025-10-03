@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
+
+class ProfileController extends Controller
+{
+    /**
+     * Tampilkan halaman profil pegawai.
+     */
+    public function index(Request $request): View
+    {
+        return view('profile.edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Update data profil pegawai.
+     */
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Update data user
+        $user->fill($request->validated());
+
+        // Jika email diubah, reset verifikasi
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        // Handle upload foto jika ada
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $filename = time() . '_' . $user->id . '.' . $foto->getClientOriginalExtension();
+            $foto->move(public_path('uploads/foto'), $filename);
+            $user->foto = $filename;
+        }
+
+        $user->save();
+
+        return Redirect::route('pegawai.profile')->with('success', 'Profil berhasil diperbarui');
+    }
+
+    /**
+     * Hapus akun pegawai.
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+}
