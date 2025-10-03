@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <!-- Favicon -->
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('images/favicon-48x48.png') }}">
-    <link rel="shortcut icon" href="{{ asset('images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -306,7 +306,7 @@
                 <div class="flex items-center space-x-4">
                     <div class="text-sm text-gray-600">{{ Auth::user()->name }}</div>
                     @if(Auth::user()->foto_profil)
-                    <img src="{{ asset('storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
+                    <img src="{{ asset('storage/public/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
                     @else
                     <div class="user-avatar bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold">
                         {{ substr(Auth::user()->name,0,1) }}

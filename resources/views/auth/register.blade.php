@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - KARISMA</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('images/favicon-48x48.png') }}">
-    <link rel="shortcut icon" href="{{ asset('images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <link rel="manifest" href="{{ asset('pwa/manifest.json') }}">
     <meta name="theme-color" content="#5AB6EA">
@@ -263,7 +263,7 @@
                 <div class="logo-text">KARISMA</div>
             </div>
             <p class="tagline">Daftar akun baru KARISMA
-</p>
+            </p>
         </div>
 
         <!-- Body -->
