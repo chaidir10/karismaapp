@@ -990,7 +990,7 @@
                     row.style.display = 'none';
                 }
             });
-        });
+        })
     });
 </script>
 @endpush
