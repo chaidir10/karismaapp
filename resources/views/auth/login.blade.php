@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - KARISMA</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('images/favicon-48x48.png') }}">
-    <link rel="shortcut icon" href="{{ asset('images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <link rel="manifest" href="{{ asset('pwa/manifest.json') }}">
     <meta name="theme-color" content="#5AB6EA">
@@ -38,7 +38,7 @@
         <div class="bg-gradient-to-r from-blue-600 to-cyan-400 text-white p-8 text-center">
             <div class="flex items-center justify-center mb-1">
                 <div class="w-12 h-12 bg-white/600 flex items-center justify-center mr-3 overflow-hidden">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
+                    <img src="{{ asset('public/images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
 
                 <div class="text-2xl font-bold">KARISMA</div>
