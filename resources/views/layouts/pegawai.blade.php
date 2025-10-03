@@ -13,7 +13,7 @@
 
     <!-- External CSS -->
     <!-- Manifest -->
-    <link rel="manifest" href="/pwa/manifest.json">
+    <link rel="manifest" href="public/pwa/manifest.json">
 
     <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,8 +21,8 @@
     <meta name="apple-mobile-web-app-title" content="KARISMA">
 
     <!-- iOS Icons -->
-    <link rel="apple-touch-icon" href="/pwa/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="/pwa/icons/icon-512x512.png">
+    <link rel="apple-touch-icon" href="public/pwa/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="public/pwa/icons/icon-512x512.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
