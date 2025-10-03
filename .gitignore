@@ -13,7 +13,7 @@ Thumbs.db
 # Laravel generated folders
 /vendor
 /node_modules
-/public/build
+
 /public/hot
 /public/storage
 
