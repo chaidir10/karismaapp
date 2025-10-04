@@ -12,7 +12,7 @@
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-512x512.png') }}" type="image/png">
 
     <!-- PWA -->
-    <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
+    <link rel="manifest" href="{{ asset('pwa/manifest.json') }}">
     <meta name="theme-color" content="#2E97D4">
     <link rel="apple-touch-icon" href="{{ asset('pwa/icons/icon-192x192.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
