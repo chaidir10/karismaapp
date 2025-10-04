@@ -641,7 +641,7 @@
                     <!-- Foto Section -->
                     <div class="detail-image-container">
                         @if($p->foto)
-                        <img src="{{ asset('storage/'.$p->foto) }}" class="detail-image" alt="Foto presensi" loading="lazy">
+                        <img src="{{ asset('public/storage/'.$p->foto) }}" class="detail-image" alt="Foto presensi" loading="lazy">
                         @else
                         <div class="no-photo-placeholder">
                             <i class="fas fa-camera"></i>
