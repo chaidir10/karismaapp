@@ -70,7 +70,7 @@
             <div class="detail-content-container">
                 <div class="detail-image-container">
                     @if($p->foto)
-                    <img src="{{ asset('storage/'.$p->foto) }}" class="detail-image" alt="Foto presensi">
+                    <img src="{{ asset('storage/public/'.$p->foto) }}" class="detail-image" alt="Foto presensi">
                     @else
                     <div class="d-flex align-items-center justify-content-center h-100 bg-light">
                         <i class="fas fa-camera fa-3x text-muted"></i>
