@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
