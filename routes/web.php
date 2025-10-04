@@ -39,6 +39,14 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
+Route::get('/register', [RegisteredUserController::class, 'create'])
+    ->middleware('guest')
+    ->name('register');
+
+// Handle proses register
+Route::post('/register', [RegisteredUserController::class, 'store'])
+    ->middleware('guest');
+
 // --------------------
 // Dashboard / Auth-protected routes
 // --------------------
