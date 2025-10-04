@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
-    <meta name="theme-color" content="#5AB6EA">
+    <meta name="theme-color" content="#2E97D4">
     <link rel="apple-touch-icon" href="{{ asset('public/pwa/icons/icon-192x192.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -397,7 +397,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('{{ asset("public/pwa/service-worker.js") }}')
+                navigator.serviceWorker.register('{{ asset("pwa/service-worker.js") }}')
                     .then(registration => {
                         console.log('ServiceWorker registered: ', registration);
                     })

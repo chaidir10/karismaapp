@@ -13,7 +13,7 @@
 
     <!-- PWA -->
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
-    <meta name="theme-color" content="#5AB6EA">
+    <meta name="theme-color" content="#2E97D4">
     <link rel="apple-touch-icon" href="{{ asset('pwa/icons/icon-192x192.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
