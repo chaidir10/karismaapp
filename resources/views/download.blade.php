@@ -18,7 +18,7 @@
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
 
     <div class="bg-white shadow-xl rounded-2xl p-8 max-w-md w-full text-center">
-        <img src="{{ asset('public/images/favicon-512x512.png') }}" alt="KARISMA" class="mx-auto w-24 h-24 mb-4">
+        <img src="{{ asset('public/images/icon-512x512.png') }}" alt="Logo Karisma" class="mx-auto w-24 h-24 mb-4">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">KARISMA</h1>
         <p class="text-gray-600 mb-6">
             Aplikasi Presensi ASN berbasis PWA.<br>
