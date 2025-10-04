@@ -70,7 +70,7 @@ class PresensiController extends Controller
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('public/presensi', $filename);
+                $file->storeAs('public/storage/presensi', $filename);
                 $foto_db = 'presensi/' . $filename;
             } elseif (preg_match('/^data:image\/(\w+);base64,/', $request->foto)) {
                 $image_parts = explode(";base64,", $request->foto);
