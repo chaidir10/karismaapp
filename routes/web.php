@@ -31,7 +31,6 @@ Route::get('/download', function () {
     return view('download');
 })->name('download');
 
-
 // --------------------
 // Auth Routes
 // --------------------
@@ -45,6 +44,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
+// Register dengan kode_instansi
 Route::get('/register', [RegisteredUserController::class, 'create'])
     ->middleware('guest')
     ->name('register');

@@ -375,6 +375,22 @@
                     @endif
                 </div>
 
+                <!-- Kode Instansi -->
+                <div class="form-group">
+                    <label class="form-label" for="kode_instansi">Kode Instansi</label>
+                    <div class="input-with-icon">
+                        <i class="input-icon fas fa-building"></i>
+                        <input id="kode_instansi" class="form-input" type="text" name="kode_instansi"
+                            value="{{ old('kode_instansi') }}" required placeholder="Masukkan kode instansi">
+                    </div>
+                    @if($errors->has('kode_instansi'))
+                    <div class="input-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $errors->first('kode_instansi') }}
+                    </div>
+                    @endif
+                </div>
+
                 <!-- Register Button -->
                 <button type="submit" class="register-button">
                     Daftar <i class="fas fa-user-plus"></i>
