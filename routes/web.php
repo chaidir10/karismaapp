@@ -27,6 +27,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/download', function () {
+    return view('download');
+})->name('download');
+
+
 // --------------------
 // Auth Routes
 // --------------------
