@@ -29,7 +29,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Konfirmasi Logout</h3>
                 <p class="text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari aplikasi?</p>
-                
+
                 <div class="flex gap-3">
                     <button type="button" id="logoutCancelBtn"
                         class="flex-1 px-4 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 font-medium text-sm">
@@ -50,7 +50,7 @@
         <div class="flex justify-center mb-4">
             <div class="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden flex items-center justify-center bg-blue-100 text-white text-2xl font-bold">
                 @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
-                <img src="{{ asset('storage/foto_profil/' . $user->foto_profil) }}"
+                <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}"
                     alt="Foto Profil {{ $user->name }}"
                     class="w-full h-full object-cover"
                     onerror="this.style.display='none'; this.parentNode.innerHTML='{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}'">
@@ -59,6 +59,7 @@
                 @endif
             </div>
         </div>
+
 
 
         {{-- Nama dan Jabatan --}}
