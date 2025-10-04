@@ -88,7 +88,7 @@
                             <div class="flex justify-center">
                                 <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
                                     <img
-                                        src="{{ $user->foto_profil ? asset('storage/foto_profil/' . $user->foto_profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=0a9396&color=fff' }}"
+                                        src="{{ $user->foto_profil ? asset('public/storage/foto_profil/' . $user->foto_profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=0a9396&color=fff' }}"
                                         class="h-full w-full object-cover"
                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0a9396&color=fff'">
                                 </div>

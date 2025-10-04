@@ -427,7 +427,7 @@
                             <div class="text-xs text-gray-500">Superadmin</div>
                         </div>
                         @if(Auth::user()->foto_profil)
-                        <img src="{{ asset('storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
+                        <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
                         @else
                         <div class="user-avatar bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold">
                             {{ substr(Auth::user()->name,0,1) }}
@@ -438,7 +438,7 @@
                     <!-- Mobile user avatar only -->
                     <div class="lg:hidden">
                         @if(Auth::user()->foto_profil)
-                        <img src="{{ asset('storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
+                        <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
                         @else
                         <div class="user-avatar bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">
                             {{ substr(Auth::user()->name,0,1) }}
