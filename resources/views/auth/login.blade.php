@@ -126,7 +126,7 @@
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('{{ asset("pwa/service-worker.js") }}')
+                navigator.serviceWorker.register('{{ asset("public/pwa/service-worker.js") }}')
                     .then(registration => console.log('ServiceWorker registered:', registration))
                     .catch(err => console.log('ServiceWorker registration failed:', err));
             });
