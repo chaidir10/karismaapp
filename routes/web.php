@@ -20,14 +20,16 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// Redirect root ke login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Routes Auth sudah include cek jika user sudah login di controller
+// Auth routes (login/register/logout)
+// Sudah termasuk redirect otomatis di controller jika user sudah login
 require __DIR__ . '/auth.php';
 
-// Middleware auth dan verifikasi untuk semua dashboard
+// Semua dashboard dan route auth-protected
 Route::middleware(['auth', 'verified'])->group(function () {
 
     /**

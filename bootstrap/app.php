@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'checkrole'     => CheckRole::class,
             'detectdevice'  => DetectDevice::class,
+            'preventbackhistory' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
 
         // Global middleware → otomatis jalan di semua request
