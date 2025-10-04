@@ -8,6 +8,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('public/images/favicon-512x512.png') }}">
+    <link rel="shortcut icon" href="{{ asset('public/images/favicon-512x512.png') }}" type="image/png">
 
     <!-- PWA -->
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
