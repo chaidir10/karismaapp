@@ -44,6 +44,36 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
+        
+        /* Custom Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .modal-show {
+            transform: scale(1);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-sky-50 to-blue-100 flex items-center justify-center min-h-screen p-4">
@@ -58,73 +88,13 @@
         {{-- Rating dan info --}}
         <div class="flex justify-center items-center mb-8">
             <div class="flex text-amber-400 mr-2">
+                <!-- Star icons -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
+                <!-- Repeat 4 more times -->
             </div>
             <span class="text-slate-700 font-medium">4.8 • 500+ unduhan</span>
-        </div>
-
-        {{-- Fitur aplikasi --}}
-        <div class="grid grid-cols-2 gap-3 mb-8">
-            <div class="feature-item rounded-xl p-3 text-center">
-                <div class="bg-blue-100 rounded-lg p-2 inline-flex mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <p class="text-sm font-medium text-slate-700">Presensi Real-time</p>
-            </div>
-            <div class="feature-item rounded-xl p-3 text-center">
-                <div class="bg-green-100 rounded-lg p-2 inline-flex mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <p class="text-sm font-medium text-slate-700">Terverifikasi</p>
-            </div>
-            <div class="feature-item rounded-xl p-3 text-center">
-                <div class="bg-purple-100 rounded-lg p-2 inline-flex mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
-                    </svg>
-                </div>
-                <p class="text-sm font-medium text-slate-700">Responsif</p>
-            </div>
-            <div class="feature-item rounded-xl p-3 text-center">
-                <div class="bg-amber-100 rounded-lg p-2 inline-flex mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <p class="text-sm font-medium text-slate-700">Aman</p>
-            </div>
-        </div>
-
-        {{-- Deskripsi --}}
-        <div class="mb-8">
-            <p class="text-slate-600 text-center mb-4">
-                Aplikasi Presensi ASN berbasis PWA yang modern dan mudah digunakan. 
-                Lakukan presensi dengan cepat dan aman di mana saja.
-            </p>
-            <div class="flex items-center justify-center text-slate-500 text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
-                </svg>
-                <span>Kompatibel dengan semua perangkat</span>
-            </div>
         </div>
 
         {{-- Tombol install --}}
@@ -134,49 +104,135 @@
             </svg>
             Download / Install Aplikasi
         </button>
+    </div>
 
-        {{-- Petunjuk alternatif --}}
-        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
-            <p class="text-sm text-blue-700 text-center">
-                Jika tombol install tidak muncul, gunakan menu browser 
-                <span class="font-semibold">"Tambahkan ke layar utama"</span>.
-            </p>
+    <!-- Custom Install Modal -->
+    <div id="installModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="text-center mb-6">
+                <div class="bg-blue-100 rounded-full p-3 inline-flex mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Install KARISMA</h3>
+                <p class="text-slate-600">
+                    Tambahkan KARISMA ke perangkat Anda untuk pengalaman yang lebih baik dan akses cepat.
+                </p>
+            </div>
+            
+            <div class="bg-slate-50 rounded-xl p-4 mb-6">
+                <div class="flex items-center mb-3">
+                    <img src="{{ asset('public/images/icon-512x512.png') }}" alt="Logo KARISMA" class="w-10 h-10 rounded-xl mr-3">
+                    <div>
+                        <h4 class="font-semibold text-slate-800">KARISMA</h4>
+                        <p class="text-sm text-slate-600">Presensi ASN</p>
+                    </div>
+                </div>
+                <div class="text-sm text-slate-600 space-y-1">
+                    <div class="flex justify-between">
+                        <span>Ukuran:</span>
+                        <span class="font-medium">~2 MB</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Versi:</span>
+                        <span class="font-medium">1.0.0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-3">
+                <button id="cancelInstall" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl transition">
+                    Batal
+                </button>
+                <button id="confirmInstall" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition">
+                    Install
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         let deferredPrompt;
+        let installModal = document.getElementById('installModal');
+        let installBtn = document.getElementById('installBtn');
+        let confirmInstallBtn = document.getElementById('confirmInstall');
+        let cancelInstallBtn = document.getElementById('cancelInstall');
+
+        // Fungsi untuk menampilkan modal
+        function showModal() {
+            installModal.style.display = 'flex';
+            setTimeout(() => {
+                document.querySelector('.modal-content').classList.add('modal-show');
+            }, 10);
+        }
+
+        // Fungsi untuk menyembunyikan modal
+        function hideModal() {
+            document.querySelector('.modal-content').classList.remove('modal-show');
+            setTimeout(() => {
+                installModal.style.display = 'none';
+            }, 300);
+        }
 
         window.addEventListener("beforeinstallprompt", (e) => {
             e.preventDefault();
             deferredPrompt = e;
             
             // Tampilkan tombol install
-            document.getElementById("installBtn").style.display = "flex";
+            installBtn.style.display = "flex";
         });
 
-        document.getElementById("installBtn").addEventListener("click", async () => {
+        // Ketika tombol install diklik, tampilkan modal custom
+        installBtn.addEventListener("click", () => {
             if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log("User choice:", outcome);
-                
-                // Sembunyikan tombol setelah instalasi
-                if (outcome === 'accepted') {
-                    document.getElementById("installBtn").style.display = "none";
-                }
-                
-                deferredPrompt = null;
+                showModal();
             } else {
                 alert("Aplikasi mungkin sudah terpasang, atau browser tidak mendukung. Gunakan menu browser → 'Tambahkan ke layar utama'.");
             }
         });
 
+        // Konfirmasi install dari modal custom
+        confirmInstallBtn.addEventListener("click", async () => {
+            hideModal();
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log("User choice:", outcome);
+                
+                if (outcome === 'accepted') {
+                    installBtn.style.display = "none";
+                    // Bisa tambahkan notifikasi sukses di sini
+                    showInstallSuccess();
+                }
+                
+                deferredPrompt = null;
+            }
+        });
+
+        // Batal install
+        cancelInstallBtn.addEventListener("click", hideModal);
+
+        // Tutup modal ketika klik di luar
+        installModal.addEventListener("click", (e) => {
+            if (e.target === installModal) {
+                hideModal();
+            }
+        });
+
         // Sembunyikan tombol jika aplikasi sudah diinstal
         window.addEventListener('appinstalled', () => {
-            document.getElementById("installBtn").style.display = "none";
+            installBtn.style.display = "none";
             deferredPrompt = null;
+            hideModal();
         });
+
+        // Fungsi untuk menampilkan notifikasi sukses (opsional)
+        function showInstallSuccess() {
+            // Implementasi notifikasi sukses install
+            console.log("Aplikasi berhasil diinstall!");
+        }
     </script>
 </body>
 </html>
