@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Pegawai\AkunController;
 use App\Http\Controllers\Pegawai\DashboardController as PegawaiDashboardController;
 use App\Http\Controllers\Pegawai\PresensiController;
@@ -25,18 +26,27 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Auth routes (login/register/logout)
-// Sudah termasuk redirect otomatis di controller jika user sudah login
-require __DIR__ . '/auth.php';
+// --------------------
+// Auth Routes
+// --------------------
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+    ->name('login')
+    ->middleware('preventbackhistory');
 
-// Semua dashboard dan route auth-protected
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+    ->middleware('preventbackhistory');
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->name('logout');
+
+// --------------------
+// Dashboard / Auth-protected routes
+// --------------------
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    /**
-     * --------------------
-     * Pegawai
-     * --------------------
-     */
+    // --------------------
+    // Pegawai
+    // --------------------
     Route::prefix('pegawai')->name('pegawai.')->middleware('checkrole:pegawai')->group(function () {
         Route::get('/dashboard', [PegawaiDashboardController::class, 'index'])->name('dashboard');
 
@@ -57,11 +67,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
     });
 
-    /**
-     * --------------------
-     * Admin
-     * --------------------
-     */
+    // --------------------
+    // Admin
+    // --------------------
     Route::prefix('admin')->name('admin.')->middleware('checkrole:admin')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
 
@@ -110,11 +118,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
-    /**
-     * --------------------
-     * Superadmin
-     * --------------------
-     */
+    // --------------------
+    // Superadmin
+    // --------------------
     Route::prefix('superadmin')->name('superadmin.')->middleware('checkrole:superadmin')->group(function () {
         Route::get('/dashboard', [DashboardSuperAdminController::class, 'index'])->name('dashboard');
 
