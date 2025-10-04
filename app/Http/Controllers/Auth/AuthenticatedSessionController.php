@@ -15,7 +15,7 @@ class AuthenticatedSessionController extends Controller
     public function __construct()
     {
         // Middleware untuk mencegah back button menampilkan halaman login
-        $this->middleware('prevent-back-history')->only(['create', 'store']);
+        $this->middleware('preventbackhistory')->only(['create', 'store']);
     }
 
     /**
@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request)
+    public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
@@ -65,6 +65,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Setelah logout, user bisa akses login kembali
         return redirect()->route('login');
     }
 
