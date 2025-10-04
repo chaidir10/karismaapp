@@ -1,12 +1,12 @@
 {
     "name": "KARISMA PWA",
-    "short_name": "KARISMA",
+    "short_name": "Karisma",
     "description": "Aplikasi Presensi ASN",
     "start_url": "/",
     "display": "standalone",
     "orientation": "portrait",
     "background_color": "#ffffff",
-    "theme_color": "#0a9396",
+    "theme_color": "#2E97D4",
     "icons": [
         {
             "src": "https://karismaapp.com/public/icons/icon-192x192.png",
