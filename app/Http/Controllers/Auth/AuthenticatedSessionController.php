@@ -15,8 +15,13 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
+        // Jika user sudah login, lempar ke dashboard sesuai role
+        if (Auth::check()) {
+            return $this->redirectByRole(Auth::user());
+        }
+
         return view('auth.login');
     }
 
@@ -30,27 +35,18 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
         $agent = new Agent();
-
         $isMobile = $agent->isMobile() || $agent->isTablet();
 
         if ($isMobile) {
             // Paksa login dengan remember me (infinite session)
             Auth::login($user, true);
 
-            // Semua role diarahkan ke view pegawai di mobile
+            // Semua role diarahkan ke dashboard mobile (pegawai)
             return redirect()->route('pegawai.dashboard');
         }
 
-        // Kalau desktop → ikuti role
-        if ($user->role === 'pegawai') {
-            return redirect()->route('pegawai.dashboard');
-        } elseif ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        } elseif ($user->role === 'superadmin') {
-            return redirect()->route('superadmin.dashboard');
-        }
-
-        return redirect()->intended('/'); // fallback
+        // Desktop → redirect sesuai role
+        return $this->redirectByRole($user);
     }
 
     /**
@@ -63,6 +59,19 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
+    }
+
+    /**
+     * Redirect user berdasarkan role.
+     */
+    private function redirectByRole($user): RedirectResponse
+    {
+        return match ($user->role) {
+            'pegawai' => redirect()->route('pegawai.dashboard'),
+            'admin' => redirect()->route('admin.dashboard'),
+            'superadmin' => redirect()->route('superadmin.dashboard'),
+            default => redirect()->route('pegawai.dashboard'),
+        };
     }
 }

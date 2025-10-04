@@ -20,12 +20,30 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// Route::get('/', function () {
+//     return redirect()->route('login');
+// });
+
+// // Middleware auth dan verifikasi
+// Route::middleware(['auth', 'verified'])->group(function () {
+
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
+// Root redirect
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Middleware auth dan verifikasi
+
+// Dashboard dan route lain hanya untuk user yang login dan verified
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/pegawai/dashboard', [PegawaiController::class, 'dashboard'])->name('pegawai.dashboard');
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/superadmin/dashboard', [SuperAdminController::class, 'dashboard'])->name('superadmin.dashboard');
+    
+    // route resource atau fitur lain
+});
+
 
     /**
      * --------------------
