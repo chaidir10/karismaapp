@@ -9,29 +9,24 @@
     <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
+    <!-- PWA -->
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
     <meta name="theme-color" content="#5AB6EA">
     <link rel="apple-touch-icon" href="{{ asset('public/pwa/icons/icon-192x192.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
 
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            min-height: 100vh;
-        }
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%); min-height: 100vh; }
     </style>
 </head>
 
 <body class="flex items-center justify-center p-5">
+
     <!-- Login Container -->
     <div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Header -->
@@ -40,68 +35,54 @@
                 <div class="w-12 h-12 bg-white/600 flex items-center justify-center mr-3 overflow-hidden">
                     <img src="{{ asset('public/images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
-
                 <div class="text-2xl font-bold">KARISMA</div>
             </div>
-            <p class="text-sm font-bold opacity-90">Presnsi Digital BKK Tarakan
-            </p>
+            <p class="text-sm font-bold opacity-90">Presnsi Digital BKK Tarakan</p>
         </div>
 
         <!-- Body -->
         <div class="p-8">
-            <!-- Session Status -->
             @if(session('status'))
-            <div id="successMessage" class="hidden">
-                {{ session('status') }}
-            </div>
+                <div id="successMessage" class="hidden">{{ session('status') }}</div>
             @endif
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
-
-                <!-- Email Address -->
+                <!-- Email -->
                 <div class="mb-5">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="email">Email</label>
+                    <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
                     <div class="relative">
                         <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                        <input id="email" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="Masukkan email Anda">
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
+                               placeholder="Masukkan email Anda"
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     </div>
                     @if($errors->has('email'))
-                    <div class="text-red-500 text-xs mt-2 flex items-center">
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ $errors->first('email') }}
-                    </div>
+                        <div class="text-red-500 text-xs mt-2 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>{{ $errors->first('email') }}
+                        </div>
                     @endif
                 </div>
 
                 <!-- Password -->
                 <div class="mb-5">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="password">Password</label>
+                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
                     <div class="relative">
                         <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                        <input id="password" class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" type="password" name="password" required autocomplete="current-password" placeholder="Masukkan password Anda">
-                        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" id="password-toggle">
+                        <input id="password" type="password" name="password" required autocomplete="current-password"
+                               placeholder="Masukkan password Anda"
+                               class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <button type="button" id="password-toggle" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
                     @if($errors->has('password'))
-                    <div class="text-red-500 text-xs mt-2 flex items-center">
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ $errors->first('password') }}
-                    </div>
+                        <div class="text-red-500 text-xs mt-2 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>{{ $errors->first('password') }}
+                        </div>
                     @endif
                 </div>
 
-                <!-- Remember Me & Forgot Password -->
-                <!-- <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center">
-                        <input id="remember_me" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" name="remember">
-                        <label for="remember_me" class="ml-2 text-sm text-gray-700">Ingat saya</label>
-                    </div>
-                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800 transition">Lupa password?</a>
-                </div> -->
-
-                <!-- Login Button -->
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition transform hover:-translate-y-0.5 shadow-md hover:shadow-lg">
                     Masuk <i class="fas fa-arrow-right ml-2"></i>
                 </button>
@@ -117,6 +98,11 @@
             </div>
         </div>
     </div>
+
+    <!-- PWA Install Button -->
+    <button id="installBtn" class="hidden fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
+        Install App
+    </button>
 
     <!-- Success Modal -->
     <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
@@ -135,25 +121,19 @@
     </div>
 
     <script>
+        // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('{{ asset("public/pwa/service-worker.js") }}')
-                    .then(registration => {
-                        console.log('ServiceWorker registered: ', registration);
-                    })
-                    .catch(registrationError => {
-                        console.log('ServiceWorker registration failed: ', registrationError);
-                    });
+                    .then(registration => console.log('ServiceWorker registered:', registration))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
             });
         }
-    </script>
 
-    <script>
         // Toggle password visibility
         document.getElementById('password-toggle').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
-
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye');
@@ -165,7 +145,7 @@
             }
         });
 
-        // Show success modal if there's a success message
+        // Show success modal
         document.addEventListener('DOMContentLoaded', function() {
             const successMessage = document.getElementById('successMessage');
             const modal = document.getElementById('successModal');
@@ -175,32 +155,36 @@
             if (successMessage) {
                 modalMessage.textContent = successMessage.textContent;
                 modal.classList.remove('hidden');
-
-                // Add animation
-                setTimeout(() => {
-                    modal.querySelector('.transform').classList.remove('scale-95');
-                    modal.querySelector('.transform').classList.add('scale-100');
-                }, 10);
+                setTimeout(() => modal.querySelector('.transform').classList.remove('scale-95'), 10);
             }
 
-            // Close modal
-            closeModal.addEventListener('click', function() {
-                modal.querySelector('.transform').classList.remove('scale-100');
+            closeModal.addEventListener('click', () => {
                 modal.querySelector('.transform').classList.add('scale-95');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                setTimeout(() => modal.classList.add('hidden'), 300);
             });
-
-            // Close modal when clicking outside
-            modal.addEventListener('click', function(e) {
+            modal.addEventListener('click', e => {
                 if (e.target === modal) {
-                    modal.querySelector('.transform').classList.remove('scale-100');
                     modal.querySelector('.transform').classList.add('scale-95');
-                    setTimeout(() => {
-                        modal.classList.add('hidden');
-                    }, 300);
+                    setTimeout(() => modal.classList.add('hidden'), 300);
                 }
+            });
+        });
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+
+            installBtn.addEventListener('click', async () => {
+                installBtn.classList.add('hidden');
+                deferredPrompt.prompt();
+                const choice = await deferredPrompt.userChoice;
+                console.log('User choice:', choice.outcome);
+                deferredPrompt = null;
             });
         });
     </script>
