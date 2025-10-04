@@ -684,7 +684,7 @@
             .then(user => {
                 hideLoading();
                 let foto = user.foto_profil ?
-                    `{{ asset('storage/foto_profil/') }}/${user.foto_profil}` :
+                    `{{ asset('public/storage/foto_profil/') }}/${user.foto_profil}` :
                     `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0a9396&color=fff`;
 
                 // Set photo
