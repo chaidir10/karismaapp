@@ -6,8 +6,11 @@
     <title>Download KARISMA</title>
 
     {{-- Manifest & PWA --}}
-    <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <meta name="theme-color" content="#0a9396">
+    <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
+    <meta name="theme-color" content="#2E97D4">
+    <link rel="apple-touch-icon" href="{{ asset('public/pwa/icons/icon-192x192.png') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     {{-- Tailwind --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -48,7 +51,7 @@
                 console.log("User choice:", outcome);
                 deferredPrompt = null;
             } else {
-                alert("Aplikasi mungkin sudah terpasang, atau browser tidak mendukung. Gunakan menu browser → 'Tambahkan ke layar utama'.");
+                alert("Aplikasi mungkin sudah terpasang, atau browser tidak mendukung. Gunakan menu browser → 'Tambahkan ke layar utma'.");
             }
         });
     </script>
