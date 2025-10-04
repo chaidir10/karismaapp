@@ -32,15 +32,34 @@ class AkunController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'no_hp' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:6|confirmed',
-            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // maksimal 2MB
-            'alamat' => 'nullable|string|max:1000', // validasi alamat
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'alamat' => 'nullable|string|max:1000',
+        ], [
+            'name.required' => 'Nama wajib diisi!',
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+
+            'email.required' => 'Email wajib diisi!',
+            'email.email' => 'Format email tidak valid!',
+            'email.unique' => 'Email sudah terdaftar!',
+
+            'no_hp.max' => 'Nomor HP maksimal 20 karakter.',
+
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+
+            'foto_profil.image' => 'File harus berupa gambar.',
+            'foto_profil.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+            'foto_profil.max' => 'Ukuran gambar maksimal 2MB.',
+
+            'alamat.max' => 'Alamat maksimal 1000 karakter.',
         ]);
+
 
         // Update nama, email, dan alamat
         $user->name = $request->name;
         $user->email = $request->email;
         $user->alamat = $request->alamat;
-         $user->no_hp = $request->no_hp;
+        $user->no_hp = $request->no_hp;
 
         // Update password jika ada
         if ($request->filled('password')) {
