@@ -258,7 +258,7 @@
         <div class="register-header">
             <div class="logo">
                 <div class="w-12 h-12 bg-white/600 flex items-center justify-center mr-3 overflow-hidden">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
+                    <img src="{{ asset('public/images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <div class="logo-text">KARISMA</div>
             </div>
