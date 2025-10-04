@@ -1,4 +1,4 @@
-const CACHE_NAME = "karisma-pwa-v1";
+const CACHE_NAME = "karisma-pwa-v2";
 
 // Daftar URL yang dicache saat install
 const urlsToCache = [
