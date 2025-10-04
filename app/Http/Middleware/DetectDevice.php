@@ -37,21 +37,18 @@ class DetectDevice
 
                 case 'admin':
                 case 'superadmin':
-                    if ($deviceType === 'desktop') {
+                    if ($isMobile) {
+                        // Mobile → selalu diarahkan ke PWA pegawai
+                        if (!$request->is('pegawai/*')) {
+                            return redirect()->route('pegawai.dashboard');
+                        }
+                    } else {
                         // Desktop → normal sesuai role
                         if ($user->role === 'admin' && !$request->is('admin/*')) {
                             return redirect()->route('admin.dashboard');
                         }
                         if ($user->role === 'superadmin' && !$request->is('superadmin/*')) {
                             return redirect()->route('superadmin.dashboard');
-                        }
-                    } else {
-                        // Mobile → arahkan ke PWA pegawai sekali saja
-                        if (!$request->is('pegawai/*')) {
-                            if (!$request->session()->get('mobile_redirected', false)) {
-                                $request->session()->put('mobile_redirected', true);
-                                return redirect()->route('pegawai.dashboard');
-                            }
                         }
                     }
                     break;

@@ -17,9 +17,19 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View|RedirectResponse
     {
-        // Jika user sudah login, lempar ke dashboard sesuai role
-        if (Auth::check()) {
-            return $this->redirectByRole(Auth::user());
+        $user = Auth::user();
+
+        if ($user) {
+            $agent = new Agent();
+            $isMobile = $agent->isMobile() || $agent->isTablet();
+
+            if ($isMobile) {
+                // Mobile → semua diarahkan ke pegawai/dashboard
+                return redirect()->route('pegawai.dashboard');
+            }
+
+            // Desktop → redirect sesuai role
+            return $this->redirectByRole($user);
         }
 
         return view('auth.login');
@@ -41,7 +51,7 @@ class AuthenticatedSessionController extends Controller
             // Paksa login dengan remember me (infinite session)
             Auth::login($user, true);
 
-            // Semua role diarahkan ke dashboard mobile (pegawai)
+            // Semua role diarahkan ke PWA pegawai
             return redirect()->route('pegawai.dashboard');
         }
 

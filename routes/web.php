@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Pegawai\AkunController;
 use App\Http\Controllers\Pegawai\DashboardController as PegawaiDashboardController;
 use App\Http\Controllers\Pegawai\PresensiController;
@@ -14,7 +15,6 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,14 +44,13 @@ Route::get('/register', [RegisteredUserController::class, 'create'])
     ->middleware('guest')
     ->name('register');
 
-// Handle proses register
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest');
 
 // --------------------
 // Dashboard / Auth-protected routes
 // --------------------
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
 
     // --------------------
     // Pegawai
