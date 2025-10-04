@@ -33,17 +33,14 @@
                 data-employee-phone="{{ $p->no_hp ?? '-' }}"
                 data-employee-address="{{ $p->alamat ?? '-' }}"
                 data-employee-status="{{ $p->status ?? 'Aktif' }}"
-                data-employee-avatar="{{ $p->foto_profil ? asset('storage/foto_profil/' . $p->foto_profil) : '' }}">
+                data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
 
                 <div class="employee-avatar">
                     @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
-                    <img src="{{ asset('storage/foto_profil/' . $p->foto_profil) }}"
-                        alt="{{ $p->name }}"
+                    <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
                         onerror="handleAvatarError(this, '{{ $p->name }}')">
                     @else
-                    <div class="avatar-placeholder">
-                        {{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}
-                    </div>
+                    <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
                     @endif
                 </div>
 
@@ -82,7 +79,6 @@
             </div>
             @endforelse
         </div>
-
     </div>
 </div>
 
@@ -256,7 +252,6 @@
         flex: 1;
         transition: all 0.2s ease;
     }
-
     .btn-secondary:hover {
         background: var(--gray);
         color: var(--white);
@@ -603,30 +598,30 @@
         const searchInput = document.getElementById('searchInput');
         const modalAvatarContainer = document.getElementById('modalEmployeeAvatarContainer');
 
-        // Placeholder avatar
+        // Fungsi untuk membuat placeholder avatar berdasarkan nama
         function createAvatarPlaceholder(name) {
             const initials = name.split(' ').map(word => word[0]).join('').toUpperCase();
             return `<div class="employee-avatar-placeholder">${initials}</div>`;
         }
 
-        // Avatar dengan gambar
+        // Fungsi untuk membuat avatar dengan gambar
         function createAvatarImage(avatarUrl, name) {
             return `<img src="${avatarUrl}" class="employee-avatar-large" alt="${name}" onerror="handleModalAvatarError(this, '${name}')">`;
         }
 
-        // Error avatar di list
+        // Fungsi untuk menangani error gambar di list
         function handleAvatarError(imgElement, name) {
             imgElement.style.display = 'none';
-            imgElement.parentElement.innerHTML = createAvatarPlaceholder(name);
+            imgElement.parentElement.innerHTML = `<div class="avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
         }
 
-        // Error avatar di modal
+        // Fungsi untuk menangani error gambar di modal
         function handleModalAvatarError(imgElement, name) {
             imgElement.style.display = 'none';
             modalAvatarContainer.innerHTML = createAvatarPlaceholder(name);
         }
 
-        // Isi data modal
+        // Fungsi untuk mengisi data modal
         function fillModalData(employeeItem) {
             const employeeName = employeeItem.querySelector('.employee-name').textContent;
             const employeePosition = employeeItem.querySelector('.employee-position').textContent;
@@ -638,14 +633,14 @@
             const employeeAddress = employeeItem.getAttribute('data-employee-address');
             const employeeStatus = employeeItem.getAttribute('data-employee-status');
 
-            // Avatar modal
+            // Set avatar di modal
             if (employeeAvatar && employeeAvatar.trim() !== '') {
                 modalAvatarContainer.innerHTML = createAvatarImage(employeeAvatar, employeeName);
             } else {
                 modalAvatarContainer.innerHTML = createAvatarPlaceholder(employeeName);
             }
 
-            // Data lainnya
+            // Set data lainnya
             document.getElementById('modalEmployeeName').textContent = employeeName;
             document.getElementById('modalEmployeePosition').textContent = employeePosition;
             document.getElementById('modalEmployeeDepartment').textContent = employeeDepartment;
@@ -655,7 +650,7 @@
             document.getElementById('modalEmployeePhone').textContent = employeePhone || '-';
             document.getElementById('modalEmployeeAddress').textContent = employeeAddress || '-';
 
-            // WhatsApp link
+            // Set WhatsApp link
             const whatsappLink = document.getElementById('whatsappLink');
             if (employeePhone && employeePhone !== '-') {
                 let phoneNumber = employeePhone.replace(/[^0-9]/g, '');
@@ -672,8 +667,9 @@
             }
         }
 
-        // Setup event untuk setiap pegawai
+        // Tambahkan event listener untuk setiap item pegawai
         employeeItems.forEach((item) => {
+            // Setup error handling untuk avatar di list
             const avatarImg = item.querySelector('.employee-avatar img');
             const employeeName = item.querySelector('.employee-name').textContent;
 
@@ -683,13 +679,14 @@
                 });
             }
 
+            // Click handler untuk modal - PERBAIKAN: Gunakan event delegation yang lebih baik
             item.addEventListener('click', function() {
                 fillModalData(this);
                 employeeModal.show();
             });
         });
 
-        // Search filter
+        // Search functionality
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase().trim();
@@ -709,15 +706,22 @@
             });
         }
 
-        // Reset modal ketika ditutup
-        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function() {
+        // PERBAIKAN PENTING: Reset modal ketika ditutup
+        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function () {
+            // Kosongkan container avatar untuk memastikan tidak ada konflik
             modalAvatarContainer.innerHTML = '';
         });
-
-        // Export fungsi agar bisa dipanggil inline
-        window.handleAvatarError = handleAvatarError;
-        window.handleModalAvatarError = handleModalAvatarError;
     });
-</script>
 
+    // Export fungsi ke global scope untuk digunakan di inline event handlers
+    window.handleAvatarError = function(imgElement, name) {
+        imgElement.style.display = 'none';
+        imgElement.parentElement.innerHTML = `<div class="avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
+    };
+
+    window.handleModalAvatarError = function(imgElement, name) {
+        imgElement.style.display = 'none';
+        document.getElementById('modalEmployeeAvatarContainer').innerHTML = `<div class="employee-avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
+    };
+</script>
 @endsection
