@@ -20,30 +20,15 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Route::get('/', function () {
-//     return redirect()->route('login');
-// });
-
-// // Middleware auth dan verifikasi
-// Route::middleware(['auth', 'verified'])->group(function () {
-
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
-// Root redirect
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Routes Auth sudah include cek jika user sudah login di controller
+require __DIR__ . '/auth.php';
 
-// Dashboard dan route lain hanya untuk user yang login dan verified
+// Middleware auth dan verifikasi untuk semua dashboard
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/pegawai/dashboard', [PegawaiController::class, 'dashboard'])->name('pegawai.dashboard');
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/superadmin/dashboard', [SuperAdminController::class, 'dashboard'])->name('superadmin.dashboard');
-    
-    // route resource atau fitur lain
-});
-
 
     /**
      * --------------------
@@ -76,7 +61,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
      * --------------------
      */
     Route::prefix('admin')->name('admin.')->middleware('checkrole:admin')->group(function () {
-        // Dashboard
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
 
         // Pengajuan Approve / Reject
@@ -130,8 +114,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
      * --------------------
      */
     Route::prefix('superadmin')->name('superadmin.')->middleware('checkrole:superadmin')->group(function () {
-
-        // Dashboard Superadmin
         Route::get('/dashboard', [DashboardSuperAdminController::class, 'index'])->name('dashboard');
 
         // Manajemen Admin
@@ -144,5 +126,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 });
-
-require __DIR__ . '/auth.php';
