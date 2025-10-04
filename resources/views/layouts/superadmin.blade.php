@@ -388,18 +388,23 @@
             <!-- User info in sidebar -->
             <div class="p-4 border-t border-gray-100">
                 <div class="flex items-center space-x-3">
-                    @if(Auth::user()->foto_profil)
-                    <img src="{{ asset('storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
+                    @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
+                    <img src="{{ url('public/storage/foto_profil/' . Auth::user()->foto_profil) }}"
+                        class="user-avatar"
+                        alt="Avatar"
+                        onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=128'">
                     @else
                     <div class="user-avatar bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">
                         {{ substr(Auth::user()->name,0,1) }}
                     </div>
                     @endif
+
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-900 truncate">{{ Auth::user()->name }}</p>
                         <p class="text-xs text-gray-500 truncate">Superadmin</p>
                     </div>
                 </div>
+
             </div>
         </div>
 

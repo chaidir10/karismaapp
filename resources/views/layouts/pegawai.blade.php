@@ -787,7 +787,7 @@
 
                 <div class="user-avatar">
                     @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
-                    <img src="{{ asset('storage/foto_profil/' . Auth::user()->foto_profil) }}"
+                    <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}"
                         alt="Foto Profil {{ Auth::user()->name }}"
                         class="w-full h-full object-cover"
                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=128'">
