@@ -3,51 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Aplikasi KARISMA</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css">
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <title>Download KARISMA</title>
 
-    <div class="bg-white p-6 rounded-2xl shadow-lg text-center w-80">
-        <h1 class="text-xl font-bold text-gray-700 mb-4">📲 Download Aplikasi KARISMA</h1>
-        
-        <p class="text-gray-600 mb-4">Pasang aplikasi untuk pengalaman lebih baik di perangkat Anda.</p>
-        
-        <button id="btnInstall" 
-                class="w-full bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700 transition">
-            Download Aplikasi
+    {{-- Manifest & PWA --}}
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0a9396">
+
+    {{-- Tailwind --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white shadow-xl rounded-2xl p-8 max-w-md w-full text-center">
+        <img src="{{ asset('images/favicon-512x512.png') }}" alt="KARISMA" class="mx-auto w-24 h-24 mb-4">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">KARISMA</h1>
+        <p class="text-gray-600 mb-6">
+            Aplikasi Presensi ASN berbasis PWA.<br>
+            Klik tombol di bawah untuk menginstal aplikasi.
+        </p>
+
+        <button id="installBtn"
+            class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-xl shadow-md transition">
+            📲 Download / Install Aplikasi
         </button>
 
-        <p id="installStatus" class="text-gray-500 text-sm mt-3"></p>
+        <p class="mt-4 text-sm text-gray-500">
+            Jika tombol install tidak muncul, silakan gunakan fitur browser<br>
+            <span class="font-semibold">"Tambahkan ke layar utama"</span>.
+        </p>
     </div>
 
     <script>
         let deferredPrompt;
 
-        // Tangkap event sebelum install
-        window.addEventListener('beforeinstallprompt', (e) => {
+        window.addEventListener("beforeinstallprompt", (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('installStatus').innerText = "Aplikasi siap dipasang.";
         });
 
-        // Klik tombol download
-        document.getElementById('btnInstall').addEventListener('click', async () => {
+        document.getElementById("installBtn").addEventListener("click", async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('installStatus').innerText = "✅ Aplikasi berhasil dipasang.";
-                } else {
-                    document.getElementById('installStatus').innerText = "❌ Pemasangan dibatalkan.";
-                }
+                console.log("User choice:", outcome);
                 deferredPrompt = null;
             } else {
-                // fallback jika app sudah terpasang
-                document.getElementById('installStatus').innerText = "ℹ️ Aplikasi sudah terpasang atau browser tidak mendukung.";
+                alert("Aplikasi mungkin sudah terpasang, atau browser tidak mendukung. Gunakan menu browser → 'Tambahkan ke layar utama'.");
             }
         });
     </script>
-
 </body>
 </html>
