@@ -12,12 +12,6 @@ use Jenssegers\Agent\Agent;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware untuk mencegah back button menampilkan halaman login
-        $this->middleware('prevent-back-history')->only(['create', 'store']);
-    }
-
     /**
      * Display the login view.
      */
@@ -34,7 +28,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request)
+    public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
