@@ -58,7 +58,7 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
 Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
 
     // --------------------
-    // Pegawai
+    // PEGAWAI
     // --------------------
     Route::prefix('pegawai')->name('pegawai.')->middleware('checkrole:pegawai')->group(function () {
         Route::get('/dashboard', [PegawaiDashboardController::class, 'index'])->name('dashboard');
@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
     });
 
     // --------------------
-    // Admin
+    // ADMIN
     // --------------------
     Route::prefix('admin')->name('admin.')->middleware('checkrole:admin')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
@@ -94,7 +94,9 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::post('/presensi/{id}/approve', [DashboardAdminController::class, 'approvePresensi'])->name('presensi.approve');
         Route::post('/presensi/{id}/reject', [DashboardAdminController::class, 'rejectPresensi'])->name('presensi.reject');
 
+        // --------------------
         // Manajemen Pegawai
+        // --------------------
         Route::prefix('manajemen-pegawai')->name('manajemenpegawai.')->group(function () {
             Route::get('/', [ManajemenPegawaiController::class, 'index'])->name('index');
             Route::post('/', [ManajemenPegawaiController::class, 'store'])->name('store');
@@ -104,7 +106,9 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::put('/{id}/reset-password', [ManajemenPegawaiController::class, 'resetPassword'])->name('reset-password');
         });
 
+        // --------------------
         // Manajemen Lokasi Presensi
+        // --------------------
         Route::prefix('lokasi')->name('lokasi.')->group(function () {
             Route::get('/', [ManajemenLokasiController::class, 'index'])->name('index');
             Route::post('/', [ManajemenLokasiController::class, 'store'])->name('store');
@@ -113,16 +117,28 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::delete('/{id}', [ManajemenLokasiController::class, 'destroy'])->name('destroy');
         });
 
-        // Manajemen Jam Kerja
+        // --------------------
+        // Manajemen Jam Kerja & Jam Shift
+        // --------------------
         Route::prefix('jamkerja')->name('jamkerja.')->group(function () {
             Route::get('/', [JamKerjaController::class, 'index'])->name('index');
+
+            // Jam kerja normal
             Route::get('/{id}', [JamKerjaController::class, 'show'])->name('show');
             Route::post('/', [JamKerjaController::class, 'store'])->name('store');
             Route::put('/{id}', [JamKerjaController::class, 'update'])->name('update');
             Route::delete('/{id}', [JamKerjaController::class, 'destroy'])->name('destroy');
+
+            // Jam shift
+            Route::post('/shift', [JamKerjaController::class, 'storeShift'])->name('shift.store');
+            Route::get('/shift/{id}', [JamKerjaController::class, 'showShift'])->name('shift.show');
+            Route::put('/shift/{id}', [JamKerjaController::class, 'updateShift'])->name('shift.update');
+            Route::delete('/shift/{id}', [JamKerjaController::class, 'destroyShift'])->name('shift.destroy');
         });
 
-        // Manajemen Laporan Kehadiran
+        // --------------------
+        // Laporan Kehadiran
+        // --------------------
         Route::prefix('laporan')->name('laporan.')->group(function () {
             Route::get('/', [LaporanController::class, 'index'])->name('index');
             Route::get('/data', [LaporanController::class, 'getLaporan'])->name('data');
@@ -132,7 +148,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
     });
 
     // --------------------
-    // Superadmin
+    // SUPERADMIN
     // --------------------
     Route::prefix('superadmin')->name('superadmin.')->middleware('checkrole:superadmin')->group(function () {
         Route::get('/dashboard', [DashboardSuperAdminController::class, 'index'])->name('dashboard');
