@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class JamKerjaController extends Controller
 {
     /**
-     * Tampilkan halaman manajemen jam kerja & jam shift.
+     * Halaman utama: menampilkan jam kerja normal & jam shift.
      */
     public function index()
     {
@@ -43,7 +43,12 @@ class JamKerjaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        JamKerja::create($request->only('hari', 'jam_masuk', 'jam_pulang'));
+        JamKerja::create([
+            'hari' => $request->hari,
+            'jam_masuk' => $request->jam_masuk,
+            'jam_pulang' => $request->jam_pulang,
+        ]);
+
         return response()->json(['success' => true]);
     }
 
@@ -65,7 +70,12 @@ class JamKerjaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $jamKerja->update($request->only('hari', 'jam_masuk', 'jam_pulang'));
+        $jamKerja->update([
+            'hari' => $request->hari,
+            'jam_masuk' => $request->jam_masuk,
+            'jam_pulang' => $request->jam_pulang,
+        ]);
+
         return response()->json(['success' => true]);
     }
 
@@ -83,7 +93,7 @@ class JamKerjaController extends Controller
     public function storeShift(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nama' => 'required|string|max:100',
+            'nama' => 'required|string|max:100|unique:jam_shift,nama',
             'jam_masuk' => 'required|date_format:H:i',
             'jam_pulang' => 'required|date_format:H:i|after:jam_masuk',
         ]);
@@ -92,7 +102,12 @@ class JamKerjaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        JamShift::create($request->only('nama', 'jam_masuk', 'jam_pulang'));
+        JamShift::create([
+            'nama' => $request->nama,
+            'jam_masuk' => $request->jam_masuk,
+            'jam_pulang' => $request->jam_pulang,
+        ]);
+
         return response()->json(['success' => true]);
     }
 
@@ -114,7 +129,12 @@ class JamKerjaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $jamShift->update($request->only('nama', 'jam_masuk', 'jam_pulang'));
+        $jamShift->update([
+            'nama' => $request->nama,
+            'jam_masuk' => $request->jam_masuk,
+            'jam_pulang' => $request->jam_pulang,
+        ]);
+
         return response()->json(['success' => true]);
     }
 
