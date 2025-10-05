@@ -90,6 +90,17 @@ class JamKerjaController extends Controller
     // ==================== JAM SHIFT ======================
     // =====================================================
 
+    public function showShift($id)
+    {
+        $shift = JamShift::find($id);
+
+        if (!$shift) {
+            return response()->json(['error' => 'Shift tidak ditemukan'], 404);
+        }
+
+        return response()->json($shift);
+    }
+
     public function storeShift(Request $request)
     {
         $validator = Validator::make($request->all(), [
