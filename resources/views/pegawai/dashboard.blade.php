@@ -22,12 +22,6 @@
 </style>
 
 @section('content')
-@if(!$shift)
-<div class="alert alert-danger text-center mx-3 mt-3 rounded-lg">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    Gagal mengambil data shift. Silakan hubungi admin.
-</div>
-@endif
 
 <!-- Card Absensi -->
 <div class="attendance-card">
