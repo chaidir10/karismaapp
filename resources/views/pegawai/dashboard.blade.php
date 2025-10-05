@@ -160,7 +160,7 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi Presensi -->
+<!-- Modal Konfirmasi Presensi (Luar Radius) -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-2xl">
@@ -211,7 +211,53 @@
     </div>
 </div>
 
+<!-- Modal Presensi Berhasil (Dalam Radius - Auto Close) -->
+<div class="modal fade" id="successConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-2xl auto-close-modal">
+            <div class="modal-body p-0">
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Presensi Berhasil</h3>
+                    <p class="text-gray-600 mb-4">Presensi Anda berhasil dicatat.</p>
+                    
+                    <div class="confirmation-details bg-gray-50 rounded-xl p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-4 text-left">
+                            <div>
+                                <div class="text-xs text-gray-500 mb-1">Jenis Presensi</div>
+                                <div id="successConfirmationJenis" class="font-semibold text-gray-800"></div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-500 mb-1">Waktu</div>
+                                <div id="successConfirmationWaktu" class="font-semibold text-gray-800"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="text-xs text-gray-500 mb-1">Lokasi Saat Ini</div>
+                            <div id="successConfirmationLokasi" class="font-semibold text-gray-800 text-sm"></div>
+                        </div>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
+                                <div class="text-xs text-green-700">
+                                    <strong>Lokasi Valid:</strong> Anda berada di dalam radius wilayah kerja.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="border-t border-gray-200">
+                    <button type="button" class="w-full py-4 bg-green-500 text-white font-medium hover:bg-green-600 rounded-b-2xl transition-colors" data-bs-dismiss="modal">
+                        <i class="fas fa-check mr-2"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Toast Notifikasi -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
@@ -312,6 +358,24 @@
 .modal-body .flex button:last-child {
     border-bottom-right-radius: 16px;
 }
+
+/* Auto Close Modal Animation */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+}
+
+.auto-close-modal {
+    animation: slideDown 0.5s ease-in-out;
+}
+
+@keyframes slideDown {
+    0% { transform: translateY(-20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.success-modal-content {
+    border: 2px solid #10b981;
+}
 </style>
 @endpush
 
@@ -322,6 +386,7 @@ let mapInstance = null;
 let currentPosition = null;
 let isOutsideRadius = false;
 let capturedPhotoData = null;
+let autoCloseTimer = null;
 
 function setJenis(jenis){ 
     document.getElementById('jenisPresensi').value = jenis; 
@@ -371,6 +436,12 @@ function cleanupPresensiModal(){
         submitBtn.disabled=false; 
     }
     capturedPhotoData = null;
+    
+    // Clear auto close timer
+    if (autoCloseTimer) {
+        clearTimeout(autoCloseTimer);
+        autoCloseTimer = null;
+    }
 }
 
 function initializeCamera(){
@@ -526,7 +597,7 @@ function captureAndProcess(){
         if (isOutsideRadius) {
             showConfirmationModal();
         } else {
-            showSuccessConfirmationModal();
+            langsungProsesPresensi();
         }
     }).catch(error => {
         console.error('Error capturing photo:', error);
@@ -570,6 +641,28 @@ function showConfirmationModal(){
     confirmationModal.show();
 }
 
+function langsungProsesPresensi(){
+    if (!capturedPhotoData) {
+        showError("Foto belum diambil.");
+        return;
+    }
+
+    // Set foto ke input hidden
+    document.getElementById('fotoInput').value = capturedPhotoData;
+
+    // Submit form
+    document.getElementById('formPresensi').submit();
+    
+    // Tutup modal presensi
+    const presensiModal = bootstrap.Modal.getInstance(document.getElementById('presensiModal'));
+    if (presensiModal) {
+        presensiModal.hide();
+    }
+    
+    // Tampilkan modal sukses yang auto close
+    showSuccessConfirmationModal();
+}
+
 function showSuccessConfirmationModal(){
     const jenis = document.getElementById('jenisPresensi').value;
     const waktu = new Date().toLocaleTimeString('id-ID', { 
@@ -582,18 +675,16 @@ function showSuccessConfirmationModal(){
     document.getElementById('successConfirmationWaktu').textContent = waktu;
     document.getElementById('successConfirmationLokasi').textContent = document.getElementById('location-address-mini').textContent;
 
-    // Reset tombol konfirmasi
-    const confirmBtn = document.getElementById('successConfirmPresensiBtn');
-    confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Ya, Presensi';
-    confirmBtn.disabled = false;
-
     // Tampilkan modal konfirmasi
     const confirmationModal = new bootstrap.Modal(document.getElementById('successConfirmationModal'));
     confirmationModal.show();
-}
-
-function langsungProsesPresensi(){
-    prosesPresensi(true);
+    
+    // Auto close setelah 3 detik
+    autoCloseTimer = setTimeout(() => {
+        if (confirmationModal) {
+            confirmationModal.hide();
+        }
+    }, 3000);
 }
 
 function prosesPresensi(isInRadius = false){
@@ -602,10 +693,7 @@ function prosesPresensi(isInRadius = false){
         return;
     }
 
-    const confirmBtn = isInRadius ? 
-        document.getElementById('successConfirmPresensiBtn') : 
-        document.getElementById('confirmPresensiBtn');
-    
+    const confirmBtn = document.getElementById('confirmPresensiBtn');
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...'; 
     confirmBtn.disabled = true;
 
@@ -617,17 +705,16 @@ function prosesPresensi(isInRadius = false){
         document.getElementById('formPresensi').submit();
         
         // Tutup modal konfirmasi
-        if (isInRadius) {
-            const confirmationModal = bootstrap.Modal.getInstance(document.getElementById('successConfirmationModal'));
-            confirmationModal.hide();
-        } else {
-            const confirmationModal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+        const confirmationModal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+        if (confirmationModal) {
             confirmationModal.hide();
         }
         
         // Tutup modal presensi
         const presensiModal = bootstrap.Modal.getInstance(document.getElementById('presensiModal'));
-        presensiModal.hide();
+        if (presensiModal) {
+            presensiModal.hide();
+        }
     }, 1500);
 }
 
