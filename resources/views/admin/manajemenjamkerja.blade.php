@@ -387,7 +387,7 @@ document.getElementById('formAddShift').addEventListener('submit', function(e){
     const errorsDiv = document.getElementById('addShiftErrors');
     errorsDiv.classList.add('hidden');
     
-    fetch(`{{ route('admin.jamshift.store') }}`, {
+    fetch(`{{ route('admin.jamkerja.shift.store') }}`, {
         method: 'POST',
         headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
         body: formData
