@@ -314,7 +314,7 @@ function openEditModal(id){
     const errorsDiv = document.getElementById('editJamErrors');
     errorsDiv.classList.add('hidden');
     
-    fetch(`{{ url('admin/jamkerja') }}/${id}`)
+    fetch(`{{ url('admin/jamkerja/shift') }}/${id}`)
     .then(res => res.json())
     .then(data => {
         document.getElementById('editJamId').value = data.id;
