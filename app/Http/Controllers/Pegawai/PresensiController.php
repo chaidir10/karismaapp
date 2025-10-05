@@ -54,72 +54,8 @@ class PresensiController extends Controller
     }
 
     /**
-     * Simpan presensi masuk/pulang
+     * Simpan presensi (masuk / pulang)
      */
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'jenis'  => 'required|in:masuk,pulang',
-    //         'lokasi' => 'nullable|string|max:255',
-    //         'foto'   => 'required',
-    //     ]);
-
-    //     $foto_db = null;
-
-    //     try {
-    //         // Simpan foto
-    //         if ($request->hasFile('foto')) {
-    //             $file = $request->file('foto');
-    //             $filename = time() . '_' . $file->getClientOriginalName();
-    //             $file->storeAs('public/presensi', $filename);
-    //             $foto_db = 'presensi/' . $filename;
-    //         } elseif (preg_match('/^data:image\/(\w+);base64,/', $request->foto)) {
-    //             $image_parts = explode(";base64,", $request->foto);
-    //             $image_type_aux = explode("image/", $image_parts[0]);
-    //             $image_type = $image_type_aux[1];
-    //             $image_base64 = base64_decode($image_parts[1]);
-    //             $filename = time() . '.' . $image_type;
-    //             Storage::disk('public')->put('presensi/' . $filename, $image_base64);
-    //             $foto_db = 'presensi/' . $filename;
-    //         } else {
-    //             return back()->withErrors(['foto' => 'Format foto tidak valid']);
-    //         }
-
-    //         // Ambil lokasi user
-    //         $userLocation = explode(',', $request->lokasi);
-    //         $userLat = isset($userLocation[0]) ? floatval($userLocation[0]) : null;
-    //         $userLng = isset($userLocation[1]) ? floatval($userLocation[1]) : null;
-
-    //         // Ambil wilayah kerja user
-    //         $wilayah = Auth::user()->wilayahKerja;
-    //         $status = 'pending';
-
-    //         if ($wilayah && $userLat && $userLng) {
-    //             $radius = $wilayah->radius ?? 100; // meter
-    //             $distance = $this->haversineDistance($userLat, $userLng, $wilayah->latitude, $wilayah->longitude);
-
-    //             if ($distance <= $radius) {
-    //                 $status = 'approved';
-    //             }
-    //         }
-
-    //         Presensi::create([
-    //             'user_id' => Auth::id(),
-    //             'jenis'   => $request->jenis,
-    //             'foto'    => $foto_db,
-    //             'lokasi'  => $request->lokasi,
-    //             'tanggal' => now()->format('Y-m-d'),
-    //             'jam'     => now()->format('H:i:s'),
-    //             'status'  => $status,
-    //         ]);
-
-    //         return redirect()->route('pegawai.dashboard')
-    //             ->with('success', 'Presensi berhasil disimpan dan status: ' . strtoupper($status) . '!');
-    //     } catch (\Exception $e) {
-    //         return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
-    //     }
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -131,18 +67,17 @@ class PresensiController extends Controller
         $foto_db = null;
 
         try {
-            // Simpan foto dengan kompresi
+            // === Simpan foto dengan kompresi ===
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
                 $filename = time() . '_' . $file->getClientOriginalName();
 
-                // Kompres & resize
                 $image = Image::make($file)
                     ->resize(800, null, function ($constraint) {
                         $constraint->aspectRatio();
                         $constraint->upsize();
                     })
-                    ->encode($file->getClientOriginalExtension(), 75); // quality 0-100
+                    ->encode($file->getClientOriginalExtension(), 75);
 
                 Storage::disk('public')->put('presensi/' . $filename, $image);
                 $foto_db = 'presensi/' . $filename;
@@ -152,7 +87,6 @@ class PresensiController extends Controller
                 $image_type = $image_type_aux[1];
                 $image_base64 = base64_decode($image_parts[1]);
 
-                // Kompres & resize
                 $image = Image::make($image_base64)
                     ->resize(800, null, function ($constraint) {
                         $constraint->aspectRatio();
@@ -167,24 +101,34 @@ class PresensiController extends Controller
                 return back()->withErrors(['foto' => 'Format foto tidak valid']);
             }
 
-            // Ambil lokasi user
+            // === Ambil lokasi user ===
             $userLocation = explode(',', $request->lokasi);
             $userLat = isset($userLocation[0]) ? floatval($userLocation[0]) : null;
             $userLng = isset($userLocation[1]) ? floatval($userLocation[1]) : null;
 
-            // Ambil wilayah kerja user
-            $wilayah = Auth::user()->wilayahKerja;
+            // === Cek di semua titik wilayah kerja ===
             $status = 'pending';
 
-            if ($wilayah && $userLat && $userLng) {
-                $radius = $wilayah->radius ?? 100; // meter
-                $distance = $this->haversineDistance($userLat, $userLng, $wilayah->latitude, $wilayah->longitude);
+            if ($userLat && $userLng) {
+                $semuaWilayah = WilayahKerja::all();
 
-                if ($distance <= $radius) {
-                    $status = 'approved';
+                foreach ($semuaWilayah as $wilayah) {
+                    $radius = $wilayah->radius ?? 100; // default 100 meter
+                    $distance = $this->haversineDistance(
+                        $userLat,
+                        $userLng,
+                        $wilayah->latitude,
+                        $wilayah->longitude
+                    );
+
+                    if ($distance <= $radius) {
+                        $status = 'approved';
+                        break; // cukup satu titik cocok
+                    }
                 }
             }
 
+            // === Simpan data presensi ===
             Presensi::create([
                 'user_id' => Auth::id(),
                 'jenis'   => $request->jenis,

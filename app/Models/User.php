@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Presensi;
+use App\Models\WilayahKerja;    
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\JamShift;
+
 
 class User extends Authenticatable
 {
@@ -63,5 +68,10 @@ class User extends Authenticatable
     public function wilayahKerja()
     {
         return $this->belongsTo(WilayahKerja::class, 'unit_id');
+    }
+
+    public function jamShift()
+    {
+        return $this->belongsToMany(JamShift::class, 'user_jam_shift', 'user_id', 'jam_shift_id');
     }
 }
