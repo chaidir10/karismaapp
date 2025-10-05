@@ -414,7 +414,7 @@ function openEditShiftModal(id){
     const errorsDiv = document.getElementById('editShiftErrors');
     errorsDiv.classList.add('hidden');
     
-    fetch(`{{ url('admin/jamshift') }}/${id}`)
+    fetch(`{{ url('admin/jamkerja/shift') }}/${id}`)
     .then(res => res.json())
     .then(data => {
         document.getElementById('editShiftId').value = data.id;
@@ -435,7 +435,7 @@ document.getElementById('formEditShift').addEventListener('submit', function(e){
     const errorsDiv = document.getElementById('editShiftErrors');
     errorsDiv.classList.add('hidden');
 
-    fetch(`{{ url('admin/jamshift') }}/${id}`, {
+    fetch(`{{ url('admin/jamkerja/shift') }}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -464,7 +464,7 @@ document.getElementById('formEditShift').addEventListener('submit', function(e){
 function deleteShift(id){
     if(!confirm('Yakin ingin menghapus shift ini?')) return;
     
-    fetch(`{{ url('admin/jamshift') }}/${id}`, {
+    fetch(`{{ url('admin/jamkerja/shift') }}/${id}`, {
         method: 'DELETE',
         headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
     })
