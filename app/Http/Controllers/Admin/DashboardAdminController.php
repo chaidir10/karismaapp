@@ -1,164 +1,153 @@
 <?php
 
-namespace App\Http\Controllers\Pegawai;
+namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use App\Models\Presensi;
-use App\Models\WilayahKerja;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Presensi;
+use App\Models\PengajuanPresensi;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
-class PresensiController extends Controller
+class DashboardAdminController extends Controller
 {
-    /**
-     * Riwayat presensi hari ini (untuk dashboard pegawai)
-     * Hanya menampilkan presensi yang sudah approved
-     */
-    public function today()
+    public function index()
     {
-        $today = Carbon::today()->format('Y-m-d');
+        $today = Carbon::today()->toDateString();
 
-        $todayPresensi = Presensi::where('user_id', Auth::id())
+        // Jumlah pegawai hadir hari ini (masuk yang approved)
+        $jumlahHadir = Presensi::whereDate('tanggal', $today)
+            ->where('jenis', 'masuk')
+            ->where('status', 'approved')
+            ->distinct('user_id') // hitung unique user
+            ->count('user_id');
+
+        // Total pegawai
+        $jumlahPegawai = User::count();
+
+        // Total pengajuan pending
+        $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
+
+        // Presensi hari ini (masuk & pulang, hanya yang approved)
+        $presensiHariIni = Presensi::with('user')
             ->whereDate('tanggal', $today)
-            ->where('status', 'approved') // hanya approved
+            ->where('status', 'approved') // Hanya yang approved
             ->orderBy('jam', 'asc')
             ->get();
 
-        return view('pegawai.dashboard', [
-            'riwayatHariIni' => $todayPresensi,
-        ]);
-    }
+        // Tandai terlambat + hitung waktu kurang
+        $jamMasukStandard = '07:30:00';
+        $jamPulangStandard = '16:00:00';
+        foreach ($presensiHariIni as $presensi) {
+            $presensi->terlambat = false;
+            $presensi->waktu_kurang_menit = 0;
 
-    /**
-     * Riwayat lengkap dengan filter bulan & grouping per hari
-     * Hanya menampilkan presensi yang sudah approved
-     */
-    public function riwayat(Request $request)
-    {
-        $bulan = $request->get('bulan', Carbon::now()->format('Y-m'));
-
-        $riwayat = Presensi::where('user_id', Auth::id())
-            ->whereYear('tanggal', Carbon::parse($bulan)->year)
-            ->whereMonth('tanggal', Carbon::parse($bulan)->month)
-            ->where('status', 'approved') // hanya approved
-            ->orderBy('tanggal', 'desc')
-            ->orderBy('jam', 'asc')
-            ->get()
-            ->groupBy(function ($item) {
-                return Carbon::parse($item->tanggal)->translatedFormat('d F Y');
-            });
-
-        return view('pegawai.riwayat', [
-            'riwayat' => $riwayat,
-            'bulan'   => $bulan,
-        ]);
-    }
-
-    /**
-     * Simpan presensi masuk/pulang
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'jenis'  => 'required|in:masuk,pulang',
-            'lokasi' => 'nullable|string|max:255',
-            'foto'   => 'required',
-        ]);
-
-        $foto_db = null;
-
-        try {
-            // Simpan foto
-            if ($request->hasFile('foto')) {
-                $file = $request->file('foto');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('public/presensi', $filename);
-                $foto_db = 'presensi/' . $filename;
-            } elseif (preg_match('/^data:image\/(\w+);base64,/', $request->foto)) {
-                $image_parts = explode(";base64,", $request->foto);
-                $image_type_aux = explode("image/", $image_parts[0]);
-                $image_type = $image_type_aux[1];
-                $image_base64 = base64_decode($image_parts[1]);
-                $filename = time() . '.' . $image_type;
-                Storage::disk('public')->put('presensi/' . $filename, $image_base64);
-                $foto_db = 'presensi/' . $filename;
-            } else {
-                return back()->withErrors(['foto' => 'Format foto tidak valid']);
+            if ($presensi->jenis === 'masuk' && $presensi->jam > $jamMasukStandard) {
+                $presensi->terlambat = true;
+                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasukStandard)) / 60);
             }
 
-            // Ambil lokasi user
-            $userLocation = explode(',', $request->lokasi);
-            $userLat = isset($userLocation[0]) ? floatval($userLocation[0]) : null;
-            $userLng = isset($userLocation[1]) ? floatval($userLocation[1]) : null;
-
-            // Ambil wilayah kerja user
-            $wilayah = Auth::user()->wilayahKerja;
-            $status = 'pending'; // default pending jika di luar radius
-
-            if ($wilayah && $userLat && $userLng) {
-                $radius = $wilayah->radius ?? 100; // meter
-                $distance = $this->haversineDistance($userLat, $userLng, $wilayah->latitude, $wilayah->longitude);
-
-                if ($distance <= $radius) {
-                    $status = 'approved';
-                }
+            if ($presensi->jenis === 'pulang' && $presensi->jam < $jamPulangStandard) {
+                $presensi->waktu_kurang_menit = intval((strtotime($jamPulangStandard) - strtotime($presensi->jam)) / 60);
             }
-
-            Presensi::create([
-                'user_id' => Auth::id(),
-                'jenis'   => $request->jenis,
-                'foto'    => $foto_db,
-                'lokasi'  => $request->lokasi,
-                'tanggal' => now()->format('Y-m-d'),
-                'jam'     => now()->format('H:i:s'),
-                'status'  => $status,
-            ]);
-
-            return redirect()->route('pegawai.dashboard')
-                ->with('success', 'Presensi berhasil disimpan dan status: ' . strtoupper($status) . '!');
-
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
+
+        // Pengajuan pending
+        $pengajuanPending = PengajuanPresensi::with('user')
+            ->where('status', 'pending')
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
+        // Presensi pending (untuk admin approve/reject)
+        $presensiPending = Presensi::with('user')
+            ->where('status', 'pending') // hanya pending
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'jumlahHadir',
+            'jumlahPegawai',
+            'jumlahPengajuan',
+            'presensiHariIni',
+            'pengajuanPending',
+            'presensiPending'
+        ));
     }
 
-    /**
-     * Hapus presensi sekaligus file foto
-     */
-    public function destroy($id)
+    // ----- Fungsi Approve/Reject Pengajuan -----
+    public function approve($id)
+    {
+        $pengajuan = PengajuanPresensi::findOrFail($id);
+
+        DB::transaction(function () use ($pengajuan) {
+            $jamMasukDefault = '07:30:00';
+            $jamPulangDefault = '16:00:00';
+
+            if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'kedua') {
+                Presensi::updateOrCreate(
+                    [
+                        'user_id' => $pengajuan->user_id,
+                        'tanggal' => $pengajuan->tanggal,
+                        'jenis' => 'masuk'
+                    ],
+                    [
+                        'jam' => $jamMasukDefault,
+                        'status' => 'approved',
+                        'foto' => $pengajuan->bukti ?? null,
+                        'lokasi' => $pengajuan->lokasi ?? null
+                    ]
+                );
+            }
+
+            if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'kedua') {
+                Presensi::updateOrCreate(
+                    [
+                        'user_id' => $pengajuan->user_id,
+                        'tanggal' => $pengajuan->tanggal,
+                        'jenis' => 'pulang'
+                    ],
+                    [
+                        'jam' => $jamPulangDefault,
+                        'status' => 'approved',
+                        'foto' => $pengajuan->bukti ?? null,
+                        'lokasi' => $pengajuan->lokasi ?? null
+                    ]
+                );
+            }
+
+            $pengajuan->status = 'approved';
+            $pengajuan->save();
+        });
+
+        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
+    }
+
+    public function reject($id)
+    {
+        $pengajuan = PengajuanPresensi::findOrFail($id);
+        $pengajuan->status = 'rejected';
+        $pengajuan->save();
+
+        return redirect()->back()->with('success', 'Pengajuan ditolak.');
+    }
+
+    // ----- Fungsi Approve/Reject Presensi Pending -----
+    public function approvePresensi($id)
     {
         $presensi = Presensi::findOrFail($id);
+        $presensi->status = 'approved';
+        $presensi->save();
 
-        if ($presensi->foto && Storage::disk('public')->exists($presensi->foto)) {
-            Storage::disk('public')->delete($presensi->foto);
-        }
-
-        $presensi->delete();
-
-        return redirect()->route('pegawai.dashboard')
-            ->with('success', 'Presensi berhasil dihapus!');
+        return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
     }
 
-    /**
-     * Hitung jarak antara 2 titik koordinat (Haversine)
-     */
-    private function haversineDistance($lat1, $lng1, $lat2, $lng2)
+    public function rejectPresensi($id)
     {
-        $earthRadius = 6371000; // meter
+        $presensi = Presensi::findOrFail($id);
+        $presensi->status = 'rejected';
+        $presensi->save();
 
-        $latFrom = deg2rad($lat1);
-        $lngFrom = deg2rad($lng1);
-        $latTo = deg2rad($lat2);
-        $lngTo = deg2rad($lng2);
-
-        $latDelta = $latTo - $latFrom;
-        $lngDelta = $lngTo - $lngFrom;
-
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-            cos($latFrom) * cos($latTo) * pow(sin($lngDelta / 2), 2)));
-
-        return $angle * $earthRadius;
+        return redirect()->back()->with('success', 'Presensi ditolak.');
     }
 }
