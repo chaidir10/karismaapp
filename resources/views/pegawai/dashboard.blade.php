@@ -570,7 +570,27 @@ function showConfirmationModal(){
     confirmationModal.show();
 }
 
+function showSuccessConfirmationModal(){
+    const jenis = document.getElementById('jenisPresensi').value;
+    const waktu = new Date().toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+    });
+    
+    // Update modal konfirmasi dalam radius
+    document.getElementById('successConfirmationJenis').textContent = jenis.toUpperCase();
+    document.getElementById('successConfirmationWaktu').textContent = waktu;
+    document.getElementById('successConfirmationLokasi').textContent = document.getElementById('location-address-mini').textContent;
 
+    // Reset tombol konfirmasi
+    const confirmBtn = document.getElementById('successConfirmPresensiBtn');
+    confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Ya, Presensi';
+    confirmBtn.disabled = false;
+
+    // Tampilkan modal konfirmasi
+    const confirmationModal = new bootstrap.Modal(document.getElementById('successConfirmationModal'));
+    confirmationModal.show();
+}
 
 function langsungProsesPresensi(){
     prosesPresensi(true);
