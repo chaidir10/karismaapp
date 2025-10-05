@@ -211,56 +211,7 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi Dalam Radius -->
-<div class="modal fade" id="successConfirmationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-2xl">
-            <div class="modal-body p-0">
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-check-circle text-green-500 text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Konfirmasi Presensi</h3>
-                    <p class="text-gray-600 mb-4">Anda berada di dalam radius wilayah kerja. Lanjutkan presensi?</p>
-                    
-                    <div class="confirmation-details bg-gray-50 rounded-xl p-4 mb-4">
-                        <div class="grid grid-cols-2 gap-4 text-left">
-                            <div>
-                                <div class="text-xs text-gray-500 mb-1">Jenis Presensi</div>
-                                <div id="successConfirmationJenis" class="font-semibold text-gray-800"></div>
-                            </div>
-                            <div>
-                                <div class="text-xs text-gray-500 mb-1">Waktu</div>
-                                <div id="successConfirmationWaktu" class="font-semibold text-gray-800"></div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <div class="text-xs text-gray-500 mb-1">Lokasi Saat Ini</div>
-                            <div id="successConfirmationLokasi" class="font-semibold text-gray-800 text-sm"></div>
-                        </div>
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
-                            <div class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
-                                <div class="text-xs text-green-700">
-                                    <strong>Lokasi Valid:</strong> Anda berada di dalam radius wilayah kerja. Presensi akan langsung diproses.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="flex border-t border-gray-200">
-                    <button type="button" class="flex-1 py-4 text-gray-600 font-medium hover:bg-gray-50 rounded-bl-2xl transition-colors" data-bs-dismiss="modal">
-                        <i class="fas fa-times mr-2"></i>Batal
-                    </button>
-                    <button type="button" class="flex-1 py-4 bg-green-500 text-white font-medium hover:bg-green-600 rounded-br-2xl transition-colors" onclick="langsungProsesPresensi()" id="successConfirmPresensiBtn">
-                        <i class="fas fa-check mr-2"></i>Ya, Presensi
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Toast Notifikasi -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
@@ -619,27 +570,7 @@ function showConfirmationModal(){
     confirmationModal.show();
 }
 
-function showSuccessConfirmationModal(){
-    const jenis = document.getElementById('jenisPresensi').value;
-    const waktu = new Date().toLocaleTimeString('id-ID', { 
-        hour: '2-digit', 
-        minute: '2-digit'
-    });
-    
-    // Update modal konfirmasi dalam radius
-    document.getElementById('successConfirmationJenis').textContent = jenis.toUpperCase();
-    document.getElementById('successConfirmationWaktu').textContent = waktu;
-    document.getElementById('successConfirmationLokasi').textContent = document.getElementById('location-address-mini').textContent;
 
-    // Reset tombol konfirmasi
-    const confirmBtn = document.getElementById('successConfirmPresensiBtn');
-    confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Ya, Presensi';
-    confirmBtn.disabled = false;
-
-    // Tampilkan modal konfirmasi
-    const confirmationModal = new bootstrap.Modal(document.getElementById('successConfirmationModal'));
-    confirmationModal.show();
-}
 
 function langsungProsesPresensi(){
     prosesPresensi(true);
