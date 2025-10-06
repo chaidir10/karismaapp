@@ -150,6 +150,7 @@
         display: flex;
         align-items: center;
         padding: 15px;
+        margin-bottom: 10px;
         background-color: var(--light);
         border-radius: 16px;
         transition: all 0.2s ease;
