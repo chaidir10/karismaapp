@@ -20,7 +20,7 @@ class DashboardAdminController extends Controller
         $jumlahHadir = Presensi::whereDate('tanggal', $today)
             ->where('jenis', 'masuk')
             ->where('status', 'approved')
-            ->distinct('user_id') // hitung unique user
+            ->distinct('user_id')
             ->count('user_id');
 
         // Total pegawai
@@ -32,24 +32,37 @@ class DashboardAdminController extends Controller
         // Presensi hari ini (masuk & pulang, hanya yang approved)
         $presensiHariIni = Presensi::with('user')
             ->whereDate('tanggal', $today)
-            ->where('status', 'approved') // Hanya yang approved
+            ->where('status', 'approved')
             ->orderBy('jam', 'asc')
             ->get();
 
-        // Tandai terlambat + hitung waktu kurang
+        // Standar jam kerja
         $jamMasukStandard = '07:30:00';
         $jamPulangStandard = '16:00:00';
+
         foreach ($presensiHariIni as $presensi) {
             $presensi->terlambat = false;
             $presensi->waktu_kurang_menit = 0;
+            $presensi->lembur_menit = 0;
 
-            if ($presensi->jenis === 'masuk' && $presensi->jam > $jamMasukStandard) {
+            $hari = Carbon::parse($presensi->tanggal)->format('l'); // Nama hari (Monday, etc.)
+
+            // === Cek Terlambat ===
+            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:30:59') {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasukStandard)) / 60);
             }
 
+            // === Cek Pulang Kurang Waktu ===
             if ($presensi->jenis === 'pulang' && $presensi->jam < $jamPulangStandard) {
                 $presensi->waktu_kurang_menit = intval((strtotime($jamPulangStandard) - strtotime($presensi->jam)) / 60);
+            }
+
+            // === Cek Lembur (hanya weekend) ===
+            if ($presensi->jenis === 'pulang' && in_array($hari, ['Saturday', 'Sunday'])) {
+                if ($presensi->jam > $jamPulangStandard) {
+                    $presensi->lembur_menit = intval((strtotime($presensi->jam) - strtotime($jamPulangStandard)) / 60);
+                }
             }
         }
 
@@ -61,7 +74,7 @@ class DashboardAdminController extends Controller
 
         // Presensi pending (untuk admin approve/reject)
         $presensiPending = Presensi::with('user')
-            ->where('status', 'pending') // hanya pending
+            ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
             ->get();
 
