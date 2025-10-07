@@ -80,7 +80,7 @@
         border: 1px solid var(--gray-light);
         border-radius: 12px;
         padding: 14px 16px;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         font-size: 16px;
         background: var(--white);
         transition: all 0.3s;
@@ -128,7 +128,7 @@
     }
 
     .date-section {
-        margin-bottom: 24px;
+        margin-bottom: 15px;
     }
 
     .date-divider {
