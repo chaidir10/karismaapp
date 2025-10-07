@@ -621,6 +621,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(refreshDashboard, 1000);
 });
 </script>
-@endsection
+
 
 @endsection
