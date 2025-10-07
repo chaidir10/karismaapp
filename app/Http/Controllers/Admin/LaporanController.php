@@ -63,6 +63,7 @@ class LaporanController extends Controller
                     'pulang_cepat'  => '-',
                     'jam_kerja'     => '-',
                     'waktu_kurang'  => '-',
+                    'lembur'        => '-',
                     'is_weekend'    => $isWeekend,
                 ];
 
@@ -70,31 +71,42 @@ class LaporanController extends Controller
                     $jamMasukObj  = Carbon::createFromFormat('H:i', Carbon::parse($masuk->jam)->format('H:i'));
                     $jamPulangObj = Carbon::createFromFormat('H:i', Carbon::parse($pulang->jam)->format('H:i'));
 
+                    $jamKerja = $jamMasukObj->diffInMinutes($jamPulangObj);
+
                     if ($isWeekend) {
-                        $jamKerja = $jamMasukObj->diffInMinutes($jamPulangObj);
+                        // Akhir pekan = semua jam dianggap lembur
                         $row['jam_kerja'] = $jamKerja;
+                        $row['lembur'] = $jamKerja;
                         $totalLembur += $jamKerja;
                     } else {
-                        // Keterlambatan
+                        // Hari kerja normal
+                        $jamKerjaWajib = $jamMasukDefault->diffInMinutes($jamPulangDefault);
+
+                        // Hitung keterlambatan dan pulang cepat
                         $keterlambatan = $jamMasukObj->gt($jamMasukDefault)
-                            ? abs($jamMasukObj->diffInMinutes($jamMasukDefault))
+                            ? $jamMasukObj->diffInMinutes($jamMasukDefault)
                             : 0;
 
-                        // Pulang cepat
                         $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
-                            ? abs($jamPulangDefault->diffInMinutes($jamPulangObj))
+                            ? $jamPulangDefault->diffInMinutes($jamPulangObj)
                             : 0;
 
-                        // Jam kerja dan waktu kurang
-                        $jamKerja      = abs($jamMasukObj->diffInMinutes($jamPulangObj));
-                        $jamKerjaWajib = abs($jamMasukDefault->diffInMinutes($jamPulangDefault));
-                        $waktuKurang   = abs($jamKerjaWajib - $jamKerja);
+                        // Hitung waktu kurang (hanya jika < jam wajib)
+                        $waktuKurang = $jamKerja < $jamKerjaWajib
+                            ? $jamKerjaWajib - $jamKerja
+                            : 0;
 
+                        // Tidak ada lembur di hari kerja biasa
+                        $lembur = 0;
+
+                        // Simpan ke baris
                         $row['keterlambatan'] = $keterlambatan ?: '-';
                         $row['pulang_cepat']  = $pulangCepat ?: '-';
                         $row['jam_kerja']     = $jamKerja ?: '-';
                         $row['waktu_kurang']  = $waktuKurang ?: '-';
+                        $row['lembur']        = '-';
 
+                        // Akumulasi
                         $totalKeterlambatan += $keterlambatan;
                         $totalPulangCepat   += $pulangCepat;
                         $totalJamKerja      += $jamKerja;
