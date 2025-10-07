@@ -98,7 +98,7 @@
                 Untuk menginstal di iPhone atau iPad:
             </p>
             <ol class="text-left text-slate-700 space-y-2 text-sm">
-                <li>1️⃣ Tekan ikon <strong>Bagikan</strong> di Safari (kotak + panah ke atas)</li>
+                <li>1️⃣ Tekan ikon <strong><i class="fa-solid fa-arrow-up-from-bracket"></i> Bagikan</strong> di Safari</li>
                 <li>2️⃣ Gulir ke bawah, pilih <strong>Tambahkan ke Layar Utama</strong></li>
                 <li>3️⃣ Tekan <strong>Tambahkan</strong> untuk menginstal</li>
             </ol>
