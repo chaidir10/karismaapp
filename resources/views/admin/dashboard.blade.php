@@ -595,4 +595,32 @@
         }
     }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dashboardContainer = document.querySelector('.admin-dashboard');
+
+    // Fungsi untuk memperbarui isi dashboard
+    function refreshDashboard() {
+        fetch('{{ route("admin.dashboard") }}', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContent = doc.querySelector('.admin-dashboard');
+            if (newContent) {
+                dashboardContainer.innerHTML = newContent.innerHTML;
+                console.log("✅ Dashboard diperbarui otomatis");
+            }
+        })
+        .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
+    }
+
+    // Jalankan setiap 30 detik (30000 ms)
+    setInterval(refreshDashboard, 1000);
+});
+</script>
+@endsection
+
 @endsection
