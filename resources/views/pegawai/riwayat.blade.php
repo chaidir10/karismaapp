@@ -132,7 +132,7 @@
     }
 
     .date-divider {
-        padding: 5px 0 10px 0;
+        padding: 0px 0 5px 0;
         border-bottom: 2px solid var(--primary);
         margin-bottom: 12px;
         position: relative;
