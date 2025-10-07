@@ -128,7 +128,7 @@
     }
 
     .date-section {
-        margin-bottom: 15px;
+        margin-bottom: 5px;
     }
 
     .date-divider {
