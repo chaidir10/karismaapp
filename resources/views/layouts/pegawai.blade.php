@@ -325,6 +325,67 @@
             color: var(--primary);
         }
 
+        /* Loading Spinner Styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-spinner-full {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(90, 182, 234, 0.2);
+        }
+
+        /* Page transition */
+        .page-transition {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Prevent loading on active nav items */
+        .nav-item.active {
+            pointer-events: none;
+        }
+
+        /* Smooth transitions for all interactive elements */
+        a, button, .nav-item {
+            transition: all 0.3s ease;
+        }
+
         /* Modal Styles - Full Screen Mobile */
         .modal-fullscreen-mobile {
             width: 100vw;
@@ -839,6 +900,14 @@
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-full"></div>
+            <div class="loading-text">Memuat...</div>
+        </div>
+    </div>
+
     <!-- External JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -854,8 +923,234 @@
                     });
             });
         }
-    </script>
 
+        // Loading handler
+        class LoadingManager {
+            constructor() {
+                this.loadingOverlay = document.getElementById('loadingOverlay');
+                this.isLoading = false;
+                this.init();
+            }
+
+            init() {
+                // Intercept all link clicks
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('a');
+                    if (link && this.shouldShowLoading(link)) {
+                        e.preventDefault();
+                        this.show();
+                        
+                        // Navigate after showing loading
+                        setTimeout(() => {
+                            window.location.href = link.href;
+                        }, 100);
+                    }
+                });
+
+                // Handle browser back/forward buttons
+                window.addEventListener('popstate', () => {
+                    this.show();
+                });
+
+                // Show loading when page is about to unload
+                window.addEventListener('beforeunload', () => {
+                    this.show();
+                });
+
+                // Hide loading when page is fully loaded
+                window.addEventListener('load', () => {
+                    this.hide();
+                });
+
+                // Also hide loading when DOM is ready
+                document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(() => this.hide(), 500);
+                });
+
+                // Intercept form submissions
+                document.addEventListener('submit', (e) => {
+                    this.show('Mengirim data...');
+                });
+
+                // Intercept AJAX requests
+                this.interceptAjax();
+            }
+
+            shouldShowLoading(link) {
+                // Don't show loading for same page anchors, external links, or links with no-href
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || 
+                    link.target === '_blank' || link.hasAttribute('download')) {
+                    return false;
+                }
+                
+                // Only show for internal links
+                try {
+                    const url = new URL(href, window.location.origin);
+                    return url.origin === window.location.origin;
+                } catch {
+                    return true; // Assume internal for relative URLs
+                }
+            }
+
+            interceptAjax() {
+                const originalFetch = window.fetch;
+                const originalXHROpen = XMLHttpRequest.prototype.open;
+                const originalXHRSend = XMLHttpRequest.prototype.send;
+
+                let activeRequests = 0;
+
+                // Intercept fetch
+                window.fetch = (...args) => {
+                    activeRequests++;
+                    this.show();
+                    
+                    return originalFetch.apply(this, args)
+                        .then(response => {
+                            activeRequests--;
+                            if (activeRequests === 0) {
+                                setTimeout(() => this.hide(), 300);
+                            }
+                            return response;
+                        })
+                        .catch(error => {
+                            activeRequests--;
+                            if (activeRequests === 0) {
+                                this.hide();
+                            }
+                            throw error;
+                        });
+                };
+
+                // Intercept XMLHttpRequest
+                XMLHttpRequest.prototype.open = function(...args) {
+                    this._url = args[1];
+                    return originalXHROpen.apply(this, args);
+                };
+
+                XMLHttpRequest.prototype.send = function(...args) {
+                    // Don't show loading for specific endpoints if needed
+                    if (this._url && !this._url.includes('/api/')) {
+                        activeRequests++;
+                        this.show();
+                    }
+
+                    this.addEventListener('loadend', () => {
+                        if (this._url && !this._url.includes('/api/')) {
+                            activeRequests--;
+                            if (activeRequests === 0) {
+                                setTimeout(() => this.hide(), 300);
+                            }
+                        }
+                    });
+
+                    return originalXHRSend.apply(this, args);
+                };
+            }
+
+            show(message = 'Memuat...') {
+                if (this.isLoading) return;
+                
+                this.isLoading = true;
+                const textElement = this.loadingOverlay.querySelector('.loading-text');
+                if (textElement) {
+                    textElement.textContent = message;
+                }
+                
+                this.loadingOverlay.classList.add('active');
+                
+                // Auto hide after 10 seconds as fallback
+                this.timeout = setTimeout(() => {
+                    this.hide();
+                }, 10000);
+            }
+
+            hide() {
+                this.isLoading = false;
+                clearTimeout(this.timeout);
+                this.loadingOverlay.classList.remove('active');
+            }
+        }
+
+        // Initialize loading manager when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.loadingManager = new LoadingManager();
+            
+            // Add page transition class to main content
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.classList.add('page-transition');
+            }
+
+            // Update greeting based on time
+            updateGreeting();
+        });
+
+        // Function to show loading manually (can be called from other scripts)
+        function showLoading(message = 'Memuat...') {
+            if (window.loadingManager) {
+                window.loadingManager.show(message);
+            }
+        }
+
+        // Function to hide loading manually
+        function hideLoading() {
+            if (window.loadingManager) {
+                window.loadingManager.hide();
+            }
+        }
+
+        // Update greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingElement = document.getElementById('greeting');
+            
+            if (greetingElement) {
+                let greeting = 'Selamat pagi';
+                if (hour >= 12 && hour < 15) {
+                    greeting = 'Selamat siang';
+                } else if (hour >= 15 && hour < 19) {
+                    greeting = 'Selamat sore';
+                } else if (hour >= 19 || hour < 4) {
+                    greeting = 'Selamat malam';
+                }
+                greetingElement.textContent = greeting;
+            }
+        }
+
+        // Handle Turbolinks if used (for Laravel Livewire, Inertia.js, etc.)
+        if (typeof Turbolinks !== 'undefined') {
+            document.addEventListener('turbolinks:click', () => {
+                showLoading();
+            });
+            
+            document.addEventListener('turbolinks:load', () => {
+                setTimeout(hideLoading, 500);
+            });
+        }
+
+        // Handle Livewire if used
+        if (typeof Livewire !== 'undefined') {
+            Livewire.hook('request', ({ uri, options }) => {
+                showLoading('Memproses...');
+            });
+
+            Livewire.hook('response', ({ component, success }) => {
+                setTimeout(hideLoading, 300);
+            });
+        }
+
+        // Example usage for custom buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attach loading to all buttons with data-loading attribute
+            document.querySelectorAll('[data-loading]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const message = this.getAttribute('data-loading-message') || 'Memproses...';
+                    showLoading(message);
+                });
+            });
+        });
+    </script>
 
     <!-- Push scripts dari child blade -->
     @stack('scripts')
