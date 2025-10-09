@@ -5,22 +5,24 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg flex justify-between items-center flex-wrap gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-white">Manajemen Jam Kerja & Shift</h1>
-            <p class="text-blue-100 mt-1">Kelola jam kerja dan shift pegawai</p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-            <button onclick="openModal('modalAddJam')"
-                class="bg-white hover:bg-gray-100 text-blue-600 px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md">
-                <i class="fas fa-plus mr-2"></i>
-                Tambah Jam Kerja
-            </button>
-            <button onclick="openModal('modalAddShift')"
-                class="bg-white hover:bg-gray-100 text-green-600 px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md">
-                <i class="fas fa-plus mr-2"></i>
-                Tambah Jam Shift
-            </button>
+    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Manajemen Jam Kerja & Shift</h1>
+                <p class="text-blue-100 mt-1">Kelola jam kerja dan shift pegawai</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="openModal('modalAddJam')" 
+                        class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>
+                    Tambah Jam Kerja
+                </button>
+                <button onclick="openModal('modalAddShift')" 
+                        class="btn-success">
+                    <i class="fas fa-plus mr-2"></i>
+                    Tambah Jam Shift
+                </button>
+            </div>
         </div>
     </div>
 
@@ -47,15 +49,17 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $jam->hari }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900">{{ $jam->jam_masuk }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900">{{ $jam->jam_pulang }}</td>
-                            <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-                                <button onclick="openEditModal({{ $jam->id }})"
-                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteJam({{ $jam->id }})"
-                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <td class="px-6 py-4 text-right text-sm font-medium">
+                                <div class="action-buttons">
+                                    <button onclick="openEditModal({{ $jam->id }})"
+                                        class="btn-edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteJam({{ $jam->id }})"
+                                        class="btn-delete" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -85,15 +89,17 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $shift->nama }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900">{{ $shift->jam_masuk }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900">{{ $shift->jam_pulang }}</td>
-                            <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-                                <button onclick="openEditShiftModal({{ $shift->id }})"
-                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteShift({{ $shift->id }})"
-                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <td class="px-6 py-4 text-right text-sm font-medium">
+                                <div class="action-buttons">
+                                    <button onclick="openEditShiftModal({{ $shift->id }})"
+                                        class="btn-edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteShift({{ $shift->id }})"
+                                        class="btn-delete" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -261,6 +267,88 @@
         </form>
     </div>
 </div>
+
+<style>
+    /* Action Buttons - Konsisten dengan Dashboard */
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: flex-end;
+    }
+
+    .btn-edit,
+    .btn-delete {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 12px;
+    }
+
+    .btn-edit {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .btn-edit:hover {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .btn-delete:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    /* Button Styles untuk Header */
+    .btn-primary {
+        background: white;
+        color: #3b82f6;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-success {
+        background: white;
+        color: #10b981;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-success:hover {
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+</style>
 @endsection
 
 @push('scripts')
