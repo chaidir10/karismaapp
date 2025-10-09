@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <!-- Favicon -->
-    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
@@ -71,11 +70,44 @@
             }
         }
 
-        /* Sidebar styling */
+        /* Layout utama */
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar styling - FIXED */
         .sidebar {
             width: 250px;
             background: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 40;
+            display: none; /* Default hidden untuk mobile */
+        }
+
+        /* Sidebar untuk desktop */
+        @media (min-width: 640px) {
+            .sidebar {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto; /* Scroll sendiri untuk sidebar */
+        }
+
+        .sidebar-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 1rem;
         }
 
         .sidebar-item {
@@ -110,11 +142,30 @@
             text-transform: uppercase;
         }
 
+        /* Content area */
+        .content-area {
+            flex: 1;
+            margin-left: 0; /* Default untuk mobile */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Untuk desktop, beri margin kiri sesuai lebar sidebar */
+        @media (min-width: 640px) {
+            .content-area {
+                margin-left: 250px;
+            }
+        }
+
         /* Topbar styling */
         .topbar {
             background: white;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 1rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
         }
 
         .user-avatar {
@@ -122,6 +173,13 @@
             height: 35px;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            overflow-y: auto; /* Scroll sendiri untuk konten */
+            background: #f9fafb;
         }
 
         /* Modal Konfirmasi Logout */
@@ -220,6 +278,35 @@
             transform: translateY(-1px);
             box-shadow: 0 6px 8px -1px rgba(239, 68, 68, 0.4);
         }
+
+        /* Mobile sidebar styles */
+        .mobile-sidebar {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .mobile-sidebar-content {
+            width: 250px;
+            height: 100%;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+        }
     </style>
 </head>
 
@@ -243,61 +330,58 @@
         </div>
     </div>
 
-    <div class="min-h-screen flex flex-col sm:flex-row">
+    <div class="main-container">
         <!-- Desktop Sidebar -->
-        <div class="sidebar hidden sm:flex flex-col">
-            <div class="p-4 border-b">
-                <h2 class="text-xl font-bold text-blue-400">Admin Panel</h2>
-            </div>
-            <div class="flex-1 p-2">
-                <div class="sidebar-title">Menu Utama</div>
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-item @if(request()->routeIs('admin.dashboard')) active @endif">
-                    <i class="fas fa-home"></i>
-                    Dashboard
-                </a>
-                <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
-                    <i class="fas fa-users"></i>
-                    Pegawai
-                </a>
-                <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
-                    <i class="fas fa-clock"></i>
-                    Jam Kerja
-                </a>
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <div class="p-4 border-b">
+                    <h2 class="text-xl font-bold text-blue-400">Admin Panel</h2>
+                </div>
+                <div class="sidebar-scrollable">
+                    <div class="p-2">
+                        <div class="sidebar-title">Menu Utama</div>
+                        <a href="{{ route('admin.dashboard') }}" class="sidebar-item @if(request()->routeIs('admin.dashboard')) active @endif">
+                            <i class="fas fa-home"></i>
+                            Dashboard
+                        </a>
+                        <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
+                            <i class="fas fa-users"></i>
+                            Pegawai
+                        </a>
+                        <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
+                            <i class="fas fa-clock"></i>
+                            Jam Kerja
+                        </a>
 
-                <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
-                    <i class="fas fa-map-marker-alt"></i>
-                    Lokasi
-                </a>
+                        <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Lokasi
+                        </a>
 
-                <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
-                    <i class="fas fa-chart-bar"></i>
-                    Laporan
-                </a>
+                        <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
+                            <i class="fas fa-chart-bar"></i>
+                            Laporan
+                        </a>
 
+                        <div class="sidebar-title mt-6">Pengaturan</div>
+                        <a href="" class="sidebar-item">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                        <a href="#" class="sidebar-item logout-trigger">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
 
-                <div class="sidebar-title mt-6">Pengaturan</div>
-                <a href="" class="sidebar-item">
-                    <i class="fas fa-cog"></i>
-                    Settings
-                </a>
-                <a href="#" class="sidebar-item logout-trigger">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                    @csrf
-                </form>
-
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                            @csrf
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Mobile sidebar toggle -->
-        <button id="sidebarToggle" class="sm:hidden fixed bottom-4 right-4 bg-indigo-600 text-white p-3 rounded-full shadow-lg z-50">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <!-- Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Content Area -->
+        <div class="content-area">
             <!-- Topbar -->
             <div class="topbar flex justify-between items-center">
                 <div class="flex items-center">
@@ -316,53 +400,60 @@
             </div>
 
             <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto p-2 sm:p-4 bg-gray-50">
+            <main class="main-content p-2 sm:p-4">
                 @yield('content')
             </main>
         </div>
     </div>
 
-    {{-- Mobile Sidebar Overlay --}}
-    <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"></div>
+    <!-- Mobile sidebar toggle -->
+    <button id="sidebarToggle" class="sm:hidden fixed bottom-4 right-4 bg-indigo-600 text-white p-3 rounded-full shadow-lg z-50">
+        <i class="fas fa-bars"></i>
+    </button>
 
-    {{-- Mobile Sidebar --}}
-    <div id="mobileSidebar" class="hidden fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50 transform -translate-x-full sm:hidden transition-transform duration-300 ease-in-out">
-        <div class="p-4 border-b">
-            <h2 class="text-xl font-bold text-indigo-600">Admin Panel</h2>
-        </div>
-        <div class="flex-1 p-2">
-            <div class="sidebar-title">Menu Utama</div>
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-item @if(request()->routeIs('admin.dashboard')) active @endif">
-                <i class="fas fa-home"></i>
-                Dashboard
-            </a>
-            <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
-                <i class="fas fa-users"></i>
-                Pegawai
-            </a>
-            <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
-                <i class="fas fa-clock"></i>
-                Jam Kerja
-            </a>
-            <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
-                <i class="fas fa-map-marker-alt"></i>
-                Lokasi
-            </a>
-            <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
-                <i class="fas fa-chart-bar"></i>
-                Laporan
-            </a>
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar sm:hidden">
+        <div class="mobile-sidebar-content">
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-bold text-indigo-600">Admin Panel</h2>
+            </div>
+            <div class="sidebar-scrollable">
+                <div class="p-2">
+                    <div class="sidebar-title">Menu Utama</div>
+                    <a href="{{ route('admin.dashboard') }}" class="sidebar-item @if(request()->routeIs('admin.dashboard')) active @endif">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
+                        <i class="fas fa-users"></i>
+                        Pegawai
+                    </a>
+                    <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
+                        <i class="fas fa-clock"></i>
+                        Jam Kerja
+                    </a>
+                    <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Lokasi
+                    </a>
+                    <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
+                        <i class="fas fa-chart-bar"></i>
+                        Laporan
+                    </a>
 
-            <div class="sidebar-title mt-6">Pengaturan</div>
-            <a href="" class="sidebar-item">
-                <i class="fas fa-cog"></i>
-                Settings
-            </a>
-            <a href="#" class="sidebar-item logout-trigger">
-                <i class="fas fa-sign-out-alt"></i>
-                Logout
-            </a>
+                    <div class="sidebar-title mt-6">Pengaturan</div>
+                    <a href="" class="sidebar-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="#" class="sidebar-item logout-trigger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
         </div>
+        <div class="mobile-sidebar-overlay" id="sidebarOverlay"></div>
     </div>
 
     <script>
@@ -391,19 +482,19 @@
                 document.body.style.overflow = '';
             }
 
+            function openMobileSidebar() {
+                mobileSidebar.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
             function closeMobileSidebar() {
-                mobileSidebar.classList.add('hidden');
-                mobileSidebar.classList.remove('translate-x-0');
-                mobileSidebar.classList.add('-translate-x-full');
-                sidebarOverlay.classList.add('hidden');
+                mobileSidebar.classList.remove('open');
+                document.body.style.overflow = '';
             }
 
             // Mobile sidebar events
             sidebarToggle.addEventListener('click', function() {
-                mobileSidebar.classList.toggle('hidden');
-                mobileSidebar.classList.toggle('-translate-x-full');
-                mobileSidebar.classList.toggle('translate-x-0');
-                sidebarOverlay.classList.toggle('hidden');
+                openMobileSidebar();
             });
 
             sidebarOverlay.addEventListener('click', closeMobileSidebar);
@@ -446,6 +537,7 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeLogoutModal();
+                    closeMobileSidebar();
                 }
             });
         });
