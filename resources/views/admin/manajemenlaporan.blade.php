@@ -8,7 +8,7 @@
     body {
         font-family: 'Poppins', sans-serif;
     }
-
+    
     .notification {
         position: fixed;
         top: 20px;
@@ -73,7 +73,7 @@
                 <select name="user_id" id="user_id" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm">
                     <option value="">Semua Pegawai</option>
                     @foreach($users as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
+                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
                     @endforeach
                 </select>
             </div>
@@ -156,7 +156,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         // Event listener untuk form filter
-        document.getElementById('formFilter').addEventListener('submit', function(e) {
+        document.getElementById('formFilter').addEventListener('submit', function(e){
             e.preventDefault();
 
             const userId = document.getElementById('user_id').value;
@@ -176,13 +176,13 @@
             `;
 
             fetch("{{ route('admin.laporan.data') }}?user_id=" + userId + "&bulan=" + bulan)
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.getElementById('laporanBody');
-                    tbody.innerHTML = '';
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('laporanBody');
+                tbody.innerHTML = '';
 
-                    if (data.length === 0) {
-                        tbody.innerHTML = `
+                if(data.length === 0){
+                    tbody.innerHTML = `
                         <tr>
                             <td colspan="8" class="px-4 py-6 text-center text-gray-500">
                                 <div class="flex flex-col items-center justify-center">
@@ -195,30 +195,30 @@
                             </td>
                         </tr>
                     `;
-                        return;
-                    }
+                    return;
+                }
 
-                    data.forEach(item => {
-                        item.rows.forEach(row => {
-                            // Format jam kerja
-                            let jamKerja = row.jam_kerja;
-                            if (!isNaN(jamKerja)) {
-                                if (row.is_weekend) {
-                                    const jam = Math.floor(jamKerja / 60);
-                                    jamKerja = `${jam} jam (lembur)`;
-                                } else {
-                                    const jam = Math.floor(jamKerja / 60);
-                                    const menit = jamKerja % 60;
-                                    jamKerja = `${jam > 0 ? jam+' jam ' : ''}${menit > 0 ? menit+' menit' : (jam > 0 ? '' : '0 menit')}`;
-                                }
+                data.forEach(item => {
+                    item.rows.forEach(row => {
+                        // Format jam kerja
+                        let jamKerja = row.jam_kerja;
+                        if(!isNaN(jamKerja)) {
+                            if(row.is_weekend){
+                                const jam = Math.floor(jamKerja/60);
+                                jamKerja = `${jam} jam (lembur)`;
+                            } else {
+                                const jam = Math.floor(jamKerja/60);
+                                const menit = jamKerja % 60;
+                                jamKerja = `${jam > 0 ? jam+' jam ' : ''}${menit > 0 ? menit+' menit' : (jam > 0 ? '' : '0 menit')}`;
                             }
+                        }
 
-                            // Format status dengan warna
-                            const keterlambatanClass = row.keterlambatan > 0 ? 'text-red-600 font-medium' : 'text-gray-600';
-                            const pulangCepatClass = row.pulang_cepat > 0 ? 'text-orange-600 font-medium' : 'text-gray-600';
-                            const waktuKurangClass = row.waktu_kurang > 0 ? 'text-red-600 font-medium' : 'text-gray-600';
+                        // Format status dengan warna
+                        const keterlambatanClass = row.keterlambatan > 0 ? 'text-red-600 font-medium' : 'text-gray-600';
+                        const pulangCepatClass = row.pulang_cepat > 0 ? 'text-orange-600 font-medium' : 'text-gray-600';
+                        const waktuKurangClass = row.waktu_kurang > 0 ? 'text-red-600 font-medium' : 'text-gray-600';
 
-                            tbody.innerHTML += `
+                        tbody.innerHTML += `
                             <tr class="transition-colors ${row.is_weekend ? 'bg-gray-100' : 'hover:bg-gray-50'}">
 
                                 <td class="px-4 py-3">
@@ -241,14 +241,14 @@
 
                             </tr>
                         `;
-                        });
                     });
+                });
 
-                    showNotification('Data laporan berhasil dimuat', 'success');
-                })
-                .catch(error => {
-                    const tbody = document.getElementById('laporanBody');
-                    tbody.innerHTML = `
+                showNotification('Data laporan berhasil dimuat', 'success');
+            })
+            .catch(error => {
+                const tbody = document.getElementById('laporanBody');
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="px-4 py-6 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
@@ -261,17 +261,17 @@
                         </td>
                     </tr>
                 `;
-                    showNotification('Gagal memuat data laporan', 'error');
-                });
+                showNotification('Gagal memuat data laporan', 'error');
+            });
         });
 
         // Export PDF
-        document.getElementById('btnPdf').addEventListener('click', function(e) {
+        document.getElementById('btnPdf').addEventListener('click', function(e){
             e.preventDefault();
             const userId = document.getElementById('user_id').value;
             const bulan = document.getElementById('bulan').value;
             const mode = userId ? 'single' : 'all';
-
+            
             if (!bulan) {
                 showNotification('Pilih bulan terlebih dahulu', 'error');
                 return;
@@ -282,11 +282,11 @@
         });
 
         // Export Excel
-        document.getElementById('btnExcel').addEventListener('click', function(e) {
+        document.getElementById('btnExcel').addEventListener('click', function(e){
             e.preventDefault();
             const userId = document.getElementById('user_id').value;
             const bulan = document.getElementById('bulan').value;
-
+            
             if (!bulan) {
                 showNotification('Pilih bulan terlebih dahulu', 'error');
                 return;
@@ -314,38 +314,5 @@
         }
     `;
     document.head.appendChild(style);
-    // Contoh penggunaan untuk download laporan
-    document.addEventListener('DOMContentLoaded', function() {
-        // Untuk link download biasa
-        document.querySelectorAll('.download-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const url = this.href;
-                handleDownload(this, url, 'GET');
-            });
-        });
-
-        // Untuk form download dengan filter
-        document.querySelectorAll('.download-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const url = this.action;
-                const formData = new FormData(this);
-                const data = Object.fromEntries(formData);
-                handleDownload(this.querySelector('button[type="submit"]'), url, 'POST', data);
-            });
-        });
-
-        // Untuk button download dengan AJAX
-        document.querySelectorAll('.download-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const url = this.dataset.url;
-                const method = this.dataset.method || 'GET';
-                const data = this.dataset.params ? JSON.parse(this.dataset.params) : null;
-                handleDownload(this, url, method, data);
-            });
-        });
-    });
 </script>
-
 @endpush

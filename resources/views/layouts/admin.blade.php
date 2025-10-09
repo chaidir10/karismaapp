@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <!-- Favicon -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
@@ -22,93 +23,6 @@
         body {
             font-family: 'Poppins', sans-serif;
             -webkit-text-size-adjust: 100%;
-        }
-
-        /* Loading Spinner Styles */
-        .loading-spinner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .loading-spinner.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(79, 70, 229, 0.1);
-            border-left: 4px solid #2099dfff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 16px;
-        }
-
-        .spinner-text {
-            font-size: 16px;
-            color: #4b5563;
-            font-weight: 500;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Pulse animation for a modern alternative */
-        .pulse-spinner {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #2099dfff, #4f46e5);
-            border-radius: 50%;
-            animation: pulse 1.5s ease-in-out infinite;
-            margin-bottom: 16px;
-            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.8; }
-            50% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.8); opacity: 0.8; }
-        }
-
-        /* Dots animation for another modern alternative */
-        .dots-spinner {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #2099dfff;
-            animation: bounce 1.4s ease-in-out infinite both;
-        }
-
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: scale(0);
-            } 40% {
-                transform: scale(1);
-            }
         }
 
         /* Mobile optimizations */
@@ -154,19 +68,6 @@
 
             .mobile-p-2 {
                 padding: 0.5rem;
-            }
-
-            .loading-spinner {
-                padding: 20px;
-            }
-            
-            .spinner, .pulse-spinner {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .spinner-text {
-                font-size: 14px;
             }
         }
 
@@ -323,26 +224,6 @@
 </head>
 
 <body class="bg-gray-100 text-gray-800 text-sm">
-    <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner">
-        <!-- Pilih salah satu dari tiga spinner di bawah ini -->
-        
-        <!-- Spinner 1: Classic Spinner -->
-        <div class="spinner"></div>
-        
-        <!-- Spinner 2: Pulse Spinner -->
-        <!-- <div class="pulse-spinner"></div> -->
-        
-        <!-- Spinner 3: Dots Spinner -->
-        <!-- <div class="dots-spinner">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div> -->
-        
-        <div class="spinner-text">Memuat...</div>
-    </div>
-
     <!-- Modal Konfirmasi Logout -->
     <div class="logout-modal" id="logoutModal">
         <div class="logout-modal-content">
@@ -486,38 +367,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Loading spinner element
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            
-            // Function to show loading spinner
-            function showLoading(message = 'Memuat...') {
-                const spinnerText = loadingSpinner.querySelector('.spinner-text');
-                if (spinnerText) {
-                    spinnerText.textContent = message;
-                }
-                loadingSpinner.classList.add('active');
-            }
-            
-            // Function to hide loading spinner
-            function hideLoading() {
-                loadingSpinner.classList.remove('active');
-            }
-            
-            // Example: Show loading when navigating between pages
-            document.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Only show loading for internal navigation, not external links
-                    if (this.href && this.href.startsWith(window.location.origin)) {
-                        showLoading('Mengalihkan...');
-                    }
-                });
-            });
-            
-            // Hide loading when page is fully loaded
-            window.addEventListener('load', function() {
-                setTimeout(hideLoading, 500); // Small delay for smoother UX
-            });
-            
             // Mobile sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mobileSidebar = document.getElementById('mobileSidebar');
@@ -570,7 +419,6 @@
             logoutCancelBtn.addEventListener('click', closeLogoutModal);
 
             logoutConfirmBtn.addEventListener('click', function() {
-                showLoading('Logging out...');
                 logoutForm.submit();
             });
 
@@ -600,10 +448,6 @@
                     closeLogoutModal();
                 }
             });
-            
-            // Expose loading functions globally for use in other scripts
-            window.showLoading = showLoading;
-            window.hideLoading = hideLoading;
         });
     </script>
 
