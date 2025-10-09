@@ -93,18 +93,76 @@
         border: 1px solid #e2e8f0;
     }
 
-    .btn-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        transition: all 0.2s;
+    /* Action Buttons - Konsisten dengan Dashboard */
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: flex-end;
     }
 
-    .btn-icon:hover {
-        transform: scale(1.05);
+    .btn-detail,
+    .btn-edit,
+    .btn-delete {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 12px;
+    }
+
+    .btn-detail {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .btn-detail:hover {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-edit {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .btn-edit:hover {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .btn-delete:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    /* Button Styles untuk Header */
+    .btn-primary {
+        background: white;
+        color: #3b82f6;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .radius-slider-container {
@@ -218,12 +276,8 @@
                 <p class="text-indigo-100 mt-1">Kelola titik lokasi presensi dengan mudah</p>
             </div>
             <button id="btnTambah"
-                class="w-full sm:w-auto bg-white hover:bg-gray-50 text-indigo-600 px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                        clip-rule="evenodd" />
-                </svg>
+                class="btn-primary">
+                <i class="fas fa-plus mr-2"></i>
                 <span class="font-medium">Tambah Titik</span>
             </button>
         </div>
@@ -243,22 +297,14 @@
             <div class="mb-4 flex flex-col md:flex-row gap-4">
                 <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                clip-rule="evenodd" />
-                        </svg>
+                        <i class="fas fa-search text-gray-400"></i>
                     </div>
                     <input type="text" id="searchInput" placeholder="Cari titik presensi..."
                         class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-1 focus:outline-none text-sm shadow-sm" />
                 </div>
                 <button id="btnSort"
                     class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 flex items-center text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                            d="M5 12a1 1 0 110-2h10a1 1 0 110 2H5zM5 8a1 1 0 110-2h6a1 1 0 110 2H5zM5 16a1 1 0 110-2h4a1 1 0 110 2H5z" />
-                    </svg>
+                    <i class="fas fa-sort mr-2"></i>
                     Urutkan
                 </button>
             </div>
@@ -286,22 +332,21 @@
                                 </td>
                                 <td class="px-4 py-3 text-xs">{{ $item->radius }} m</td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex justify-end space-x-1">
-                                        <button onclick="showDetail({{ $item->id }})" class="btn-icon bg-green-100 text-green-700 hover:bg-green-200">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                                            </svg>
+                                    <div class="action-buttons">
+                                        <button onclick="showDetail({{ $item->id }})" 
+                                                class="btn-detail" 
+                                                title="Detail">
+                                            <i class="fas fa-eye"></i>
                                         </button>
-                                        <button onclick="editLokasi({{ $item->id }})" class="btn-icon bg-blue-100 text-blue-700 hover:bg-blue-200">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.380-8.379-2.83-2.828z" />
-                                            </svg>
+                                        <button onclick="editLokasi({{ $item->id }})" 
+                                                class="btn-edit" 
+                                                title="Edit">
+                                            <i class="fas fa-edit"></i>
                                         </button>
-                                        <button onclick="deleteLokasi({{ $item->id }}, '{{ $item->nama }}')" class="btn-icon bg-red-100 text-red-700 hover:bg-red-200">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                            </svg>
+                                        <button onclick="deleteLokasi({{ $item->id }}, '{{ $item->nama }}')" 
+                                                class="btn-delete" 
+                                                title="Hapus">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -310,13 +355,7 @@
                             <tr>
                                 <td colspan="3">
                                     <div id="emptyState" class="empty-state p-6 text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-3 mx-auto" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
+                                        <i class="fas fa-map-marker-alt text-gray-300 mb-3" style="font-size: 3rem;"></i>
                                         <h3 class="font-medium text-sm mb-2">Belum ada titik presensi</h3>
                                         <p class="max-w-md text-xs mx-auto">Tambahkan titik presensi pertama Anda dengan menekan tombol "Tambah
                                             Titik" di atas.</p>
@@ -338,9 +377,7 @@
     <div class="modal-content w-full max-w-5xl p-6 mx-4 max-h-[90vh] overflow-y-auto">
         <button class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors"
             onclick="closeModal('modalForm')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i class="fas fa-times"></i>
         </button>
         <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Titik Presensi</h2>
         <form id="formTitik" method="POST" class="grid grid-cols-12 gap-4">
@@ -352,11 +389,7 @@
             <div class="col-span-12 md:col-span-7">
                 <div id="mapForm" class="h-80 md:h-96 w-full rounded-xl border"></div>
                 <div class="mt-2 text-xs text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clip-rule="evenodd" />
-                    </svg>
+                    <i class="fas fa-info-circle mr-1"></i>
                     Klik pada peta untuk menandai lokasi
                 </div>
             </div>
@@ -401,16 +434,15 @@
                     <!-- Tombol Batal -->
                     <button type="button"
                         class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                        onclick="confirmCancel()">Batal</button>
+                        onclick="confirmCancel()">
+                        <i class="fas fa-times mr-2"></i>
+                        Batal
+                    </button>
 
                     <!-- Tombol Simpan -->
                     <button type="submit"
                         class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
+                        <i class="fas fa-check mr-2"></i>
                         Simpan
                     </button>
                 </div>
@@ -426,9 +458,7 @@
         <!-- Close Button -->
         <button class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-lg transition-colors"
             onclick="closeModal('modalDetail')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i class="fas fa-times"></i>
         </button>
 
         <h2 class="text-lg font-bold mb-4">Detail Titik Presensi</h2>
@@ -437,11 +467,7 @@
             <div class="col-span-12 md:col-span-7">
                 <div id="mapDetail" class="h-80 md:h-96 w-full rounded-xl border"></div>
                 <div class="mt-2 text-[10px] text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clip-rule="evenodd" />
-                    </svg>
+                    <i class="fas fa-info-circle mr-1"></i>
                     Lokasi titik presensi
                 </div>
             </div>
@@ -476,6 +502,7 @@
                     <button
                         class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-xs"
                         onclick="closeModal('modalDetail')">
+                        <i class="fas fa-times mr-2"></i>
                         Tutup
                     </button>
                 </div>
@@ -490,17 +517,11 @@
     <div class="modal-content p-6">
         <button class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors"
             onclick="closeModal('modalDelete')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i class="fas fa-times"></i>
         </button>
         <div class="mb-4">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+                <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
             </div>
         </div>
         <h2 class="text-xl font-bold mb-2">Hapus Titik Presensi</h2>
@@ -510,14 +531,13 @@
         <div class="flex justify-center gap-3 mt-6">
             <button
                 class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                onclick="closeModal('modalDelete')">Batal</button>
+                onclick="closeModal('modalDelete')">
+                <i class="fas fa-times mr-2"></i>
+                Batal
+            </button>
             <button id="confirmDelete"
                 class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
+                <i class="fas fa-trash mr-2"></i>
                 Hapus
             </button>
         </div>
@@ -530,17 +550,11 @@
     <div class="modal-content p-6">
         <button class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors"
             onclick="closeModal('modalConfirmCancel')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i class="fas fa-times"></i>
         </button>
         <div class="mb-4">
             <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
             </div>
         </div>
         <h2 class="text-xl font-bold mb-2">Batalkan Perubahan</h2>
@@ -549,15 +563,14 @@
         <div class="flex justify-center gap-3 mt-6">
             <button
                 class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                onclick="closeModal('modalConfirmCancel')">Lanjutkan Edit</button>
+                onclick="closeModal('modalConfirmCancel')">
+                <i class="fas fa-edit mr-2"></i>
+                Lanjutkan Edit
+            </button>
             <button
                 class="px-5 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors flex items-center text-sm"
                 onclick="closeModal('modalForm'); closeModal('modalConfirmCancel');">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clip-rule="evenodd" />
-                </svg>
+                <i class="fas fa-times mr-2"></i>
                 Batalkan
             </button>
         </div>
@@ -570,17 +583,11 @@
     <div class="modal-content p-6">
         <button class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors"
             onclick="closeModal('modalConfirmSave')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i class="fas fa-times"></i>
         </button>
         <div class="mb-4">
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M5 13l4 4L19 7" />
-                </svg>
+                <i class="fas fa-check text-green-500 text-xl"></i>
             </div>
         </div>
         <h2 class="text-xl font-bold mb-2">Berhasil</h2>
@@ -589,11 +596,7 @@
             <button
                 class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center text-sm"
                 onclick="closeModal('modalConfirmSave'); closeModal('modalForm'); location.reload();">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clip-rule="evenodd" />
-                </svg>
+                <i class="fas fa-check mr-2"></i>
                 Oke
             </button>
         </div>
