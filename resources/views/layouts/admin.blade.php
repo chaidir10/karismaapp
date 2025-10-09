@@ -503,146 +503,20 @@
                 loadingSpinner.classList.remove('active');
             }
             
-            // Enhanced function for download operations
-            function handleDownload(button, url, method = 'GET', data = null) {
-                showLoading('Mempersiapkan download...');
-                
-                // Disable button to prevent multiple clicks
-                if (button) {
-                    button.disabled = true;
-                    const originalText = button.innerHTML;
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-                }
-                
-                // Create form for POST requests
-                if (method.toUpperCase() === 'POST') {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = url;
-                    form.style.display = 'none';
-                    
-                    // Add CSRF token
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    const csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = '_token';
-                    csrfInput.value = csrfToken;
-                    form.appendChild(csrfInput);
-                    
-                    // Add data if provided
-                    if (data) {
-                        for (const key in data) {
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = key;
-                            input.value = data[key];
-                            form.appendChild(input);
-                        }
+            // Example: Show loading when navigating between pages
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Only show loading for internal navigation, not external links
+                    if (this.href && this.href.startsWith(window.location.origin)) {
+                        showLoading('Mengalihkan...');
                     }
-                    
-                    document.body.appendChild(form);
-                    form.submit();
-                    document.body.removeChild(form);
-                } else {
-                    // For GET requests, use fetch to detect completion
-                    fetch(url, {
-                        method: method,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.blob();
-                        }
-                        throw new Error('Network response was not ok');
-                    })
-                    .then(blob => {
-                        // Create download link
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = url;
-                        
-                        // Extract filename from response headers or use default
-                        const contentDisposition = response.headers.get('content-disposition');
-                        let filename = 'laporan.pdf';
-                        if (contentDisposition) {
-                            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-                            if (filenameMatch.length === 2) {
-                                filename = filenameMatch[1];
-                            }
-                        }
-                        a.download = filename;
-                        
-                        document.body.appendChild(a);
-                        a.click();
-                        
-                        // Cleanup
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-                        
-                        hideLoading();
-                        if (button) {
-                            button.disabled = false;
-                            button.innerHTML = originalText;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Download error:', error);
-                        hideLoading();
-                        if (button) {
-                            button.disabled = false;
-                            button.innerHTML = originalText;
-                        }
-                        alert('Terjadi kesalahan saat mendownload laporan');
-                    });
-                }
-                
-                // Fallback: hide loading after timeout (safety measure)
-                setTimeout(() => {
-                    hideLoading();
-                    if (button) {
-                        button.disabled = false;
-                        const originalText = button.dataset.originalText || 'Download';
-                        button.innerHTML = originalText;
-                    }
-                }, 30000); // 30 seconds timeout
-            }
+                });
+            });
             
-            // Auto-hide loading when page is fully loaded
+            // Hide loading when page is fully loaded
             window.addEventListener('load', function() {
-                setTimeout(hideLoading, 500);
+                setTimeout(hideLoading, 500); // Small delay for smoother UX
             });
-            
-            // Hide loading when navigating away
-            window.addEventListener('beforeunload', function() {
-                hideLoading();
-            });
-            
-            // Detect download completion by monitoring network requests
-            let activeRequests = 0;
-            
-            const originalFetch = window.fetch;
-            window.fetch = function(...args) {
-                activeRequests++;
-                showLoading('Memproses permintaan...');
-                
-                return originalFetch.apply(this, args)
-                    .then(response => {
-                        activeRequests--;
-                        if (activeRequests === 0) {
-                            setTimeout(hideLoading, 1000);
-                        }
-                        return response;
-                    })
-                    .catch(error => {
-                        activeRequests--;
-                        hideLoading();
-                        throw error;
-                    });
-            };
             
             // Mobile sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
@@ -727,22 +601,9 @@
                 }
             });
             
-            // Expose functions globally for use in other scripts
+            // Expose loading functions globally for use in other scripts
             window.showLoading = showLoading;
             window.hideLoading = hideLoading;
-            window.handleDownload = handleDownload;
-        });
-        
-        // Additional event listener to catch any unhandled download completions
-        window.addEventListener('focus', function() {
-            setTimeout(() => {
-                const loadingSpinner = document.getElementById('loadingSpinner');
-                if (loadingSpinner && loadingSpinner.classList.contains('active')) {
-                    // If spinner is still active after window regains focus, 
-                    // assume download is complete and hide spinner
-                    loadingSpinner.classList.remove('active');
-                }
-            }, 2000);
         });
     </script>
 
