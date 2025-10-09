@@ -71,7 +71,16 @@ class LaporanController extends Controller
                     $jamMasukObj  = Carbon::createFromFormat('H:i', Carbon::parse($masuk->jam)->format('H:i'));
                     $jamPulangObj = Carbon::createFromFormat('H:i', Carbon::parse($pulang->jam)->format('H:i'));
 
-                    $jamKerja = $jamMasukObj->diffInMinutes($jamPulangObj);
+                    // Jika masuk sebelum 07:30, hitung mulai dari 07:30 saja
+                    if ($jamMasukObj->lt($jamMasukDefault)) {
+                        $jamMulaiKerja = $jamMasukDefault->copy();
+                    } else {
+                        $jamMulaiKerja = $jamMasukObj->copy();
+                    }
+
+                    // Hitung total jam kerja dari waktu mulai kerja (min 07:30) hingga jam pulang
+                    $jamKerja = $jamMulaiKerja->diffInMinutes($jamPulangObj);
+
 
                     if ($isWeekend) {
                         // Akhir pekan = semua jam dianggap lembur
