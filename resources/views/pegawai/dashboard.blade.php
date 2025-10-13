@@ -615,7 +615,6 @@
                     this._map = map;
                 }, 400); // ⏱ delay 400ms
             });
-
             modal {
                 {
                     $p - > id
