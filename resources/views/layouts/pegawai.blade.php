@@ -3,13 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KARISMA | @yield('title')</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
-
 
     <!-- External CSS -->
     <!-- Manifest -->
@@ -58,9 +56,14 @@
             color: var(--dark);
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
+        /* Container utama - di desktop lebarnya seperti HP, di mobile fit ke layar */
         .container {
+            width: 100%;
             max-width: 500px;
             background-color: var(--white);
             min-height: 100vh;
@@ -68,6 +71,32 @@
             padding: 0;
             box-shadow: 0 0 30px rgba(90, 182, 234, 0.1);
             position: relative;
+        }
+
+        /* Desktop: tetap di tengah dengan lebar HP */
+        @media (min-width: 768px) {
+            body {
+                background-color: #d1e8f5;
+                padding: 20px 0;
+            }
+            
+            .container {
+                border-radius: 20px;
+                overflow: hidden;
+                min-height: calc(100vh - 40px);
+            }
+        }
+
+        /* Mobile: full width tanpa padding */
+        @media (max-width: 767px) {
+            body {
+                background-color: #E6F4F9;
+            }
+            
+            .container {
+                max-width: 100%;
+                box-shadow: none;
+            }
         }
 
         /* Header */
@@ -292,6 +321,23 @@
             border-top: 1px solid var(--gray-light);
             border-top-left-radius: 20px;
             border-top-right-radius: 20px;
+        }
+
+        /* Desktop: posisikan bottom-nav di dalam container */
+        @media (min-width: 768px) {
+            .bottom-nav {
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 20px;
+            }
+        }
+
+        /* Mobile: full width bottom-nav */
+        @media (max-width: 767px) {
+            .bottom-nav {
+                max-width: 100%;
+                border-radius: 0;
+            }
         }
 
         .nav-item {
@@ -845,7 +891,6 @@
                     <h1 class="user-name" id="user-name">{{ Auth::user()->name ?? 'User' }}</h1>
                 </div>
 
-
                 <div class="user-avatar">
                     @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
                     <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}"
@@ -858,7 +903,6 @@
                         class="w-full h-full object-cover">
                     @endif
                 </div>
-
             </div>
         </div>
         @endif
@@ -888,7 +932,6 @@
             <a href="{{ route('pegawai.daftar') }}" class="nav-item {{ Route::is('pegawai.daftar') ? 'active' : '' }}">
                 <div class="nav-icon">
                     <div class="nav-icon"><i class="fas fa-users"></i></div>
-
                 </div>
                 <div>Pegawai</div>
             </a>
