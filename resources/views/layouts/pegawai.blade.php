@@ -530,7 +530,7 @@
             top: 70px;
             right: 15px;
             width: 300px;
-            height: 200px;
+            height: 150px;
             z-index: 10;
             background: white;
             border-radius: 12px;
@@ -845,8 +845,8 @@
             .mini-map-container {
                 top: 60px;
                 right: 10px;
-                width: 150px;
-                height: 150px;
+                width: 300px;
+                height: 100px;
             }
 
             .mini-map {
