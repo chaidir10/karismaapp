@@ -529,7 +529,7 @@
             position: absolute;
             top: 70px;
             right: 15px;
-            width: 200px;
+            width: 300px;
             height: 200px;
             z-index: 10;
             background: white;
@@ -845,8 +845,8 @@
             .mini-map-container {
                 top: 60px;
                 right: 10px;
-                width: 100px;
-                height: 100px;
+                width: 150px;
+                height: 150px;
             }
 
             .mini-map {
