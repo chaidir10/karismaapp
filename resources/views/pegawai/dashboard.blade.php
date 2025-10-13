@@ -553,6 +553,7 @@ function initializeDetailModals(){
     if(modal{{ $p->id }}){
         modal{{ $p->id }}.addEventListener('shown.bs.modal',function(){
             const coords="{{ $p->lokasi }}".split(',');
+            console.log("Lokasi mentah: '{{ $p->lokasi }}'");
             const lat=parseFloat(coords[0]); 
             const lng=parseFloat(coords[1]);
             const map=L.map('mapDetail{{ $p->id }}').setView([lat,lng],17);
