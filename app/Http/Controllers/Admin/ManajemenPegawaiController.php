@@ -8,6 +8,9 @@ use App\Models\User;
 use App\Models\WilayahKerja;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\JamShift;
+use App\Models\UserJamShift;
+
 
 class ManajemenPegawaiController extends Controller
 {
