@@ -35,7 +35,7 @@
         margin: 0;
         position: relative;
         z-index: 2;
-        padding: 25px;
+    
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(109, 40, 217, 0.1);
         border: 1px solid rgba(109, 40, 217, 0.1);
