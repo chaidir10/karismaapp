@@ -409,7 +409,7 @@
 
     @media (max-width: 400px) {
         .employee-item {
-            padding: 12px;
+            padding: 0px;
         }
 
         .employee-avatar {
