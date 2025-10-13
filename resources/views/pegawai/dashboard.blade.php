@@ -505,7 +505,8 @@ function updateLocationInfo(position){
         document.getElementById('location-address-mini').textContent=wilayahAlamat;
         isOutsideRadius = false;
     }else{
-        infoEl.textContent="⚠ Anda berada di luar radius wilayah kerja";
+        infoEl.textContent='<span class="badge badge-warning">⚠ Anda berada di luar radius wilayah kerja</span>';
+        infoEl.style.fontSize = "10 px";
         infoEl.classList.remove('text-success'); 
         infoEl.classList.add('text-warning');
         submitBtn.disabled=false;

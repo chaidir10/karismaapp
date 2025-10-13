@@ -1,146 +1,7 @@
 @extends('layouts.pegawai')
 @section('title', 'Daftar Pegawai')
 
-@section('content')
-<div class="container">
-    <!-- Employee List Section -->
-    <div class="employee-section">
-        <div class="section-header">
-            <h3 class="section-title">Daftar Pegawai</h3>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-primary btn-scale">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
-            </div>
-        </div>
-
-        <div class="search-box">
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search text-muted"></i>
-                </span>
-                <input type="text" class="form-control" placeholder="Cari pegawai..." id="searchInput">
-            </div>
-        </div>
-
-        <div class="employee-list">
-            @forelse($pegawai as $p)
-            <!-- Bagian employee-item -->
-            <div class="employee-item"
-                data-employee-id="{{ $p->id }}"
-                data-employee-nip="{{ $p->nip }}"
-                data-employee-email="{{ $p->email }}"
-                data-employee-phone="{{ $p->no_hp ?? '-' }}"
-                data-employee-address="{{ $p->alamat ?? '-' }}"
-                data-employee-status="{{ $p->status ?? 'Aktif' }}"
-                data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
-
-                <div class="employee-avatar">
-                    @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
-                    <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
-                        onerror="handleAvatarError(this, '{{ $p->name }}')">
-                    @else
-                    <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
-                    @endif
-                </div>
-
-                <div class="employee-info">
-                    <h5 class="employee-name">{{ $p->name }}</h5>
-                    <p class="employee-position">{{ $p->jabatan ?? '-' }}</p>
-                    <div class="employee-department">
-                        <span class="badge bg-primary-light">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
-                    </div>
-                </div>
-
-                <div class="employee-status">
-                    @php
-                    $statusClass = 'bg-success-light';
-                    $statusText = 'Aktif';
-                    if(isset($p->status)) {
-                    if($p->status == 'Cuti') {
-                    $statusClass = 'bg-warning-light';
-                    $statusText = 'Cuti';
-                    } elseif($p->status == 'Tidak Aktif') {
-                    $statusClass = 'bg-danger-light';
-                    $statusText = 'Tidak Aktif';
-                    }
-                    }
-                    @endphp
-                    <span class="badge {{ $statusClass }}">
-                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> {{ $statusText }}
-                    </span>
-                </div>
-            </div>
-
-            @empty
-            <div class="text-center py-4">
-                <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada data pegawai.</p>
-            </div>
-            @endforelse
-        </div>
-    </div>
-</div>
-
-<!-- Modal Detail Pegawai -->
-<div class="modal fade" id="employeeDetailModal" tabindex="-1" aria-labelledby="employeeDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-body p-0 pt-2">
-                <div class="text-center mb-2">
-                    <div id="modalEmployeeAvatarContainer" class="employee-avatar-container">
-                        <!-- Avatar akan dimuat di sini melalui JavaScript -->
-                    </div>
-                </div>
-
-                <div class="employee-detail-section">
-                    <h5 class="text-center" id="modalEmployeeName">Nama Pegawai</h5>
-                    <div class="text-center mb-4">
-                        <span class="badge bg-primary-light" id="modalEmployeePosition">-</span>
-                    </div>
-
-                    <div class="detail-grid full-width">
-                        <div class="detail-item">
-                            <div class="detail-label">Unit Kerja</div>
-                            <div class="detail-value" id="modalEmployeeDepartment">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Status</div>
-                            <div class="detail-value" id="modalEmployeeStatus">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">NIP</div>
-                            <div class="detail-value" id="modalEmployeeNip">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">No. Telepon</div>
-                            <div class="detail-value d-flex align-items-center justify-content-between">
-                                <span id="modalEmployeePhone">-</span>
-                                <a href="#" id="whatsappLink" target="_blank" style="text-decoration: none;">
-                                    <i class="fab fa-whatsapp" style="color: #25D366; font-size: 18px;"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Email</div>
-                            <div class="detail-value" id="modalEmployeeEmail">-</div>
-                        </div>
-
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Alamat</div>
-                            <div class="detail-value" id="modalEmployeeAddress">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer pb-0 pt-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+@push('styles')
 <style>
     /* CSS Variables */
     :root {
@@ -252,6 +113,7 @@
         flex: 1;
         transition: all 0.2s ease;
     }
+
     .btn-secondary:hover {
         background: var(--gray);
         color: var(--white);
@@ -590,6 +452,147 @@
         border-radius: 50%;
     }
 </style>
+@endpush
+
+@section('content')
+<div class="container">
+    <!-- Employee List Section -->
+    <div class="employee-section">
+        <div class="section-header">
+            <h3 class="section-title">Daftar Pegawai</h3>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary btn-scale">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control" placeholder="Cari pegawai..." id="searchInput">
+            </div>
+        </div>
+
+        <div class="employee-list">
+            @forelse($pegawai as $p)
+            <!-- Bagian employee-item -->
+            <div class="employee-item"
+                data-employee-id="{{ $p->id }}"
+                data-employee-nip="{{ $p->nip }}"
+                data-employee-email="{{ $p->email }}"
+                data-employee-phone="{{ $p->no_hp ?? '-' }}"
+                data-employee-address="{{ $p->alamat ?? '-' }}"
+                data-employee-status="{{ $p->status ?? 'Aktif' }}"
+                data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
+
+                <div class="employee-avatar">
+                    @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
+                    <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
+                        onerror="handleAvatarError(this, '{{ $p->name }}')">
+                    @else
+                    <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
+                    @endif
+                </div>
+
+                <div class="employee-info">
+                    <h5 class="employee-name">{{ $p->name }}</h5>
+                    <p class="employee-position">{{ $p->jabatan ?? '-' }}</p>
+                    <div class="employee-department">
+                        <span class="badge bg-primary-light">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
+                    </div>
+                </div>
+
+                <div class="employee-status">
+                    @php
+                    $statusClass = 'bg-success-light';
+                    $statusText = 'Aktif';
+                    if(isset($p->status)) {
+                    if($p->status == 'Cuti') {
+                    $statusClass = 'bg-warning-light';
+                    $statusText = 'Cuti';
+                    } elseif($p->status == 'Tidak Aktif') {
+                    $statusClass = 'bg-danger-light';
+                    $statusText = 'Tidak Aktif';
+                    }
+                    }
+                    @endphp
+                    <span class="badge {{ $statusClass }}">
+                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> {{ $statusText }}
+                    </span>
+                </div>
+            </div>
+
+            @empty
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Belum ada data pegawai.</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Pegawai -->
+<div class="modal fade" id="employeeDetailModal" tabindex="-1" aria-labelledby="employeeDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-body p-0 pt-2">
+                <div class="text-center mb-2">
+                    <div id="modalEmployeeAvatarContainer" class="employee-avatar-container">
+                        <!-- Avatar akan dimuat di sini melalui JavaScript -->
+                    </div>
+                </div>
+
+                <div class="employee-detail-section">
+                    <h5 class="text-center" id="modalEmployeeName">Nama Pegawai</h5>
+                    <div class="text-center mb-4">
+                        <span class="badge bg-primary-light" id="modalEmployeePosition">-</span>
+                    </div>
+
+                    <div class="detail-grid full-width">
+                        <div class="detail-item">
+                            <div class="detail-label">Unit Kerja</div>
+                            <div class="detail-value" id="modalEmployeeDepartment">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value" id="modalEmployeeStatus">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">NIP</div>
+                            <div class="detail-value" id="modalEmployeeNip">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">No. Telepon</div>
+                            <div class="detail-value d-flex align-items-center justify-content-between">
+                                <span id="modalEmployeePhone">-</span>
+                                <a href="#" id="whatsappLink" target="_blank" style="text-decoration: none;">
+                                    <i class="fab fa-whatsapp" style="color: #25D366; font-size: 18px;"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="detail-item full-width">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value" id="modalEmployeeEmail">-</div>
+                        </div>
+
+                        <div class="detail-item full-width">
+                            <div class="detail-label">Alamat</div>
+                            <div class="detail-value" id="modalEmployeeAddress">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pb-0 pt-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -707,7 +710,7 @@
         }
 
         // PERBAIKAN PENTING: Reset modal ketika ditutup
-        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function() {
             // Kosongkan container avatar untuk memastikan tidak ada konflik
             modalAvatarContainer.innerHTML = '';
         });
