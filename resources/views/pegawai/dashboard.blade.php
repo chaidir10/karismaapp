@@ -497,7 +497,7 @@ function updateLocationInfo(position){
 
     if(distance<=radius){
         // infoEl.textContent="✔ Anda berada di dalam radius wilayah kerja"; 
-        infoEl.innerHTML = '<span class="badge badge-success">✔ Dalam radius</span> Anda berada di dalam wilayah kerja';
+        infoEl.innerHTML = '<span class="badge badge-success">✔  Anda berada di dalam wilayah kerja </span>';
         infoEl.style.fontSize = "10 px";
         infoEl.classList.remove('text-danger','text-warning'); 
         infoEl.classList.add('text-success');
