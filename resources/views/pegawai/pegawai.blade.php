@@ -1,7 +1,6 @@
 @extends('layouts.pegawai')
 @section('title', 'Daftar Pegawai')
 
-@push('styles')
 <style>
     /* CSS Variables */
     :root {
@@ -452,7 +451,7 @@
         border-radius: 50%;
     }
 </style>
-@endpush
+
 
 @section('content')
 <div class="container">
