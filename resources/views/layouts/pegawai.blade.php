@@ -61,7 +61,7 @@
         }
 
         .container {
-            max-width: 200px;
+            max-width: 500px;
             background-color: var(--white);
             min-height: 100vh;
             margin: 0 auto;
