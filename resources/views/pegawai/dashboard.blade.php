@@ -497,6 +497,7 @@ function updateLocationInfo(position){
 
     if(distance<=radius){
         infoEl.textContent="✔ Anda berada di dalam radius wilayah kerja";
+        infoEl.style.fontSize = "8px";
         infoEl.classList.remove('text-danger','text-warning'); 
         infoEl.classList.add('text-success');
         submitBtn.disabled=false;
