@@ -60,24 +60,14 @@
             min-height: 100vh;
         }
 
-        /* .container {
-            max-width: 500px;
+        .container {
+            max-width: 200px;
             background-color: var(--white);
             min-height: 100vh;
             margin: 0 auto;
             padding: 0;
             box-shadow: 0 0 30px rgba(90, 182, 234, 0.1);
             position: relative;
-        } */
-        .container {
-            max-width: 390px;
-            background-color: var(--white);
-            min-height: 100vh;
-            margin: 2rem auto;
-            padding: 0;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
-            position: relative;
-            overflow: hidden;
         }
 
         /* Header */
@@ -392,9 +382,7 @@
         }
 
         /* Smooth transitions for all interactive elements */
-        a,
-        button,
-        .nav-item {
+        a, button, .nav-item {
             transition: all 0.3s ease;
         }
 
@@ -951,7 +939,7 @@
                     if (link && this.shouldShowLoading(link)) {
                         e.preventDefault();
                         this.show();
-
+                        
                         // Navigate after showing loading
                         setTimeout(() => {
                             window.location.href = link.href;
@@ -991,11 +979,11 @@
             shouldShowLoading(link) {
                 // Don't show loading for same page anchors, external links, or links with no-href
                 const href = link.getAttribute('href');
-                if (!href || href.startsWith('#') || href.startsWith('javascript:') ||
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || 
                     link.target === '_blank' || link.hasAttribute('download')) {
                     return false;
                 }
-
+                
                 // Only show for internal links
                 try {
                     const url = new URL(href, window.location.origin);
@@ -1016,7 +1004,7 @@
                 window.fetch = (...args) => {
                     activeRequests++;
                     this.show();
-
+                    
                     return originalFetch.apply(this, args)
                         .then(response => {
                             activeRequests--;
@@ -1062,15 +1050,15 @@
 
             show(message = 'Memuat...') {
                 if (this.isLoading) return;
-
+                
                 this.isLoading = true;
                 const textElement = this.loadingOverlay.querySelector('.loading-text');
                 if (textElement) {
                     textElement.textContent = message;
                 }
-
+                
                 this.loadingOverlay.classList.add('active');
-
+                
                 // Auto hide after 10 seconds as fallback
                 this.timeout = setTimeout(() => {
                     this.hide();
@@ -1087,7 +1075,7 @@
         // Initialize loading manager when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.loadingManager = new LoadingManager();
-
+            
             // Add page transition class to main content
             const mainContent = document.querySelector('.main-content');
             if (mainContent) {
@@ -1116,7 +1104,7 @@
         function updateGreeting() {
             const hour = new Date().getHours();
             const greetingElement = document.getElementById('greeting');
-
+            
             if (greetingElement) {
                 let greeting = 'Selamat pagi';
                 if (hour >= 12 && hour < 15) {
@@ -1135,7 +1123,7 @@
             document.addEventListener('turbolinks:click', () => {
                 showLoading();
             });
-
+            
             document.addEventListener('turbolinks:load', () => {
                 setTimeout(hideLoading, 500);
             });
@@ -1143,17 +1131,11 @@
 
         // Handle Livewire if used
         if (typeof Livewire !== 'undefined') {
-            Livewire.hook('request', ({
-                uri,
-                options
-            }) => {
+            Livewire.hook('request', ({ uri, options }) => {
                 showLoading('Memproses...');
             });
 
-            Livewire.hook('response', ({
-                component,
-                success
-            }) => {
+            Livewire.hook('response', ({ component, success }) => {
                 setTimeout(hideLoading, 300);
             });
         }
