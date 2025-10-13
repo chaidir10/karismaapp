@@ -850,7 +850,7 @@
             }
 
             .mini-map {
-                height: 100px;
+                height: 65px;
             }
 
             .submit-btn-large {
