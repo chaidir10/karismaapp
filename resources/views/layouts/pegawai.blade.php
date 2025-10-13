@@ -845,8 +845,8 @@
             .mini-map-container {
                 top: 60px;
                 right: 10px;
-                width: 300px;
-                height: 100px;
+                width: 500px;
+                height: 130px;
             }
 
             .mini-map {
