@@ -361,14 +361,16 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
                     <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                 </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Bisa Shift?</label>
-                    <select name="can_shift" id="edit_can_shift" class="w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="0">Tidak</option>
-                        <option value="1">Ya</option>
-                    </select>
+                <div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bisa Shift?</label>
+                        <select name="can_shift" id="edit_can_shift"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                            <option value="0">Tidak</option>
+                            <option value="1">Ya</option>
+                        </select>
+                    </div>
                 </div>
-
             </div>
 
             <div>
@@ -748,6 +750,7 @@
                 document.getElementById('edit_jenis_pegawai').value = user.jenis_pegawai;
                 document.getElementById('edit_email').value = user.email ?? '';
                 document.getElementById('edit_no_hp').value = user.no_hp ?? '';
+                document.getElementById('edit_can_shift').value = user.can_shift ? '1' : '0';
                 document.getElementById('edit_alamat').value = user.alamat ?? '';
 
                 openModal('modalEdit');
