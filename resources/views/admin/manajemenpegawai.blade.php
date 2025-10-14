@@ -188,6 +188,15 @@
                     <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                 </div>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bisa Shift?</label>
+                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                        <option value="0">Tidak</option>
+                        <option value="1">Ya</option>
+                    </select>
+                </div>
+            </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>

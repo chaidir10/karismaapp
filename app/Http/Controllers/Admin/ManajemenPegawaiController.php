@@ -111,7 +111,7 @@ class ManajemenPegawaiController extends Controller
         $user->jenis_pegawai = $request->jenis_pegawai;
         $user->no_hp = $request->no_hp;
         $user->alamat = $request->alamat;
-        $user->can_shift = $request->has('can_shift'); // ✅ tambahan
+        $user->can_shift = $request->boolean('can_shift', false);// ✅ tambahan
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
