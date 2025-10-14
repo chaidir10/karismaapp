@@ -102,10 +102,11 @@
                         </td>
 
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $user->jabatan ?? '-' }} <br>
-                                <small class="font-semibold text-blue-500">{{ ucwords(str_replace('_', ' ', $user->jenis_pegawai)) }}</small>
-                            </span> </td>
+                            <small class="font-semibold text-blue-500">{{ ucwords(str_replace('_', ' ', $user->jenis_pegawai)) }}</small>
+                            </span>
+                        </td>
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $user->wilayahKerja->nama ?? '-' }}</td>
-                        
+
 
                         <td class="px-6 py-4 text-right text-sm font-medium">
                             <div class="flex justify-end space-x-2">
@@ -359,6 +360,13 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
                     <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Bisa Shift?</label>
+                    <select name="can_shift" id="edit_can_shift" class="w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="0">Tidak</option>
+                        <option value="1">Ya</option>
+                    </select>
                 </div>
 
             </div>

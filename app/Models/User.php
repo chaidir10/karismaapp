@@ -6,14 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Presensi;
-use App\Models\WilayahKerja;    
+use App\Models\WilayahKerja;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Models\JamShift;
-
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -26,6 +23,7 @@ class User extends Authenticatable
         'unit_id',
         'role',
         'can_approve_pengajuan',
+        'can_shift', // ✅ tambahkan field baru
         'foto_profil',
         'no_hp',
         'alamat',
@@ -51,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'can_approve_pengajuan' => 'boolean',
+            'can_shift' => 'boolean', // ✅ pastikan dibaca sebagai boolean
         ];
     }
 
@@ -68,10 +67,5 @@ class User extends Authenticatable
     public function wilayahKerja()
     {
         return $this->belongsTo(WilayahKerja::class, 'unit_id');
-    }
-
-    public function jamShift()
-    {
-        return $this->belongsToMany(JamShift::class, 'user_jam_shift', 'user_id', 'jam_shift_id');
     }
 }

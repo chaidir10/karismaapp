@@ -8,9 +8,6 @@ use App\Models\User;
 use App\Models\WilayahKerja;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use App\Models\JamShift;
-use App\Models\UserJamShift;
-
 
 class ManajemenPegawaiController extends Controller
 {
@@ -40,6 +37,7 @@ class ManajemenPegawaiController extends Controller
             'jenis_pegawai' => 'required|in:asn,non_asn,outsourcing',
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string|max:500',
+            'can_shift' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -59,6 +57,7 @@ class ManajemenPegawaiController extends Controller
             'jenis_pegawai' => $request->jenis_pegawai,
             'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
+            'can_shift' => $request->has('can_shift'), // ✅ tambahan
         ]);
 
         return response()->json([
@@ -94,6 +93,7 @@ class ManajemenPegawaiController extends Controller
             'jenis_pegawai' => 'required|in:asn,non_asn,outsourcing',
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string|max:500',
+            'can_shift' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -111,6 +111,7 @@ class ManajemenPegawaiController extends Controller
         $user->jenis_pegawai = $request->jenis_pegawai;
         $user->no_hp = $request->no_hp;
         $user->alamat = $request->alamat;
+        $user->can_shift = $request->has('can_shift'); // ✅ tambahan
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
