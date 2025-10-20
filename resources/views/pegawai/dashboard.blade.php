@@ -19,47 +19,106 @@
         color: var(--white);
     }
     
+    /* FIX: Full height layout */
+    html, body {
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+    }
+    
+    .content-wrapper {
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .main-content {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    .attendance-card,
+    .attendance-history {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    /* FIX: Modal full height */
+    .modal-fullscreen-mobile {
+        max-width: 100% !important;
+        margin: 0 !important;
+        height: 100vh !important;
+    }
+    
+    .modal-fullscreen-mobile .modal-content {
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+    }
+    
+    /* FIX: Camera container full height */
+    .camera-container-full {
+        height: 60vh !important;
+        min-height: 400px !important;
+        position: relative !important;
+    }
+    
+    .camera-container-full video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
 </style>
 
 @section('content')
 
-<!-- Card Absensi -->
-<div class="attendance-card">
-    <div class="attendance-date">
-        <i class="far fa-calendar-alt date-icon"></i>
-        <span>{{ now()->translatedFormat('d M Y') }}</span>
-    </div>
-    <div class="attendance-time">
-        <i class="far fa-clock time-icon"></i>
-        <span>Jam Kerja (07:30 - 16:00)</span>
-    </div>
-    <div class="attendance-actions">
-        <button class="attendance-btn" id="clock-in-btn" data-bs-toggle="modal" data-bs-target="#presensiModal" onclick="setJenis('masuk')">
-            <i class="fas fa-sign-in-alt attendance-icon"></i> Masuk
-        </button>
-        <button class="attendance-btn" id="clock-out-btn" data-bs-toggle="modal" data-bs-target="#presensiModal" onclick="setJenis('pulang')">
-            <i class="fas fa-sign-out-alt attendance-icon"></i> Pulang
-        </button>
-    </div>
-</div>
-
-<!-- Riwayat Hari Ini -->
-<div class="attendance-history">
-    <div class="history-header">
-        <h5 class="history-title">Riwayat Hari Ini</h5>
-    </div>
-    <div>
-        @forelse($riwayatHariIni as $p)
-        <div class="history-item">
-            <div>
-                <span class="history-time">{{ $p->jam }}</span>
-                <div class="history-type">{{ ucfirst($p->jenis) }}</div>
+<!-- Main Content Container -->
+<div class="content-wrapper">
+    <div class="main-content">
+        <!-- Card Absensi -->
+        <div class="attendance-card">
+            <div class="attendance-date">
+                <i class="far fa-calendar-alt date-icon"></i>
+                <span>{{ now()->translatedFormat('d M Y') }}</span>
             </div>
-            <i class="fas fa-chevron-right text-info cursor-pointer" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}" title="Lihat Detail"></i>
+            <div class="attendance-time">
+                <i class="far fa-clock time-icon"></i>
+                <span>Jam Kerja (07:30 - 16:00)</span>
+            </div>
+            <div class="attendance-actions">
+                <button class="attendance-btn" id="clock-in-btn" data-bs-toggle="modal" data-bs-target="#presensiModal" onclick="setJenis('masuk')">
+                    <i class="fas fa-sign-in-alt attendance-icon"></i> Masuk
+                </button>
+                <button class="attendance-btn" id="clock-out-btn" data-bs-toggle="modal" data-bs-target="#presensiModal" onclick="setJenis('pulang')">
+                    <i class="fas fa-sign-out-alt attendance-icon"></i> Pulang
+                </button>
+            </div>
         </div>
-        @empty
-        <div class="empty-state">Belum ada riwayat absensi hari ini</div>
-        @endforelse
+
+        <!-- Riwayat Hari Ini -->
+        <div class="attendance-history">
+            <div class="history-header">
+                <h5 class="history-title">Riwayat Hari Ini</h5>
+            </div>
+            <div>
+                @forelse($riwayatHariIni as $p)
+                <div class="history-item">
+                    <div>
+                        <span class="history-time">{{ $p->jam }}</span>
+                        <div class="history-type">{{ ucfirst($p->jenis) }}</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-info cursor-pointer" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}" title="Lihat Detail"></i>
+                </div>
+                @empty
+                <div class="empty-state">Belum ada riwayat absensi hari ini</div>
+                @endforelse
+            </div>
+        </div>
     </div>
 </div>
 
@@ -310,6 +369,81 @@
 
 @push('styles')
 <style>
+/* FIX: Full height solutions */
+html, body, #app, .page-wrapper {
+    height: 100% !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.content-wrapper {
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+.main-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* FIX: Attendance card full width */
+.attendance-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.attendance-history {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    flex: 1 !important;
+}
+
+/* FIX: Modal fullscreen for mobile */
+.modal-fullscreen-mobile {
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100vh !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-fullscreen-mobile .modal-content {
+    min-height: 100vh !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* FIX: Camera container full height */
+.camera-container-full {
+    height: 60vh !important;
+    min-height: 300px !important;
+    max-height: 70vh !important;
+    position: relative !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.camera-container-full video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    background: #000 !important;
+}
+
 /* Modal Konfirmasi Styles */
 .confirmation-icon {
     animation: pulse 2s infinite;
@@ -376,6 +510,23 @@
 .success-modal-content {
     border: 2px solid #10b981;
 }
+
+/* FIX: Ensure proper scrolling */
+.modal-body {
+    max-height: calc(100vh - 200px) !important;
+    overflow-y: auto !important;
+}
+
+/* FIX: Map containers */
+.mini-map {
+    height: 150px !important;
+    width: 100% !important;
+}
+
+.detail-map {
+    height: 200px !important;
+    width: 100% !important;
+}
 </style>
 @endpush
 
@@ -393,6 +544,10 @@ function setJenis(jenis){
 }
 
 document.addEventListener('DOMContentLoaded',function(){
+    // FIX: Force full height
+    document.documentElement.style.height = '100%';
+    document.body.style.height = '100%';
+    
     const presensiModal=document.getElementById('presensiModal');
     if(presensiModal){
         presensiModal.addEventListener('shown.bs.modal',initializePresensiModal);
@@ -496,9 +651,8 @@ function updateLocationInfo(position){
     lokasiInput.value = `${lat},${lng}`;
 
     if(distance<=radius){
-        // infoEl.textContent="✔ Anda berada di dalam radius wilayah kerja"; 
         infoEl.innerHTML = '<span class="badge badge-success">✔ Anda berada di dalam wilayah kerja</span>';
-        infoEl.style.fontSize = "10 px";
+        infoEl.style.fontSize = "10px";
         infoEl.classList.remove('text-danger','text-warning'); 
         infoEl.classList.add('text-success');
         submitBtn.disabled=false;
@@ -506,7 +660,7 @@ function updateLocationInfo(position){
         isOutsideRadius = false;
     }else{
         infoEl.innerHTML='<span class="badge badge-warning">⚠ Anda berada di luar radius wilayah kerja</span>';
-        infoEl.style.fontSize = "10 px";
+        infoEl.style.fontSize = "10px";
         infoEl.classList.remove('text-success'); 
         infoEl.classList.add('text-warning');
         submitBtn.disabled=false;
