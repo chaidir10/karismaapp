@@ -97,7 +97,7 @@ class DashboardAdminController extends Controller
             $jamMasukDefault = '07:30:00';
             $jamPulangDefault = '16:00:00';
 
-            if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'kedua') {
+            if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'keduanya') {
                 Presensi::updateOrCreate(
                     [
                         'user_id' => $pengajuan->user_id,
@@ -113,7 +113,7 @@ class DashboardAdminController extends Controller
                 );
             }
 
-            if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'kedua') {
+            if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'keduanya') {
                 Presensi::updateOrCreate(
                     [
                         'user_id' => $pengajuan->user_id,
