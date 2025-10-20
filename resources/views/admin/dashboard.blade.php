@@ -68,7 +68,14 @@
                         </thead>
                         <tbody>
                             @forelse($presensiPending ?? [] as $index => $p)
-                            <tr>
+                            <tr class="cursor-pointer hover:bg-blue-50"
+                                data-nama="{{ $peng->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal)->translatedFormat('d M Y') }}"
+                                data-jenis="{{ ucfirst($peng->jenis ?? '-') }}"
+                                data-status="{{ ucfirst($peng->status ?? '-') }}"
+                                data-lokasi="{{ $peng->lokasi ?? '-' }}"
+                                data-foto="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
+                                data-keterangan="{{ $peng->keterangan ?? '-' }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">
@@ -206,7 +213,13 @@
                         </thead>
                         <tbody>
                             @forelse($presensiHariIni ?? [] as $index => $p)
-                            <tr>
+                            <tr class="cursor-pointer hover:bg-blue-50"
+                                data-nama="{{ $p->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d M Y') }}"
+                                data-jenis="{{ ucfirst($p->jenis ?? '-') }}"
+                                data-status="{{ ucfirst($p->status ?? '-') }}"
+                                data-lokasi="{{ $p->lokasi ?? '-' }}"
+                                data-foto="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td>
@@ -252,6 +265,30 @@
     </div>
 </div>
 
+<!-- Modal Detail -->
+<div id="detailModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h2 class="text-lg font-semibold mb-4 text-gray-800" id="modalTitle">Detail</h2>
+
+        <div class="space-y-2 text-sm">
+            <div><strong>Pegawai:</strong> <span id="detailNama"></span></div>
+            <div><strong>Tanggal:</strong> <span id="detailTanggal"></span></div>
+            <div><strong>Jenis:</strong> <span id="detailJenis"></span></div>
+            <div><strong>Status:</strong> <span id="detailStatus"></span></div>
+            <div><strong>Lokasi:</strong> <span id="detailLokasi"></span></div>
+            <div><strong>Keterangan:</strong> <span id="detailKeterangan"></span></div>
+
+            <div id="detailFotoContainer" class="mt-3 hidden">
+                <strong>Bukti Foto:</strong>
+                <img id="detailFoto" src="" alt="Bukti" class="w-full rounded-md mt-2 border border-gray-200">
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
     :root {
@@ -596,29 +633,67 @@
     }
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const dashboardContainer = document.querySelector('.admin-dashboard');
+    document.addEventListener('DOMContentLoaded', function() {
+        const dashboardContainer = document.querySelector('.admin-dashboard');
 
-    // Fungsi untuk memperbarui isi dashboard
-    function refreshDashboard() {
-        fetch('{{ route("admin.dashboard") }}', {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newContent = doc.querySelector('.admin-dashboard');
-            if (newContent) {
-                dashboardContainer.innerHTML = newContent.innerHTML;
-                console.log("✅ Dashboard diperbarui otomatis");
+        // Fungsi untuk memperbarui isi dashboard
+        function refreshDashboard() {
+            fetch('{{ route("admin.dashboard") }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.querySelector('.admin-dashboard');
+                    if (newContent) {
+                        dashboardContainer.innerHTML = newContent.innerHTML;
+                        console.log("✅ Dashboard diperbarui otomatis");
+                    }
+                })
+                .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
+        }
+
+        // Jalankan setiap 30 detik (30000 ms)
+        setInterval(refreshDashboard, 1000);
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('detailModal');
+    const closeModal = document.getElementById('closeModal');
+
+    document.querySelectorAll('table.data-table tbody tr[data-nama]').forEach(row => {
+        row.addEventListener('click', function() {
+            document.getElementById('modalTitle').innerText = "Detail Data";
+            document.getElementById('detailNama').innerText = this.dataset.nama;
+            document.getElementById('detailTanggal').innerText = this.dataset.tanggal;
+            document.getElementById('detailJenis').innerText = this.dataset.jenis;
+            document.getElementById('detailStatus').innerText = this.dataset.status;
+            document.getElementById('detailLokasi').innerText = this.dataset.lokasi ?? '-';
+            document.getElementById('detailKeterangan').innerText = this.dataset.keterangan ?? '-';
+
+            const foto = this.dataset.foto;
+            const fotoContainer = document.getElementById('detailFotoContainer');
+            const fotoImg = document.getElementById('detailFoto');
+
+            if (foto) {
+                fotoContainer.classList.remove('hidden');
+                fotoImg.src = foto;
+            } else {
+                fotoContainer.classList.add('hidden');
             }
-        })
-        .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
-    }
 
-    // Jalankan setiap 30 detik (30000 ms)
-    setInterval(refreshDashboard, 1000);
+            modal.classList.remove('hidden');
+        });
+    });
+
+    closeModal.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', e => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
 });
 </script>
 
