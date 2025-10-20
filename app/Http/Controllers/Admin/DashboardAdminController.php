@@ -16,25 +16,28 @@ class DashboardAdminController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        // === Data utama untuk ringkasan ===
-        $jumlahPegawai = User::count();
-
+        // Jumlah pegawai hadir hari ini (masuk yang approved)
         $jumlahHadir = Presensi::whereDate('tanggal', $today)
             ->where('jenis', 'masuk')
             ->where('status', 'approved')
             ->distinct('user_id')
             ->count('user_id');
 
+        // Total pegawai
+        $jumlahPegawai = User::count();
+
+        // Total pengajuan pending
         $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
 
-        // === Presensi hari ini (approved) ===
+        // Presensi hari ini (masuk & pulang, hanya yang approved)
         $presensiHariIni = Presensi::with('user')
             ->whereDate('tanggal', $today)
             ->where('status', 'approved')
             ->orderBy('jam', 'asc')
             ->get();
 
-        $jamMasukStandard  = '07:30:00';
+        // Standar jam kerja
+        $jamMasukStandard = '07:30:00';
         $jamPulangStandard = '16:00:00';
 
         foreach ($presensiHariIni as $presensi) {
@@ -42,20 +45,20 @@ class DashboardAdminController extends Controller
             $presensi->waktu_kurang_menit = 0;
             $presensi->lembur_menit = 0;
 
-            $hari = Carbon::parse($presensi->tanggal)->format('l');
+            $hari = Carbon::parse($presensi->tanggal)->format('l'); // Nama hari (Monday, etc.)
 
-            // Cek keterlambatan
+            // === Cek Terlambat ===
             if ($presensi->jenis === 'masuk' && $presensi->jam > '07:30:59') {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasukStandard)) / 60);
             }
 
-            // Cek pulang lebih awal
+            // === Cek Pulang Kurang Waktu ===
             if ($presensi->jenis === 'pulang' && $presensi->jam < $jamPulangStandard) {
                 $presensi->waktu_kurang_menit = intval((strtotime($jamPulangStandard) - strtotime($presensi->jam)) / 60);
             }
 
-            // Cek lembur di hari libur/weekend
+            // === Cek Lembur (hanya weekend) ===
             if ($presensi->jenis === 'pulang' && in_array($hari, ['Saturday', 'Sunday'])) {
                 if ($presensi->jam > $jamPulangStandard) {
                     $presensi->lembur_menit = intval((strtotime($presensi->jam) - strtotime($jamPulangStandard)) / 60);
@@ -63,22 +66,21 @@ class DashboardAdminController extends Controller
             }
         }
 
-        // === Pengajuan pending ===
+        // Pengajuan pending
         $pengajuanPending = PengajuanPresensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
             ->get();
 
-        // === Presensi pending ===
+        // Presensi pending (untuk admin approve/reject)
         $presensiPending = Presensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
             ->get();
 
-        // Kirim semua data ke view
         return view('admin.dashboard', compact(
-            'jumlahPegawai',
             'jumlahHadir',
+            'jumlahPegawai',
             'jumlahPengajuan',
             'presensiHariIni',
             'pengajuanPending',
@@ -86,48 +88,49 @@ class DashboardAdminController extends Controller
         ));
     }
 
-    // ====== APPROVE / REJECT PENGAJUAN ======
+    // ----- Fungsi Approve/Reject Pengajuan -----
     public function approve($id)
     {
         $pengajuan = PengajuanPresensi::findOrFail($id);
 
         DB::transaction(function () use ($pengajuan) {
-            $jamMasukDefault  = '07:30:00';
+            $jamMasukDefault = '07:30:00';
             $jamPulangDefault = '16:00:00';
 
-            if (in_array($pengajuan->jenis, ['masuk', 'keduanya'])) {
+            if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'keduanya') {
                 Presensi::updateOrCreate(
                     [
                         'user_id' => $pengajuan->user_id,
                         'tanggal' => $pengajuan->tanggal,
-                        'jenis'   => 'masuk'
+                        'jenis' => 'masuk'
                     ],
                     [
-                        'jam'     => $jamMasukDefault,
-                        'status'  => 'approved',
-                        'foto'    => $pengajuan->bukti ?? null,
-                        'lokasi'  => $pengajuan->lokasi ?? null,
+                        'jam' => $jamMasukDefault,
+                        'status' => 'approved',
+                        'foto' => $pengajuan->bukti ?? null,
+                        'lokasi' => $pengajuan->lokasi ?? null
                     ]
                 );
             }
 
-            if (in_array($pengajuan->jenis, ['pulang', 'keduanya'])) {
+            if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'keduanya') {
                 Presensi::updateOrCreate(
                     [
                         'user_id' => $pengajuan->user_id,
                         'tanggal' => $pengajuan->tanggal,
-                        'jenis'   => 'pulang'
+                        'jenis' => 'pulang'
                     ],
                     [
-                        'jam'     => $jamPulangDefault,
-                        'status'  => 'approved',
-                        'foto'    => $pengajuan->bukti ?? null,
-                        'lokasi'  => $pengajuan->lokasi ?? null,
+                        'jam' => $jamPulangDefault,
+                        'status' => 'approved',
+                        'foto' => $pengajuan->bukti ?? null,
+                        'lokasi' => $pengajuan->lokasi ?? null
                     ]
                 );
             }
 
-            $pengajuan->update(['status' => 'approved']);
+            $pengajuan->status = 'approved';
+            $pengajuan->save();
         });
 
         return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
@@ -136,16 +139,18 @@ class DashboardAdminController extends Controller
     public function reject($id)
     {
         $pengajuan = PengajuanPresensi::findOrFail($id);
-        $pengajuan->update(['status' => 'rejected']);
+        $pengajuan->status = 'rejected';
+        $pengajuan->save();
 
         return redirect()->back()->with('success', 'Pengajuan ditolak.');
     }
 
-    // ====== APPROVE / REJECT PRESENSI ======
+    // ----- Fungsi Approve/Reject Presensi Pending -----
     public function approvePresensi($id)
     {
         $presensi = Presensi::findOrFail($id);
-        $presensi->update(['status' => 'approved']);
+        $presensi->status = 'approved';
+        $presensi->save();
 
         return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
     }
@@ -153,7 +158,8 @@ class DashboardAdminController extends Controller
     public function rejectPresensi($id)
     {
         $presensi = Presensi::findOrFail($id);
-        $presensi->update(['status' => 'rejected']);
+        $presensi->status = 'rejected';
+        $presensi->save();
 
         return redirect()->back()->with('success', 'Presensi ditolak.');
     }
