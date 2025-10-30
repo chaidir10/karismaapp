@@ -74,13 +74,16 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
+        // 🔹 Baris kosong
         $rows[] = [];
-        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
-        $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
-        $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
-        $rows[] = ['Total Jam Kerja', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Waktu Kurang', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Lembur', $this->formatLembur($this->data['summary']['total_lembur'])];
+
+        // 🔹 Ringkasan: nilai pindah dari kolom B ke C
+        $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
+        $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
+        $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
+        $rows[] = ['Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Lembur', '', $this->formatLembur($this->data['summary']['total_lembur'])];
 
         return $rows;
     }
@@ -110,7 +113,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
-        $sheet->mergeCells('A37:C37');
 
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A2')->getFont()->setBold(true);
@@ -141,7 +143,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
-        // Margin tipis seperti di file contoh
+        // 🔹 Margin tipis seperti di file contoh
         $sheet->getPageMargins()
             ->setTop(0.4)
             ->setRight(0.3)
@@ -150,8 +152,14 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // 🔹 Bold total
-        $sheet->getStyle("A{$lastRow}:B{$lastRow}")
+        // 🔹 Merge kolom A–B untuk bagian ringkasan
+        $highestRow = $sheet->getHighestRow();
+        for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
+            $sheet->mergeCells("A{$r}:B{$r}");
+        }
+
+        // 🔹 Bold total summary
+        $sheet->getStyle("A{$highestRow}-C{$highestRow}")
             ->getFont()->setBold(true);
 
         return [];
