@@ -51,6 +51,7 @@ class LaporanController extends Controller
                 $pulang = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'pulang') : null;
 
                 $jamMasukDefault  = Carbon::createFromTimeString('07:30');
+                $jamToleransi     = Carbon::createFromTimeString('07:31'); // batas keterlambatan
                 $jamPulangDefault = $date->isFriday()
                     ? Carbon::createFromTimeString('16:30')
                     : Carbon::createFromTimeString('16:00');
@@ -71,25 +72,30 @@ class LaporanController extends Controller
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
 
+                    // Total jam kerja aktual
                     $jamKerja = abs(floor($jamMasukObj->diffInMinutes($jamPulangObj)));
 
                     if ($isWeekend) {
+                        // Sabtu/Minggu = lembur penuh
                         $row['jam_kerja'] = $jamKerja;
                         $row['lembur']    = $jamKerja;
                         $totalLembur     += $jamKerja;
                     } else {
+                        // Jam kerja wajib (dari 07:30 sampai jam pulang)
                         $jamKerjaWajib = abs(floor($jamMasukDefault->diffInMinutes($jamPulangDefault)));
 
-                        // Pastikan tidak negatif & tanpa desimal
-                        $keterlambatan = $jamMasukObj->gt($jamMasukDefault)
+                        // ✅ Keterlambatan hanya jika >= 07:31
+                        $keterlambatan = $jamMasukObj->gte($jamToleransi)
                             ? abs(floor($jamMasukObj->diffInMinutes($jamMasukDefault)))
                             : 0;
 
+                        // ✅ Pulang cepat jika sebelum jam wajib pulang
                         $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
                             ? abs(floor($jamPulangDefault->diffInMinutes($jamPulangObj)))
                             : 0;
 
-                        $waktuKurang = $jamKerja < $jamKerjaWajib
+                        // ✅ Kekurangan jam kerja (tidak negatif)
+                        $waktuKurang = ($jamKerja < $jamKerjaWajib)
                             ? abs(floor($jamKerjaWajib - $jamKerja))
                             : 0;
 
