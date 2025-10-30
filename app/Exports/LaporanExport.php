@@ -77,7 +77,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         // 🔹 Tambahkan baris kosong
         $rows[] = [];
 
-        // 🔹 Ringkasan: kolom A merge sampai B, nilai pindah ke kolom C
+        // 🔹 Ringkasan: kolom A merge ke B, nilai di C merge ke D
         $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -109,7 +109,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // 🔹 Format header utama
+        // 🔹 Header utama
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
@@ -120,12 +120,12 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Warna header tabel
+        // 🔹 Header tabel
         $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('000000');
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Border seluruh data
+        // 🔹 Border data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
@@ -152,20 +152,23 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // 🔹 Merge kolom A–B di bagian ringkasan
+        // 🔹 Merge kolom A–B dan C–D di bagian ringkasan
         $highestRow = $sheet->getHighestRow();
-        // Diasumsikan ringkasan terdiri dari 6 baris terakhir
+        // Diasumsikan ringkasan = 6 baris terakhir
         for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
+            $sheet->mergeCells("C{$r}:D{$r}");
         }
 
-        // 🔹 Perataan & tebal untuk ringkasan
-        $sheet->getStyle("A" . ($highestRow - 5) . ":C{$highestRow}")
+        // 🔹 Styling ringkasan
+        $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
             ->getFont()->setBold(true);
-        $sheet->getStyle("A" . ($highestRow - 5) . ":A{$highestRow}")
+
+        $sheet->getStyle("A" . ($highestRow - 5) . ":B{$highestRow}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        $sheet->getStyle("C" . ($highestRow - 5) . ":C{$highestRow}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("C" . ($highestRow - 5) . ":D{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         return [];
     }
