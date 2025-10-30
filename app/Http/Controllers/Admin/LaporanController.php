@@ -13,12 +13,18 @@ use App\Exports\LaporanExport;
 
 class LaporanController extends Controller
 {
+    /**
+     * Halaman utama laporan
+     */
     public function index()
     {
         $users = User::orderBy('name')->get();
         return view('admin.manajemenlaporan', compact('users'));
     }
 
+    /**
+     * Fungsi inti pembuat laporan bulanan
+     */
     private function generateLaporan($userId = null, $bulan)
     {
         $startDate = Carbon::createFromFormat('Y-m', $bulan)->startOfMonth();
@@ -44,16 +50,16 @@ class LaporanController extends Controller
 
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
                 $tanggal   = $date->format('Y-m-d');
-                $dayOfWeek = $date->dayOfWeek; // 0=Min, 6=Sabtu
+                $dayOfWeek = $date->dayOfWeek;
                 $isWeekend = ($dayOfWeek == 0 || $dayOfWeek == 6);
 
                 $masuk  = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'masuk') : null;
                 $pulang = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'pulang') : null;
 
-                $jamMasukDefault  = Carbon::createFromFormat('H:i', '07:30');
+                $jamMasukDefault  = Carbon::createFromTimeString('07:30');
                 $jamPulangDefault = $date->isFriday()
-                    ? Carbon::createFromFormat('H:i', '16:30')
-                    : Carbon::createFromFormat('H:i', '16:00');
+                    ? Carbon::createFromTimeString('16:30')
+                    : Carbon::createFromTimeString('16:00');
 
                 $row = [
                     'tanggal'       => $date->format('d/m/Y'),
@@ -68,30 +74,22 @@ class LaporanController extends Controller
                 ];
 
                 if ($masuk && $pulang) {
-                    $jamMasukObj  = Carbon::createFromFormat('H:i', Carbon::parse($masuk->jam)->format('H:i'));
-                    $jamPulangObj = Carbon::createFromFormat('H:i', Carbon::parse($pulang->jam)->format('H:i'));
+                    $jamMasukObj  = Carbon::parse($masuk->jam);
+                    $jamPulangObj = Carbon::parse($pulang->jam);
 
-                    // $jamKerja = $jamMasukObj->diffInMinutes($jamPulangObj);
-                    // Jika masuk sebelum 07:30, hitung mulai dari 07:30 saja
-                    if ($jamMasukObj->lt($jamMasukDefault)) {
-                        $jamMulaiKerja = $jamMasukDefault->copy();
-                    } else {
-                        $jamMulaiKerja = $jamMasukObj->copy();
-                    }
-
-                    // Hitung total jam kerja dari waktu mulai kerja (min 07:30) hingga jam pulang
+                    // ⛔ Tidak ada pembatasan ke jam 07:30 lagi
+                    // Sekarang jam kerja dihitung dari jam masuk sebenarnya
+                    $jamMulaiKerja = $jamMasukObj->copy();
                     $jamKerja = $jamMulaiKerja->diffInMinutes($jamPulangObj);
 
                     if ($isWeekend) {
-                        // Akhir pekan = semua jam dianggap lembur
+                        // Hari Sabtu/Minggu dianggap lembur penuh
                         $row['jam_kerja'] = $jamKerja;
-                        $row['lembur'] = $jamKerja;
+                        $row['lembur']    = $jamKerja;
                         $totalLembur += $jamKerja;
                     } else {
-                        // Hari kerja normal
                         $jamKerjaWajib = $jamMasukDefault->diffInMinutes($jamPulangDefault);
 
-                        // Hitung keterlambatan dan pulang cepat
                         $keterlambatan = $jamMasukObj->gt($jamMasukDefault)
                             ? $jamMasukObj->diffInMinutes($jamMasukDefault)
                             : 0;
@@ -100,22 +98,15 @@ class LaporanController extends Controller
                             ? $jamPulangDefault->diffInMinutes($jamPulangObj)
                             : 0;
 
-                        // Hitung waktu kurang (hanya jika < jam wajib)
                         $waktuKurang = $jamKerja < $jamKerjaWajib
                             ? $jamKerjaWajib - $jamKerja
                             : 0;
 
-                        // Tidak ada lembur di hari kerja biasa
-                        $lembur = 0;
-
-                        // Simpan ke baris
                         $row['keterlambatan'] = $keterlambatan ?: '-';
                         $row['pulang_cepat']  = $pulangCepat ?: '-';
                         $row['jam_kerja']     = $jamKerja ?: '-';
                         $row['waktu_kurang']  = $waktuKurang ?: '-';
-                        $row['lembur']        = '-';
 
-                        // Akumulasi
                         $totalKeterlambatan += $keterlambatan;
                         $totalPulangCepat   += $pulangCepat;
                         $totalJamKerja      += $jamKerja;
@@ -139,13 +130,16 @@ class LaporanController extends Controller
                     'total_jam_kerja'     => $totalJamKerja,
                     'total_kekurangan'    => $totalKekurangan,
                     'total_lembur'        => $totalLembur,
-                ]
+                ],
             ];
         }
 
         return $laporan;
     }
 
+    /**
+     * Tampilkan laporan via AJAX
+     */
     public function getLaporan(Request $request)
     {
         $request->validate([
@@ -157,6 +151,9 @@ class LaporanController extends Controller
         return response()->json($laporan);
     }
 
+    /**
+     * Export PDF
+     */
     public function exportPdf(Request $request)
     {
         $request->validate([
@@ -165,17 +162,20 @@ class LaporanController extends Controller
         ]);
 
         $laporan = $this->generateLaporan($request->user_id, $request->bulan);
-
         $pdf = PDF::loadView('admin.manajemenlaporan_pdf', compact('laporan'))
             ->setPaper('a4', 'portrait');
 
+        $bulanNama = Carbon::createFromFormat('Y-m', $request->bulan)->isoFormat('MMMM Y');
         $filename = $request->user_id
-            ? "Laporan Absensi {$laporan[0]['user']->name} {$laporan[0]['user']->nip} BKK Kls I Tarakan.pdf"
-            : "Laporan Absensi Pegawai BKK Kls I Tarakan.pdf";
+            ? "Laporan Presensi {$laporan[0]['user']->name} ({$laporan[0]['user']->nip}) - {$bulanNama}.pdf"
+            : "Laporan Presensi Seluruh Pegawai - {$bulanNama}.pdf";
 
         return $pdf->download($filename);
     }
 
+    /**
+     * Export Excel
+     */
     public function exportExcel(Request $request)
     {
         $request->validate([
@@ -183,10 +183,13 @@ class LaporanController extends Controller
             'bulan'   => 'required|date_format:Y-m',
         ]);
 
+        $bulanNama = Carbon::createFromFormat('Y-m', $request->bulan)->isoFormat('MMMM Y');
         $filename = $request->user_id
-            ? "Laporan Absensi {$request->user_id} BKK Kls I Tarakan.xlsx"
-            : "Laporan Absensi Pegawai BKK Kls I Tarakan.xlsx";
+            ? "Laporan Presensi " . User::find($request->user_id)->name . " - {$bulanNama}.xlsx"
+            : "Laporan Presensi Seluruh Pegawai - {$bulanNama}.xlsx";
 
-        return Excel::download(new LaporanExport($request->all()), $filename);
+        return Excel::download(new LaporanExport(
+            $this->generateLaporan($request->user_id, $request->bulan)
+        ), $filename);
     }
 }

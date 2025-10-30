@@ -248,10 +248,8 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
-
 
 <style>
     :root {
