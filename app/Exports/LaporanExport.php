@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class LaporanExport implements WithMultipleSheets
 {
@@ -52,7 +53,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
                 ($this->data['user']->jabatan ?? 'Pegawai')
             ],
             [],
-            ['Tanggal', 'Masuk', 'Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang'],
+            ['Tanggal', 'Masuk', 'Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur'],
         ];
     }
 
@@ -65,23 +66,22 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
                 $row['tanggal'],
                 $row['masuk'],
                 $row['pulang'],
-                $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' menit' : '-',
-                $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' menit' : '-',
+                $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
+                $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
                 $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
-                $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' menit' : '-',
+                $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
+                $row['lembur'] !== '-' ? $this->formatMenit($row['lembur']) : '-',
             ];
         }
 
-        // Tambahkan baris kosong dan total ringkasan
+        // Baris kosong dan ringkasan
         $rows[] = [];
-        $rows[] = [
-            'Total Hari Kerja: ' . $this->data['total_hari_kerja'],
-            'Total Keterlambatan: ' . $this->data['summary']['total_keterlambatan'] . ' menit',
-            'Total Pulang Cepat: ' . $this->data['summary']['total_pulang_cepat'] . ' menit',
-            'Total Jam Kerja: ' . $this->formatMenit($this->data['summary']['total_jam_kerja']),
-            'Total Waktu Kurang: ' . $this->data['summary']['total_kekurangan'] . ' menit',
-            'Total Lembur: ' . $this->formatMenit($this->data['summary']['total_lembur']),
-        ];
+        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
+        $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
+        $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
+        $rows[] = ['Total Jam Kerja', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Waktu Kurang', $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Lembur', $this->formatMenit($this->data['summary']['total_lembur'])];
 
         return $rows;
     }
@@ -102,12 +102,34 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
 
     public function styles(Worksheet $sheet)
     {
+        // Header styles
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->getStyle('A4:G4')->getFont()->setBold(true);
-        $sheet->getStyle('A4:G4')->getFill()->setFillType('solid')
+        $sheet->getStyle('A4:H4')->getFont()->setBold(true);
+        $sheet->getStyle('A4:H4')->getFill()->setFillType('solid')
             ->getStartColor()->setRGB('0A9396');
-        $sheet->getStyle('A4:G4')->getFont()->getColor()->setRGB('FFFFFF');
+        $sheet->getStyle('A4:H4')->getFont()->getColor()->setRGB('FFFFFF');
+        $sheet->getStyle('A4:H4')->getAlignment()->setHorizontal('center');
+
+        // Border untuk semua data
+        $lastRow = $sheet->getHighestRow();
+        $sheet->getStyle("A4:H{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle('thin');
+
+        // ✅ Page setup agar muat di 1 lembar A4
+        $sheet->getPageSetup()
+            ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
+            ->setPaperSize(PageSetup::PAPERSIZE_A4)
+            ->setFitToPage(true)
+            ->setFitToWidth(1)
+            ->setFitToHeight(0);
+
+        $sheet->getPageMargins()
+            ->setTop(0.3)
+            ->setRight(0.3)
+            ->setLeft(0.3)
+            ->setBottom(0.3);
+
+        $sheet->getPageSetup()->setHorizontalCentered(true);
 
         return [];
     }
