@@ -74,10 +74,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        // 🔹 Baris kosong
+        // 🔹 Tambahkan baris kosong
         $rows[] = [];
 
-        // 🔹 Ringkasan: nilai pindah dari kolom B ke C
+        // 🔹 Ringkasan: kolom A merge sampai B, nilai pindah ke kolom C
         $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -109,7 +109,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // 🔹 Format header
+        // 🔹 Format header utama
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
@@ -125,25 +125,25 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Border untuk seluruh area data
+        // 🔹 Border seluruh data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // 🔹 Lebar kolom disesuaikan seperti contoh Excel
+        // 🔹 Lebar kolom
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // 🔹 Page setup persis seperti layout contoh
+        // 🔹 Page setup
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
-        // 🔹 Margin tipis seperti di file contoh
+        // 🔹 Margin
         $sheet->getPageMargins()
             ->setTop(0.4)
             ->setRight(0.3)
@@ -152,15 +152,20 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // 🔹 Merge kolom A–B untuk bagian ringkasan
+        // 🔹 Merge kolom A–B di bagian ringkasan
         $highestRow = $sheet->getHighestRow();
+        // Diasumsikan ringkasan terdiri dari 6 baris terakhir
         for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
         }
 
-        // 🔹 Bold total summary
-        $sheet->getStyle("A{$highestRow}-C{$highestRow}")
+        // 🔹 Perataan & tebal untuk ringkasan
+        $sheet->getStyle("A" . ($highestRow - 5) . ":C{$highestRow}")
             ->getFont()->setBold(true);
+        $sheet->getStyle("A" . ($highestRow - 5) . ":A{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle("C" . ($highestRow - 5) . ":C{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         return [];
     }
