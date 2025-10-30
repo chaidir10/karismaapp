@@ -43,6 +43,19 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
         $this->data = $data;
     }
 
+    public function headings(): array
+    {
+        return [
+            ['LAPORAN KEHADIRAN'],
+            [
+                $this->data['user']->name . ' (NIP. ' . $this->data['user']->nip . ') - ' .
+                ($this->data['user']->jabatan ?? 'Pegawai')
+            ],
+            [],
+            ['Tanggal', 'Masuk', 'Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang'],
+        ];
+    }
+
     public function array(): array
     {
         $rows = [];
@@ -52,35 +65,34 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
                 $row['tanggal'],
                 $row['masuk'],
                 $row['pulang'],
-                $row['keterlambatan'],
-                $row['pulang_cepat'],
-                $row['jam_kerja'],
-                $row['waktu_kurang'],
-                $row['lembur'],
+                $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' menit' : '-',
+                $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' menit' : '-',
+                $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
+                $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' menit' : '-',
             ];
         }
 
-        // Tambahkan baris kosong + total di bawahnya
+        // Tambahkan baris kosong dan total ringkasan
         $rows[] = [];
-        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
-        $rows[] = ['Total Keterlambatan (mnt)', $this->data['summary']['total_keterlambatan']];
-        $rows[] = ['Total Pulang Cepat (mnt)', $this->data['summary']['total_pulang_cepat']];
-        $rows[] = ['Total Jam Kerja (mnt)', $this->data['summary']['total_jam_kerja']];
-        $rows[] = ['Total Waktu Kurang (mnt)', $this->data['summary']['total_kekurangan']];
-        $rows[] = ['Total Lembur (mnt)', $this->data['summary']['total_lembur']];
+        $rows[] = [
+            'Total Hari Kerja: ' . $this->data['total_hari_kerja'],
+            'Total Keterlambatan: ' . $this->data['summary']['total_keterlambatan'] . ' menit',
+            'Total Pulang Cepat: ' . $this->data['summary']['total_pulang_cepat'] . ' menit',
+            'Total Jam Kerja: ' . $this->formatMenit($this->data['summary']['total_jam_kerja']),
+            'Total Waktu Kurang: ' . $this->data['summary']['total_kekurangan'] . ' menit',
+            'Total Lembur: ' . $this->formatMenit($this->data['summary']['total_lembur']),
+        ];
 
         return $rows;
     }
 
-    public function headings(): array
+    private function formatMenit($totalMenit)
     {
-        return [
-            ['LAPORAN PRESENSI PEGAWAI'],
-            ['Nama: ' . $this->data['user']->name],
-            ['NIP: ' . $this->data['user']->nip],
-            [],
-            ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan (mnt)', 'Pulang Cepat (mnt)', 'Jam Kerja (mnt)', 'Waktu Kurang (mnt)', 'Lembur (mnt)'],
-        ];
+        $jam = floor($totalMenit / 60);
+        $menit = $totalMenit % 60;
+        if ($totalMenit <= 0) return '-';
+        if ($menit == 0) return "{$jam} jam";
+        return "{$jam} jam {$menit} menit";
     }
 
     public function title(): string
@@ -90,11 +102,13 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1    => ['font' => ['bold' => true, 'size' => 14]],
-            2    => ['font' => ['bold' => true]],
-            3    => ['font' => ['bold' => true]],
-            5    => ['font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']], 'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0A9396']]],
-        ];
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:G4')->getFont()->setBold(true);
+        $sheet->getStyle('A4:G4')->getFill()->setFillType('solid')
+            ->getStartColor()->setRGB('0A9396');
+        $sheet->getStyle('A4:G4')->getFont()->getColor()->setRGB('FFFFFF');
+
+        return [];
     }
 }
