@@ -72,9 +72,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        // Tambahkan baris kosong dan ringkasan total
+        // Baris kosong + ringkasan
         $rows[] = [];
-
         $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -106,50 +105,56 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // Merge header utama
+        // Merge judul
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
 
-        // Format judul
+        // Header
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->getStyle('A3')->getFont()->setBold(true);
         $sheet->getStyle('A1:H3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Header tabel
+        // Tabel header
         $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0A9396');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Border seluruh tabel data
+        // Border semua data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Lebar kolom agar muat di A4 landscape
+        // Lebar kolom disesuaikan agar pas di A4 landscape
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // Merge bagian ringkasan total (kolom A–G digabung)
-        $summaryStart = $lastRow - 6; // posisi mulai total
-        for ($r = $summaryStart; $r <= $lastRow; $r++) {
+        // Hitung posisi ringkasan
+        $summaryStart = $lastRow - 6; // baris pertama dari 7 total ringkasan
+        $summaryEnd = $lastRow;
+
+        // Tambahkan garis atas tebal pemisah sebelum ringkasan
+        $sheet->getStyle("A" . ($summaryStart - 1) . ":H" . ($summaryStart - 1))
+            ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
+
+        // Format ringkasan
+        for ($r = $summaryStart; $r <= $summaryEnd; $r++) {
             $sheet->mergeCells("A{$r}:G{$r}");
-            $sheet->getStyle("A{$r}:G{$r}")->getFont()->setBold(true);
+            $sheet->getStyle("A{$r}:H{$r}")->getFont()->setBold(true);
             $sheet->getStyle("A{$r}:G{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $sheet->getStyle("A{$r}:H{$r}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle("A{$r}:H{$r}")
+                ->getFill()->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('D9EAD3');
         }
 
-        // Page setup untuk 1 lembar A4 landscape
+        // Page setup A4 landscape
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
-        // Margin halus
         $sheet->getPageMargins()
             ->setTop(0.4)
             ->setRight(0.3)
