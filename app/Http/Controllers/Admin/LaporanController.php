@@ -13,18 +13,12 @@ use App\Exports\LaporanExport;
 
 class LaporanController extends Controller
 {
-    /**
-     * Halaman utama laporan
-     */
     public function index()
     {
         $users = User::orderBy('name')->get();
         return view('admin.manajemenlaporan', compact('users'));
     }
 
-    /**
-     * Fungsi inti pembuat laporan bulanan
-     */
     private function generateLaporan($userId = null, $bulan)
     {
         $startDate = Carbon::createFromFormat('Y-m', $bulan)->startOfMonth();
@@ -77,29 +71,26 @@ class LaporanController extends Controller
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
 
-                    // ⛔ Tidak ada pembatasan ke jam 07:30 lagi
-                    // Sekarang jam kerja dihitung dari jam masuk sebenarnya
-                    $jamMulaiKerja = $jamMasukObj->copy();
-                    $jamKerja = $jamMulaiKerja->diffInMinutes($jamPulangObj);
+                    $jamKerja = abs(floor($jamMasukObj->diffInMinutes($jamPulangObj)));
 
                     if ($isWeekend) {
-                        // Hari Sabtu/Minggu dianggap lembur penuh
                         $row['jam_kerja'] = $jamKerja;
                         $row['lembur']    = $jamKerja;
-                        $totalLembur += $jamKerja;
+                        $totalLembur     += $jamKerja;
                     } else {
-                        $jamKerjaWajib = $jamMasukDefault->diffInMinutes($jamPulangDefault);
+                        $jamKerjaWajib = abs(floor($jamMasukDefault->diffInMinutes($jamPulangDefault)));
 
+                        // Pastikan tidak negatif & tanpa desimal
                         $keterlambatan = $jamMasukObj->gt($jamMasukDefault)
-                            ? $jamMasukObj->diffInMinutes($jamMasukDefault)
+                            ? abs(floor($jamMasukObj->diffInMinutes($jamMasukDefault)))
                             : 0;
 
                         $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
-                            ? $jamPulangDefault->diffInMinutes($jamPulangObj)
+                            ? abs(floor($jamPulangDefault->diffInMinutes($jamPulangObj)))
                             : 0;
 
                         $waktuKurang = $jamKerja < $jamKerjaWajib
-                            ? $jamKerjaWajib - $jamKerja
+                            ? abs(floor($jamKerjaWajib - $jamKerja))
                             : 0;
 
                         $row['keterlambatan'] = $keterlambatan ?: '-';
@@ -137,9 +128,6 @@ class LaporanController extends Controller
         return $laporan;
     }
 
-    /**
-     * Tampilkan laporan via AJAX
-     */
     public function getLaporan(Request $request)
     {
         $request->validate([
@@ -151,9 +139,6 @@ class LaporanController extends Controller
         return response()->json($laporan);
     }
 
-    /**
-     * Export PDF
-     */
     public function exportPdf(Request $request)
     {
         $request->validate([
@@ -173,9 +158,6 @@ class LaporanController extends Controller
         return $pdf->download($filename);
     }
 
-    /**
-     * Export Excel
-     */
     public function exportExcel(Request $request)
     {
         $request->validate([
