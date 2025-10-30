@@ -68,9 +68,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
                 $row['pulang'],
                 $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
                 $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
-                $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
+                $row['jam_kerja'] !== '-' ? $this->formatJamMenit($row['jam_kerja']) : '-',
                 $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
-                $row['lembur'] !== '-' ? $this->formatMenit($row['lembur']) : '-',
+                $row['lembur'] !== '-' ? $this->formatLemburJam($row['lembur']) : '-',
             ];
         }
 
@@ -79,20 +79,32 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
         $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
-        $rows[] = ['Total Jam Kerja', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Jam Kerja', $this->formatJamMenit($this->data['summary']['total_jam_kerja'])];
         $rows[] = ['Total Waktu Kurang', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Lembur', $this->formatMenit($this->data['summary']['total_lembur'])];
+        $rows[] = ['Total Lembur', $this->formatLemburJam($this->data['summary']['total_lembur'])];
 
         return $rows;
     }
 
-    private function formatMenit($totalMenit)
+    /**
+     * Format total jam dan menit (contoh: 8 jam 30 menit)
+     */
+    private function formatJamMenit($totalMenit)
     {
+        if ($totalMenit <= 0) return '-';
         $jam = floor($totalMenit / 60);
         $menit = $totalMenit % 60;
+        return $menit > 0 ? "{$jam} jam {$menit} menit" : "{$jam} jam";
+    }
+
+    /**
+     * Format lembur hanya jam saja (contoh: 8 jam 58 menit → 8 jam)
+     */
+    private function formatLemburJam($totalMenit)
+    {
         if ($totalMenit <= 0) return '-';
-        if ($menit == 0) return "{$jam} jam";
-        return "{$jam} jam {$menit} menit";
+        $jam = floor($totalMenit / 60);
+        return "{$jam} jam";
     }
 
     public function title(): string
@@ -115,9 +127,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A4:H{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle('thin');
 
-        // ✅ Page setup agar muat di 1 lembar A4
+        // ✅ Page setup agar pas 1 halaman A4 Landscape
         $sheet->getPageSetup()
-            ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
+            ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToPage(true)
             ->setFitToWidth(1)
@@ -130,6 +142,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
             ->setBottom(0.3);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
+        $sheet->getPageSetup()->setVerticalCentered(false);
 
         return [];
     }
