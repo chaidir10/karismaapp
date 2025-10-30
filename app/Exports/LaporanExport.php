@@ -25,11 +25,9 @@ class LaporanExport implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets = [];
-
         foreach ($this->laporan as $data) {
             $sheets[] = new LaporanPerPegawaiSheet($data);
         }
-
         return $sheets;
     }
 }
@@ -74,7 +72,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
+        // Tambahkan baris kosong dan ringkasan total
         $rows[] = [];
+
         $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -106,41 +106,50 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // 🔹 Format header
+        // Merge header utama
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
 
+        // Format judul
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A3')->getFont()->setBold(true);
+        $sheet->getStyle('A1:H3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        // 🔹 Warna header tabel
+        // Header tabel
         $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0A9396');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Border untuk seluruh area data
+        // Border seluruh tabel data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // 🔹 Lebar kolom disesuaikan seperti contoh Excel
+        // Lebar kolom agar muat di A4 landscape
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // 🔹 Page setup persis seperti layout contoh
+        // Merge bagian ringkasan total (kolom A–G digabung)
+        $summaryStart = $lastRow - 6; // posisi mulai total
+        for ($r = $summaryStart; $r <= $lastRow; $r++) {
+            $sheet->mergeCells("A{$r}:G{$r}");
+            $sheet->getStyle("A{$r}:G{$r}")->getFont()->setBold(true);
+            $sheet->getStyle("A{$r}:G{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle("A{$r}:H{$r}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        }
+
+        // Page setup untuk 1 lembar A4 landscape
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
-        // Margin tipis seperti di file contoh
+        // Margin halus
         $sheet->getPageMargins()
             ->setTop(0.4)
             ->setRight(0.3)
@@ -148,10 +157,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ->setBottom(0.4);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
-
-        // 🔹 Bold total
-        $sheet->getStyle("A{$lastRow}:B{$lastRow}")
-            ->getFont()->setBold(true);
 
         return [];
     }
