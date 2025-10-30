@@ -25,13 +25,18 @@ class LaporanExport implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets = [];
+
         foreach ($this->laporan as $data) {
             $sheets[] = new LaporanPerPegawaiSheet($data);
         }
+
         return $sheets;
     }
 }
 
+/**
+ * Sheet per pegawai
+ */
 class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, WithStyles
 {
     protected $data;
@@ -69,7 +74,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        // Baris kosong dan ringkasan total
         $rows[] = [];
         $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
@@ -102,56 +106,42 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // Header utama
+        // 🔹 Format header
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
+        $sheet->mergeCells('A36:H36');
 
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1:H3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A3')->getFont()->setBold(true);
 
-        // Header tabel
-        $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
+        $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // 🔹 Warna header tabel
+        $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('000000');
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Border seluruh data
+        // 🔹 Border untuk seluruh area data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Lebar kolom seperti contoh
+        // 🔹 Lebar kolom disesuaikan seperti contoh Excel
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // Hitung posisi ringkasan
-        $summaryStart = $lastRow - 6; // ringkasan dimulai 7 baris terakhir
-        $summaryEnd = $lastRow;
-
-        // Garis tebal di atas ringkasan
-        $sheet->getStyle("A" . ($summaryStart - 1) . ":H" . ($summaryStart - 1))
-            ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
-
-        // Format ringkasan: merge 1 kolom lebih ke kanan (A–C)
-        for ($r = $summaryStart; $r <= $summaryEnd; $r++) {
-            $sheet->mergeCells("A{$r}:C{$r}");
-            $sheet->getStyle("A{$r}:C{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $sheet->getStyle("A{$r}:H{$r}")->getFont()->setBold(true);
-
-            $sheet->getStyle("A{$r}:H{$r}")
-                ->getFill()->setFillType(Fill::FILL_SOLID)
-                ->getStartColor()->setRGB('D9EAD3');
-        }
-
-        // Page setup A4 landscape
+        // 🔹 Page setup persis seperti layout contoh
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
+        // Margin tipis seperti di file contoh
         $sheet->getPageMargins()
             ->setTop(0.4)
             ->setRight(0.3)
@@ -159,6 +149,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ->setBottom(0.4);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
+
+        // 🔹 Bold total
+        $sheet->getStyle("A{$lastRow}:B{$lastRow}")
+            ->getFont()->setBold(true);
 
         return [];
     }
