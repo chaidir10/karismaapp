@@ -6,10 +6,12 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class LaporanExport implements WithMultipleSheets
 {
@@ -32,10 +34,7 @@ class LaporanExport implements WithMultipleSheets
     }
 }
 
-/**
- * Sheet per pegawai
- */
-class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithStyles
+class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, WithStyles
 {
     protected $data;
 
@@ -47,7 +46,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
     public function headings(): array
     {
         return [
-            ['LAPORAN KEHADIRAN'],
+            ['LAPORAN KEHADIRAN PEGAWAI'],
             [
                 $this->data['user']->name . ' (NIP. ' . $this->data['user']->nip . ') - ' .
                 ($this->data['user']->jabatan ?? 'Pegawai')
@@ -74,7 +73,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
             ];
         }
 
-        // Baris kosong dan ringkasan
+        // Baris kosong dan ringkasan total
         $rows[] = [];
         $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
@@ -86,9 +85,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
         return $rows;
     }
 
-    /**
-     * Format total jam dan menit (contoh: 8 jam 30 menit)
-     */
     private function formatJamMenit($totalMenit)
     {
         if ($totalMenit <= 0) return '-';
@@ -97,9 +93,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
         return $menit > 0 ? "{$jam} jam {$menit} menit" : "{$jam} jam";
     }
 
-    /**
-     * Format lembur hanya jam saja (contoh: 8 jam 58 menit → 8 jam)
-     */
     private function formatLemburJam($totalMenit)
     {
         if ($totalMenit <= 0) return '-';
@@ -114,20 +107,52 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
 
     public function styles(Worksheet $sheet)
     {
-        // Header styles
+        // Font umum
+        $sheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(11);
+
+        // Header besar
+        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A2:H2');
+        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->getStyle('A4:H4')->getFont()->setBold(true);
-        $sheet->getStyle('A4:H4')->getFill()->setFillType('solid')
-            ->getStartColor()->setRGB('0A9396');
-        $sheet->getStyle('A4:H4')->getFont()->getColor()->setRGB('FFFFFF');
-        $sheet->getStyle('A4:H4')->getAlignment()->setHorizontal('center');
 
-        // Border untuk semua data
+        // Header tabel
+        $sheet->getStyle('A4:H4')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '0A9396']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER
+            ],
+        ]);
+
+        // Border seluruh data
         $lastRow = $sheet->getHighestRow();
-        $sheet->getStyle("A4:H{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle('thin');
+        $sheet->getStyle("A4:H{$lastRow}")->applyFromArray([
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']]
+            ]
+        ]);
 
-        // ✅ Page setup agar pas 1 halaman A4 Landscape
+        // Lebar kolom disesuaikan agar sama seperti contoh
+        $sheet->getColumnDimension('A')->setWidth(14); // Tanggal
+        $sheet->getColumnDimension('B')->setWidth(10); // Masuk
+        $sheet->getColumnDimension('C')->setWidth(10); // Pulang
+        $sheet->getColumnDimension('D')->setWidth(15); // Keterlambatan
+        $sheet->getColumnDimension('E')->setWidth(15); // Pulang Cepat
+        $sheet->getColumnDimension('F')->setWidth(15); // Jam Kerja
+        $sheet->getColumnDimension('G')->setWidth(16); // Waktu Kurang
+        $sheet->getColumnDimension('H')->setWidth(12); // Lembur
+
+        // Rata tengah untuk kolom waktu
+        $sheet->getStyle('A5:C' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('D5:H' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Page setup agar muat di 1 lembar A4 landscape
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
@@ -142,7 +167,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, Shou
             ->setBottom(0.3);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
-        $sheet->getPageSetup()->setVerticalCentered(false);
 
         return [];
     }
