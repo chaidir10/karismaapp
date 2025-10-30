@@ -47,11 +47,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
     public function headings(): array
     {
         return [
-            ['LAPORAN PRESENSI PEGAWAI'],
-            ['Nama: ' . $this->data['user']->name],
-            ['NIP: ' . $this->data['user']->nip],
+            ['LAPORAN KEHADIRAN'],
+            [$this->data['user']->name . ' (NIP. ' . $this->data['user']->nip . ') - Pranata Komputer Ahli Pertama'],
             [],
-            ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur'],
+            ['Tanggal', 'Masuk', 'Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur'],
         ];
     }
 
@@ -64,43 +63,31 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
                 $row['tanggal'],
                 $row['masuk'],
                 $row['pulang'],
-                $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
-                $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
-                $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
-                $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
-                $row['lembur'] !== '-' ? $this->formatLembur($row['lembur']) : '-',
+                $row['keterlambatan'],
+                $row['pulang_cepat'],
+                $row['jam_kerja'],
+                $row['waktu_kurang'],
+                $row['lembur'],
             ];
         }
 
         // Baris kosong + ringkasan
         $rows[] = [];
-        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
+        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja'], 'Ringkasan presensi ' . $this->data['user']->name . ' (NIP. ' . $this->data['user']->nip . ') - Pranata Komputer Ahli Pertama'];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
-        $rows[] = ['Total Jam Kerja', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Jam Kerja', $this->data['summary']['total_jam_kerja']];
         $rows[] = ['Total Waktu Kurang', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Lembur', $this->formatLembur($this->data['summary']['total_lembur'])];
+        $rows[] = ['Total Lembur', $this->data['summary']['total_lembur']];
 
         return $rows;
     }
 
-    private function formatMenit($totalMenit)
-    {
-        $jam = floor($totalMenit / 60);
-        $menit = $totalMenit % 60;
-        if ($totalMenit <= 0) return '-';
-        return $menit === 0 ? "{$jam} jam" : "{$jam} jam {$menit} menit";
-    }
-
-    private function formatLembur($totalMenit)
-    {
-        $jam = floor($totalMenit / 60);
-        return $jam > 0 ? "{$jam} jam" : '-';
-    }
-
     public function title(): string
     {
-        return $this->data['user']->name;
+        // Hanya ambil nama depan untuk judul sheet
+        $namaParts = explode(' ', $this->data['user']->name);
+        return $namaParts[0];
     }
 
     public function styles(Worksheet $sheet)
@@ -110,42 +97,41 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
 
-        // Header
+        // Header utama
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1:H3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        // Tabel header
-        $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
-        $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0A9396');
-        $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:H2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        
+        // Header tabel
+        $sheet->getStyle('A4:H4')->getFont()->setBold(true);
+        $sheet->getStyle('A4:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Border semua data
         $lastRow = $sheet->getHighestRow();
-        $sheet->getStyle("A5:H{$lastRow}")
+        $dataStartRow = 4;
+        $sheet->getStyle("A{$dataStartRow}:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Lebar kolom disesuaikan agar pas di A4 landscape
-        $widths = [14, 10, 10, 14, 14, 14, 14, 12];
+        // Lebar kolom disesuaikan
+        $widths = [14, 12, 12, 16, 14, 16, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // Hitung posisi ringkasan
-        $summaryStart = $lastRow - 6; // baris pertama dari 7 total ringkasan
+        // Format ringkasan - mulai dari baris terakhir dikurangi 6
+        $summaryStart = $lastRow - 6;
         $summaryEnd = $lastRow;
 
-        // Tambahkan garis atas tebal pemisah sebelum ringkasan
-        $sheet->getStyle("A" . ($summaryStart - 1) . ":H" . ($summaryStart - 1))
-            ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
-
-        // Format ringkasan
+        // Baris pertama ringkasan (Total Hari Kerja) - merge kolom B sampai H untuk deskripsi
+        $sheet->mergeCells("C{$summaryStart}:H{$summaryStart}");
+        
+        // Format khusus untuk baris ringkasan
         for ($r = $summaryStart; $r <= $summaryEnd; $r++) {
-            $sheet->mergeCells("A{$r}:G{$r}");
             $sheet->getStyle("A{$r}:H{$r}")->getFont()->setBold(true);
-            $sheet->getStyle("A{$r}:G{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $sheet->getStyle("A{$r}:H{$r}")
-                ->getFill()->setFillType(Fill::FILL_SOLID)
-                ->getStartColor()->setRGB('D9EAD3');
+            
+            // Untuk baris pertama ringkasan, ratakan kiri untuk kolom C
+            if ($r === $summaryStart) {
+                $sheet->getStyle("C{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            }
         }
 
         // Page setup A4 landscape
