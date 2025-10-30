@@ -73,7 +73,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         // Baris kosong + ringkasan
         $rows[] = [];
-        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja'], 'Ringkasan presensi ' . $this->data['user']->name . ' (NIP. ' . $this->data['user']->nip . ') - Pranata Komputer Ahli Pertama'];
+        $rows[] = ['Ringkasan presensi ' . $this->data['user']->name . ' (NIP. ' . $this->data['user']->nip . ') - Pranata Komputer Ahli Pertama'];
+        $rows[] = ['Total Hari Kerja', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', $this->data['summary']['total_pulang_cepat'] . ' menit'];
         $rows[] = ['Total Jam Kerja', $this->data['summary']['total_jam_kerja']];
@@ -85,9 +86,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function title(): string
     {
-        // Hanya ambil nama depan untuk judul sheet
-        $namaParts = explode(' ', $this->data['user']->name);
-        return $namaParts[0];
+        return $this->data['user']->name;
     }
 
     public function styles(Worksheet $sheet)
@@ -105,33 +104,36 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle('A4:H4')->getFont()->setBold(true);
         $sheet->getStyle('A4:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Border semua data
-        $lastRow = $sheet->getHighestRow();
-        $dataStartRow = 4;
-        $sheet->getStyle("A{$dataStartRow}:H{$lastRow}")
+        // Border untuk data presensi
+        $lastDataRow = count($this->data['rows']) + 4; // +4 untuk header
+        $sheet->getStyle("A4:H{$lastDataRow}")
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Format ringkasan - mulai dari baris setelah data
+        $summaryStart = $lastDataRow + 2; // +2 untuk baris kosong
+        $summaryEnd = $summaryStart + 6; // 7 baris ringkasan
+
+        // Merge baris judul ringkasan
+        $sheet->mergeCells("A{$summaryStart}:H{$summaryStart}");
+
+        // Format judul ringkasan
+        $sheet->getStyle("A{$summaryStart}")->getFont()->setBold(true);
+        $sheet->getStyle("A{$summaryStart}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Format baris ringkasan
+        for ($r = $summaryStart + 1; $r <= $summaryEnd; $r++) {
+            $sheet->getStyle("A{$r}")->getFont()->setBold(true);
+            $sheet->getStyle("B{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        }
+
+        // Border untuk ringkasan (opsional)
+        $sheet->getStyle("A" . ($summaryStart + 1) . ":B{$summaryEnd}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         // Lebar kolom disesuaikan
         $widths = [14, 12, 12, 16, 14, 16, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
-        }
-
-        // Format ringkasan - mulai dari baris terakhir dikurangi 6
-        $summaryStart = $lastRow - 6;
-        $summaryEnd = $lastRow;
-
-        // Baris pertama ringkasan (Total Hari Kerja) - merge kolom B sampai H untuk deskripsi
-        $sheet->mergeCells("C{$summaryStart}:H{$summaryStart}");
-        
-        // Format khusus untuk baris ringkasan
-        for ($r = $summaryStart; $r <= $summaryEnd; $r++) {
-            $sheet->getStyle("A{$r}:H{$r}")->getFont()->setBold(true);
-            
-            // Untuk baris pertama ringkasan, ratakan kiri untuk kolom C
-            if ($r === $summaryStart) {
-                $sheet->getStyle("C{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-            }
         }
 
         // Page setup A4 landscape
