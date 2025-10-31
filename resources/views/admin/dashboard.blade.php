@@ -1006,6 +1006,60 @@
     crossorigin=""></script>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Klik pada baris presensi pending
+    document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(row => {
+        row.addEventListener('click', function() {
+            document.getElementById('detailPegawaiPresensi').textContent = this.dataset.userName;
+            document.getElementById('detailTanggalPresensi').textContent = this.dataset.tanggal;
+            document.getElementById('detailJenisPresensi').textContent = this.dataset.jenis;
+            document.getElementById('detailJamPresensi').textContent = this.dataset.jam;
+            document.getElementById('detailLokasiPresensi').textContent = this.dataset.lokasi;
+
+            // Update form action
+            document.getElementById('formApprovePresensi').action = this.dataset.approveUrl;
+            document.getElementById('formRejectPresensi').action = this.dataset.rejectUrl;
+
+            // Tampilkan modal
+            openModal('modalPresensiPending');
+        });
+    });
+
+    // Klik pada baris pengajuan pending
+    document.querySelectorAll('#pengajuanPendingTable .clickable-row').forEach(row => {
+        row.addEventListener('click', function() {
+            document.getElementById('detailPegawaiPengajuan').textContent = this.dataset.userName;
+            document.getElementById('detailTanggalPengajuan').textContent = this.dataset.tanggal;
+            document.getElementById('detailJenisPengajuan').textContent = this.dataset.jenis;
+            document.getElementById('detailAlasanPengajuan').textContent = this.dataset.alasan;
+
+            const buktiContainer = document.getElementById('detailBuktiPengajuan');
+            buktiContainer.innerHTML = this.dataset.buktiUrl
+                ? `<a href="${this.dataset.buktiUrl}" target="_blank"><img src="${this.dataset.buktiUrl}" class="bukti-image"></a>`
+                : '<span class="text-muted">Tidak ada bukti</span>';
+
+            document.getElementById('formApprovePengajuan').action = this.dataset.approveUrl;
+            document.getElementById('formRejectPengajuan').action = this.dataset.rejectUrl;
+
+            openModal('modalPengajuanPending');
+        });
+    });
+});
+
+// Fungsi buka/tutup modal
+function openModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
+}
+</script>
+
+
+<script>
     // Global map variable
     let presensiMap = null;
     let currentMarker = null;
