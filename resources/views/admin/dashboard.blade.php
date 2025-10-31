@@ -152,7 +152,7 @@
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
                                 data-bukti="{{ $peng->bukti ?? '' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('<public>storage/' . $peng->bukti) : '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
