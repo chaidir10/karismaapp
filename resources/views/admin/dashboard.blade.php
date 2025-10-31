@@ -916,7 +916,7 @@
                 <form id="formApprovePresensi" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i> Setujui
+                        <i class="fas fa-check"></i>
                     </button>
                 </form>
                 <form id="formRejectPresensi" method="POST" class="inline-form">
