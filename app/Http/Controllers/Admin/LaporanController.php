@@ -50,7 +50,7 @@ class LaporanController extends Controller
             $totalKekurangan    = 0;
             $totalHariKerja     = 0;
             $totalLembur        = 0;
-            $totalHariTelat     = 0; // Tambahan: menghitung hari telat
+            $totalHariTelat     = 0;
 
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
                 $tanggal   = $date->format('Y-m-d');
@@ -77,15 +77,15 @@ class LaporanController extends Controller
                     'waktu_kurang'  => '-',
                     'lembur'        => '-',
                     'is_weekend'    => $isWeekend,
-                    'status_masuk'  => 'Tidak Hadir', // default
+                    'status_masuk'  => 'Tidak Hadir',
                 ];
 
                 if ($masuk && $pulang) {
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
 
-                    // Total jam kerja aktual
-                    $jamKerja = abs(floor($jamMasukObj->diffInMinutes($jamPulangObj)));
+                    // Total jam kerja aktual (dalam menit, tanpa detik)
+                    $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
                     if ($isWeekend) {
                         // Sabtu/Minggu = lembur penuh
@@ -95,11 +95,11 @@ class LaporanController extends Controller
                         $totalLembur     += $jamKerja;
                     } else {
                         // Jam kerja wajib (dari 07:30 sampai jam pulang)
-                        $jamKerjaWajib = abs(floor($jamMasukDefault->diffInMinutes($jamPulangDefault)));
+                        $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
-                        // ✅ Keterlambatan hanya jika >= 07:31
+                        // ✅ Keterlambatan hanya jika >= 07:31 (dibulatkan ke atas)
                         $keterlambatan = $jamMasukObj->gte($jamToleransi)
-                            ? abs(floor($jamMasukObj->diffInMinutes($jamMasukDefault)))
+                            ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
                             : 0;
 
                         // Hitung hari telat
@@ -107,14 +107,14 @@ class LaporanController extends Controller
                             $totalHariTelat++;
                         }
 
-                        // ✅ Pulang cepat jika sebelum jam wajib pulang
+                        // ✅ Pulang cepat jika sebelum jam wajib pulang (dibulatkan ke atas)
                         $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
-                            ? abs(floor($jamPulangDefault->diffInMinutes($jamPulangObj)))
+                            ? $this->calculateMinutesWithoutSeconds($jamPulangObj, $jamPulangDefault, true)
                             : 0;
 
-                        // ✅ Kekurangan jam kerja (tidak negatif)
+                        // ✅ Kekurangan jam kerja (tidak negatif, dibulatkan ke atas)
                         $waktuKurang = ($jamKerja < $jamKerjaWajib)
-                            ? abs(floor($jamKerjaWajib - $jamKerja))
+                            ? $this->roundUpToNearestMinute($jamKerjaWajib - $jamKerja)
                             : 0;
 
                         // Tentukan status
@@ -146,7 +146,7 @@ class LaporanController extends Controller
             $laporan[] = [
                 'user'             => $user,
                 'total_hari_kerja' => $totalHariKerja,
-                'total_hari_telat' => $totalHariTelat, // tambahan metric
+                'total_hari_telat' => $totalHariTelat,
                 'rows'             => $rows,
                 'summary'          => [
                     'total_keterlambatan' => $totalKeterlambatan,
@@ -159,6 +159,56 @@ class LaporanController extends Controller
         }
 
         return $laporan;
+    }
+
+    /**
+     * Menghitung selisih menit antara dua waktu tanpa memperhitungkan detik
+     * dan membulatkan ke atas jika diperlukan
+     *
+     * @param Carbon $start
+     * @param Carbon $end
+     * @param bool $roundUp Apakah harus dibulatkan ke atas
+     * @return int
+     */
+    private function calculateMinutesWithoutSeconds(Carbon $start, Carbon $end, bool $roundUp = false): int
+    {
+        // Buat copy tanpa detik
+        $startWithoutSeconds = $start->copy()->setSeconds(0);
+        $endWithoutSeconds = $end->copy()->setSeconds(0);
+        
+        $diffInMinutes = $startWithoutSeconds->diffInMinutes($endWithoutSeconds);
+        
+        // Jika perlu dibulatkan ke atas dan ada sisa detik yang signifikan
+        if ($roundUp && $start->second > 0) {
+            $diffInMinutes++;
+        }
+        
+        return $diffInMinutes;
+    }
+
+    /**
+     * Membulatkan nilai menit ke atas ke menit terdekat
+     *
+     * @param float $minutes
+     * @return int
+     */
+    private function roundUpToNearestMinute(float $minutes): int
+    {
+        return (int) ceil($minutes);
+    }
+
+    /**
+     * Format menit ke format jam:menit
+     *
+     * @param int $minutes
+     * @return string
+     */
+    private function formatMinutesToTime(int $minutes): string
+    {
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+        
+        return sprintf("%02d:%02d", $hours, $remainingMinutes);
     }
 
     public function getLaporan(Request $request)
