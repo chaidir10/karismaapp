@@ -48,7 +48,7 @@ class DashboardAdminController extends Controller
             $hari = Carbon::parse($presensi->tanggal)->format('l'); // Nama hari (Monday, etc.)
 
             // === Cek Terlambat ===
-            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:30:59') {
+            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:31') {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasukStandard)) / 60);
             }
