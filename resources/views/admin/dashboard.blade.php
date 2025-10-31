@@ -152,7 +152,7 @@
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
                                 data-bukti="{{ $peng->bukti ?? '' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('<public>storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -992,7 +992,7 @@ function closeModal(id) {
         // Handle foto
         const fotoContainer = document.getElementById('detailFotoPresensi');
         if (presensi.foto_url) {
-            fotoContainer.innerHTML = `<img src="${presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="this.style.display='none'">`;
+            fotoContainer.innerHTML = `<img src="${public.presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="this.style.display='none'">`;
         } else {
             fotoContainer.innerHTML = '<span class="text-muted">Tidak ada foto</span>';
         }
