@@ -3,414 +3,6 @@
 @section('title', 'Dashboard ')
 
 @section('content')
-<div class="admin-dashboard text-sm">
-    <!-- Header -->
-    <div class="dashboard-header">
-        <div class="header-content">
-            <h1 class="dashboard-title">Dashboard Admin</h1>
-            <p class="dashboard-subtitle">Ringkasan aktivitas dan statistik sistem</p>
-        </div>
-    </div>
-
-    {{-- Statistics Cards --}}
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $jumlahHadir ?? 0 }}</h3>
-                <p class="stat-label">Hadir Hari Ini</p>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-user-check"></i>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
-                <p class="stat-label">Total Pegawai</p>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
-                <p class="stat-label">Pengajuan Pending</p>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
-        </div>
-    </div>
-
-    {{-- Content Grid --}}
-    <div class="content-grid">
-
-        {{-- Presensi Diluar Radius --}}
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="card-title">Presensi Diluar Radius</h2>
-                <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
-            </div>
-            <div class="card-content">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th>Pegawai</th>
-                                <th>Tanggal</th>
-                                <th>Jenis</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="presensiPendingTable">
-                            @forelse($presensiPending ?? [] as $index => $p)
-                            <tr class="clickable-row"
-                                data-presensi-id="{{ $p->id }}"
-                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
-                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
-                                data-jenis="{{ $p->jenis ?? '' }}"
-                                data-jam="{{ $p->jam ?? '-' }}"
-                                data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
-                                data-latitude="{{ $p->latitude ?? '' }}"
-                                data-longitude="{{ $p->longitude ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
-                                data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
-                                data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
-                                <td class="date-cell">
-                                    {{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}
-                                </td>
-                                <td>
-                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
-                                        {{ ucfirst($p->jenis ?? '') }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        @if(Auth::user()->can_approve_pengajuan)
-                                        <form action="{{ route('admin.presensi.approve', $p->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-success" title="Setujui">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.presensi.reject', $p->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-danger" title="Tolak">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                        @else
-                                        <span class="text-gray-400 text-xs">Tidak memiliki hak akses</span>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="empty-state">
-                                    <div class="empty-content">
-                                        <i class="fas fa-inbox"></i>
-                                        <p>Tidak ada presensi pending</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-
-        {{-- Pengajuan Pending --}}
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="card-title">Pengajuan Pending</h2>
-                <span class="card-badge">{{ count($pengajuanPending ?? []) }} menunggu</span>
-            </div>
-            <div class="card-content">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th>Pegawai</th>
-                                <th>Tanggal</th>
-                                <th>Jenis</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pengajuanPendingTable">
-                            @forelse($pengajuanPending ?? [] as $index => $peng)
-                            <tr class="clickable-row"
-                                data-pengajuan-id="{{ $peng->id }}"
-                                data-user-name="{{ $peng->user->name ?? 'N/A' }}"
-                                data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
-                                data-jenis="{{ $peng->jenis ?? '' }}"
-                                data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
-                                data-bukti="{{ $peng->bukti ?? '' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
-                                data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
-                                data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
-                                <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
-                                <td class="date-cell">
-                                    {{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}
-                                </td>
-                                <td>
-                                    <span class="badge jenis-badge {{ $peng->jenis ?? '' }}">
-                                        {{ ucfirst($peng->jenis ?? '') }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        @if(Auth::user()->can_approve_pengajuan)
-                                        <form action="{{ route('admin.pengajuan.approve', $peng->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-success" title="Setujui">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.pengajuan.reject', $peng->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-danger" title="Tolak">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                        @else
-                                        <span class="text-gray-400 text-xs">Tidak memiliki hak akses</span>
-                                        @endif
-                                    </div>
-                                </td>
-
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="empty-state">
-                                    <div class="empty-content">
-                                        <i class="fas fa-inbox"></i>
-                                        <p>Tidak ada pengajuan pending</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        {{-- Presensi Hari Ini --}}
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="card-title">Daftar Presensi Hari Ini</h2>
-                <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
-            </div>
-            <div class="card-content">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th>Nama Pegawai</th>
-                                <th>Jenis</th>
-                                <th>Jam</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($presensiHariIni ?? [] as $index => $p)
-                            <tr>
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
-                                <td>
-                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
-                                        {{ ucfirst($p->jenis ?? '') }}
-                                    </span>
-                                </td>
-                                <td class="time-cell">{{ $p->jam ?? '-' }}</td>
-                                <td>
-                                    @if(($p->jenis ?? '') === 'masuk')
-                                    @if($p->terlambat)
-                                    <span class="status-badge late">Terlambat</span>
-                                    @else
-                                    <span class="status-badge on-time">Tepat Waktu</span>
-                                    @endif
-                                    @elseif(($p->jenis ?? '') === 'pulang')
-                                    @if($p->waktu_kurang_menit > 0)
-                                    <span class="status-badge late">Waktu Kurang</span>
-                                    @else
-                                    <span class="status-badge on-time">Tepat Waktu</span>
-                                    @endif
-                                    @else
-                                    <span class="status-badge neutral">-</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="empty-state">
-                                    <div class="empty-content">
-                                        <i class="fas fa-clipboard-list"></i>
-                                        <p>Belum ada presensi hari ini</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Modal Detail Presensi Pending --}}
-<div id="modalPresensiPending" class="modal-overlay">
-    <div class="modal-container modal-large">
-        <div class="modal-header">
-            <h3 class="modal-title">Detail Presensi Pending</h3>
-            <button class="modal-close" onclick="closeModal('modalPresensiPending')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-content">
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <label>Nama Pegawai</label>
-                    <span id="detailPegawaiPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Tanggal</label>
-                    <span id="detailTanggalPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jenis Presensi</label>
-                    <span id="detailJenisPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jam</label>
-                    <span id="detailJamPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Lokasi</label>
-                    <span id="detailLokasiPresensi">-</span>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Peta Lokasi</label>
-                    <div id="mapContainer" class="map-container">
-                        <div id="presensiMap" class="map"></div>
-                        <div id="mapLoading" class="map-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Memuat peta...</span>
-                        </div>
-                        <div id="mapError" class="map-error" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Koordinat tidak tersedia</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Foto</label>
-                    <div id="detailFotoPresensi">
-                        <span class="text-muted">Tidak ada foto</span>
-                    </div>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Status</label>
-                    <span id="detailStatusPresensi" class="status-badge pending">Pending</span>
-                </div>
-            </div>
-            <div class="modal-actions">
-                @if(Auth::user()->can_approve_pengajuan)
-                <form id="formApprovePresensi" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i> Setujui
-                    </button>
-                </form>
-                <form id="formRejectPresensi" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i> Tolak
-                    </button>
-                </form>
-                @endif
-                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Modal Detail Pengajuan Pending --}}
-<div id="modalPengajuanPending" class="modal-overlay">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3 class="modal-title">Detail Pengajuan Pending</h3>
-            <button class="modal-close" onclick="closeModal('modalPengajuanPending')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-content">
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <label>Nama Pegawai</label>
-                    <span id="detailPegawaiPengajuan">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Tanggal</label>
-                    <span id="detailTanggalPengajuan">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jenis Pengajuan</label>
-                    <span id="detailJenisPengajuan">-</span>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Alasan</label>
-                    <span id="detailAlasanPengajuan">-</span>
-                </div>
-                <div class="detail-item full-width" id="buktiContainer">
-                    <label>Bukti</label>
-                    <div id="detailBuktiPengajuan">
-                        <span class="text-muted">Tidak ada bukti</span>
-                    </div>
-                </div>
-                <div class="detail-item">
-                    <label>Status</label>
-                    <span id="detailStatusPengajuan" class="status-badge pending">Pending</span>
-                </div>
-            </div>
-            <div class="modal-actions">
-                @if(Auth::user()->can_approve_pengajuan)
-                <form id="formApprovePengajuan" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i> Setujui
-                    </button>
-                </form>
-                <form id="formRejectPengajuan" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i> Tolak
-                    </button>
-                </form>
-                @endif
-                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
     :root {
         --primary: #3b82f6;
@@ -994,6 +586,414 @@
         }
     }
 </style>
+
+<div class="admin-dashboard text-sm">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">Dashboard Admin</h1>
+            <p class="dashboard-subtitle">Ringkasan aktivitas dan statistik sistem</p>
+        </div>
+    </div>
+
+    {{-- Statistics Cards --}}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-content">
+                <h3 class="stat-value">{{ $jumlahHadir ?? 0 }}</h3>
+                <p class="stat-label">Hadir Hari Ini</p>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
+                <p class="stat-label">Total Pegawai</p>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
+                <p class="stat-label">Pengajuan Pending</p>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    {{-- Content Grid --}}
+    <div class="content-grid">
+
+        {{-- Presensi Diluar Radius --}}
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">Presensi Diluar Radius</h2>
+                <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
+            </div>
+            <div class="card-content">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Pegawai</th>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="presensiPendingTable">
+                            @forelse($presensiPending ?? [] as $index => $p)
+                            <tr class="clickable-row"
+                                data-presensi-id="{{ $p->id }}"
+                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="{{ $p->jenis ?? '' }}"
+                                data-jam="{{ $p->jam ?? '-' }}"
+                                data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
+                                data-latitude="{{ $p->latitude ?? '' }}"
+                                data-longitude="{{ $p->longitude ?? '' }}"
+                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
+                                data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
+                                data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="date-cell">
+                                    {{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}
+                                </td>
+                                <td>
+                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
+                                        {{ ucfirst($p->jenis ?? '') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        @if(Auth::user()->can_approve_pengajuan)
+                                        <form action="{{ route('admin.presensi.approve', $p->id) }}" method="POST" class="inline-form">
+                                            @csrf
+                                            <button type="submit" class="btn-success" title="Setujui">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.presensi.reject', $p->id) }}" method="POST" class="inline-form">
+                                            @csrf
+                                            <button type="submit" class="btn-danger" title="Tolak">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                        @else
+                                        <span class="text-gray-400 text-xs">Tidak memiliki hak akses</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <div class="empty-content">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>Tidak ada presensi pending</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        {{-- Pengajuan Pending --}}
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">Pengajuan Pending</h2>
+                <span class="card-badge">{{ count($pengajuanPending ?? []) }} menunggu</span>
+            </div>
+            <div class="card-content">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Pegawai</th>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pengajuanPendingTable">
+                            @forelse($pengajuanPending ?? [] as $index => $peng)
+                            <tr class="clickable-row"
+                                data-pengajuan-id="{{ $peng->id }}"
+                                data-user-name="{{ $peng->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="{{ $peng->jenis ?? '' }}"
+                                data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
+                                data-bukti="{{ $peng->bukti ?? '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
+                                data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
+                                data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                                <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
+                                <td class="date-cell">
+                                    {{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}
+                                </td>
+                                <td>
+                                    <span class="badge jenis-badge {{ $peng->jenis ?? '' }}">
+                                        {{ ucfirst($peng->jenis ?? '') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        @if(Auth::user()->can_approve_pengajuan)
+                                        <form action="{{ route('admin.pengajuan.approve', $peng->id) }}" method="POST" class="inline-form">
+                                            @csrf
+                                            <button type="submit" class="btn-success" title="Setujui">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.pengajuan.reject', $peng->id) }}" method="POST" class="inline-form">
+                                            @csrf
+                                            <button type="submit" class="btn-danger" title="Tolak">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                        @else
+                                        <span class="text-gray-400 text-xs">Tidak memiliki hak akses</span>
+                                        @endif
+                                    </div>
+                                </td>
+
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <div class="empty-content">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>Tidak ada pengajuan pending</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- Presensi Hari Ini --}}
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">Daftar Presensi Hari Ini</h2>
+                <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
+            </div>
+            <div class="card-content">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Nama Pegawai</th>
+                                <th>Jenis</th>
+                                <th>Jam</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($presensiHariIni ?? [] as $index => $p)
+                            <tr>
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
+                                        {{ ucfirst($p->jenis ?? '') }}
+                                    </span>
+                                </td>
+                                <td class="time-cell">{{ $p->jam ?? '-' }}</td>
+                                <td>
+                                    @if(($p->jenis ?? '') === 'masuk')
+                                    @if($p->terlambat)
+                                    <span class="status-badge late">Terlambat</span>
+                                    @else
+                                    <span class="status-badge on-time">Tepat Waktu</span>
+                                    @endif
+                                    @elseif(($p->jenis ?? '') === 'pulang')
+                                    @if($p->waktu_kurang_menit > 0)
+                                    <span class="status-badge late">Waktu Kurang</span>
+                                    @else
+                                    <span class="status-badge on-time">Tepat Waktu</span>
+                                    @endif
+                                    @else
+                                    <span class="status-badge neutral">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <div class="empty-content">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        <p>Belum ada presensi hari ini</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Detail Presensi Pending --}}
+<div id="modalPresensiPending" class="modal-overlay">
+    <div class="modal-container modal-large">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Presensi Pending</h3>
+            <button class="modal-close" onclick="closeModal('modalPresensiPending')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nama Pegawai</label>
+                    <span id="detailPegawaiPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis Presensi</label>
+                    <span id="detailJenisPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jam</label>
+                    <span id="detailJamPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Lokasi</label>
+                    <span id="detailLokasiPresensi">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Peta Lokasi</label>
+                    <div id="mapContainer" class="map-container">
+                        <div id="presensiMap" class="map"></div>
+                        <div id="mapLoading" class="map-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat peta...</span>
+                        </div>
+                        <div id="mapError" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Koordinat tidak tersedia</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Foto</label>
+                    <div id="detailFotoPresensi">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Status</label>
+                    <span id="detailStatusPresensi" class="status-badge pending">Pending</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                @if(Auth::user()->can_approve_pengajuan)
+                <form id="formApprovePresensi" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check"></i> Setujui
+                    </button>
+                </form>
+                <form id="formRejectPresensi" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-danger">
+                        <i class="fas fa-times"></i> Tolak
+                    </button>
+                </form>
+                @endif
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Detail Pengajuan Pending --}}
+<div id="modalPengajuanPending" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Pengajuan Pending</h3>
+            <button class="modal-close" onclick="closeModal('modalPengajuanPending')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nama Pegawai</label>
+                    <span id="detailPegawaiPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis Pengajuan</label>
+                    <span id="detailJenisPengajuan">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Alasan</label>
+                    <span id="detailAlasanPengajuan">-</span>
+                </div>
+                <div class="detail-item full-width" id="buktiContainer">
+                    <label>Bukti</label>
+                    <div id="detailBuktiPengajuan">
+                        <span class="text-muted">Tidak ada bukti</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <label>Status</label>
+                    <span id="detailStatusPengajuan" class="status-badge pending">Pending</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                @if(Auth::user()->can_approve_pengajuan)
+                <form id="formApprovePengajuan" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check"></i> Setujui
+                    </button>
+                </form>
+                <form id="formRejectPengajuan" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-danger">
+                        <i class="fas fa-times"></i> Tolak
+                    </button>
+                </form>
+                @endif
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
