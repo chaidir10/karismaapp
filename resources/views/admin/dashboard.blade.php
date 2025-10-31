@@ -300,6 +300,12 @@
                     <span id="detailLokasiPresensi">-</span>
                 </div>
                 <div class="detail-item full-width">
+                    <label>Foto</label>
+                    <div id="detailFotoPresensi">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
+                </div>
+                <div class="detail-item full-width">
                     <label>Status</label>
                     <span id="detailStatusPresensi" class="status-badge pending">Pending</span>
                 </div>
@@ -710,7 +716,7 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
+        z-index: 9999;
         align-items: center;
         justify-content: center;
     }
@@ -723,6 +729,8 @@
         max-height: 90vh;
         overflow-y: auto;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        z-index: 10000;
+        position: relative;
     }
 
     .modal-header {
@@ -839,6 +847,13 @@
         border: 1px solid var(--gray-200);
     }
 
+    .foto-image {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 6px;
+        border: 1px solid var(--gray-200);
+    }
+
     .bukti-placeholder {
         padding: 20px;
         text-align: center;
@@ -907,23 +922,43 @@
 </style>
 
 <script>
+    // Debugging
+    console.log('✅ Script modal loaded');
+
     // Fungsi untuk membuka modal presensi pending
     function openPresensiModal(presensi) {
+        console.log('🟡 Opening presensi modal:', presensi);
+        
+        // Update modal content
         document.getElementById('detailPegawaiPresensi').textContent = presensi.user_name || 'N/A';
         document.getElementById('detailTanggalPresensi').textContent = presensi.tanggal_formatted || '-';
         document.getElementById('detailJenisPresensi').textContent = presensi.jenis ? presensi.jenis.charAt(0).toUpperCase() + presensi.jenis.slice(1) : '-';
         document.getElementById('detailJamPresensi').textContent = presensi.jam || '-';
         document.getElementById('detailLokasiPresensi').textContent = presensi.lokasi || 'Tidak ada lokasi';
         
+        // Handle foto
+        const fotoContainer = document.getElementById('detailFotoPresensi');
+        if (presensi.foto_url) {
+            fotoContainer.innerHTML = `<img src="${presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="this.style.display='none'">`;
+        } else {
+            fotoContainer.innerHTML = '<span class="text-muted">Tidak ada foto</span>';
+        }
+        
         // Set form action URLs
-        document.getElementById('formApprovePresensi').action = presensi.approve_url;
-        document.getElementById('formRejectPresensi').action = presensi.reject_url;
+        const approveForm = document.getElementById('formApprovePresensi');
+        const rejectForm = document.getElementById('formRejectPresensi');
+        
+        if (approveForm) approveForm.action = presensi.approve_url;
+        if (rejectForm) rejectForm.action = presensi.reject_url;
         
         openModal('modalPresensiPending');
     }
 
     // Fungsi untuk membuka modal pengajuan pending
     function openPengajuanModal(pengajuan) {
+        console.log('🟡 Opening pengajuan modal:', pengajuan);
+        
+        // Update modal content
         document.getElementById('detailPegawaiPengajuan').textContent = pengajuan.user_name || 'N/A';
         document.getElementById('detailTanggalPengajuan').textContent = pengajuan.tanggal_formatted || '-';
         document.getElementById('detailJenisPengajuan').textContent = pengajuan.jenis ? pengajuan.jenis.charAt(0).toUpperCase() + pengajuan.jenis.slice(1) : '-';
@@ -931,78 +966,123 @@
         
         // Handle bukti
         const buktiContainer = document.getElementById('detailBuktiPengajuan');
-        if (pengajuan.bukti) {
+        if (pengajuan.bukti_url) {
             buktiContainer.innerHTML = `<img src="${pengajuan.bukti_url}" alt="Bukti" class="bukti-image" onerror="this.style.display='none'">`;
         } else {
             buktiContainer.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
         }
         
         // Set form action URLs
-        document.getElementById('formApprovePengajuan').action = pengajuan.approve_url;
-        document.getElementById('formRejectPengajuan').action = pengajuan.reject_url;
+        const approveForm = document.getElementById('formApprovePengajuan');
+        const rejectForm = document.getElementById('formRejectPengajuan');
+        
+        if (approveForm) approveForm.action = pengajuan.approve_url;
+        if (rejectForm) rejectForm.action = pengajuan.reject_url;
         
         openModal('modalPengajuanPending');
     }
 
     // Fungsi umum untuk membuka modal
     function openModal(modalId) {
-        document.getElementById(modalId).style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        console.log('🟡 Opening modal:', modalId);
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        } else {
+            console.error('❌ Modal not found:', modalId);
+        }
     }
 
     // Fungsi untuk menutup modal
     function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-        document.body.style.overflow = 'auto';
+        console.log('🟡 Closing modal:', modalId);
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // Initialize event listeners
+    function initializeEventListeners() {
+        console.log('🔄 Initializing event listeners...');
+        
         // Handle klik pada baris presensi pending
-        document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row').forEach(row => {
-            row.addEventListener('click', function(e) {
-                // Jangan trigger jika klik pada tombol aksi
-                if (e.target.closest('.action-buttons')) {
-                    return;
-                }
-                
-                const presensiId = this.getAttribute('data-presensi-id');
-                const presensiData = {
-                    user_name: this.getAttribute('data-user-name'),
-                    tanggal_formatted: this.getAttribute('data-tanggal'),
-                    jenis: this.getAttribute('data-jenis'),
-                    jam: this.getAttribute('data-jam'),
-                    lokasi: this.getAttribute('data-lokasi'),
-                    approve_url: this.getAttribute('data-approve-url'),
-                    reject_url: this.getAttribute('data-reject-url')
-                };
-                
-                openPresensiModal(presensiData);
-            });
+        const presensiRows = document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row');
+        console.log('🔍 Found presensi rows:', presensiRows.length);
+        
+        presensiRows.forEach((row, index) => {
+            row.removeEventListener('click', handlePresensiClick); // Remove existing listeners
+            row.addEventListener('click', handlePresensiClick);
         });
 
         // Handle klik pada baris pengajuan pending
-        document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row').forEach(row => {
-            row.addEventListener('click', function(e) {
-                // Jangan trigger jika klik pada tombol aksi
-                if (e.target.closest('.action-buttons')) {
-                    return;
-                }
-                
-                const pengajuanId = this.getAttribute('data-pengajuan-id');
-                const pengajuanData = {
-                    user_name: this.getAttribute('data-user-name'),
-                    tanggal_formatted: this.getAttribute('data-tanggal'),
-                    jenis: this.getAttribute('data-jenis'),
-                    alasan: this.getAttribute('data-alasan'),
-                    bukti: this.getAttribute('data-bukti'),
-                    bukti_url: this.getAttribute('data-bukti-url'),
-                    approve_url: this.getAttribute('data-approve-url'),
-                    reject_url: this.getAttribute('data-reject-url')
-                };
-                
-                openPengajuanModal(pengajuanData);
-            });
+        const pengajuanRows = document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row');
+        console.log('🔍 Found pengajuan rows:', pengajuanRows.length);
+        
+        pengajuanRows.forEach((row, index) => {
+            row.removeEventListener('click', handlePengajuanClick); // Remove existing listeners
+            row.addEventListener('click', handlePengajuanClick);
         });
+
+        console.log('✅ Event listeners initialized');
+    }
+
+    // Event handler untuk presensi
+    function handlePresensiClick(e) {
+        console.log('🟡 Presensi row clicked', this);
+        
+        // Jangan trigger jika klik pada tombol aksi
+        if (e.target.closest('.action-buttons')) {
+            console.log('⏹️ Click on action buttons, ignoring');
+            return;
+        }
+        
+        const presensiData = {
+            user_name: this.getAttribute('data-user-name'),
+            tanggal_formatted: this.getAttribute('data-tanggal'),
+            jenis: this.getAttribute('data-jenis'),
+            jam: this.getAttribute('data-jam'),
+            lokasi: this.getAttribute('data-lokasi'),
+            foto_url: this.getAttribute('data-foto-url'),
+            approve_url: this.getAttribute('data-approve-url'),
+            reject_url: this.getAttribute('data-reject-url')
+        };
+        
+        console.log('📦 Presensi data:', presensiData);
+        openPresensiModal(presensiData);
+    }
+
+    // Event handler untuk pengajuan
+    function handlePengajuanClick(e) {
+        console.log('🟡 Pengajuan row clicked', this);
+        
+        // Jangan trigger jika klik pada tombol aksi
+        if (e.target.closest('.action-buttons')) {
+            console.log('⏹️ Click on action buttons, ignoring');
+            return;
+        }
+        
+        const pengajuanData = {
+            user_name: this.getAttribute('data-user-name'),
+            tanggal_formatted: this.getAttribute('data-tanggal'),
+            jenis: this.getAttribute('data-jenis'),
+            alasan: this.getAttribute('data-alasan'),
+            bukti: this.getAttribute('data-bukti'),
+            bukti_url: this.getAttribute('data-bukti-url'),
+            approve_url: this.getAttribute('data-approve-url'),
+            reject_url: this.getAttribute('data-reject-url')
+        };
+        
+        console.log('📦 Pengajuan data:', pengajuanData);
+        openPengajuanModal(pengajuanData);
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ DOM Content Loaded');
+        initializeEventListeners();
 
         // Tutup modal ketika klik di luar konten modal
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -1021,69 +1101,26 @@
                 });
             }
         });
-
-        // Auto refresh dashboard
-        const dashboardContainer = document.querySelector('.admin-dashboard');
-
-        function refreshDashboard() {
-            fetch('{{ route("admin.dashboard") }}', {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const newContent = doc.querySelector('.admin-dashboard');
-                if (newContent) {
-                    dashboardContainer.innerHTML = newContent.innerHTML;
-                    console.log("✅ Dashboard diperbarui otomatis");
-                    // Re-initialize event listeners setelah refresh
-                    initializeEventListeners();
-                }
-            })
-            .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
-        }
-
-        // Re-initialize event listeners
-        function initializeEventListeners() {
-            // Inisialisasi ulang event listeners untuk baris yang bisa diklik
-            document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row').forEach(row => {
-                row.addEventListener('click', function(e) {
-                    if (e.target.closest('.action-buttons')) return;
-                    const presensiData = {
-                        user_name: this.getAttribute('data-user-name'),
-                        tanggal_formatted: this.getAttribute('data-tanggal'),
-                        jenis: this.getAttribute('data-jenis'),
-                        jam: this.getAttribute('data-jam'),
-                        lokasi: this.getAttribute('data-lokasi'),
-                        approve_url: this.getAttribute('data-approve-url'),
-                        reject_url: this.getAttribute('data-reject-url')
-                    };
-                    openPresensiModal(presensiData);
-                });
-            });
-
-            document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row').forEach(row => {
-                row.addEventListener('click', function(e) {
-                    if (e.target.closest('.action-buttons')) return;
-                    const pengajuanData = {
-                        user_name: this.getAttribute('data-user-name'),
-                        tanggal_formatted: this.getAttribute('data-tanggal'),
-                        jenis: this.getAttribute('data-jenis'),
-                        alasan: this.getAttribute('data-alasan'),
-                        bukti: this.getAttribute('data-bukti'),
-                        bukti_url: this.getAttribute('data-bukti-url'),
-                        approve_url: this.getAttribute('data-approve-url'),
-                        reject_url: this.getAttribute('data-reject-url')
-                    };
-                    openPengajuanModal(pengajuanData);
-                });
-            });
-        }
-
-        // Jalankan setiap 30 detik (30000 ms)
-        setInterval(refreshDashboard, 30000);
     });
+
+    // Auto refresh dashboard (optional)
+    /*
+    const dashboardContainer = document.querySelector('.admin-dashboard');
+    function refreshDashboard() {
+        fetch('{{ route("admin.dashboard.data") }}', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("✅ Dashboard data updated");
+                // Update your dashboard elements here
+            }
+        })
+        .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
+    }
+    // setInterval(refreshDashboard, 30000);
+    */
 </script>
 
 @endsection
