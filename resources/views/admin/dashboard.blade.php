@@ -77,7 +77,7 @@
                                 data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
                                 data-latitude="{{ $p->latitude ?? '' }}"
                                 data-longitude="{{ $p->longitude ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
+                                data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
                                 data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
                                 data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -155,7 +155,7 @@
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
                                 data-bukti="{{ $peng->bukti ?? '' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -1006,60 +1006,6 @@
     crossorigin=""></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Klik pada baris presensi pending
-        document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(row => {
-            row.addEventListener('click', function() {
-                document.getElementById('detailPegawaiPresensi').textContent = this.dataset.userName;
-                document.getElementById('detailTanggalPresensi').textContent = this.dataset.tanggal;
-                document.getElementById('detailJenisPresensi').textContent = this.dataset.jenis;
-                document.getElementById('detailJamPresensi').textContent = this.dataset.jam;
-                document.getElementById('detailLokasiPresensi').textContent = this.dataset.lokasi;
-
-                // Update form action
-                document.getElementById('formApprovePresensi').action = this.dataset.approveUrl;
-                document.getElementById('formRejectPresensi').action = this.dataset.rejectUrl;
-
-                // Tampilkan modal
-                openModal('modalPresensiPending');
-            });
-        });
-
-        // Klik pada baris pengajuan pending
-        document.querySelectorAll('#pengajuanPendingTable .clickable-row').forEach(row => {
-            row.addEventListener('click', function() {
-                document.getElementById('detailPegawaiPengajuan').textContent = this.dataset.userName;
-                document.getElementById('detailTanggalPengajuan').textContent = this.dataset.tanggal;
-                document.getElementById('detailJenisPengajuan').textContent = this.dataset.jenis;
-                document.getElementById('detailAlasanPengajuan').textContent = this.dataset.alasan;
-
-                const buktiContainer = document.getElementById('detailBuktiPengajuan');
-                buktiContainer.innerHTML = this.dataset.buktiUrl ?
-                    `<a href="${this.dataset.buktiUrl}" target="_blank"><img src="${this.dataset.buktiUrl}" class="bukti-image"></a>` :
-                    '<span class="text-muted">Tidak ada bukti</span>';
-
-                document.getElementById('formApprovePengajuan').action = this.dataset.approveUrl;
-                document.getElementById('formRejectPengajuan').action = this.dataset.rejectUrl;
-
-                openModal('modalPengajuanPending');
-            });
-        });
-    });
-
-    // Fungsi buka/tutup modal
-    function openModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'none';
-    }
-</script>
-
-
-<script>
     // Global map variable
     let presensiMap = null;
     let currentMarker = null;
@@ -1175,10 +1121,10 @@
         document.getElementById('detailJamPresensi').textContent = presensi.jam || '-';
         document.getElementById('detailLokasiPresensi').textContent = presensi.lokasi || 'Tidak ada lokasi';
 
-        // Handle foto
+        // Handle foto - PERBAIKAN: Menggunakan path yang benar
         const fotoContainer = document.getElementById('detailFotoPresensi');
-        if (presensi.foto_url) {
-            fotoContainer.innerHTML = `<img src="${presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="this.style.display='none'">`;
+        if (presensi.foto_url && presensi.foto_url !== '') {
+            fotoContainer.innerHTML = `<img src="${presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="handleImageError(this)">`;
         } else {
             fotoContainer.innerHTML = '<span class="text-muted">Tidak ada foto</span>';
         }
@@ -1208,8 +1154,8 @@
 
         // Handle bukti
         const buktiContainer = document.getElementById('detailBuktiPengajuan');
-        if (pengajuan.bukti_url) {
-            buktiContainer.innerHTML = `<img src="${pengajuan.bukti_url}" alt="Bukti" class="bukti-image" onerror="this.style.display='none'">`;
+        if (pengajuan.bukti_url && pengajuan.bukti_url !== '') {
+            buktiContainer.innerHTML = `<img src="${pengajuan.bukti_url}" alt="Bukti" class="bukti-image" onerror="handleImageError(this)">`;
         } else {
             buktiContainer.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
         }
@@ -1224,6 +1170,14 @@
         openModal('modalPengajuanPending');
     }
 
+    // Handle image error
+    function handleImageError(img) {
+        console.log('❌ Image failed to load:', img.src);
+        img.style.display = 'none';
+        const container = img.parentElement;
+        container.innerHTML = '<span class="text-muted">Gagal memuat gambar</span>';
+    }
+
     // Initialize map function
     function initializeMap(latitude, longitude, lokasi) {
         const mapContainer = document.getElementById('presensiMap');
@@ -1235,8 +1189,18 @@
         mapError.style.display = 'none';
         mapContainer.innerHTML = '';
 
+        // Clean up existing map
+        if (presensiMap) {
+            presensiMap.remove();
+            presensiMap = null;
+        }
+        if (currentMarker) {
+            currentMarker = null;
+        }
+
         // Check if coordinates are available
-        if (!latitude || !longitude || latitude === 'null' || longitude === 'null') {
+        if (!latitude || !longitude || latitude === 'null' || longitude === 'null' || latitude === '' || longitude === '') {
+            console.log('❌ No coordinates available');
             mapLoading.style.display = 'none';
             mapError.style.display = 'flex';
             return;
@@ -1246,10 +1210,13 @@
         const lng = parseFloat(longitude);
 
         if (isNaN(lat) || isNaN(lng)) {
+            console.log('❌ Invalid coordinates:', latitude, longitude);
             mapLoading.style.display = 'none';
             mapError.style.display = 'flex';
             return;
         }
+
+        console.log('🗺️ Initializing map with coordinates:', lat, lng);
 
         // Initialize map after a small delay to ensure DOM is ready
         setTimeout(() => {
