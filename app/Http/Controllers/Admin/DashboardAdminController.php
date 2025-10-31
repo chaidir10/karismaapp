@@ -66,17 +66,37 @@ class DashboardAdminController extends Controller
             }
         }
 
-        // Pengajuan pending
+        // Pengajuan pending dengan data lengkap untuk modal
         $pengajuanPending = PengajuanPresensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
-            ->get();
+            ->get()
+            ->map(function ($pengajuan) {
+                // Tambahkan URL bukti untuk modal
+                $pengajuan->bukti_url = $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null;
+                return $pengajuan;
+            });
 
-        // Presensi pending (untuk admin approve/reject)
+        // Presensi pending (untuk admin approve/reject) dengan data lengkap
         $presensiPending = Presensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
             ->get();
+
+        // Jika request AJAX, return JSON response untuk auto-refresh
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'jumlahHadir' => $jumlahHadir,
+                    'jumlahPegawai' => $jumlahPegawai,
+                    'jumlahPengajuan' => $jumlahPengajuan,
+                    'presensiHariIni' => $this->formatPresensiHariIni($presensiHariIni),
+                    'pengajuanPending' => $this->formatPengajuanPending($pengajuanPending),
+                    'presensiPending' => $this->formatPresensiPending($presensiPending),
+                ]
+            ]);
+        }
 
         return view('admin.dashboard', compact(
             'jumlahHadir',
@@ -88,79 +108,314 @@ class DashboardAdminController extends Controller
         ));
     }
 
+    /**
+     * Format data presensi hari ini untuk response JSON
+     */
+    private function formatPresensiHariIni($presensiHariIni)
+    {
+        return $presensiHariIni->map(function ($presensi) {
+            return [
+                'id' => $presensi->id,
+                'user_name' => $presensi->user->name ?? 'N/A',
+                'jenis' => $presensi->jenis,
+                'jam' => $presensi->jam,
+                'terlambat' => $presensi->terlambat ?? false,
+                'waktu_kurang_menit' => $presensi->waktu_kurang_menit ?? 0,
+                'status_badge' => $this->getStatusBadge($presensi),
+            ];
+        });
+    }
+
+    /**
+     * Format data pengajuan pending untuk response JSON
+     */
+    private function formatPengajuanPending($pengajuanPending)
+    {
+        return $pengajuanPending->map(function ($pengajuan) {
+            return [
+                'id' => $pengajuan->id,
+                'user_name' => $pengajuan->user->name ?? 'N/A',
+                'tanggal' => $pengajuan->tanggal,
+                'tanggal_formatted' => Carbon::parse($pengajuan->tanggal)->translatedFormat('d M Y'),
+                'jenis' => $pengajuan->jenis,
+                'alasan' => $pengajuan->alasan,
+                'bukti' => $pengajuan->bukti,
+                'bukti_url' => $pengajuan->bukti_url,
+                'approve_url' => route('admin.pengajuan.approve', $pengajuan->id),
+                'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
+            ];
+        });
+    }
+
+    /**
+     * Format data presensi pending untuk response JSON
+     */
+    private function formatPresensiPending($presensiPending)
+    {
+        return $presensiPending->map(function ($presensi) {
+            return [
+                'id' => $presensi->id,
+                'user_name' => $presensi->user->name ?? 'N/A',
+                'tanggal' => $presensi->tanggal,
+                'tanggal_formatted' => Carbon::parse($presensi->tanggal)->translatedFormat('d M Y'),
+                'jenis' => $presensi->jenis,
+                'jam' => $presensi->jam,
+                'lokasi' => $presensi->lokasi ?? 'Tidak ada lokasi',
+                'foto' => $presensi->foto,
+                'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null,
+                'approve_url' => route('admin.presensi.approve', $presensi->id),
+                'reject_url' => route('admin.presensi.reject', $presensi->id),
+            ];
+        });
+    }
+
+    /**
+     * Get status badge untuk presensi
+     */
+    private function getStatusBadge($presensi)
+    {
+        if ($presensi->jenis === 'masuk') {
+            return $presensi->terlambat ? 'Terlambat' : 'Tepat Waktu';
+        } elseif ($presensi->jenis === 'pulang') {
+            return $presensi->waktu_kurang_menit > 0 ? 'Waktu Kurang' : 'Tepat Waktu';
+        }
+        return '-';
+    }
+
     // ----- Fungsi Approve/Reject Pengajuan -----
     public function approve($id)
     {
-        $pengajuan = PengajuanPresensi::findOrFail($id);
+        try {
+            $pengajuan = PengajuanPresensi::findOrFail($id);
 
-        DB::transaction(function () use ($pengajuan) {
-            $jamMasukDefault = '07:30:00';
-            $jamPulangDefault = '16:00:00';
+            DB::transaction(function () use ($pengajuan) {
+                $jamMasukDefault = '07:30:00';
+                $jamPulangDefault = '16:00:00';
 
-            if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'keduanya') {
-                Presensi::updateOrCreate(
-                    [
-                        'user_id' => $pengajuan->user_id,
-                        'tanggal' => $pengajuan->tanggal,
-                        'jenis' => 'masuk'
-                    ],
-                    [
-                        'jam' => $jamMasukDefault,
-                        'status' => 'approved',
-                        'foto' => $pengajuan->bukti ?? null,
-                        'lokasi' => $pengajuan->lokasi ?? null
-                    ]
-                );
-            }
+                if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'keduanya') {
+                    Presensi::updateOrCreate(
+                        [
+                            'user_id' => $pengajuan->user_id,
+                            'tanggal' => $pengajuan->tanggal,
+                            'jenis' => 'masuk'
+                        ],
+                        [
+                            'jam' => $jamMasukDefault,
+                            'status' => 'approved',
+                            'foto' => $pengajuan->bukti ?? null,
+                            'lokasi' => $pengajuan->lokasi ?? null
+                        ]
+                    );
+                }
 
-            if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'keduanya') {
-                Presensi::updateOrCreate(
-                    [
-                        'user_id' => $pengajuan->user_id,
-                        'tanggal' => $pengajuan->tanggal,
-                        'jenis' => 'pulang'
-                    ],
-                    [
-                        'jam' => $jamPulangDefault,
-                        'status' => 'approved',
-                        'foto' => $pengajuan->bukti ?? null,
-                        'lokasi' => $pengajuan->lokasi ?? null
-                    ]
-                );
-            }
+                if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'keduanya') {
+                    Presensi::updateOrCreate(
+                        [
+                            'user_id' => $pengajuan->user_id,
+                            'tanggal' => $pengajuan->tanggal,
+                            'jenis' => 'pulang'
+                        ],
+                        [
+                            'jam' => $jamPulangDefault,
+                            'status' => 'approved',
+                            'foto' => $pengajuan->bukti ?? null,
+                            'lokasi' => $pengajuan->lokasi ?? null
+                        ]
+                    );
+                }
 
-            $pengajuan->status = 'approved';
-            $pengajuan->save();
-        });
+                $pengajuan->status = 'approved';
+                $pengajuan->approved_by = auth()->id();
+                $pengajuan->approved_at = now();
+                $pengajuan->save();
+            });
 
-        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
+            return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function reject($id)
     {
-        $pengajuan = PengajuanPresensi::findOrFail($id);
-        $pengajuan->status = 'rejected';
-        $pengajuan->save();
+        try {
+            $pengajuan = PengajuanPresensi::findOrFail($id);
+            $pengajuan->status = 'rejected';
+            $pengajuan->approved_by = auth()->id();
+            $pengajuan->approved_at = now();
+            $pengajuan->save();
 
-        return redirect()->back()->with('success', 'Pengajuan ditolak.');
+            return redirect()->back()->with('success', 'Pengajuan ditolak.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     // ----- Fungsi Approve/Reject Presensi Pending -----
     public function approvePresensi($id)
     {
-        $presensi = Presensi::findOrFail($id);
-        $presensi->status = 'approved';
-        $presensi->save();
+        try {
+            $presensi = Presensi::findOrFail($id);
+            $presensi->status = 'approved';
+            $presensi->save();
 
-        return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
+            return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function rejectPresensi($id)
     {
-        $presensi = Presensi::findOrFail($id);
-        $presensi->status = 'rejected';
-        $presensi->save();
+        try {
+            $presensi = Presensi::findOrFail($id);
+            $presensi->status = 'rejected';
+            $presensi->save();
 
-        return redirect()->back()->with('success', 'Presensi ditolak.');
+            return redirect()->back()->with('success', 'Presensi ditolak.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * API untuk mendapatkan data dashboard (untuk auto-refresh)
+     */
+    public function getDashboardData()
+    {
+        $today = Carbon::today()->toDateString();
+
+        // Jumlah pegawai hadir hari ini
+        $jumlahHadir = Presensi::whereDate('tanggal', $today)
+            ->where('jenis', 'masuk')
+            ->where('status', 'approved')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        // Total pegawai
+        $jumlahPegawai = User::count();
+
+        // Total pengajuan pending
+        $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
+
+        // Presensi hari ini
+        $presensiHariIni = Presensi::with('user')
+            ->whereDate('tanggal', $today)
+            ->where('status', 'approved')
+            ->orderBy('jam', 'asc')
+            ->get();
+
+        // Hitung status untuk presensi hari ini
+        foreach ($presensiHariIni as $presensi) {
+            $presensi->terlambat = false;
+            $presensi->waktu_kurang_menit = 0;
+
+            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:30:59') {
+                $presensi->terlambat = true;
+                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime('07:30:00')) / 60);
+            }
+
+            if ($presensi->jenis === 'pulang' && $presensi->jam < '16:00:00') {
+                $presensi->waktu_kurang_menit = intval((strtotime('16:00:00') - strtotime($presensi->jam)) / 60);
+            }
+        }
+
+        // Pengajuan pending
+        $pengajuanPending = PengajuanPresensi::with('user')
+            ->where('status', 'pending')
+            ->orderBy('tanggal', 'asc')
+            ->get()
+            ->map(function ($pengajuan) {
+                $pengajuan->bukti_url = $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null;
+                return $pengajuan;
+            });
+
+        // Presensi pending
+        $presensiPending = Presensi::with('user')
+            ->where('status', 'pending')
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'jumlahHadir' => $jumlahHadir,
+                'jumlahPegawai' => $jumlahPegawai,
+                'jumlahPengajuan' => $jumlahPengajuan,
+                'presensiHariIni' => $this->formatPresensiHariIni($presensiHariIni),
+                'pengajuanPending' => $this->formatPengajuanPending($pengajuanPending),
+                'presensiPending' => $this->formatPresensiPending($presensiPending),
+            ],
+            'last_updated' => now()->format('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
+     * Get detail presensi untuk modal
+     */
+    public function getPresensiDetail($id)
+    {
+        try {
+            $presensi = Presensi::with('user')->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $presensi->id,
+                    'user_name' => $presensi->user->name ?? 'N/A',
+                    'tanggal' => Carbon::parse($presensi->tanggal)->translatedFormat('d M Y'),
+                    'jenis' => $presensi->jenis,
+                    'jam' => $presensi->jam,
+                    'lokasi' => $presensi->lokasi ?? 'Tidak ada lokasi',
+                    'foto' => $presensi->foto,
+                    'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null,
+                    'status' => $presensi->status,
+                    'approve_url' => route('admin.presensi.approve', $presensi->id),
+                    'reject_url' => route('admin.presensi.reject', $presensi->id),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data presensi tidak ditemukan'
+            ], 404);
+        }
+    }
+
+    /**
+     * Get detail pengajuan untuk modal
+     */
+    public function getPengajuanDetail($id)
+    {
+        try {
+            $pengajuan = PengajuanPresensi::with('user')->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $pengajuan->id,
+                    'user_name' => $pengajuan->user->name ?? 'N/A',
+                    'tanggal' => Carbon::parse($pengajuan->tanggal)->translatedFormat('d M Y'),
+                    'jenis' => $pengajuan->jenis,
+                    'alasan' => $pengajuan->alasan ?? 'Tidak ada alasan',
+                    'bukti' => $pengajuan->bukti,
+                    'bukti_url' => $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null,
+                    'status' => $pengajuan->status,
+                    'approve_url' => route('admin.pengajuan.approve', $pengajuan->id),
+                    'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data pengajuan tidak ditemukan'
+            ], 404);
+        }
     }
 }

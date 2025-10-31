@@ -66,9 +66,17 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="presensiPendingTable">
                             @forelse($presensiPending ?? [] as $index => $p)
-                            <tr>
+                            <tr class="clickable-row" 
+                                data-presensi-id="{{ $p->id }}"
+                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="{{ $p->jenis ?? '' }}"
+                                data-jam="{{ $p->jam ?? '-' }}"
+                                data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
+                                data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
+                                data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">
@@ -135,9 +143,18 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="pengajuanPendingTable">
                             @forelse($pengajuanPending ?? [] as $index => $peng)
-                            <tr>
+                            <tr class="clickable-row" 
+                                data-pengajuan-id="{{ $peng->id }}"
+                                data-user-name="{{ $peng->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="{{ $peng->jenis ?? '' }}"
+                                data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
+                                data-bukti="{{ $peng->bukti ?? '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
+                                data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
+                                data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">
@@ -251,6 +268,126 @@
     </div>
 </div>
 
+{{-- Modal Detail Presensi Pending --}}
+<div id="modalPresensiPending" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Presensi Pending</h3>
+            <button class="modal-close" onclick="closeModal('modalPresensiPending')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nama Pegawai</label>
+                    <span id="detailPegawaiPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis Presensi</label>
+                    <span id="detailJenisPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jam</label>
+                    <span id="detailJamPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Lokasi</label>
+                    <span id="detailLokasiPresensi">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Status</label>
+                    <span id="detailStatusPresensi" class="status-badge pending">Pending</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                @if(Auth::user()->can_approve_pengajuan)
+                <form id="formApprovePresensi" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check"></i> Setujui
+                    </button>
+                </form>
+                <form id="formRejectPresensi" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-danger">
+                        <i class="fas fa-times"></i> Tolak
+                    </button>
+                </form>
+                @endif
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Detail Pengajuan Pending --}}
+<div id="modalPengajuanPending" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Pengajuan Pending</h3>
+            <button class="modal-close" onclick="closeModal('modalPengajuanPending')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nama Pegawai</label>
+                    <span id="detailPegawaiPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis Pengajuan</label>
+                    <span id="detailJenisPengajuan">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Alasan</label>
+                    <span id="detailAlasanPengajuan">-</span>
+                </div>
+                <div class="detail-item full-width" id="buktiContainer">
+                    <label>Bukti</label>
+                    <div id="detailBuktiPengajuan">
+                        <span class="text-muted">Tidak ada bukti</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <label>Status</label>
+                    <span id="detailStatusPengajuan" class="status-badge pending">Pending</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                @if(Auth::user()->can_approve_pengajuan)
+                <form id="formApprovePengajuan" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check"></i> Setujui
+                    </button>
+                </form>
+                <form id="formRejectPengajuan" method="POST" class="inline-form">
+                    @csrf
+                    <button type="submit" class="btn-danger">
+                        <i class="fas fa-times"></i> Tolak
+                    </button>
+                </form>
+                @endif
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     :root {
         --primary: #3b82f6;
@@ -262,12 +399,14 @@
         --light: #f8fafc;
         --dark: #1e293b;
         --white: #ffffff;
+        --gray-50: #f8fafc;
         --gray-100: #f1f5f9;
         --gray-200: #e2e8f0;
         --gray-300: #cbd5e1;
         --gray-400: #94a3b8;
         --gray-500: #64748b;
         --gray-600: #475569;
+        --gray-700: #334155;
     }
 
     .admin-dashboard {
@@ -476,6 +615,11 @@
         color: var(--gray-500);
     }
 
+    .status-badge.pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
     /* Date Cell */
     .date-cell {
         font-size: 13px;
@@ -557,6 +701,152 @@
         font-size: 13px;
     }
 
+    /* Modal Styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-container {
+        background: var(--white);
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: var(--gray-500);
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+        background: var(--gray-100);
+        color: var(--danger);
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .detail-item label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-item span {
+        font-size: 14px;
+        color: var(--dark);
+        word-break: break-word;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--gray-200);
+        padding-top: 20px;
+    }
+
+    .btn-secondary {
+        padding: 8px 16px;
+        background: var(--gray-300);
+        color: var(--gray-700);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-400);
+    }
+
+    .text-muted {
+        color: var(--gray-400);
+        font-style: italic;
+    }
+
+    /* Row clickable style */
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .clickable-row:hover {
+        background: var(--gray-50) !important;
+    }
+
+    /* Bukti image */
+    .bukti-image {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 6px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .bukti-placeholder {
+        padding: 20px;
+        text-align: center;
+        background: var(--gray-100);
+        border-radius: 6px;
+        color: var(--gray-500);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .admin-dashboard {
@@ -591,34 +881,209 @@
             height: 40px;
             font-size: 16px;
         }
+
+        .modal-container {
+            width: 95%;
+            margin: 20px;
+        }
+
+        .detail-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .modal-actions {
+            flex-direction: column;
+        }
+
+        .modal-actions .inline-form {
+            width: 100%;
+        }
+
+        .modal-actions button {
+            width: 100%;
+        }
     }
 </style>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const dashboardContainer = document.querySelector('.admin-dashboard');
 
-    // Fungsi untuk memperbarui isi dashboard
-    function refreshDashboard() {
-        fetch('{{ route("admin.dashboard") }}', {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newContent = doc.querySelector('.admin-dashboard');
-            if (newContent) {
-                dashboardContainer.innerHTML = newContent.innerHTML;
-                console.log("✅ Dashboard diperbarui otomatis");
-            }
-        })
-        .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
+<script>
+    // Fungsi untuk membuka modal presensi pending
+    function openPresensiModal(presensi) {
+        document.getElementById('detailPegawaiPresensi').textContent = presensi.user_name || 'N/A';
+        document.getElementById('detailTanggalPresensi').textContent = presensi.tanggal_formatted || '-';
+        document.getElementById('detailJenisPresensi').textContent = presensi.jenis ? presensi.jenis.charAt(0).toUpperCase() + presensi.jenis.slice(1) : '-';
+        document.getElementById('detailJamPresensi').textContent = presensi.jam || '-';
+        document.getElementById('detailLokasiPresensi').textContent = presensi.lokasi || 'Tidak ada lokasi';
+        
+        // Set form action URLs
+        document.getElementById('formApprovePresensi').action = presensi.approve_url;
+        document.getElementById('formRejectPresensi').action = presensi.reject_url;
+        
+        openModal('modalPresensiPending');
     }
 
-    // Jalankan setiap 30 detik (30000 ms)
-    setInterval(refreshDashboard, 1000);
-});
-</script>
+    // Fungsi untuk membuka modal pengajuan pending
+    function openPengajuanModal(pengajuan) {
+        document.getElementById('detailPegawaiPengajuan').textContent = pengajuan.user_name || 'N/A';
+        document.getElementById('detailTanggalPengajuan').textContent = pengajuan.tanggal_formatted || '-';
+        document.getElementById('detailJenisPengajuan').textContent = pengajuan.jenis ? pengajuan.jenis.charAt(0).toUpperCase() + pengajuan.jenis.slice(1) : '-';
+        document.getElementById('detailAlasanPengajuan').textContent = pengajuan.alasan || 'Tidak ada alasan';
+        
+        // Handle bukti
+        const buktiContainer = document.getElementById('detailBuktiPengajuan');
+        if (pengajuan.bukti) {
+            buktiContainer.innerHTML = `<img src="${pengajuan.bukti_url}" alt="Bukti" class="bukti-image" onerror="this.style.display='none'">`;
+        } else {
+            buktiContainer.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
+        }
+        
+        // Set form action URLs
+        document.getElementById('formApprovePengajuan').action = pengajuan.approve_url;
+        document.getElementById('formRejectPengajuan').action = pengajuan.reject_url;
+        
+        openModal('modalPengajuanPending');
+    }
 
+    // Fungsi umum untuk membuka modal
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Fungsi untuk menutup modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle klik pada baris presensi pending
+        document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Jangan trigger jika klik pada tombol aksi
+                if (e.target.closest('.action-buttons')) {
+                    return;
+                }
+                
+                const presensiId = this.getAttribute('data-presensi-id');
+                const presensiData = {
+                    user_name: this.getAttribute('data-user-name'),
+                    tanggal_formatted: this.getAttribute('data-tanggal'),
+                    jenis: this.getAttribute('data-jenis'),
+                    jam: this.getAttribute('data-jam'),
+                    lokasi: this.getAttribute('data-lokasi'),
+                    approve_url: this.getAttribute('data-approve-url'),
+                    reject_url: this.getAttribute('data-reject-url')
+                };
+                
+                openPresensiModal(presensiData);
+            });
+        });
+
+        // Handle klik pada baris pengajuan pending
+        document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Jangan trigger jika klik pada tombol aksi
+                if (e.target.closest('.action-buttons')) {
+                    return;
+                }
+                
+                const pengajuanId = this.getAttribute('data-pengajuan-id');
+                const pengajuanData = {
+                    user_name: this.getAttribute('data-user-name'),
+                    tanggal_formatted: this.getAttribute('data-tanggal'),
+                    jenis: this.getAttribute('data-jenis'),
+                    alasan: this.getAttribute('data-alasan'),
+                    bukti: this.getAttribute('data-bukti'),
+                    bukti_url: this.getAttribute('data-bukti-url'),
+                    approve_url: this.getAttribute('data-approve-url'),
+                    reject_url: this.getAttribute('data-reject-url')
+                };
+                
+                openPengajuanModal(pengajuanData);
+            });
+        });
+
+        // Tutup modal ketika klik di luar konten modal
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
+        });
+
+        // Tutup modal dengan tombol ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    closeModal(modal.id);
+                });
+            }
+        });
+
+        // Auto refresh dashboard
+        const dashboardContainer = document.querySelector('.admin-dashboard');
+
+        function refreshDashboard() {
+            fetch('{{ route("admin.dashboard") }}', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector('.admin-dashboard');
+                if (newContent) {
+                    dashboardContainer.innerHTML = newContent.innerHTML;
+                    console.log("✅ Dashboard diperbarui otomatis");
+                    // Re-initialize event listeners setelah refresh
+                    initializeEventListeners();
+                }
+            })
+            .catch(err => console.error('❌ Gagal memperbarui dashboard:', err));
+        }
+
+        // Re-initialize event listeners
+        function initializeEventListeners() {
+            // Inisialisasi ulang event listeners untuk baris yang bisa diklik
+            document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    if (e.target.closest('.action-buttons')) return;
+                    const presensiData = {
+                        user_name: this.getAttribute('data-user-name'),
+                        tanggal_formatted: this.getAttribute('data-tanggal'),
+                        jenis: this.getAttribute('data-jenis'),
+                        jam: this.getAttribute('data-jam'),
+                        lokasi: this.getAttribute('data-lokasi'),
+                        approve_url: this.getAttribute('data-approve-url'),
+                        reject_url: this.getAttribute('data-reject-url')
+                    };
+                    openPresensiModal(presensiData);
+                });
+            });
+
+            document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    if (e.target.closest('.action-buttons')) return;
+                    const pengajuanData = {
+                        user_name: this.getAttribute('data-user-name'),
+                        tanggal_formatted: this.getAttribute('data-tanggal'),
+                        jenis: this.getAttribute('data-jenis'),
+                        alasan: this.getAttribute('data-alasan'),
+                        bukti: this.getAttribute('data-bukti'),
+                        bukti_url: this.getAttribute('data-bukti-url'),
+                        approve_url: this.getAttribute('data-approve-url'),
+                        reject_url: this.getAttribute('data-reject-url')
+                    };
+                    openPengajuanModal(pengajuanData);
+                });
+            });
+        }
+
+        // Jalankan setiap 30 detik (30000 ms)
+        setInterval(refreshDashboard, 30000);
+    });
+</script>
 
 @endsection

@@ -84,7 +84,11 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
     // ADMIN
     // --------------------
     Route::prefix('admin')->name('admin.')->middleware('checkrole:admin')->group(function () {
+        // Dashboard & API untuk modal detail
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/data', [DashboardAdminController::class, 'getDashboardData'])->name('dashboard.data');
+        Route::get('/presensi/{id}/detail', [DashboardAdminController::class, 'getPresensiDetail'])->name('presensi.detail');
+        Route::get('/pengajuan/{id}/detail', [DashboardAdminController::class, 'getPengajuanDetail'])->name('pengajuan.detail');
 
         // Pengajuan Approve / Reject
         Route::post('/pengajuan/{id}/approve', [DashboardAdminController::class, 'approve'])->name('pengajuan.approve');
