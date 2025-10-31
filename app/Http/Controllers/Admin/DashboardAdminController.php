@@ -48,7 +48,7 @@ class DashboardAdminController extends Controller
             $hari = Carbon::parse($presensi->tanggal)->format('l'); // Nama hari (Monday, etc.)
 
             // === Cek Terlambat ===
-            if ($presensi->jenis === 'masuk' && strtotime($presensi->jam) >= strtotime('07:31:00')) {
+            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:31:59') {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasukStandard)) / 60);
             }
@@ -72,17 +72,18 @@ class DashboardAdminController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get()
             ->map(function ($pengajuan) {
+                // Tambahkan URL bukti untuk modal
                 $pengajuan->bukti_url = $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null;
                 return $pengajuan;
             });
 
-        // Presensi pending (untuk admin approve/reject)
+        // Presensi pending (untuk admin approve/reject) dengan data lengkap
         $presensiPending = Presensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
             ->get();
 
-        // Jika request AJAX
+        // Jika request AJAX, return JSON response untuk auto-refresh
         if (request()->ajax()) {
             return response()->json([
                 'success' => true,
@@ -107,6 +108,9 @@ class DashboardAdminController extends Controller
         ));
     }
 
+    /**
+     * Format data presensi hari ini untuk response JSON
+     */
     private function formatPresensiHariIni($presensiHariIni)
     {
         return $presensiHariIni->map(function ($presensi) {
@@ -122,6 +126,9 @@ class DashboardAdminController extends Controller
         });
     }
 
+    /**
+     * Format data pengajuan pending untuk response JSON
+     */
     private function formatPengajuanPending($pengajuanPending)
     {
         return $pengajuanPending->map(function ($pengajuan) {
@@ -140,6 +147,9 @@ class DashboardAdminController extends Controller
         });
     }
 
+    /**
+     * Format data presensi pending untuk response JSON
+     */
     private function formatPresensiPending($presensiPending)
     {
         return $presensiPending->map(function ($presensi) {
@@ -159,6 +169,9 @@ class DashboardAdminController extends Controller
         });
     }
 
+    /**
+     * Get status badge untuk presensi
+     */
     private function getStatusBadge($presensi)
     {
         if ($presensi->jenis === 'masuk') {
@@ -218,6 +231,7 @@ class DashboardAdminController extends Controller
             });
 
             return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -233,6 +247,7 @@ class DashboardAdminController extends Controller
             $pengajuan->save();
 
             return redirect()->back()->with('success', 'Pengajuan ditolak.');
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -247,6 +262,7 @@ class DashboardAdminController extends Controller
             $presensi->save();
 
             return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -260,36 +276,45 @@ class DashboardAdminController extends Controller
             $presensi->save();
 
             return redirect()->back()->with('success', 'Presensi ditolak.');
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    // ===== API Dashboard (Auto-refresh) =====
+    /**
+     * API untuk mendapatkan data dashboard (untuk auto-refresh)
+     */
     public function getDashboardData()
     {
         $today = Carbon::today()->toDateString();
 
+        // Jumlah pegawai hadir hari ini
         $jumlahHadir = Presensi::whereDate('tanggal', $today)
             ->where('jenis', 'masuk')
             ->where('status', 'approved')
             ->distinct('user_id')
             ->count('user_id');
 
+        // Total pegawai
         $jumlahPegawai = User::count();
+
+        // Total pengajuan pending
         $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
 
+        // Presensi hari ini
         $presensiHariIni = Presensi::with('user')
             ->whereDate('tanggal', $today)
             ->where('status', 'approved')
             ->orderBy('jam', 'asc')
             ->get();
 
+        // Hitung status untuk presensi hari ini
         foreach ($presensiHariIni as $presensi) {
             $presensi->terlambat = false;
             $presensi->waktu_kurang_menit = 0;
 
-            if ($presensi->jenis === 'masuk' && strtotime($presensi->jam) >= strtotime('07:31:00')) {
+            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:30:59') {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime('07:30:00')) / 60);
             }
@@ -299,6 +324,7 @@ class DashboardAdminController extends Controller
             }
         }
 
+        // Pengajuan pending
         $pengajuanPending = PengajuanPresensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
@@ -308,6 +334,7 @@ class DashboardAdminController extends Controller
                 return $pengajuan;
             });
 
+        // Presensi pending
         $presensiPending = Presensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
@@ -327,6 +354,9 @@ class DashboardAdminController extends Controller
         ]);
     }
 
+    /**
+     * Get detail presensi untuk modal
+     */
     public function getPresensiDetail($id)
     {
         try {
@@ -348,6 +378,7 @@ class DashboardAdminController extends Controller
                     'reject_url' => route('admin.presensi.reject', $presensi->id),
                 ]
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -356,6 +387,9 @@ class DashboardAdminController extends Controller
         }
     }
 
+    /**
+     * Get detail pengajuan untuk modal
+     */
     public function getPengajuanDetail($id)
     {
         try {
@@ -376,6 +410,7 @@ class DashboardAdminController extends Controller
                     'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
                 ]
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -50,8 +50,9 @@ class LaporanController extends Controller
                 $masuk  = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'masuk') : null;
                 $pulang = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'pulang') : null;
 
+                // ⏰ Jam default dan batas keterlambatan
                 $jamMasukDefault  = Carbon::createFromTimeString('07:30');
-                $jamToleransi     = Carbon::createFromTimeString('07:31'); // batas keterlambatan
+                $jamToleransi     = Carbon::createFromTimeString('07:31'); // >= 07:31 dianggap terlambat
                 $jamPulangDefault = $date->isFriday()
                     ? Carbon::createFromTimeString('16:30')
                     : Carbon::createFromTimeString('16:00');
@@ -72,32 +73,30 @@ class LaporanController extends Controller
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
 
-                    // Total jam kerja aktual
-                    $jamKerja = abs(floor($jamMasukObj->diffInMinutes($jamPulangObj)));
+                    // Total jam kerja aktual (dalam menit)
+                    $jamKerja = $jamMasukObj->diffInMinutes($jamPulangObj);
 
                     if ($isWeekend) {
-                        // Sabtu/Minggu = lembur penuh
+                        // Sabtu/Minggu dianggap lembur penuh
                         $row['jam_kerja'] = $jamKerja;
                         $row['lembur']    = $jamKerja;
                         $totalLembur     += $jamKerja;
                     } else {
-                        // Jam kerja wajib (dari 07:30 sampai jam pulang)
-                        $jamKerjaWajib = abs(floor($jamMasukDefault->diffInMinutes($jamPulangDefault)));
+                        // Jam kerja wajib (07:30 sampai 16:00 / 16:30)
+                        $jamKerjaWajib = $jamMasukDefault->diffInMinutes($jamPulangDefault);
 
-                        // ✅ Keterlambatan hanya jika >= 07:31
+                        // ✅ Terlambat jika jam masuk >= 07:31
                         $keterlambatan = $jamMasukObj->gte($jamToleransi)
-                            ? abs(floor($jamMasukObj->diffInMinutes($jamMasukDefault)))
+                            ? $jamMasukObj->diffInMinutes($jamMasukDefault)
                             : 0;
 
                         // ✅ Pulang cepat jika sebelum jam wajib pulang
                         $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
-                            ? abs(floor($jamPulangDefault->diffInMinutes($jamPulangObj)))
+                            ? $jamPulangDefault->diffInMinutes($jamPulangObj)
                             : 0;
 
-                        // ✅ Kekurangan jam kerja (tidak negatif)
-                        $waktuKurang = ($jamKerja < $jamKerjaWajib)
-                            ? abs(floor($jamKerjaWajib - $jamKerja))
-                            : 0;
+                        // ✅ Kekurangan jam kerja (tidak boleh negatif)
+                        $waktuKurang = max(0, $jamKerjaWajib - $jamKerja);
 
                         $row['keterlambatan'] = $keterlambatan ?: '-';
                         $row['pulang_cepat']  = $pulangCepat ?: '-';
@@ -176,8 +175,9 @@ class LaporanController extends Controller
             ? "Laporan Presensi " . User::find($request->user_id)->name . " - {$bulanNama}.xlsx"
             : "Laporan Presensi Seluruh Pegawai - {$bulanNama}.xlsx";
 
-        return Excel::download(new LaporanExport(
-            $this->generateLaporan($request->user_id, $request->bulan)
-        ), $filename);
+        return Excel::download(
+            new LaporanExport($this->generateLaporan($request->user_id, $request->bulan)),
+            $filename
+        );
     }
 }
