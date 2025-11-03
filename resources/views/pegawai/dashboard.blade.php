@@ -19,17 +19,6 @@
         color: var(--white);
     }
     
-    .btn-disabled {
-        background: var(--gray-light) !important;
-        color: var(--gray) !important;
-        cursor: not-allowed !important;
-        opacity: 0.6;
-    }
-    
-    .btn-disabled:hover {
-        background: var(--gray-light) !important;
-        color: var(--gray) !important;
-    }
 </style>
 
 @section('content')
@@ -45,23 +34,11 @@
         <span>Jam Kerja (07:30 - 16:00)</span>
     </div>
     <div class="attendance-actions">
-        <button class="attendance-btn {{ $sudahPresensiMasuk ? 'btn-disabled' : '' }}" 
-                id="clock-in-btn" 
-                data-bs-toggle="modal" 
-                data-bs-target="#presensiModal" 
-                onclick="setJenis('masuk')"
-                {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
-            <i class="fas fa-sign-in-alt attendance-icon"></i> 
-            {{ $sudahPresensiMasuk ? 'Sudah Masuk' : 'Masuk' }}
+        <button class="attendance-btn" id="clock-in-btn" data-bs-toggle="modal" data-bs-target="#presensiModal" onclick="setJenis('masuk')">
+            <i class="fas fa-sign-in-alt attendance-icon"></i> Masuk
         </button>
-        <button class="attendance-btn {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'btn-disabled' : '' }}" 
-                id="clock-out-btn" 
-                data-bs-toggle="modal" 
-                data-bs-target="#presensiModal" 
-                onclick="handlePulangClick()"
-                {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
-            <i class="fas fa-sign-out-alt attendance-icon"></i> 
-            {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
+        <button class="attendance-btn" id="clock-out-btn" data-bs-toggle="modal" data-bs-target="#presensiModal" onclick="setJenis('pulang')">
+            <i class="fas fa-sign-out-alt attendance-icon"></i> Pulang
         </button>
     </div>
 </div>
@@ -282,29 +259,6 @@
     </div>
 </div>
 
-<!-- Modal Peringatan Belum Presensi Masuk -->
-<div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-2xl">
-            <div class="modal-body p-0">
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Presensi Masuk</h3>
-                    <p class="text-gray-600 mb-4">Anda belum melakukan presensi masuk hari ini. Silakan lakukan presensi masuk terlebih dahulu sebelum presensi pulang.</p>
-                </div>
-
-                <div class="border-t border-gray-200">
-                    <button type="button" class="w-full py-4 bg-yellow-500 text-white font-medium hover:bg-yellow-600 rounded-b-2xl transition-colors" data-bs-dismiss="modal">
-                        <i class="fas fa-check mr-2"></i>Mengerti
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Toast Notifikasi -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
     <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -434,26 +388,8 @@ let isOutsideRadius = false;
 let capturedPhotoData = null;
 let autoCloseTimer = null;
 
-// Variabel status presensi dari controller
-const sudahPresensiMasuk = @json($sudahPresensiMasuk);
-const sudahPresensiPulang = @json($sudahPresensiPulang);
-
 function setJenis(jenis){ 
     document.getElementById('jenisPresensi').value = jenis; 
-}
-
-function handlePulangClick() {
-    // Cek apakah sudah presensi masuk
-    if (!sudahPresensiMasuk) {
-        // Tampilkan modal peringatan
-        const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
-        warningModal.show();
-        return false;
-    }
-    
-    // Jika sudah presensi masuk, set jenis pulang
-    setJenis('pulang');
-    return true;
 }
 
 document.addEventListener('DOMContentLoaded',function(){
@@ -560,6 +496,7 @@ function updateLocationInfo(position){
     lokasiInput.value = `${lat},${lng}`;
 
     if(distance<=radius){
+        // infoEl.textContent="✔ Anda berada di dalam radius wilayah kerja"; 
         infoEl.innerHTML = '<span class="badge badge-success">✔ Anda berada di dalam wilayah kerja</span>';
         infoEl.style.fontSize = "10 px";
         infoEl.classList.remove('text-danger','text-warning'); 
@@ -653,13 +590,6 @@ function captureAndProcess(){
     if(!videoStream || !currentPosition){ 
         showError("Kamera atau lokasi belum siap."); 
         return; 
-    }
-
-    // Validasi tambahan untuk presensi pulang
-    const jenis = document.getElementById('jenisPresensi').value;
-    if (jenis === 'pulang' && !sudahPresensiMasuk) {
-        showError("Anda belum melakukan presensi masuk hari ini.");
-        return;
     }
 
     // Ambil foto terlebih dahulu
