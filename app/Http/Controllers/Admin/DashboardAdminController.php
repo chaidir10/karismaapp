@@ -72,8 +72,8 @@ class DashboardAdminController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get()
             ->map(function ($pengajuan) {
-                // ✅ PERBAIKI PATH ASSET - sesuaikan dengan Blade
-                $pengajuan->bukti_url = $pengajuan->bukti ? asset('public/storage/' . $pengajuan->bukti) : null;
+                // Tambahkan URL bukti untuk modal
+                $pengajuan->bukti_url = $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null;
                 return $pengajuan;
             });
 
@@ -140,7 +140,7 @@ class DashboardAdminController extends Controller
                 'jenis' => $pengajuan->jenis,
                 'alasan' => $pengajuan->alasan,
                 'bukti' => $pengajuan->bukti,
-                'bukti_url' => $pengajuan->bukti ? asset('public/storage/' . $pengajuan->bukti) : null, // ✅ PATH DIPERBAIKI
+                'bukti_url' => $pengajuan->bukti_url,
                 'approve_url' => route('admin.pengajuan.approve', $pengajuan->id),
                 'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
             ];
@@ -161,10 +161,8 @@ class DashboardAdminController extends Controller
                 'jenis' => $presensi->jenis,
                 'jam' => $presensi->jam,
                 'lokasi' => $presensi->lokasi ?? 'Tidak ada lokasi',
-                'latitude' => $presensi->latitude, // ✅ KOORDINAT DITAMBAHKAN - untuk maps
-                'longitude' => $presensi->longitude, // ✅ KOORDINAT DITAMBAHKAN - untuk maps
                 'foto' => $presensi->foto,
-                'foto_url' => $presensi->foto ? asset('public/storage/' . $presensi->foto) : null, // ✅ PATH DIPERBAIKI
+                'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null,
                 'approve_url' => route('admin.presensi.approve', $presensi->id),
                 'reject_url' => route('admin.presensi.reject', $presensi->id),
             ];
@@ -205,9 +203,7 @@ class DashboardAdminController extends Controller
                             'jam' => $jamMasukDefault,
                             'status' => 'approved',
                             'foto' => $pengajuan->bukti ?? null,
-                            'lokasi' => $pengajuan->lokasi ?? null,
-                            'latitude' => $pengajuan->latitude ?? null,
-                            'longitude' => $pengajuan->longitude ?? null
+                            'lokasi' => $pengajuan->lokasi ?? null
                         ]
                     );
                 }
@@ -223,9 +219,7 @@ class DashboardAdminController extends Controller
                             'jam' => $jamPulangDefault,
                             'status' => 'approved',
                             'foto' => $pengajuan->bukti ?? null,
-                            'lokasi' => $pengajuan->lokasi ?? null,
-                            'latitude' => $pengajuan->latitude ?? null,
-                            'longitude' => $pengajuan->longitude ?? null
+                            'lokasi' => $pengajuan->lokasi ?? null
                         ]
                     );
                 }
@@ -336,7 +330,7 @@ class DashboardAdminController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get()
             ->map(function ($pengajuan) {
-                $pengajuan->bukti_url = $pengajuan->bukti ? asset('public/storage/' . $pengajuan->bukti) : null;
+                $pengajuan->bukti_url = $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null;
                 return $pengajuan;
             });
 
@@ -377,10 +371,8 @@ class DashboardAdminController extends Controller
                     'jenis' => $presensi->jenis,
                     'jam' => $presensi->jam,
                     'lokasi' => $presensi->lokasi ?? 'Tidak ada lokasi',
-                    'latitude' => $presensi->latitude, // ✅ TAMBAHKAN - untuk maps
-                    'longitude' => $presensi->longitude, // ✅ TAMBAHKAN - untuk maps
                     'foto' => $presensi->foto,
-                    'foto_url' => $presensi->foto ? asset('public/storage/' . $presensi->foto) : null, // ✅ PATH DIPERBAIKI
+                    'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null,
                     'status' => $presensi->status,
                     'approve_url' => route('admin.presensi.approve', $presensi->id),
                     'reject_url' => route('admin.presensi.reject', $presensi->id),
@@ -412,7 +404,7 @@ class DashboardAdminController extends Controller
                     'jenis' => $pengajuan->jenis,
                     'alasan' => $pengajuan->alasan ?? 'Tidak ada alasan',
                     'bukti' => $pengajuan->bukti,
-                    'bukti_url' => $pengajuan->bukti ? asset('public/storage/' . $pengajuan->bukti) : null, // ✅ PATH DIPERBAIKI
+                    'bukti_url' => $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null,
                     'status' => $pengajuan->status,
                     'approve_url' => route('admin.pengajuan.approve', $pengajuan->id),
                     'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
