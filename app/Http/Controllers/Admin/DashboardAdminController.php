@@ -72,7 +72,7 @@ class DashboardAdminController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get()
             ->map(function ($pengajuan) {
-                // ✅ PERBAIKAN: Path yang benar
+                // Tambahkan URL bukti untuk modal
                 $pengajuan->bukti_url = $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null;
                 return $pengajuan;
             });
@@ -140,7 +140,7 @@ class DashboardAdminController extends Controller
                 'jenis' => $pengajuan->jenis,
                 'alasan' => $pengajuan->alasan,
                 'bukti' => $pengajuan->bukti,
-                'bukti_url' => $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null, // ✅ PERBAIKAN: Path yang benar
+                'bukti_url' => $pengajuan->bukti_url,
                 'approve_url' => route('admin.pengajuan.approve', $pengajuan->id),
                 'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
             ];
@@ -153,9 +153,6 @@ class DashboardAdminController extends Controller
     private function formatPresensiPending($presensiPending)
     {
         return $presensiPending->map(function ($presensi) {
-            // ✅ PERBAIKAN: Parse koordinat dari field lokasi
-            $coordinates = $this->parseCoordinates($presensi->lokasi);
-            
             return [
                 'id' => $presensi->id,
                 'user_name' => $presensi->user->name ?? 'N/A',
@@ -164,32 +161,12 @@ class DashboardAdminController extends Controller
                 'jenis' => $presensi->jenis,
                 'jam' => $presensi->jam,
                 'lokasi' => $presensi->lokasi ?? 'Tidak ada lokasi',
-                'latitude' => $coordinates['latitude'], // ✅ PERBAIKAN: Diambil dari parsing lokasi
-                'longitude' => $coordinates['longitude'], // ✅ PERBAIKAN: Diambil dari parsing lokasi
                 'foto' => $presensi->foto,
-                'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null, // ✅ PERBAIKAN: Path yang benar
+                'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null,
                 'approve_url' => route('admin.presensi.approve', $presensi->id),
                 'reject_url' => route('admin.presensi.reject', $presensi->id),
             ];
         });
-    }
-
-    /**
-     * Parse coordinates from location string
-     * Format: "latitude,longitude" contoh: "3.3163096,117.5788327"
-     */
-    private function parseCoordinates($location)
-    {
-        if (!$location) {
-            return ['latitude' => null, 'longitude' => null];
-        }
-
-        $coordinates = explode(',', $location);
-        
-        return [
-            'latitude' => count($coordinates) === 2 ? trim($coordinates[0]) : null,
-            'longitude' => count($coordinates) === 2 ? trim($coordinates[1]) : null
-        ];
     }
 
     /**
@@ -384,9 +361,6 @@ class DashboardAdminController extends Controller
     {
         try {
             $presensi = Presensi::with('user')->findOrFail($id);
-            
-            // ✅ PERBAIKAN: Parse koordinat dari field lokasi
-            $coordinates = $this->parseCoordinates($presensi->lokasi);
 
             return response()->json([
                 'success' => true,
@@ -397,10 +371,8 @@ class DashboardAdminController extends Controller
                     'jenis' => $presensi->jenis,
                     'jam' => $presensi->jam,
                     'lokasi' => $presensi->lokasi ?? 'Tidak ada lokasi',
-                    'latitude' => $coordinates['latitude'], // ✅ PERBAIKAN: Diambil dari parsing lokasi
-                    'longitude' => $coordinates['longitude'], // ✅ PERBAIKAN: Diambil dari parsing lokasi
                     'foto' => $presensi->foto,
-                    'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null, // ✅ PERBAIKAN: Path yang benar
+                    'foto_url' => $presensi->foto ? asset('storage/' . $presensi->foto) : null,
                     'status' => $presensi->status,
                     'approve_url' => route('admin.presensi.approve', $presensi->id),
                     'reject_url' => route('admin.presensi.reject', $presensi->id),
@@ -432,7 +404,7 @@ class DashboardAdminController extends Controller
                     'jenis' => $pengajuan->jenis,
                     'alasan' => $pengajuan->alasan ?? 'Tidak ada alasan',
                     'bukti' => $pengajuan->bukti,
-                    'bukti_url' => $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null, // ✅ PERBAIKAN: Path yang benar
+                    'bukti_url' => $pengajuan->bukti ? asset('storage/' . $pengajuan->bukti) : null,
                     'status' => $pengajuan->status,
                     'approve_url' => route('admin.pengajuan.approve', $pengajuan->id),
                     'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
