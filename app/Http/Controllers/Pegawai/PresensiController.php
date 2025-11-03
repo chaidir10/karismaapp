@@ -64,6 +64,46 @@ class PresensiController extends Controller
             'foto'   => 'required',
         ]);
 
+        $today = now()->format('Y-m-d');
+        $userId = Auth::id();
+
+        // === VALIDASI: Cek apakah sudah presensi masuk untuk pulang ===
+        if ($request->jenis === 'pulang') {
+            $sudahMasuk = Presensi::where('user_id', $userId)
+                ->where('tanggal', $today)
+                ->where('jenis', 'masuk')
+                ->exists();
+
+            if (!$sudahMasuk) {
+                return redirect()->route('pegawai.dashboard')
+                    ->with('error', 'Anda belum melakukan presensi masuk hari ini!');
+            }
+
+            // === VALIDASI: Cek apakah sudah presensi pulang ===
+            $sudahPulang = Presensi::where('user_id', $userId)
+                ->where('tanggal', $today)
+                ->where('jenis', 'pulang')
+                ->exists();
+
+            if ($sudahPulang) {
+                return redirect()->route('pegawai.dashboard')
+                    ->with('error', 'Anda sudah melakukan presensi pulang hari ini!');
+            }
+        }
+
+        // === VALIDASI: Cek apakah sudah presensi masuk (untuk jenis masuk) ===
+        if ($request->jenis === 'masuk') {
+            $sudahMasuk = Presensi::where('user_id', $userId)
+                ->where('tanggal', $today)
+                ->where('jenis', 'masuk')
+                ->exists();
+
+            if ($sudahMasuk) {
+                return redirect()->route('pegawai.dashboard')
+                    ->with('error', 'Anda sudah melakukan presensi masuk hari ini!');
+            }
+        }
+
         $foto_db = null;
 
         try {
@@ -130,17 +170,19 @@ class PresensiController extends Controller
 
             // === Simpan data presensi ===
             Presensi::create([
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'jenis'   => $request->jenis,
                 'foto'    => $foto_db,
                 'lokasi'  => $request->lokasi,
-                'tanggal' => now()->format('Y-m-d'),
+                'tanggal' => $today,
                 'jam'     => now()->format('H:i:s'),
                 'status'  => $status,
             ]);
 
+            $message = $request->jenis === 'masuk' ? 'Presensi masuk berhasil' : 'Presensi pulang berhasil';
             return redirect()->route('pegawai.dashboard')
-                ->with('success', 'Presensi berhasil disimpan dan status: ' . strtoupper($status) . '!');
+                ->with('success', $message . ' - Status: ' . strtoupper($status) . '!');
+
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
