@@ -29,25 +29,29 @@ class PengajuanController extends Controller
         $request->validate([
             'jenis'   => 'required|in:masuk,pulang,keduanya',
             'tanggal' => 'required|date',
-            'alasan'  => 'required|string|max:255',
+            'alasan'  => 'required|string', // text → tidak perlu max:255
             'bukti'   => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         // default null
         $path = null;
 
-        // hanya simpan file kalau ada
+        // simpan file jika ada
         if ($request->hasFile('bukti')) {
             $path = $request->file('bukti')->store('bukti_pengajuan', 'public');
         }
 
         PengajuanPresensi::create([
-            'user_id' => Auth::id(),
-            'jenis'   => $request->jenis,
-            'tanggal' => $request->tanggal,
-            'alasan'  => $request->alasan,
-            'bukti'   => $path, // bisa null kalau tidak upload
-            'status'  => 'pending',
+            'user_id'      => Auth::id(),
+            'jenis'        => $request->jenis,
+            'tanggal'      => $request->tanggal,
+            'alasan'       => $request->alasan,
+            'bukti'        => $path,
+            'status'       => 'pending',
+
+            // karena pegawai mengajukan → belum di-approve
+            'approved_by'  => null,
+            'approved_at'  => null,
         ]);
 
         return redirect()->route('pegawai.pengajuan.index')

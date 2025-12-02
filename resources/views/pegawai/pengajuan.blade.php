@@ -2,151 +2,6 @@
 @section('title', 'Pengajuan')
 
 @section('content')
-<div class="container">
-    <!-- Pengajuan Section -->
-    <div class="pengajuan-section">
-        <div class="section-header">
-            <h3 class="section-title">Pengajuan Presensi</h3>
-            <button class="btn btn-sm btn-primary btn-scale" onclick="openModal()">
-                <i class="fas fa-plus"></i> Buat 
-            </button>
-        </div>
-
-        {{-- Riwayat Pengajuan --}}
-        <div class="pengajuan-list">
-            @forelse($pengajuan as $p)
-            <div class="pengajuan-item"
-                 data-pengajuan-id="{{ $p->id }}"
-                 data-pengajuan-jenis="{{ $p->jenis }}"
-                 data-pengajuan-tanggal="{{ $p->tanggal }}"
-                 data-pengajuan-alasan="{{ $p->alasan }}"
-                 data-pengajuan-bukti="{{ $p->bukti ? Storage::url($p->bukti) : '' }}"
-                 data-pengajuan-status="{{ $p->status }}">
-
-                <div class="pengajuan-icon">
-                    @if($p->jenis == 'masuk')
-                    <i class="fas fa-sign-in-alt text-primary"></i>
-                    @elseif($p->jenis == 'pulang')
-                    <i class="fas fa-sign-out-alt text-warning"></i>
-                    @else
-                    <i class="fas fa-exchange-alt text-info"></i>
-                    @endif
-                </div>
-
-                <div class="pengajuan-info">
-                    <h5 class="pengajuan-jenis">{{ ucfirst($p->jenis) }}</h5>
-                    <p class="pengajuan-date">{{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d F Y') }}</p>
-                    <div class="pengajuan-alasan">
-                        <span class="badge bg-secondary-light">{{ Str::limit($p->alasan, 30) }}</span>
-                    </div>
-                </div>
-
-                <div class="pengajuan-status">
-                    <span class="badge status-{{ $p->status }}">
-                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> 
-                        {{ ucfirst($p->status) }}
-                    </span>
-                </div>
-            </div>
-
-            @empty
-            <div class="text-center py-4">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada pengajuan.</p>
-            </div>
-            @endforelse
-        </div>
-    </div>
-</div>
-
-<!-- Modal Detail Pengajuan -->
-<div class="modal fade" id="pengajuanDetailModal" tabindex="-1" aria-labelledby="pengajuanDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-body p-0 pt-2">
-                <div class="text-center mb-3">
-                    <div id="modalPengajuanIconContainer" class="pengajuan-icon-container">
-                        <!-- Icon akan dimuat di sini melalui JavaScript -->
-                    </div>
-                </div>
-
-                <div class="pengajuan-detail-section">
-                    <h5 class="text-center" id="modalPengajuanJenis">Jenis Pengajuan</h5>
-                    <div class="text-center mb-4">
-                        <span class="badge bg-primary-light" id="modalPengajuanStatus">-</span>
-                    </div>
-
-                    <div class="detail-grid full-width">
-                        <div class="detail-item">
-                            <div class="detail-label">Tanggal</div>
-                            <div class="detail-value" id="modalPengajuanTanggal">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Jenis</div>
-                            <div class="detail-value" id="modalPengajuanJenisDetail">-</div>
-                        </div>
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Alasan</div>
-                            <div class="detail-value" id="modalPengajuanAlasan">-</div>
-                        </div>
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Bukti</div>
-                            <div class="detail-value" id="modalPengajuanBukti">
-                                <span class="text-muted">Tidak ada bukti</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer pb-0 pt-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Modal Buat Pengajuan --}}
-<div id="pengajuanModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3>Buat Pengajuan Presensi</h3>
-
-        <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            <div class="form-group">
-                <label for="jenis">Jenis Pengajuan</label>
-                <select name="jenis" id="jenis" required>
-                    <option value="">-- Pilih --</option>
-                    <option value="masuk">Masuk</option>
-                    <option value="pulang">Pulang</option>
-                    <option value="keduanya">Keduanya</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="tanggal">Tanggal</label>
-                <input type="date" name="tanggal" id="tanggal" required>
-            </div>
-
-            <div class="form-group">
-                <label for="alasan">Alasan</label>
-                <textarea name="alasan" id="alasan" rows="3" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="bukti">Upload Bukti (jpg/png/pdf, max 2MB)</label>
-                <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf">
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">Kirim Pengajuan</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <style>
     /* CSS Variables - Sama seperti di pegawai */
     :root {
@@ -601,6 +456,164 @@
         }
     }
 </style>
+
+<div class="container">
+    <!-- Pengajuan Section -->
+    <div class="pengajuan-section">
+        <div class="section-header">
+            <h3 class="section-title">Pengajuan Presensi</h3>
+            <button class="btn btn-sm btn-primary btn-scale" onclick="openModal()">
+                <i class="fas fa-plus"></i> Buat 
+            </button>
+        </div>
+
+        {{-- Riwayat Pengajuan --}}
+        <div class="pengajuan-list">
+            @forelse($pengajuan as $p)
+            <div class="pengajuan-item"
+                 data-pengajuan-id="{{ $p->id }}"
+                 data-pengajuan-jenis="{{ $p->jenis }}"
+                 data-pengajuan-tanggal="{{ $p->tanggal }}"
+                 data-pengajuan-alasan="{{ $p->alasan }}"
+                 data-pengajuan-bukti="{{ $p->bukti ? Storage::url($p->bukti) : '' }}"
+                 data-pengajuan-status="{{ $p->status }}">
+
+                <div class="pengajuan-icon">
+                    @if($p->jenis == 'masuk')
+                    <i class="fas fa-sign-in-alt text-primary"></i>
+                    @elseif($p->jenis == 'pulang')
+                    <i class="fas fa-sign-out-alt text-warning"></i>
+                    @else
+                    <i class="fas fa-exchange-alt text-info"></i>
+                    @endif
+                </div>
+
+                <div class="pengajuan-info">
+                    <h5 class="pengajuan-jenis">{{ ucfirst($p->jenis) }}</h5>
+                    <p class="pengajuan-date">{{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d F Y') }}</p>
+                    <div class="pengajuan-alasan">
+                        <span class="badge bg-secondary-light">{{ Str::limit($p->alasan, 30) }}</span>
+                    </div>
+                </div>
+
+                <div class="pengajuan-status">
+                    <span class="badge status-{{ $p->status }}">
+                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> 
+                        {{ ucfirst($p->status) }}
+                    </span>
+                </div>
+            </div>
+
+            @empty
+            <div class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Belum ada pengajuan.</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Pengajuan -->
+<div class="modal fade" id="pengajuanDetailModal" tabindex="-1" aria-labelledby="pengajuanDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-body p-0 pt-2">
+                <div class="text-center mb-3">
+                    <div id="modalPengajuanIconContainer" class="pengajuan-icon-container">
+                        <!-- Icon akan dimuat di sini melalui JavaScript -->
+                    </div>
+                </div>
+
+                <div class="pengajuan-detail-section">
+                    <h5 class="text-center" id="modalPengajuanJenis">Jenis Pengajuan</h5>
+                    <div class="text-center mb-4">
+                        <span class="badge bg-primary-light" id="modalPengajuanStatus">-</span>
+                    </div>
+
+                    <div class="detail-grid full-width">
+                        <div class="detail-item">
+                            <div class="detail-label">Tanggal</div>
+                            <div class="detail-value" id="modalPengajuanTanggal">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Jenis</div>
+                            <div class="detail-value" id="modalPengajuanJenisDetail">-</div>
+                        </div>
+                        <div class="detail-item full-width">
+                            <div class="detail-label">Alasan</div>
+                            <div class="detail-value" id="modalPengajuanAlasan">-</div>
+                        </div>
+                        <div class="detail-item full-width">
+                            <div class="detail-label">Bukti</div>
+                            <div class="detail-value" id="modalPengajuanBukti">
+                                <span class="text-muted">Tidak ada bukti</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pb-0 pt-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Buat Pengajuan --}}
+<div id="pengajuanModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Buat Pengajuan Presensi</h3>
+
+        <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <div class="form-group">
+                <label for="jenis">Jenis Pengajuan</label>
+                <select name="jenis" id="jenis" required onchange="toggleJamFields()">
+                    <option value="">-- Pilih --</option>
+                    <option value="masuk">Masuk</option>
+                    <option value="pulang">Pulang</option>
+                    <option value="keduanya">Keduanya</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tanggal">Tanggal</label>
+                <input type="date" name="tanggal" id="tanggal" required>
+            </div>
+
+            {{-- Jam Masuk --}}
+            <div class="form-group" id="group_jam_masuk" style="display:none;">
+                <label for="jam_masuk">Jam Masuk</label>
+                <input type="time" name="jam_masuk" id="jam_masuk">
+            </div>
+
+            {{-- Jam Pulang --}}
+            <div class="form-group" id="group_jam_pulang" style="display:none;">
+                <label for="jam_pulang">Jam Pulang</label>
+                <input type="time" name="jam_pulang" id="jam_pulang">
+            </div>
+
+            <div class="form-group">
+                <label for="alasan">Alasan</label>
+                <textarea name="alasan" id="alasan" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="bukti">Upload Bukti (jpg/png/pdf, max 2MB)</label>
+                <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Kirim Pengajuan</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
