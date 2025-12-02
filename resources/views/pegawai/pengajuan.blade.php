@@ -621,10 +621,9 @@
         const pengajuanModal = new bootstrap.Modal(document.getElementById('pengajuanDetailModal'));
         const modalIconContainer = document.getElementById('modalPengajuanIconContainer');
 
-        // Fungsi untuk membuat icon berdasarkan jenis pengajuan
+        // Fungsi membuat ikon berdasarkan jenis
         function createPengajuanIcon(jenis) {
             let iconClass, iconColor;
-            
             switch(jenis) {
                 case 'masuk':
                     iconClass = 'fas fa-sign-in-alt';
@@ -642,63 +641,56 @@
                     iconClass = 'fas fa-clock';
                     iconColor = 'var(--gray)';
             }
-            
             return `<i class="${iconClass}" style="color: ${iconColor}"></i>`;
         }
 
-        // Fungsi untuk mengisi data modal
+        // Fungsi mengisi modal
         function fillModalData(pengajuanItem) {
-            const pengajuanJenis = pengajuanItem.getAttribute('data-pengajuan-jenis');
-            const pengajuanTanggal = pengajuanItem.getAttribute('data-pengajuan-tanggal');
-            const pengajuanAlasan = pengajuanItem.getAttribute('data-pengajuan-alasan');
-            const pengajuanBukti = pengajuanItem.getAttribute('data-pengajuan-bukti');
-            const pengajuanStatus = pengajuanItem.getAttribute('data-pengajuan-status');
+            const jenis = pengajuanItem.dataset.pengajuanJenis;
+            const tanggal = pengajuanItem.dataset.pengajuanTanggal;
+            const alasan = pengajuanItem.dataset.pengajuanAlasan;
+            const bukti = pengajuanItem.dataset.pengajuanBukti;
+            const status = pengajuanItem.dataset.pengajuanStatus;
 
-            // ⬅️ Tambahan baru
-            const pengajuanJamMasuk = pengajuanItem.getAttribute('data-pengajuan-jam-masuk');
-            const pengajuanJamPulang = pengajuanItem.getAttribute('data-pengajuan-jam-pulang');
+            // ⬅️ Tambahan sesuai permintaan
+            const jamMasuk = pengajuanItem.dataset.pengajuanJamMasuk;
+            const jamPulang = pengajuanItem.dataset.pengajuanJamPulang;
 
-            // Set icon di modal
-            modalIconContainer.innerHTML = createPengajuanIcon(pengajuanJenis);
+            // icon
+            modalIconContainer.innerHTML = createPengajuanIcon(jenis);
 
-            // Set data lainnya
-            document.getElementById('modalPengajuanJenis').textContent = `Pengajuan ${pengajuanJenis}`;
-            document.getElementById('modalPengajuanStatus').textContent = pengajuanStatus;
-            document.getElementById('modalPengajuanTanggal').textContent = new Date(pengajuanTanggal).toLocaleDateString('id-ID', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('modalPengajuanJenisDetail').textContent = pengajuanJenis;
-            document.getElementById('modalPengajuanAlasan').textContent = pengajuanAlasan;
+            // set data dasar
+            document.getElementById('modalPengajuanJenis').textContent = `Pengajuan ${jenis}`;
+            document.getElementById('modalPengajuanStatus').textContent = status;
+            document.getElementById('modalPengajuanTanggal').textContent = new Date(tanggal)
+                .toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
 
-            // ⬅️ Tampilkan jam masuk
+            document.getElementById('modalPengajuanJenisDetail').textContent = jenis;
+            document.getElementById('modalPengajuanAlasan').textContent = alasan;
+
+            // Jam Masuk
             const jamMasukElem = document.getElementById('modalPengajuanJamMasuk');
-            if (pengajuanJamMasuk && pengajuanJamMasuk !== "") {
-                jamMasukElem.textContent = pengajuanJamMasuk;
-            } else {
-                jamMasukElem.textContent = "-";
-            }
+            jamMasukElem.textContent = jamMasuk ? jamMasuk : "-";
 
-            // ⬅️ Tampilkan jam pulang
+            // Jam Pulang
             const jamPulangElem = document.getElementById('modalPengajuanJamPulang');
-            if (pengajuanJamPulang && pengajuanJamPulang !== "") {
-                jamPulangElem.textContent = pengajuanJamPulang;
-            } else {
-                jamPulangElem.textContent = "-";
-            }
+            jamPulangElem.textContent = jamPulang ? jamPulang : "-";
 
-            // Set bukti
-            const buktiElement = document.getElementById('modalPengajuanBukti');
-            if (pengajuanBukti && pengajuanBukti.trim() !== '') {
-                buktiElement.innerHTML = `<a href="${pengajuanBukti}" target="_blank" class="text-primary">Lihat Bukti</a>`;
+            // Bukti
+            const buktiElem = document.getElementById('modalPengajuanBukti');
+            if (bukti && bukti.trim() !== "") {
+                buktiElem.innerHTML = `<a href="${bukti}" target="_blank" class="text-primary">Lihat Bukti</a>`;
             } else {
-                buktiElement.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
+                buktiElem.innerHTML = `<span class="text-muted">Tidak ada bukti</span>`;
             }
         }
 
-        // Tambahkan event listener untuk setiap item pengajuan
+        // Event listener setiap item
         pengajuanItems.forEach((item) => {
             item.addEventListener('click', function() {
                 fillModalData(this);
@@ -706,13 +698,13 @@
             });
         });
 
-        // Reset modal ketika ditutup
+        // Reset icon ketika modal ditutup
         document.getElementById('pengajuanDetailModal').addEventListener('hidden.bs.modal', function () {
             modalIconContainer.innerHTML = '';
         });
     });
 
-    // Fungsi untuk modal buat pengajuan (existing)
+    // Modal buat pengajuan
     function openModal() {
         document.getElementById("pengajuanModal").style.display = "block";
         const today = new Date().toISOString().split('T')[0];
@@ -730,4 +722,5 @@
         }
     }
 </script>
+
 @endsection
