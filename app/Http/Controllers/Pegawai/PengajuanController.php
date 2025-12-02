@@ -27,31 +27,36 @@ class PengajuanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis'   => 'required|in:masuk,pulang,keduanya',
-            'tanggal' => 'required|date',
-            'alasan'  => 'required|string', // text → tidak perlu max:255
-            'bukti'   => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048',
+            'jenis'       => 'required|in:masuk,pulang,keduanya',
+            'tanggal'     => 'required|date',
+            'alasan'      => 'required|string',
+            'bukti'       => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048',
+
+            // tambahkan validasi jam (nullable saja)
+            'jam_masuk'   => 'nullable|date_format:H:i',
+            'jam_keluar'  => 'nullable|date_format:H:i',
         ]);
 
-        // default null
         $path = null;
 
-        // simpan file jika ada
         if ($request->hasFile('bukti')) {
             $path = $request->file('bukti')->store('bukti_pengajuan', 'public');
         }
 
         PengajuanPresensi::create([
-            'user_id'      => Auth::id(),
-            'jenis'        => $request->jenis,
-            'tanggal'      => $request->tanggal,
-            'alasan'       => $request->alasan,
-            'bukti'        => $path,
-            'status'       => 'pending',
+            'user_id'     => Auth::id(),
+            'jenis'       => $request->jenis,
+            'tanggal'     => $request->tanggal,
+            'alasan'      => $request->alasan,
+            'bukti'       => $path,
+            'status'      => 'pending',
 
-            // karena pegawai mengajukan → belum di-approve
-            'approved_by'  => null,
-            'approved_at'  => null,
+            // tambahkan jam masuk / pulang
+            'jam_masuk'   => $request->jam_masuk,
+            'jam_keluar'  => $request->jam_keluar,
+
+            'approved_by' => null,
+            'approved_at' => null,
         ]);
 
         return redirect()->route('pegawai.pengajuan.index')
