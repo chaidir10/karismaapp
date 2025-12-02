@@ -12,7 +12,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Carbon\Carbon;
 
 class LaporanExport implements WithMultipleSheets
 {
@@ -51,8 +50,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
     {
         return [
             ['LAPORAN PRESENSI PEGAWAI'],
-            ['Nama: ' . $this->data['user']->name],
-            ['NIP: ' . $this->data['user']->nip],
+            ['Nama: ' . ($this->data['user']->name ?? '-')],
+            ['NIP: ' . ($this->data['user']->nip ?? '-')],
             [],
             ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur'],
         ];
@@ -62,38 +61,46 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
     {
         $rows = [];
 
-        foreach ($this->data['rows'] as $row) {
-            $rows[] = [
-                $row['tanggal'],
-                $row['masuk'],
-                $row['pulang'],
-                $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
-                $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
-                $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
-                $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
-                $row['lembur'] !== '-' ? $this->formatLembur($row['lembur']) : '-',
-            ];
+        $detailRows = $this->data['rows'] ?? [];
+
+        // jika bulan kosong → tetap kasih 1 baris
+        if (empty($detailRows)) {
+            $rows[] = ['-', '-', '-', '-', '-', '-', '-', '-'];
+        } else {
+            foreach ($detailRows as $row) {
+                $rows[] = [
+                    $row['tanggal'] ?? '-',
+                    $row['masuk'] ?? '-',
+                    $row['pulang'] ?? '-',
+                    isset($row['keterlambatan']) && $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
+                    isset($row['pulang_cepat']) && $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
+                    isset($row['jam_kerja']) && $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
+                    isset($row['waktu_kurang']) && $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
+                    isset($row['lembur']) && $row['lembur'] !== '-' ? $this->formatLembur($row['lembur']) : '-',
+                ];
+            }
         }
 
-        // 🔹 Tambahkan baris kosong
+        // baris kosong sebelum ringkasan
         $rows[] = [];
 
-        // 🔹 Ringkasan
-        $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
-        $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
-        $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
-        $rows[] = ['Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Lembur', '', $this->formatLembur($this->data['summary']['total_lembur'])];
+        $summary = $this->data['summary'] ?? [];
+
+        $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja'] ?? 0];
+        $rows[] = ['Total Keterlambatan', '', ($summary['total_keterlambatan'] ?? 0) . ' menit'];
+        $rows[] = ['Total Pulang Cepat', '', ($summary['total_pulang_cepat'] ?? 0) . ' menit'];
+        $rows[] = ['Total Jam Kerja', '', $this->formatMenit($summary['total_jam_kerja'] ?? 0)];
+        $rows[] = ['Total Waktu Kurang', '', ($summary['total_kekurangan'] ?? 0) . ' menit'];
+        $rows[] = ['Total Lembur', '', $this->formatLembur($summary['total_lembur'] ?? 0)];
 
         return $rows;
     }
 
     private function formatMenit($totalMenit)
     {
+        if ($totalMenit <= 0) return '-';
         $jam = floor($totalMenit / 60);
         $menit = $totalMenit % 60;
-        if ($totalMenit <= 0) return '-';
         return $menit === 0 ? "{$jam} jam" : "{$jam} jam {$menit} menit";
     }
 
@@ -105,12 +112,12 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function title(): string
     {
-        return $this->data['user']->name;
+        return $this->data['user']->name ?? 'Pegawai';
     }
 
     public function styles(Worksheet $sheet)
     {
-        // 🔹 Header utama
+        // Header utama
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
@@ -121,81 +128,47 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Header tabel
-        $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('000000');
+        // Header tabel
+        $sheet->getStyle('A5:H5')->getFont()->setBold(true);
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Border data
+        // Border semua data
         $lastRow = $sheet->getHighestRow();
-        $sheet->getStyle("A5:H{$lastRow}")
-            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // 🔹 Lebar kolom
+        if ($lastRow >= 5) {
+            $sheet->getStyle("A5:H{$lastRow}")
+                ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        }
+
+        // Lebar kolom
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // 🔹 Page setup
+        // Page setup
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
-        // 🔹 Margin
         $sheet->getPageMargins()
             ->setTop(0.4)->setRight(0.3)->setLeft(0.3)->setBottom(0.4);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
+        // Merge ringkasan jika baris cukup
+        $highestRow = $sheet->getHighestRow();
+        $ringkasanMulai = $highestRow - 5;
 
-        /* =======================================================
-         |  PERUBAHAN DIMULAI DI SINI
-         |  WARNA MERAH UNTUK SABTU, MINGGU, LIBUR NASIONAL, CUTI
-         ======================================================= */
-
-        $dataStart = 6; // baris pertama berisi data tanggal
-        $dataEnd = $this->data['total_hari_kerja'] + 5;
-
-        // daftar libur nasional (bisa Anda ganti ambil dari DB)
-        $liburNasional = $this->data['libur'] ?? [];  
-        // contoh format:
-        // $liburNasional = ['2025-01-01','2025-03-29','2025-04-18', ... ];
-
-        for ($row = $dataStart; $row <= $dataEnd; $row++) {
-            $tanggal = $sheet->getCell("A{$row}")->getValue();
-            if (!$tanggal) continue;
-
-            $carbonDate = Carbon::parse($tanggal);
-            $hari = $carbonDate->dayOfWeek; // 0=minggu, 6=sabtu
-
-            $isWeekend = ($hari === 0 || $hari === 6);
-            $isLibur = in_array($tanggal, $liburNasional);
-
-            if ($isWeekend || $isLibur) {
-                // warna merah seluruh baris
-                $sheet->getStyle("A{$row}:H{$row}")
-                    ->getFont()->getColor()->setRGB('FF0000');
+        if ($ringkasanMulai > 6) {
+            for ($r = $ringkasanMulai; $r <= $highestRow; $r++) {
+                $sheet->mergeCells("A{$r}:B{$r}");
+                $sheet->mergeCells("C{$r}:D{$r}");
             }
         }
-
-        /* =======================================================
-         |  PERUBAHAN SELESAI
-         ======================================================= */
-
-
-        // 🔹 Merge kolom A–B dan C–D di bagian ringkasan
-        $highestRow = $sheet->getHighestRow();
-        for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
-            $sheet->mergeCells("A{$r}:B{$r}");
-            $sheet->mergeCells("C{$r}:D{$r}");
-        }
-
-        // 🔹 Styling ringkasan
-        $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
-            ->getFont()->setBold(true);
 
         return [];
     }
