@@ -12,6 +12,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use Carbon\Carbon;
 
 class LaporanExport implements WithMultipleSheets
 {
@@ -34,6 +36,9 @@ class LaporanExport implements WithMultipleSheets
     }
 }
 
+/**
+ * Sheet per pegawai
+ */
 class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, WithStyles
 {
     protected $data;
@@ -71,10 +76,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        // Tambah baris kosong
+        // 🔹 Tambahkan baris kosong
         $rows[] = [];
 
-        // Ringkasan
+        // 🔹 Ringkasan: kolom A merge ke B, nilai di C merge ke D
         $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -106,7 +111,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // Header utama
+        // 🔹 Header utama
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
@@ -117,29 +122,30 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Header tabel
+        // 🔹 Header tabel
         $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('000000');
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Border
+        // 🔹 Border data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Lebar kolom
+        // 🔹 Lebar kolom
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // Page setup
+        // 🔹 Page setup
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
+        // 🔹 Margin
         $sheet->getPageMargins()
             ->setTop(0.4)
             ->setRight(0.3)
@@ -148,37 +154,55 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // Merge ringkasan
+        // 🔹 Merge kolom A–B dan C–D di bagian ringkasan
         $highestRow = $sheet->getHighestRow();
+        // Diasumsikan ringkasan = 6 baris terakhir
         for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");
         }
 
+        // 🔹 Styling ringkasan
         $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
             ->getFont()->setBold(true);
 
-        // ===============================
-        // 🔥 PEWARNAAN KHUSUS SABTU–MINGGU
-        // ===============================
-        $dataStart = 6; // data mulai baris 6
+        $sheet->getStyle("A" . ($highestRow - 5) . ":B{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        for ($r = $dataStart; $r <= $highestRow - 7; $r++) {
+        $sheet->getStyle("C" . ($highestRow - 5) . ":D{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-            $tanggal = $sheet->getCell("A{$r}")->getValue();
-            if (!$tanggal) continue;
-
-            $timestamp = strtotime($tanggal);
-            if ($timestamp === false) continue;
-
-            $dayOfWeek = date('N', $timestamp); // 6=Sabtu, 7=Minggu
-
-            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
-                $sheet->getStyle("A{$r}:H{$r}")
-                    ->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setRGB('FFCCCC'); // warna merah lembut
+        // 🔹 WARNA MERAH UNTUK HARI SABTU DAN MINGGU
+        $startDataRow = 6; // Baris pertama data (setelah header)
+        $endDataRow = $highestRow - 7; // Baris terakhir data (sebelum ringkasan)
+        
+        for ($row = $startDataRow; $row <= $endDataRow; $row++) {
+            $tanggal = $sheet->getCell("A{$row}")->getValue();
+            
+            // Coba parse tanggal dengan beberapa format
+            $parsedDate = null;
+            
+            // Format umum dari database/array
+            if (strtotime($tanggal) !== false) {
+                $parsedDate = Carbon::parse($tanggal);
+            }
+            // Format Excel (angka serial)
+            elseif (is_numeric($tanggal) && $tanggal > 0) {
+                $parsedDate = Carbon::createFromTimestamp(
+                    ($tanggal - 25569) * 86400 // Konversi dari Excel serial date
+                );
+            }
+            
+            if ($parsedDate) {
+                $dayOfWeek = $parsedDate->dayOfWeek; // 6 = Sabtu, 0 = Minggu
+                
+                if ($dayOfWeek == Carbon::SATURDAY || $dayOfWeek == Carbon::SUNDAY) {
+                    // Set warna merah untuk seluruh baris (kolom A sampai H)
+                    $sheet->getStyle("A{$row}:H{$row}")
+                        ->getFont()
+                        ->getColor()
+                        ->setARGB(Color::COLOR_RED);
+                }
             }
         }
 
