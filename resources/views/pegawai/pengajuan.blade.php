@@ -655,10 +655,11 @@
         const pengajuanModal = new bootstrap.Modal(document.getElementById('pengajuanDetailModal'));
         const modalIconContainer = document.getElementById('modalPengajuanIconContainer');
 
-        // Fungsi membuat ikon berdasarkan jenis
+        // Fungsi untuk membuat icon berdasarkan jenis pengajuan
         function createPengajuanIcon(jenis) {
             let iconClass, iconColor;
-            switch (jenis) {
+            
+            switch(jenis) {
                 case 'masuk':
                     iconClass = 'fas fa-sign-in-alt';
                     iconColor = 'var(--primary)';
@@ -675,56 +676,57 @@
                     iconClass = 'fas fa-clock';
                     iconColor = 'var(--gray)';
             }
+            
             return `<i class="${iconClass}" style="color: ${iconColor}"></i>`;
         }
 
-        // Fungsi mengisi modal
+        // Fungsi untuk mengisi data modal
         function fillModalData(pengajuanItem) {
-            const jenis = pengajuanItem.dataset.pengajuanJenis;
-            const tanggal = pengajuanItem.dataset.pengajuanTanggal;
-            const alasan = pengajuanItem.dataset.pengajuanAlasan;
-            const bukti = pengajuanItem.dataset.pengajuanBukti;
-            const status = pengajuanItem.dataset.pengajuanStatus;
+            const pengajuanJenis = pengajuanItem.getAttribute('data-pengajuan-jenis');
+            const pengajuanTanggal = pengajuanItem.getAttribute('data-pengajuan-tanggal');
+            const pengajuanAlasan = pengajuanItem.getAttribute('data-pengajuan-alasan');
+            const pengajuanBukti = pengajuanItem.getAttribute('data-pengajuan-bukti');
+            const pengajuanStatus = pengajuanItem.getAttribute('data-pengajuan-status');
 
-            // ⬅️ Tambahan sesuai permintaan
-            const jamMasuk = pengajuanItem.dataset.pengajuanJamMasuk;
-            const jamPulang = pengajuanItem.dataset.pengajuanJamPulang;
+            // Tambahan baru
+            const pengajuanJamMasuk = pengajuanItem.getAttribute('data-pengajuan-jam-masuk');
+            const pengajuanJamPulang = pengajuanItem.getAttribute('data-pengajuan-jam-pulang');
 
-            // icon
-            modalIconContainer.innerHTML = createPengajuanIcon(jenis);
+            // Set icon
+            modalIconContainer.innerHTML = createPengajuanIcon(pengajuanJenis);
 
-            // set data dasar
-            document.getElementById('modalPengajuanJenis').textContent = `Pengajuan ${jenis}`;
-            document.getElementById('modalPengajuanStatus').textContent = status;
-            document.getElementById('modalPengajuanTanggal').textContent = new Date(tanggal)
-                .toLocaleDateString('id-ID', {
+            // Set data
+            document.getElementById('modalPengajuanJenis').textContent = `Pengajuan ${pengajuanJenis}`;
+            document.getElementById('modalPengajuanStatus').textContent = pengajuanStatus;
+
+            document.getElementById('modalPengajuanTanggal').textContent =
+                new Date(pengajuanTanggal).toLocaleDateString('id-ID', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 });
 
-            document.getElementById('modalPengajuanJenisDetail').textContent = jenis;
-            document.getElementById('modalPengajuanAlasan').textContent = alasan;
+            document.getElementById('modalPengajuanJenisDetail').textContent = pengajuanJenis;
+            document.getElementById('modalPengajuanAlasan').textContent = pengajuanAlasan;
 
             // Jam Masuk
-            const jamMasukElem = document.getElementById('modalPengajuanJamMasuk');
-            jamMasukElem.textContent = jamMasuk ? jamMasuk : "-";
+            document.getElementById('modalPengajuanJamMasuk').textContent =
+                pengajuanJamMasuk && pengajuanJamMasuk !== "" ? pengajuanJamMasuk : "-";
 
             // Jam Pulang
-            const jamPulangElem = document.getElementById('modalPengajuanJamPulang');
-            jamPulangElem.textContent = jamPulang ? jamPulang : "-";
+            document.getElementById('modalPengajuanJamPulang').textContent =
+                pengajuanJamPulang && pengajuanJamPulang !== "" ? pengajuanJamPulang : "-";
 
             // Bukti
-            const buktiElem = document.getElementById('modalPengajuanBukti');
-            if (bukti && bukti.trim() !== "") {
-                buktiElem.innerHTML = `<a href="${bukti}" target="_blank" class="text-primary">Lihat Bukti</a>`;
+            const buktiElement = document.getElementById('modalPengajuanBukti');
+            if (pengajuanBukti && pengajuanBukti.trim() !== '') {
+                buktiElement.innerHTML = `<a href="${pengajuanBukti}" target="_blank" class="text-primary">Lihat Bukti</a>`;
             } else {
-                buktiElem.innerHTML = `<span class="text-muted">Tidak ada bukti</span>`;
+                buktiElement.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
             }
         }
 
-        // Event listener setiap item
         pengajuanItems.forEach((item) => {
             item.addEventListener('click', function() {
                 fillModalData(this);
@@ -732,13 +734,13 @@
             });
         });
 
-        // Reset icon ketika modal ditutup
-        document.getElementById('pengajuanDetailModal').addEventListener('hidden.bs.modal', function() {
+        // Reset modal saat ditutup
+        document.getElementById('pengajuanDetailModal').addEventListener('hidden.bs.modal', function () {
             modalIconContainer.innerHTML = '';
         });
     });
 
-    // Modal buat pengajuan
+    // MODAL PENGAJUAN (open & close)
     function openModal() {
         document.getElementById("pengajuanModal").style.display = "block";
         const today = new Date().toISOString().split('T')[0];
@@ -753,6 +755,25 @@
         const modal = document.getElementById("pengajuanModal");
         if (event.target == modal) {
             closeModal();
+        }
+    }
+
+    // 🔥 FIELD JAM — tampil sesuai jenis (masuk / pulang / keduanya)
+    function pilihJenisPengajuan() {
+        let jenis = document.getElementById('jenis').value;
+
+        document.getElementById('formJamMasuk').style.display = 'none';
+        document.getElementById('formJamPulang').style.display = 'none';
+
+        if (jenis === 'masuk') {
+            document.getElementById('formJamMasuk').style.display = 'block';
+        } 
+        else if (jenis === 'pulang') {
+            document.getElementById('formJamPulang').style.display = 'block';
+        } 
+        else if (jenis === 'keduanya') {
+            document.getElementById('formJamMasuk').style.display = 'block';
+            document.getElementById('formJamPulang').style.display = 'block';
         }
     }
 </script>
