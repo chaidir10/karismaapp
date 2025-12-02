@@ -41,6 +41,30 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 {
     protected $data;
 
+    // daftar libur nasional dan cuti bersama tahun berjalan
+    protected $liburNasional = [
+        '2025-01-01',
+        '2025-01-29',
+        '2025-03-31',
+        '2025-04-18',
+        '2025-04-20',
+        '2025-05-01',
+        '2025-05-29',
+        '2025-06-01',
+        '2025-06-06',
+        '2025-06-27',
+        '2025-08-17',
+        '2025-10-06',
+        '2025-12-25'
+    ];
+
+    protected $cutiBersama = [
+        '2025-01-30',
+        '2025-04-21',
+        '2025-05-02',
+        '2025-12-26'
+    ];
+
     public function __construct($data)
     {
         $this->data = $data;
@@ -60,10 +84,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
     public function array(): array
     {
         $rows = [];
-
         $detailRows = $this->data['rows'] ?? [];
 
-        // jika bulan kosong → tetap kasih 1 baris
         if (empty($detailRows)) {
             $rows[] = ['-', '-', '-', '-', '-', '-', '-', '-'];
         } else {
@@ -81,7 +103,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             }
         }
 
-        // baris kosong sebelum ringkasan
+        // ringkasan
         $rows[] = [];
 
         $summary = $this->data['summary'] ?? [];
@@ -96,24 +118,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         return $rows;
     }
 
-    private function formatMenit($totalMenit)
-    {
-        if ($totalMenit <= 0) return '-';
-        $jam = floor($totalMenit / 60);
-        $menit = $totalMenit % 60;
-        return $menit === 0 ? "{$jam} jam" : "{$jam} jam {$menit} menit";
-    }
 
-    private function formatLembur($totalMenit)
-    {
-        $jam = floor($totalMenit / 60);
-        return $jam > 0 ? "{$jam} jam" : '-';
-    }
-
-    public function title(): string
-    {
-        return $this->data['user']->name ?? 'Pegawai';
-    }
+    // =======================
+    //   🎨  STYLING
+    // =======================
 
     public function styles(Worksheet $sheet)
     {
@@ -141,6 +149,38 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
                 ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         }
 
+        // Pewarnaan baris berdasarkan tanggal
+        for ($row = 6; $row <= $lastRow; $row++) {
+            $tanggal = $sheet->getCell("A{$row}")->getValue();
+
+            if (!$tanggal || $tanggal === '-') continue;
+
+            $timestamp = strtotime($tanggal);
+            $hari = date('N', $timestamp); // 6 = Sabtu, 7 = Minggu
+            $tglStr = date('Y-m-d', $timestamp);
+
+            // Weekend
+            if ($hari == 6 || $hari == 7) {
+                $sheet->getStyle("A{$row}:H{$row}")
+                    ->getFill()->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('FFE5E5'); // pink lembut
+            }
+
+            // Libur Nasional
+            if (in_array($tglStr, $this->liburNasional)) {
+                $sheet->getStyle("A{$row}:H{$row}")
+                    ->getFill()->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('FFCCCC'); // merah muda
+            }
+
+            // Cuti Bersama
+            if (in_array($tglStr, $this->cutiBersama)) {
+                $sheet->getStyle("A{$row}:H{$row}")
+                    ->getFill()->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('FFE5CC'); // oranye soft
+            }
+        }
+
         // Lebar kolom
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
@@ -159,17 +199,26 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // Merge ringkasan jika baris cukup
-        $highestRow = $sheet->getHighestRow();
-        $ringkasanMulai = $highestRow - 5;
-
-        if ($ringkasanMulai > 6) {
-            for ($r = $ringkasanMulai; $r <= $highestRow; $r++) {
-                $sheet->mergeCells("A{$r}:B{$r}");
-                $sheet->mergeCells("C{$r}:D{$r}");
-            }
-        }
-
         return [];
+    }
+
+
+    private function formatMenit($totalMenit)
+    {
+        if ($totalMenit <= 0) return '-';
+        $jam = floor($totalMenit / 60);
+        $menit = $totalMenit % 60;
+        return $menit === 0 ? "{$jam} jam" : "{$jam} jam {$menit} menit";
+    }
+
+    private function formatLembur($totalMenit)
+    {
+        $jam = floor($totalMenit / 60);
+        return $jam > 0 ? "{$jam} jam" : '-';
+    }
+
+    public function title(): string
+    {
+        return $this->data['user']->name ?? 'Pegawai';
     }
 }
