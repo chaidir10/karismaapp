@@ -654,6 +654,10 @@
             const pengajuanBukti = pengajuanItem.getAttribute('data-pengajuan-bukti');
             const pengajuanStatus = pengajuanItem.getAttribute('data-pengajuan-status');
 
+            // ⬅️ Tambahan baru
+            const pengajuanJamMasuk = pengajuanItem.getAttribute('data-pengajuan-jam-masuk');
+            const pengajuanJamPulang = pengajuanItem.getAttribute('data-pengajuan-jam-pulang');
+
             // Set icon di modal
             modalIconContainer.innerHTML = createPengajuanIcon(pengajuanJenis);
 
@@ -668,6 +672,22 @@
             });
             document.getElementById('modalPengajuanJenisDetail').textContent = pengajuanJenis;
             document.getElementById('modalPengajuanAlasan').textContent = pengajuanAlasan;
+
+            // ⬅️ Tampilkan jam masuk
+            const jamMasukElem = document.getElementById('modalPengajuanJamMasuk');
+            if (pengajuanJamMasuk && pengajuanJamMasuk !== "") {
+                jamMasukElem.textContent = pengajuanJamMasuk;
+            } else {
+                jamMasukElem.textContent = "-";
+            }
+
+            // ⬅️ Tampilkan jam pulang
+            const jamPulangElem = document.getElementById('modalPengajuanJamPulang');
+            if (pengajuanJamPulang && pengajuanJamPulang !== "") {
+                jamPulangElem.textContent = pengajuanJamPulang;
+            } else {
+                jamPulangElem.textContent = "-";
+            }
 
             // Set bukti
             const buktiElement = document.getElementById('modalPengajuanBukti');
