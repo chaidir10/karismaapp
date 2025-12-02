@@ -189,9 +189,20 @@ class DashboardAdminController extends Controller
             $pengajuan = PengajuanPresensi::findOrFail($id);
 
             DB::transaction(function () use ($pengajuan) {
-                $jamMasukDefault = '07:30:00';
-                $jamPulangDefault = '16:00:00';
 
+                // default jam masuk
+                $jamMasukDefault = '07:30:00';
+
+                // tentukan jam pulang berdasarkan hari
+                $hari = \Carbon\Carbon::parse($pengajuan->tanggal)->format('l'); // Friday, Monday, etc
+
+                if ($hari === 'Friday') {
+                    $jamPulangDefault = '16:30:00';   // Jumat
+                } else {
+                    $jamPulangDefault = '16:00:00';   // Senin – Kamis
+                }
+
+                // Jika pengajuan jam masuk
                 if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'keduanya') {
                     Presensi::updateOrCreate(
                         [
@@ -208,6 +219,7 @@ class DashboardAdminController extends Controller
                     );
                 }
 
+                // Jika pengajuan jam pulang
                 if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'keduanya') {
                     Presensi::updateOrCreate(
                         [
@@ -224,6 +236,7 @@ class DashboardAdminController extends Controller
                     );
                 }
 
+                // Simpan status pengajuan
                 $pengajuan->status = 'approved';
                 $pengajuan->approved_by = auth()->id();
                 $pengajuan->approved_at = now();
@@ -231,11 +244,11 @@ class DashboardAdminController extends Controller
             });
 
             return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     public function reject($id)
     {
@@ -247,7 +260,6 @@ class DashboardAdminController extends Controller
             $pengajuan->save();
 
             return redirect()->back()->with('success', 'Pengajuan ditolak.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -262,7 +274,6 @@ class DashboardAdminController extends Controller
             $presensi->save();
 
             return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -276,7 +287,6 @@ class DashboardAdminController extends Controller
             $presensi->save();
 
             return redirect()->back()->with('success', 'Presensi ditolak.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -378,7 +388,6 @@ class DashboardAdminController extends Controller
                     'reject_url' => route('admin.presensi.reject', $presensi->id),
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -410,7 +419,6 @@ class DashboardAdminController extends Controller
                     'reject_url' => route('admin.pengajuan.reject', $pengajuan->id),
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
