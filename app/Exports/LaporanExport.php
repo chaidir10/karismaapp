@@ -34,16 +34,15 @@ class LaporanExport implements WithMultipleSheets
     }
 }
 
-/**
- * Sheet per pegawai
- */
 class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, WithStyles
 {
     protected $data;
+    protected $holidays = []; // array tanggal libur dari API
 
     public function __construct($data)
     {
         $this->data = $data;
+        $this->holidays = $this->fetchHolidays(date('Y')); // ambil libur tahun sekarang
     }
 
     public function headings(): array
@@ -63,7 +62,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         foreach ($this->data['rows'] as $row) {
             $rows[] = [
-                $row['tanggal'], // format dd/mm/YYYY
+                $row['tanggal'], // misal '05/11/2025'
                 $row['masuk'],
                 $row['pulang'],
                 $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
@@ -109,7 +108,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // Header utama
+        // =====================
+        // Styling header & table
+        // =====================
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
@@ -117,72 +118,97 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A3')->getFont()->setBold(true);
-
         $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Header tabel
         $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('000000');
-        $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
+        $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Border data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Lebar kolom
-        $widths = [14, 10, 10, 14, 14, 14, 14, 12];
-        foreach (range('A', 'H') as $i => $col) {
+        $widths = [14,10,10,14,14,14,14,12];
+        foreach (range('A','H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // Page setup
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
-
         $sheet->getPageMargins()
             ->setTop(0.4)->setRight(0.3)->setLeft(0.3)->setBottom(0.4);
-
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // Merge ringkasan (6 baris terakhir)
+        // merge ringkasan
         $highestRow = $sheet->getHighestRow();
         for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");
         }
-
         $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
             ->getFont()->setBold(true);
 
-        // ============================================================
-        // 🔥 PEWARNAAN WEEKEND (AKURAT 100%)
-        // ============================================================
+        // ====================================================
+        // 🔥 Pewarnaan otomatis: weekend atau hari libur nasional
+        // ====================================================
+        $dataStart = 6; // baris pertama data setelah header
 
-        $dataStart = 6; // baris data pertama setelah header
         for ($r = $dataStart; $r <= $highestRow - 7; $r++) {
-
             $tanggal = $sheet->getCell("A{$r}")->getValue();
             if (!$tanggal) continue;
 
-            // Parse format dd/mm/YYYY
+            // parse tanggal dari format dd/mm/YYYY
             $dt = \DateTime::createFromFormat('d/m/Y', $tanggal);
             if (!$dt) continue;
 
-            $dayOfWeek = (int)$dt->format('N'); // 6=Sabtu, 7=Minggu
+            $dayOfWeek = (int) $dt->format('N'); // 6 = Sabtu, 7 = Minggu
+            $isoDate = $dt->format('Y-m-d');     // untuk dibandingkan dengan API
 
-            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
+            $isWeekend = ($dayOfWeek == 6 || $dayOfWeek == 7);
+            $isHoliday = in_array($isoDate, $this->holidays);
+
+            if ($isWeekend || $isHoliday) {
                 $sheet->getStyle("A{$r}:H{$r}")
                     ->getFill()
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()
-                    ->setRGB('FFCCCC');  // merah muda
+                    ->setRGB('FFCCCC');
             }
         }
 
         return [];
+    }
+
+    /**
+     * Fetch daftar libur nasional & cuti bersama dari API
+     * Mengembalikan array tanggal dalam format 'Y-m-d'
+     */
+    protected function fetchHolidays($year)
+    {
+        $url = "https://libur.deno.dev/api?year={$year}";
+
+        // menggunakan file_get_contents (atau bisa pakai Guzzle / cURL)
+        $json = @file_get_contents($url);
+        if (!$json) {
+            return [];
+        }
+
+        $data = @json_decode($json, true);
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $dates = [];
+        foreach ($data as $item) {
+            if (!empty($item['tanggal'])) {
+                // API mengembalikan misal "2025-12-25"
+                $dates[] = $item['tanggal'];
+            }
+        }
+        return $dates;
     }
 }
