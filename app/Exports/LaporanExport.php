@@ -12,7 +12,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class LaporanExport implements WithMultipleSheets
 {
@@ -41,39 +40,10 @@ class LaporanExport implements WithMultipleSheets
 class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, WithStyles
 {
     protected $data;
-    protected $weekendRows = []; // Menyimpan baris yang weekend
 
     public function __construct($data)
     {
         $this->data = $data;
-        $this->identifyWeekendRows();
-    }
-
-    /**
-     * Identifikasi baris yang merupakan weekend
-     */
-    private function identifyWeekendRows()
-    {
-        $rowIndex = 6; // Mulai dari baris 6 (setelah header)
-        
-        foreach ($this->data['rows'] as $row) {
-            $tanggal = $row['tanggal'];
-            
-            // Cek jika tanggal valid
-            if ($tanggal && $tanggal !== '-') {
-                try {
-                    $hari = date('w', strtotime($tanggal)); // 0 = Minggu, 6 = Sabtu
-                    
-                    if ($hari == 0 || $hari == 6) {
-                        $this->weekendRows[] = $rowIndex;
-                    }
-                } catch (\Exception $e) {
-                    // Tanggal tidak valid, abaikan
-                }
-            }
-            
-            $rowIndex++;
-        }
     }
 
     public function headings(): array
@@ -93,7 +63,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         foreach ($this->data['rows'] as $row) {
             $rows[] = [
-                $row['tanggal'],
+                $row['tanggal'], // format dd/mm/YYYY
                 $row['masuk'],
                 $row['pulang'],
                 $row['keterlambatan'] !== '-' ? $row['keterlambatan'] . ' mnt' : '-',
@@ -104,10 +74,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        // 🔹 Tambahkan baris kosong
+        // baris kosong
         $rows[] = [];
 
-        // 🔹 Ringkasan: kolom A merge ke B, nilai di C merge ke D
+        // ringkasan
         $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -139,7 +109,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function styles(Worksheet $sheet)
     {
-        // 🔹 Header utama
+        // Header utama
         $sheet->mergeCells('A1:H1');
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A3:H3');
@@ -150,69 +120,67 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $sheet->getStyle('A1:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Header tabel
+        // Header tabel
         $sheet->getStyle('A5:H5')->getFont()->setBold(true)->getColor()->setRGB('000000');
         $sheet->getStyle('A5:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('BFBFBF');
         $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 🔹 Border data
+        // Border data
         $lastRow = $sheet->getHighestRow();
         $sheet->getStyle("A5:H{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // 🔹 Lebar kolom
+        // Lebar kolom
         $widths = [14, 10, 10, 14, 14, 14, 14, 12];
         foreach (range('A', 'H') as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // 🔹 Page setup
+        // Page setup
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
 
-        // 🔹 Margin
         $sheet->getPageMargins()
-            ->setTop(0.4)
-            ->setRight(0.3)
-            ->setLeft(0.3)
-            ->setBottom(0.4);
+            ->setTop(0.4)->setRight(0.3)->setLeft(0.3)->setBottom(0.4);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
-        // 🔹 Merge kolom A–B dan C–D di bagian ringkasan
+        // Merge ringkasan (6 baris terakhir)
         $highestRow = $sheet->getHighestRow();
-        // Diasumsikan ringkasan = 6 baris terakhir
         for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");
         }
 
-        // 🔹 Styling ringkasan
         $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
             ->getFont()->setBold(true);
 
-        $sheet->getStyle("A" . ($highestRow - 5) . ":B{$highestRow}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        // ============================================================
+        // 🔥 PEWARNAAN WEEKEND (AKURAT 100%)
+        // ============================================================
 
-        $sheet->getStyle("C" . ($highestRow - 5) . ":D{$highestRow}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $dataStart = 6; // baris data pertama setelah header
+        for ($r = $dataStart; $r <= $highestRow - 7; $r++) {
 
-        // 🔹 Beri warna merah untuk baris weekend
-        foreach ($this->weekendRows as $row) {
-            $sheet->getStyle("A{$row}:H{$row}")
-                ->getFill()
-                ->setFillType(Fill::FILL_SOLID)
-                ->getStartColor()
-                ->setRGB('FFCCCC'); // Merah muda
-                
-            // Opsional: Buat teks juga merah
-            $sheet->getStyle("A{$row}:H{$row}")
-                ->getFont()
-                ->getColor()
-                ->setRGB('990000'); // Merah tua
+            $tanggal = $sheet->getCell("A{$r}")->getValue();
+            if (!$tanggal) continue;
+
+            // Parse format dd/mm/YYYY
+            $dt = \DateTime::createFromFormat('d/m/Y', $tanggal);
+            if (!$dt) continue;
+
+            $dayOfWeek = (int)$dt->format('N'); // 6=Sabtu, 7=Minggu
+
+            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
+                $sheet->getStyle("A{$r}:H{$r}")
+                    ->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()
+                    ->setRGB('FFCCCC');  // merah muda
+            }
         }
 
         return [];
