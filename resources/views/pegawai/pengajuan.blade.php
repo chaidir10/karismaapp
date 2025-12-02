@@ -155,16 +155,18 @@
     }
 
     /* Status Colors */
-    .status-pending { 
-        background-color: var(--warning-light); 
+    .status-pending {
+        background-color: var(--warning-light);
         color: var(--warning);
     }
-    .status-approved { 
-        background-color: var(--success-light); 
+
+    .status-approved {
+        background-color: var(--success-light);
         color: var(--success);
     }
-    .status-rejected { 
-        background-color: var(--danger-light); 
+
+    .status-rejected {
+        background-color: var(--danger-light);
         color: var(--danger);
     }
 
@@ -284,6 +286,7 @@
             opacity: 0;
             transform: translateY(10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -300,24 +303,41 @@
         opacity: 0;
     }
 
-    .pengajuan-item:nth-child(1) { animation-delay: 0.15s; }
-    .pengajuan-item:nth-child(2) { animation-delay: 0.2s; }
-    .pengajuan-item:nth-child(3) { animation-delay: 0.25s; }
-    .pengajuan-item:nth-child(4) { animation-delay: 0.3s; }
-    .pengajuan-item:nth-child(5) { animation-delay: 0.35s; }
+    .pengajuan-item:nth-child(1) {
+        animation-delay: 0.15s;
+    }
+
+    .pengajuan-item:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .pengajuan-item:nth-child(3) {
+        animation-delay: 0.25s;
+    }
+
+    .pengajuan-item:nth-child(4) {
+        animation-delay: 0.3s;
+    }
+
+    .pengajuan-item:nth-child(5) {
+        animation-delay: 0.35s;
+    }
 
     /* MODAL BUAT PENGAJUAN (Existing Modal) */
     .modal {
         display: none;
         position: fixed;
         z-index: 100;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.4);
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
         overflow: auto;
         padding-top: 50px;
         animation: fadeIn 0.3s ease-out;
     }
+
     .modal-content {
         background: var(--white);
         margin: auto;
@@ -325,10 +345,11 @@
         border-radius: 16px;
         width: 90%;
         max-width: 450px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         border: none;
         animation: slideIn 0.3s ease-out;
     }
+
     .close {
         float: right;
         font-size: 24px;
@@ -336,18 +357,22 @@
         color: var(--gray);
         transition: color 0.2s ease;
     }
+
     .close:hover {
         color: var(--dark);
     }
+
     .modal-content h3 {
         font-weight: 700;
         color: var(--dark);
         margin-bottom: 20px;
         text-align: center;
     }
+
     .form-group {
         margin-bottom: 20px;
     }
+
     .form-group label {
         font-weight: 600;
         display: block;
@@ -355,8 +380,9 @@
         color: var(--dark);
         font-size: 14px;
     }
-    .form-group input, 
-    .form-group select, 
+
+    .form-group input,
+    .form-group select,
     .form-group textarea {
         width: 100%;
         border: 1px solid var(--gray-light);
@@ -366,18 +392,21 @@
         transition: all 0.2s ease;
         background-color: var(--white);
     }
-    .form-group input:focus, 
-    .form-group select:focus, 
+
+    .form-group input:focus,
+    .form-group select:focus,
     .form-group textarea:focus {
         border-color: var(--primary);
         box-shadow: 0 0 0 0.25rem rgba(90, 182, 234, 0.15);
         outline: none;
     }
+
     .form-actions {
         display: flex;
         gap: 10px;
         margin-top: 25px;
     }
+
     .btn-secondary {
         background: var(--gray-light);
         color: var(--dark);
@@ -390,6 +419,7 @@
         flex: 1;
         transition: all 0.2s ease;
     }
+
     .btn-secondary:hover {
         background: var(--gray);
         color: var(--white);
@@ -400,6 +430,7 @@
             opacity: 0;
             transform: translateY(-20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -463,7 +494,7 @@
         <div class="section-header">
             <h3 class="section-title">Pengajuan Presensi</h3>
             <button class="btn btn-sm btn-primary btn-scale" onclick="openModal()">
-                <i class="fas fa-plus"></i> Buat 
+                <i class="fas fa-plus"></i> Buat
             </button>
         </div>
 
@@ -471,12 +502,15 @@
         <div class="pengajuan-list">
             @forelse($pengajuan as $p)
             <div class="pengajuan-item"
-                 data-pengajuan-id="{{ $p->id }}"
-                 data-pengajuan-jenis="{{ $p->jenis }}"
-                 data-pengajuan-tanggal="{{ $p->tanggal }}"
-                 data-pengajuan-alasan="{{ $p->alasan }}"
-                 data-pengajuan-bukti="{{ $p->bukti ? Storage::url($p->bukti) : '' }}"
-                 data-pengajuan-status="{{ $p->status }}">
+                data-pengajuan-id="{{ $p->id }}"
+                data-pengajuan-jenis="{{ $p->jenis }}"
+
+                data-pengajuan-tanggal="{{ $p->tanggal }}"
+                data-pengajuan-jam-masuk="{{ $p->jam_masuk }}"
+                data-pengajuan-jam-pulang="{{ $p->jam_keluar }}"
+                data-pengajuan-alasan="{{ $p->alasan }}"
+                data-pengajuan-bukti="{{ $p->bukti ? Storage::url($p->bukti) : '' }}"
+                data-pengajuan-status="{{ $p->status }}">
 
                 <div class="pengajuan-icon">
                     @if($p->jenis == 'masuk')
@@ -498,7 +532,7 @@
 
                 <div class="pengajuan-status">
                     <span class="badge status-{{ $p->status }}">
-                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> 
+                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i>
                         {{ ucfirst($p->status) }}
                     </span>
                 </div>
@@ -624,7 +658,7 @@
         // Fungsi membuat ikon berdasarkan jenis
         function createPengajuanIcon(jenis) {
             let iconClass, iconColor;
-            switch(jenis) {
+            switch (jenis) {
                 case 'masuk':
                     iconClass = 'fas fa-sign-in-alt';
                     iconColor = 'var(--primary)';
@@ -699,7 +733,7 @@
         });
 
         // Reset icon ketika modal ditutup
-        document.getElementById('pengajuanDetailModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('pengajuanDetailModal').addEventListener('hidden.bs.modal', function() {
             modalIconContainer.innerHTML = '';
         });
     });
