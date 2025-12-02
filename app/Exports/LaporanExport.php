@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Carbon\Carbon;
 
 class LaporanExport implements WithMultipleSheets
 {
@@ -77,7 +78,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         // 🔹 Tambahkan baris kosong
         $rows[] = [];
 
-        // 🔹 Ringkasan: kolom A merge ke B, nilai di C merge ke D
+        // 🔹 Ringkasan
         $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
         $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
@@ -145,16 +146,48 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         // 🔹 Margin
         $sheet->getPageMargins()
-            ->setTop(0.4)
-            ->setRight(0.3)
-            ->setLeft(0.3)
-            ->setBottom(0.4);
+            ->setTop(0.4)->setRight(0.3)->setLeft(0.3)->setBottom(0.4);
 
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
+
+        /* =======================================================
+         |  PERUBAHAN DIMULAI DI SINI
+         |  WARNA MERAH UNTUK SABTU, MINGGU, LIBUR NASIONAL, CUTI
+         ======================================================= */
+
+        $dataStart = 6; // baris pertama berisi data tanggal
+        $dataEnd = $this->data['total_hari_kerja'] + 5;
+
+        // daftar libur nasional (bisa Anda ganti ambil dari DB)
+        $liburNasional = $this->data['libur'] ?? [];  
+        // contoh format:
+        // $liburNasional = ['2025-01-01','2025-03-29','2025-04-18', ... ];
+
+        for ($row = $dataStart; $row <= $dataEnd; $row++) {
+            $tanggal = $sheet->getCell("A{$row}")->getValue();
+            if (!$tanggal) continue;
+
+            $carbonDate = Carbon::parse($tanggal);
+            $hari = $carbonDate->dayOfWeek; // 0=minggu, 6=sabtu
+
+            $isWeekend = ($hari === 0 || $hari === 6);
+            $isLibur = in_array($tanggal, $liburNasional);
+
+            if ($isWeekend || $isLibur) {
+                // warna merah seluruh baris
+                $sheet->getStyle("A{$row}:H{$row}")
+                    ->getFont()->getColor()->setRGB('FF0000');
+            }
+        }
+
+        /* =======================================================
+         |  PERUBAHAN SELESAI
+         ======================================================= */
+
+
         // 🔹 Merge kolom A–B dan C–D di bagian ringkasan
         $highestRow = $sheet->getHighestRow();
-        // Diasumsikan ringkasan = 6 baris terakhir
         for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");
@@ -163,12 +196,6 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         // 🔹 Styling ringkasan
         $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
             ->getFont()->setBold(true);
-
-        $sheet->getStyle("A" . ($highestRow - 5) . ":B{$highestRow}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
-        $sheet->getStyle("C" . ($highestRow - 5) . ":D{$highestRow}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         return [];
     }
