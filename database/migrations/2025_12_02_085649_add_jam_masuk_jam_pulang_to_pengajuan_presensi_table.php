@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('pengajuan_presensis', function (Blueprint $table) {
+        Schema::table('pengajuan_presensi', function (Blueprint $table) {
             $table->time('jam_masuk')->nullable()->after('tanggal');
             $table->time('jam_pulang')->nullable()->after('jam_masuk');
         });
@@ -19,7 +19,7 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('pengajuan_presensis', function (Blueprint $table) {
+        Schema::table('pengajuan_presensi', function (Blueprint $table) {
             $table->dropColumn(['jam_masuk', 'jam_pulang']);
         });
     }
