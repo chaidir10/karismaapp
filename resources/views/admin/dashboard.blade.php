@@ -848,9 +848,6 @@
                             </tr>
                             @endforelse
                         </tbody>
-                        <div class="mt-3">
-                            {{ $presensiHariIni->links() }}
-                        </div>
                     </table>
                 </div>
             </div>
@@ -925,7 +922,7 @@
                 <form id="formRejectPresensi" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times"></i> 
                     </button>
                 </form>
                 @endif
@@ -980,13 +977,13 @@
                 <form id="formApprovePengajuan" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i>
+                        <i class="fas fa-check"></i> 
                     </button>
                 </form>
                 <form id="formRejectPengajuan" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times"></i> 
                     </button>
                 </form>
                 @endif
