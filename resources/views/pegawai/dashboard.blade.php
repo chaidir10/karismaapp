@@ -235,7 +235,7 @@
 </div>
 
 <!-- Modal Presensi Berhasil (Dalam Radius - Auto Close) -->
-<div class="modal fade" id="successConfirmationModal" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade" id="successConfirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-2xl auto-close-modal">
             <div class="modal-body p-0">
@@ -280,7 +280,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Modal Peringatan Belum Presensi Masuk -->
 <div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
