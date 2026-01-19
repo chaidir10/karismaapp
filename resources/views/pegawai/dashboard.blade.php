@@ -467,19 +467,20 @@
     const sudahPresensiPulang = @json($sudahPresensiPulang);
 
     function setJenis(jenis) {
-        document.getElementById('jenisPresensi').value = jenis;
+        const el = document.getElementById('jenisPresensi');
+        if (el) el.value = jenis;
     }
 
     function handlePulangClick() {
-        // Cek apakah sudah presensi masuk
         if (!sudahPresensiMasuk) {
-            // Tampilkan modal peringatan
-            const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
-            warningModal.show();
+            if (window.bootstrap?.Modal) {
+                const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+                warningModal.show();
+            } else {
+                alert('Bootstrap JS belum termuat.');
+            }
             return false;
         }
-
-        // Jika sudah presensi masuk, set jenis pulang
         setJenis('pulang');
         return true;
     }
@@ -490,28 +491,32 @@
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
         }
+
+        // Detail map modals
         initializeDetailModals();
 
         // Inisialisasi toast
-        const toastElList = [].slice.call(document.querySelectorAll('.toast'))
-        const toastList = toastElList.map(function(toastEl) {
-            return new bootstrap.Toast(toastEl, {
-                autohide: true,
-                delay: 5000
-            })
-        });
+        if (window.bootstrap?.Toast) {
+            const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    autohide: true,
+                    delay: 5000
+                });
+            });
+        }
 
         // Handle response dari server
         @if(session('success'))
-        showSuccess("{{ session('success') }}");
+            showSuccess(@json(session('success')));
         @endif
 
         @if(session('error'))
-        showError("{{ session('error') }}");
+            showError(@json(session('error')));
         @endif
 
         @if(session('warning'))
-        showWarning("{{ session('warning') }}");
+            showWarning(@json(session('warning')));
         @endif
     });
 
@@ -525,53 +530,76 @@
             videoStream.getTracks().forEach(t => t.stop());
             videoStream = null;
         }
+
+        // reset mapInstance agar tidak double-init
+        if (mapInstance) {
+            try { mapInstance.remove(); } catch (e) {}
+            mapInstance = null;
+        }
+
         const submitBtn = document.querySelector('.submit-btn-large');
         if (submitBtn) {
             submitBtn.innerHTML = '<i class="fas fa-camera me-2"></i>Ambil Foto & Absen';
             submitBtn.disabled = false;
         }
-        capturedPhotoData = null;
 
-        // Clear auto close timer
+        capturedPhotoData = null;
+        currentPosition = null;
+        isOutsideRadius = false;
+
         if (autoCloseTimer) {
             clearTimeout(autoCloseTimer);
             autoCloseTimer = null;
         }
+
+        // reset teks lokasi
+        const loc = document.getElementById('location-address-mini');
+        if (loc) loc.textContent = 'Mendeteksi lokasi...';
+
+        const infoEl = document.getElementById('locationRadiusInfo');
+        if (infoEl) infoEl.textContent = '';
     }
 
     function initializeCamera() {
         const video = document.getElementById('video');
+        if (!video) return;
+
+        // penting untuk iOS: muted agar autoplay bisa jalan
+        video.muted = true;
+
         if (!navigator.mediaDevices?.getUserMedia) {
             showError("Browser tidak mendukung akses kamera.");
             return;
         }
+
         navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'user',
-                    width: {
-                        ideal: 1920
-                    },
-                    height: {
-                        ideal: 1080
-                    }
-                }
-            })
-            .then(stream => {
-                videoStream = stream;
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error(err);
-                showError("Tidak dapat mengakses kamera.");
-            });
+            video: {
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        })
+        .then(stream => {
+            videoStream = stream;
+            video.srcObject = stream;
+            return video.play().catch(() => {});
+        })
+        .catch(err => {
+            console.error(err);
+            showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
+        });
     }
 
     function initializeLocation() {
+        const addrEl = document.getElementById('location-address-mini');
+
         if (!navigator.geolocation) {
-            document.getElementById('location-address-mini').textContent = "Browser tidak mendukung geolokasi";
+            if (addrEl) addrEl.textContent = "Browser tidak mendukung geolokasi";
             initializeMiniMapWithDefault();
             return;
         }
+
         navigator.geolocation.getCurrentPosition(
             pos => {
                 currentPosition = pos;
@@ -580,48 +608,53 @@
             },
             err => {
                 console.error(err);
-                document.getElementById('location-address-mini').textContent = "Gagal mendapatkan lokasi";
+                if (addrEl) addrEl.textContent = "Gagal mendapatkan lokasi (izin ditolak / GPS mati)";
                 initializeMiniMapWithDefault();
-            }, {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
-            }
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
         );
     }
 
     function updateLocationInfo(position) {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+
         const lokasiInput = document.getElementById('lokasiInput');
+        if (lokasiInput) lokasiInput.value = `${lat},${lng}`;
 
         const wilayahLat = parseFloat("{{ Auth::user()->wilayahKerja->latitude ?? 0 }}");
         const wilayahLng = parseFloat("{{ Auth::user()->wilayahKerja->longitude ?? 0 }}");
-        const wilayahAlamat = "{{ Auth::user()->wilayahKerja->alamat ?? '' }}";
+        const wilayahAlamat = @json(Auth::user()->wilayahKerja->alamat ?? '');
         const radius = parseFloat("{{ Auth::user()->wilayahKerja->radius ?? 100 }}");
+
         const distance = haversineDistance(lat, lng, wilayahLat, wilayahLng);
 
         const infoEl = document.getElementById('locationRadiusInfo');
         const submitBtn = document.querySelector('.submit-btn-large');
+        const addrEl = document.getElementById('location-address-mini');
 
-        lokasiInput.value = `${lat},${lng}`;
+        if (infoEl) infoEl.style.fontSize = "10px";
 
         if (distance <= radius) {
-            infoEl.innerHTML = '<span class="badge badge-success">✔ Anda berada di dalam wilayah kerja</span>';
-            infoEl.style.fontSize = "10 px";
-            infoEl.classList.remove('text-danger', 'text-warning');
-            infoEl.classList.add('text-success');
-            submitBtn.disabled = false;
-            document.getElementById('location-address-mini').textContent = wilayahAlamat;
+            if (infoEl) {
+                infoEl.innerHTML = '<span class="badge bg-success">✔ Anda berada di dalam wilayah kerja</span>';
+                infoEl.classList.remove('text-danger', 'text-warning');
+                infoEl.classList.add('text-success');
+            }
+            if (submitBtn) submitBtn.disabled = false;
+            if (addrEl) addrEl.textContent = wilayahAlamat || 'Di dalam wilayah kerja';
             isOutsideRadius = false;
         } else {
-            infoEl.innerHTML = '<span class="badge badge-warning">⚠ Anda berada di luar radius wilayah kerja</span>';
-            infoEl.style.fontSize = "10 px";
-            infoEl.classList.remove('text-success');
-            infoEl.classList.add('text-warning');
-            submitBtn.disabled = false;
-            getAddressFromCoordinates(lat, lng, 'location-address-mini');
+            if (infoEl) {
+                infoEl.innerHTML = '<span class="badge bg-warning">⚠ Anda berada di luar radius wilayah kerja</span>';
+                infoEl.classList.remove('text-success');
+                infoEl.classList.add('text-warning');
+            }
+            if (submitBtn) submitBtn.disabled = false;
             isOutsideRadius = true;
+
+            // ambil alamat real
+            getAddressFromCoordinates(lat, lng, 'location-address-mini');
         }
     }
 
@@ -630,127 +663,163 @@
         const toRad = x => x * Math.PI / 180;
         const dLat = toRad(lat2 - lat1);
         const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
         return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     function initializeMiniMap(position) {
+        const mapEl = document.getElementById('mini-map');
+        if (!mapEl) return;
+
+        if (!window.L) {
+            console.error('Leaflet belum dimuat. Pastikan leaflet.js ada di layout.');
+            return;
+        }
+
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        const mapEl = document.getElementById('mini-map');
+
         if (!mapInstance) {
             mapInstance = L.map(mapEl, {
                 zoomControl: false,
                 attributionControl: false
             }).setView([lat, lng], 17);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(mapInstance);
+
             L.marker([lat, lng]).addTo(mapInstance);
-            ['dragging', 'touchZoom', 'doubleClickZoom', 'scrollWheelZoom', 'boxZoom', 'keyboard'].forEach(f => mapInstance[f].disable());
+
+            ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
+                .forEach(f => mapInstance[f] && mapInstance[f].disable());
         } else {
             mapInstance.setView([lat, lng], 17);
         }
+
+        // penting: setelah modal tampil, map perlu invalidateSize
+        setTimeout(() => {
+            try { mapInstance.invalidateSize(); } catch (e) {}
+        }, 300);
     }
 
     function initializeMiniMapWithDefault() {
         const mapEl = document.getElementById('mini-map');
+        if (!mapEl) return;
+
+        if (!window.L) return;
+
         if (!mapInstance) {
             mapInstance = L.map(mapEl, {
                 zoomControl: false,
                 attributionControl: false
             }).setView([-6.2088, 106.8456], 10);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(mapInstance);
+
+            setTimeout(() => {
+                try { mapInstance.invalidateSize(); } catch (e) {}
+            }, 300);
         }
     }
 
+    // ✅ FIX UTAMA: ini yang sebelumnya rusak karena kebelah "{{$p->id}}"
     function initializeDetailModals() {
+        if (!window.L) return;
+
         @foreach($riwayatHariIni as $p)
-        @if($p - > lokasi)
-        const modal {
-            {
-                $p - > id
-            }
-        } = document.getElementById('detailModal{{ $p->id }}');
-        if (modal {
-                {
-                    $p - > id
+            @if($p->lokasi)
+                const modal{{ $p->id }} = document.getElementById('detailModal{{ $p->id }}');
+                if (modal{{ $p->id }}) {
+                    modal{{ $p->id }}.addEventListener('shown.bs.modal', function () {
+                        const coords = @json($p->lokasi).split(',');
+                        const lat = parseFloat(coords[0]);
+                        const lng = parseFloat(coords[1]);
+
+                        const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                        L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+
+                        getAddressFromCoordinates(lat, lng, 'locationAddress{{ $p->id }}');
+                        this._map = map;
+
+                        setTimeout(() => {
+                            try { map.invalidateSize(); } catch (e) {}
+                        }, 300);
+                    });
+
+                    modal{{ $p->id }}.addEventListener('hidden.bs.modal', function () {
+                        if (this._map) {
+                            try { this._map.remove(); } catch (e) {}
+                            this._map = null;
+                        }
+                    });
                 }
-            }) {
-            modal {
-                {
-                    $p - > id
-                }
-            }.addEventListener('shown.bs.modal', function() {
-                const coords = "{{ $p->lokasi }}".split(',');
-                const lat = parseFloat(coords[0]);
-                const lng = parseFloat(coords[1]);
-                const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
-                getAddressFromCoordinates(lat, lng, 'locationAddress{{ $p->id }}');
-                this._map = map;
-            });
-            modal {
-                {
-                    $p - > id
-                }
-            }.addEventListener('hidden.bs.modal', function() {
-                if (this._map) {
-                    this._map.remove();
-                    this._map = null;
-                }
-            });
-        }
-        @endif
+            @endif
         @endforeach
     }
 
     function getAddressFromCoordinates(lat, lng, elementId) {
         const el = document.getElementById(elementId);
+        if (!el) return;
+
         el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin me-2"></i>Mendeteksi alamat...</div>';
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-            .then(r => r.json())
-            .then(data => {
-                el.innerHTML = data?.display_name ?? '<span class="text-warning">Alamat tidak dapat ditemukan</span>';
-            })
-            .catch(e => {
-                console.error(e);
-                el.innerHTML = '<span class="text-danger">Gagal mendapatkan alamat</span>';
-            });
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            el.innerHTML = (data && data.display_name) ? data.display_name : '<span class="text-warning">Alamat tidak dapat ditemukan</span>';
+        })
+        .catch(e => {
+            console.error(e);
+            el.innerHTML = '<span class="text-danger">Gagal mendapatkan alamat</span>';
+        });
     }
 
     function captureAndProcess() {
         if (!videoStream || !currentPosition) {
-            showError("Kamera atau lokasi belum siap.");
+            showError("Kamera atau lokasi belum siap. Pastikan izin kamera & lokasi diizinkan.");
             return;
         }
 
-        // Validasi tambahan untuk presensi pulang
-        const jenis = document.getElementById('jenisPresensi').value;
+        const jenis = document.getElementById('jenisPresensi')?.value || '';
         if (jenis === 'pulang' && !sudahPresensiMasuk) {
             showError("Anda belum melakukan presensi masuk hari ini.");
             return;
         }
 
-        // Ambil foto terlebih dahulu
-        capturePhoto().then(photoData => {
-            capturedPhotoData = photoData;
+        capturePhoto()
+            .then(photoData => {
+                capturedPhotoData = photoData;
 
-            // Tampilkan modal konfirmasi sesuai radius
-            if (isOutsideRadius) {
-                showConfirmationModal();
-            } else {
-                langsungProsesPresensi();
-            }
-        }).catch(error => {
-            console.error('Error capturing photo:', error);
-            showError("Gagal mengambil foto.");
-        });
+                if (isOutsideRadius) {
+                    showConfirmationModal();
+                } else {
+                    langsungProsesPresensi();
+                }
+            })
+            .catch(error => {
+                console.error('Error capturing photo:', error);
+                showError("Gagal mengambil foto.");
+            });
     }
 
     function capturePhoto() {
         return new Promise((resolve, reject) => {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
+            if (!video || !canvas) return reject(new Error('Video/canvas tidak ditemukan'));
+
+            if (!video.videoWidth || !video.videoHeight) {
+                return reject(new Error('Video belum siap'));
+            }
 
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -762,25 +831,23 @@
     }
 
     function showConfirmationModal() {
-        const jenis = document.getElementById('jenisPresensi').value;
-        const waktu = new Date().toLocaleTimeString('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        const jenis = document.getElementById('jenisPresensi')?.value || '';
+        const waktu = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-        // Update modal konfirmasi luar radius
         document.getElementById('confirmationJenis').textContent = jenis.toUpperCase();
         document.getElementById('confirmationWaktu').textContent = waktu;
-        document.getElementById('confirmationLokasi').textContent = document.getElementById('location-address-mini').textContent;
+        document.getElementById('confirmationLokasi').textContent = document.getElementById('location-address-mini')?.textContent || '-';
 
-        // Reset tombol konfirmasi
         const confirmBtn = document.getElementById('confirmPresensiBtn');
-        confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Ya, Presensi';
-        confirmBtn.disabled = false;
+        if (confirmBtn) {
+            confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Ya, Presensi';
+            confirmBtn.disabled = false;
+        }
 
-        // Tampilkan modal konfirmasi
-        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-        confirmationModal.show();
+        if (window.bootstrap?.Modal) {
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+        }
     }
 
     function langsungProsesPresensi() {
@@ -789,103 +856,64 @@
             return;
         }
 
-        // Set foto ke input hidden
-        document.getElementById('fotoInput').value = capturedPhotoData;
+        const fotoInput = document.getElementById('fotoInput');
+        if (fotoInput) fotoInput.value = capturedPhotoData;
 
-        // Submit form
-        document.getElementById('formPresensi').submit();
+        const form = document.getElementById('formPresensi');
+        if (form) form.submit();
 
-        // Tutup modal presensi
-        const presensiModal = bootstrap.Modal.getInstance(document.getElementById('presensiModal'));
-        if (presensiModal) {
-            presensiModal.hide();
-        }
-
-        // Tampilkan modal sukses yang auto close
-        showSuccessConfirmationModal();
+        const presensiModal = window.bootstrap?.Modal?.getInstance(document.getElementById('presensiModal'));
+        if (presensiModal) presensiModal.hide();
     }
 
-    function showSuccessConfirmationModal() {
-        const jenis = document.getElementById('jenisPresensi').value;
-        const waktu = new Date().toLocaleTimeString('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        // Update modal konfirmasi dalam radius
-        document.getElementById('successConfirmationJenis').textContent = jenis.toUpperCase();
-        document.getElementById('successConfirmationWaktu').textContent = waktu;
-        document.getElementById('successConfirmationLokasi').textContent = document.getElementById('location-address-mini').textContent;
-
-        // Tampilkan modal konfirmasi
-        const confirmationModal = new bootstrap.Modal(document.getElementById('successConfirmationModal'));
-        confirmationModal.show();
-
-        // Auto close setelah 3 detik
-        autoCloseTimer = setTimeout(() => {
-            if (confirmationModal) {
-                confirmationModal.hide();
-            }
-        }, 3000);
-    }
-
-    function prosesPresensi(isInRadius = false) {
+    function prosesPresensi() {
         if (!capturedPhotoData) {
             showError("Foto belum diambil.");
             return;
         }
 
         const confirmBtn = document.getElementById('confirmPresensiBtn');
-        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
-        confirmBtn.disabled = true;
+        if (confirmBtn) {
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+            confirmBtn.disabled = true;
+        }
 
-        // Set foto ke input hidden
-        document.getElementById('fotoInput').value = capturedPhotoData;
+        const fotoInput = document.getElementById('fotoInput');
+        if (fotoInput) fotoInput.value = capturedPhotoData;
 
-        // Submit form
         setTimeout(() => {
-            document.getElementById('formPresensi').submit();
+            const form = document.getElementById('formPresensi');
+            if (form) form.submit();
 
-            // Tutup modal konfirmasi
-            const confirmationModal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
-            if (confirmationModal) {
-                confirmationModal.hide();
-            }
+            const confirmationModal = window.bootstrap?.Modal?.getInstance(document.getElementById('confirmationModal'));
+            if (confirmationModal) confirmationModal.hide();
 
-            // Tutup modal presensi
-            const presensiModal = bootstrap.Modal.getInstance(document.getElementById('presensiModal'));
-            if (presensiModal) {
-                presensiModal.hide();
-            }
-        }, 1500);
+            const presensiModal = window.bootstrap?.Modal?.getInstance(document.getElementById('presensiModal'));
+            if (presensiModal) presensiModal.hide();
+        }, 800);
     }
 
     // Fungsi Notifikasi
     function showSuccess(message) {
         const toast = document.getElementById('successToast');
         const messageEl = document.getElementById('successToastMessage');
-        if (message && messageEl) {
-            messageEl.textContent = message;
-        }
-        bootstrap.Toast.getOrCreateInstance(toast).show();
+        if (message && messageEl) messageEl.textContent = message;
+        if (toast && window.bootstrap?.Toast) bootstrap.Toast.getOrCreateInstance(toast).show();
     }
 
     function showError(message) {
         const toast = document.getElementById('errorToast');
         const messageEl = document.getElementById('errorToastMessage');
-        if (message && messageEl) {
-            messageEl.textContent = message;
-        }
-        bootstrap.Toast.getOrCreateInstance(toast).show();
+        if (message && messageEl) messageEl.textContent = message;
+        if (toast && window.bootstrap?.Toast) bootstrap.Toast.getOrCreateInstance(toast).show();
+        else alert(message || 'Terjadi kesalahan');
     }
 
     function showWarning(message) {
         const toast = document.getElementById('warningToast');
         const messageEl = document.getElementById('warningToastMessage');
-        if (message && messageEl) {
-            messageEl.textContent = message;
-        }
-        bootstrap.Toast.getOrCreateInstance(toast).show();
+        if (message && messageEl) messageEl.textContent = message;
+        if (toast && window.bootstrap?.Toast) bootstrap.Toast.getOrCreateInstance(toast).show();
     }
 </script>
 @endpush
