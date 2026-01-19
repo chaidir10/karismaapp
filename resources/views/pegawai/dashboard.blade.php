@@ -634,7 +634,7 @@
 
         const wilayahLat = parseFloat("{{ Auth::user()->wilayahKerja->latitude ?? 0 }}");
         const wilayahLng = parseFloat("{{ Auth::user()->wilayahKerja->longitude ?? 0 }}");
-        const wilayahAlamat = @json(Auth::user() - > wilayahKerja - > alamat ?? '');
+        const wilayahAlamat = @json(Auth::user() -> wilayahKerja -> alamat ?? '');
         const radius = parseFloat("{{ Auth::user()->wilayahKerja->radius ?? 100 }}");
 
         const distance = haversineDistance(lat, lng, wilayahLat, wilayahLng);
@@ -747,23 +747,23 @@
         if (!window.L) return;
 
         @foreach($riwayatHariIni as $p)
-        @if($p - > lokasi)
+        @if($p -> lokasi)
         const modal {
             {
-                $p - > id
+                $p -> id
             }
         } = document.getElementById('detailModal{{ $p->id }}');
         if (modal {
                 {
-                    $p - > id
+                    $p -> id
                 }
             }) {
             modal {
                 {
-                    $p - > id
+                    $p -> id
                 }
             }.addEventListener('shown.bs.modal', function() {
-                const coords = @json($p - > lokasi).split(',');
+                const coords = @json($p -> lokasi).split(',');
                 const lat = parseFloat(coords[0]);
                 const lng = parseFloat(coords[1]);
 
@@ -785,7 +785,7 @@
 
             modal {
                 {
-                    $p - > id
+                    $p -> id
                 }
             }.addEventListener('hidden.bs.modal', function() {
                 if (this._map) {
