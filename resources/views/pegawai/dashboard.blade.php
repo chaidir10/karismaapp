@@ -664,7 +664,7 @@
 
     function initializeDetailModals() {
         @foreach($riwayatHariIni as $p)
-        @if($p -> lokasi)
+        @if($p - > lokasi)
         const modal {
             {
                 $p - > id
