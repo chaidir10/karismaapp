@@ -728,7 +728,7 @@
         }
     }
 
-    // ✅ FIX UTAMA: ini yang sebelumnya rusak karena kebelah "{{$p->id}}"
+   
     function initializeDetailModals() {
         if (!window.L) return;
 
