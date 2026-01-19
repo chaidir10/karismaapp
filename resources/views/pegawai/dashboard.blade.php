@@ -450,7 +450,30 @@
     .success-modal-content {
         border: 2px solid #10b981;
     }
-    
+    .mini-map-wrapper{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  overflow:hidden;        /* biar map ikut rounded */
+}
+
+.mini-map-container{
+  width:100%;
+  height:160px;           /* wajib ada height */
+  background:#f1f5f9;
+}
+
+.mini-map{
+  width:100%;
+  height:100%;
+}
+
+.location-info-mini{
+  padding:10px 12px;
+  margin-top:0 !important; /* override mt-1 */
+  border-top:1px solid rgba(0,0,0,.08);
+  background:#fff;
+}
 </style>
 @endpush
 
