@@ -540,7 +540,7 @@
 
         .mini-map {
             width: 100%;
-            height: 110px;
+            height: 200px;
         }
 
         .location-info-mini {
