@@ -530,7 +530,7 @@
             top: 70px;
             right: 15px;
             width: 300px;
-            height: 150px;
+            height: auto;
             z-index: 10;
             background: white;
             border-radius: 12px;
@@ -540,11 +540,12 @@
 
         .mini-map {
             width: 100%;
-            height: 80px;
+            height: 110px;
         }
 
         .location-info-mini {
             padding: 5px;
+            margin-top: 0 !important;
             font-size: 10px;
             text-align: center;
             background: var(--primary);

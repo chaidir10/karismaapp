@@ -176,14 +176,15 @@
                     <div class="mini-map-wrapper">
                         <div class="mini-map-container">
                             <div id="mini-map" class="mini-map"></div>
-                        </div>
 
-                        <div class="location-info-mini mt-1">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span id="location-address-mini">Mendeteksi lokasi...</span>
-                            <div id="locationRadiusInfo" class="text-sm mt-1"></div>
+                            <div class="location-info-mini">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="location-address-mini">Mendeteksi lokasi...</span>
+                                <div id="locationRadiusInfo" class="text-sm mt-1"></div>
+                            </div>
                         </div>
                     </div>
+
 
                     <div class="submit-btn-container">
                         <button type="button" class="submit-btn-large" onclick="captureAndProcess()">
@@ -450,30 +451,6 @@
     .success-modal-content {
         border: 2px solid #10b981;
     }
-    .mini-map-wrapper{
-  background:#fff;
-  border:1px solid rgba(0,0,0,.08);
-  border-radius:16px;
-  overflow:hidden;        /* biar map ikut rounded */
-}
-
-.mini-map-container{
-  width:100%;
-  height:160px;           /* wajib ada height */
-  background:#f1f5f9;
-}
-
-.mini-map{
-  width:100%;
-  height:100%;
-}
-
-.location-info-mini{
-  padding:10px 12px;
-  margin-top:0 !important; /* override mt-1 */
-  border-top:1px solid rgba(0,0,0,.08);
-  background:#fff;
-}
 </style>
 @endpush
 
@@ -532,15 +509,15 @@
 
         // Handle response dari server
         @if(session('success'))
-            showSuccess(@json(session('success')));
+        showSuccess(@json(session('success')));
         @endif
 
         @if(session('error'))
-            showError(@json(session('error')));
+        showError(@json(session('error')));
         @endif
 
         @if(session('warning'))
-            showWarning(@json(session('warning')));
+        showWarning(@json(session('warning')));
         @endif
     });
 
@@ -557,7 +534,9 @@
 
         // reset mapInstance agar tidak double-init
         if (mapInstance) {
-            try { mapInstance.remove(); } catch (e) {}
+            try {
+                mapInstance.remove();
+            } catch (e) {}
             mapInstance = null;
         }
 
@@ -597,22 +576,26 @@
         }
 
         navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            },
-            audio: false
-        })
-        .then(stream => {
-            videoStream = stream;
-            video.srcObject = stream;
-            return video.play().catch(() => {});
-        })
-        .catch(err => {
-            console.error(err);
-            showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
-        });
+                video: {
+                    facingMode: 'user',
+                    width: {
+                        ideal: 1280
+                    },
+                    height: {
+                        ideal: 720
+                    }
+                },
+                audio: false
+            })
+            .then(stream => {
+                videoStream = stream;
+                video.srcObject = stream;
+                return video.play().catch(() => {});
+            })
+            .catch(err => {
+                console.error(err);
+                showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
+            });
     }
 
     function initializeLocation() {
@@ -634,8 +617,11 @@
                 console.error(err);
                 if (addrEl) addrEl.textContent = "Gagal mendapatkan lokasi (izin ditolak / GPS mati)";
                 initializeMiniMapWithDefault();
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            }, {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 60000
+            }
         );
     }
 
@@ -648,7 +634,7 @@
 
         const wilayahLat = parseFloat("{{ Auth::user()->wilayahKerja->latitude ?? 0 }}");
         const wilayahLng = parseFloat("{{ Auth::user()->wilayahKerja->longitude ?? 0 }}");
-        const wilayahAlamat = @json(Auth::user()->wilayahKerja->alamat ?? '');
+        const wilayahAlamat = @json(Auth::user() - > wilayahKerja - > alamat ?? '');
         const radius = parseFloat("{{ Auth::user()->wilayahKerja->radius ?? 100 }}");
 
         const distance = haversineDistance(lat, lng, wilayahLat, wilayahLng);
@@ -718,15 +704,17 @@
 
             L.marker([lat, lng]).addTo(mapInstance);
 
-            ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
-                .forEach(f => mapInstance[f] && mapInstance[f].disable());
+            ['dragging', 'touchZoom', 'doubleClickZoom', 'scrollWheelZoom', 'boxZoom', 'keyboard']
+            .forEach(f => mapInstance[f] && mapInstance[f].disable());
         } else {
             mapInstance.setView([lat, lng], 17);
         }
 
         // penting: setelah modal tampil, map perlu invalidateSize
         setTimeout(() => {
-            try { mapInstance.invalidateSize(); } catch (e) {}
+            try {
+                mapInstance.invalidateSize();
+            } catch (e) {}
         }, 300);
     }
 
@@ -747,7 +735,9 @@
             }).addTo(mapInstance);
 
             setTimeout(() => {
-                try { mapInstance.invalidateSize(); } catch (e) {}
+                try {
+                    mapInstance.invalidateSize();
+                } catch (e) {}
             }, 300);
         }
     }
@@ -757,34 +747,56 @@
         if (!window.L) return;
 
         @foreach($riwayatHariIni as $p)
-            @if($p->lokasi)
-                const modal{{ $p->id }} = document.getElementById('detailModal{{ $p->id }}');
-                if (modal{{ $p->id }}) {
-                    modal{{ $p->id }}.addEventListener('shown.bs.modal', function () {
-                        const coords = @json($p->lokasi).split(',');
-                        const lat = parseFloat(coords[0]);
-                        const lng = parseFloat(coords[1]);
-
-                        const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-                        L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
-
-                        getAddressFromCoordinates(lat, lng, 'locationAddress{{ $p->id }}');
-                        this._map = map;
-
-                        setTimeout(() => {
-                            try { map.invalidateSize(); } catch (e) {}
-                        }, 300);
-                    });
-
-                    modal{{ $p->id }}.addEventListener('hidden.bs.modal', function () {
-                        if (this._map) {
-                            try { this._map.remove(); } catch (e) {}
-                            this._map = null;
-                        }
-                    });
+        @if($p - > lokasi)
+        const modal {
+            {
+                $p - > id
+            }
+        } = document.getElementById('detailModal{{ $p->id }}');
+        if (modal {
+                {
+                    $p - > id
                 }
-            @endif
+            }) {
+            modal {
+                {
+                    $p - > id
+                }
+            }.addEventListener('shown.bs.modal', function() {
+                const coords = @json($p - > lokasi).split(',');
+                const lat = parseFloat(coords[0]);
+                const lng = parseFloat(coords[1]);
+
+                const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+                L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+
+                getAddressFromCoordinates(lat, lng, 'locationAddress{{ $p->id }}');
+                this._map = map;
+
+                setTimeout(() => {
+                    try {
+                        map.invalidateSize();
+                    } catch (e) {}
+                }, 300);
+            });
+
+            modal {
+                {
+                    $p - > id
+                }
+            }.addEventListener('hidden.bs.modal', function() {
+                if (this._map) {
+                    try {
+                        this._map.remove();
+                    } catch (e) {}
+                    this._map = null;
+                }
+            });
+        }
+        @endif
         @endforeach
     }
 
@@ -795,16 +807,18 @@
         el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin me-2"></i>Mendeteksi alamat...</div>';
 
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
-            headers: { 'Accept': 'application/json' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            el.innerHTML = (data && data.display_name) ? data.display_name : '<span class="text-warning">Alamat tidak dapat ditemukan</span>';
-        })
-        .catch(e => {
-            console.error(e);
-            el.innerHTML = '<span class="text-danger">Gagal mendapatkan alamat</span>';
-        });
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                el.innerHTML = (data && data.display_name) ? data.display_name : '<span class="text-warning">Alamat tidak dapat ditemukan</span>';
+            })
+            .catch(e => {
+                console.error(e);
+                el.innerHTML = '<span class="text-danger">Gagal mendapatkan alamat</span>';
+            });
     }
 
     function captureAndProcess() {
@@ -856,7 +870,10 @@
 
     function showConfirmationModal() {
         const jenis = document.getElementById('jenisPresensi')?.value || '';
-        const waktu = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const waktu = new Date().toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
 
         document.getElementById('confirmationJenis').textContent = jenis.toUpperCase();
         document.getElementById('confirmationWaktu').textContent = waktu;
