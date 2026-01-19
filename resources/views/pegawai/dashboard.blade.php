@@ -664,20 +664,20 @@
 
     function initializeDetailModals() {
         @foreach($riwayatHariIni as $p)
-        @if($p - > lokasi)
+        @if($p -> lokasi)
         const modal {
             {
-                $p - > id
+                $p -> id
             }
         } = document.getElementById('detailModal{{ $p->id }}');
         if (modal {
                 {
-                    $p - > id
+                    $p -> id
                 }
             }) {
             modal {
                 {
-                    $p - > id
+                    $p -> id
                 }
             }.addEventListener('shown.bs.modal', function() {
                 const coords = "{{ $p->lokasi }}".split(',');
@@ -691,7 +691,7 @@
             });
             modal {
                 {
-                    $p - > id
+                    $p -> id
                 }
             }.addEventListener('hidden.bs.modal', function() {
                 if (this._map) {
