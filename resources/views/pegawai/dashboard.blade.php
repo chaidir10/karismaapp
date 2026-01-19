@@ -661,7 +661,7 @@
 
         const wilayahLat = parseFloat("{{ Auth::user()->wilayahKerja->latitude ?? 0 }}");
         const wilayahLng = parseFloat("{{ Auth::user()->wilayahKerja->longitude ?? 0 }}");
-        const wilayahAlamat = @json(Auth::user() - > wilayahKerja - > alamat ?? '');
+        const wilayahAlamat = @json(Auth::user() -> wilayahKerja -> alamat ?? '');
         const radius = parseFloat("{{ Auth::user()->wilayahKerja->radius ?? 100 }}");
 
         const distance = haversineDistance(lat, lng, wilayahLat, wilayahLng);
