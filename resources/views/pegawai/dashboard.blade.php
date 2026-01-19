@@ -53,7 +53,7 @@
             onclick="setJenis('masuk')"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
             <i class="fas fa-sign-in-alt attendance-icon"></i>
-            {{ $sudahPresensiMasuk ? 'Masuk' : 'Masuk' }}
+            {{ $sudahPresensiMasuk ? 'Sudah Masuk' : 'Masuk' }}
         </button>
         <button class="attendance-btn {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'btn-disabled' : '' }}"
             id="clock-out-btn"
@@ -62,7 +62,7 @@
             onclick="handlePulangClick()"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
             <i class="fas fa-sign-out-alt attendance-icon"></i>
-            {{ $sudahPresensiPulang ? 'Pulang' : 'Pulang' }}
+            {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
 </div>
