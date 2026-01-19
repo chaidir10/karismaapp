@@ -174,16 +174,16 @@
                     </div> -->
 
                     <div class="mini-map-wrapper">
-                        <div class="mini-map-container">
-                            <div id="mini-map" class="mini-map"></div>
-                        </div>
+    <div class="mini-map-container">
+        <div id="mini-map" class="mini-map"></div>
 
-                        <div class="location-info-mini mt-1">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span id="location-address-mini">Mendeteksi lokasi...</span>
-                            <div id="locationRadiusInfo" class="text-sm mt-1"></div>
-                        </div>
-                    </div>
+        <div class="location-info-mini">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="location-address-mini">Mendeteksi lokasi...</span>
+            <div id="locationRadiusInfo" class="text-sm mt-1"></div>
+        </div>
+    </div>
+</div>
 
                     <div class="submit-btn-container">
                         <button type="button" class="submit-btn-large" onclick="captureAndProcess()">
