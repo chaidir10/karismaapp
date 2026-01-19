@@ -530,7 +530,7 @@
             top: 70px;
             right: 15px;
             width: 300px;
-            height: 150px;
+            height: 200px;
             z-index: 10;
             background: white;
             border-radius: 12px;
