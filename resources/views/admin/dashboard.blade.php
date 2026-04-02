@@ -582,9 +582,7 @@
                                 data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $p->jenis ?? '' }}"
                                 data-jam="{{ $p->jam ?? '-' }}"
-                                data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
-                                data-latitude="{{ $p->latitude ?? '' }}"
-                                data-longitude="{{ $p->longitude ?? '' }}"
+                                data-lokasi="{{ $p->lokasi ?? '' }}"
                                 data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
                                 data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
                                 data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
@@ -938,8 +936,6 @@
                     jenis             : this.dataset.jenis,
                     jam               : this.dataset.jam,
                     lokasi            : this.dataset.lokasi,
-                    latitude          : this.dataset.latitude,
-                    longitude         : this.dataset.longitude,
                     foto_url          : this.dataset.fotoUrl,
                     approve_url       : this.dataset.approveUrl,
                     reject_url        : this.dataset.rejectUrl
@@ -987,7 +983,9 @@
         document.getElementById('detailTanggalPresensi').textContent  = data.tanggal  || '-';
         document.getElementById('detailJenisPresensi').textContent    = capitalize(data.jenis);
         document.getElementById('detailJamPresensi').textContent      = data.jam      || '-';
-        document.getElementById('detailLokasiPresensi').textContent   = data.lokasi   || 'Tidak ada lokasi';
+        document.getElementById('detailLokasiPresensi').textContent   = data.lokasi
+            ? data.lokasi
+            : 'Tidak ada lokasi';
 
         // Foto
         var fotoEl = document.getElementById('detailFotoPresensi');
@@ -999,10 +997,21 @@
         setFormAction('formApprovePresensi', data.approve_url);
         setFormAction('formRejectPresensi',  data.reject_url);
 
-        // Simpan koordinat — akan dirender setelah modal tampil
+        // Parse koordinat dari string lokasi format "lat,lng"
+        var lat = NaN;
+        var lng = NaN;
+
+        if (data.lokasi) {
+            var parts = data.lokasi.trim().split(',');
+            if (parts.length === 2) {
+                lat = parseFloat(parts[0].trim());
+                lng = parseFloat(parts[1].trim());
+            }
+        }
+
         pendingCoords = {
-            lat   : parseFloat(data.latitude),
-            lng   : parseFloat(data.longitude),
+            lat   : lat,
+            lng   : lng,
             lokasi: data.lokasi || 'Lokasi tidak tersedia'
         };
 
