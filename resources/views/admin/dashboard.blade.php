@@ -122,7 +122,6 @@
         align-items: center;
         padding: 15px 20px;
         border-bottom: 1px solid var(--gray-200);
-
     }
 
     .card-title {
@@ -186,7 +185,6 @@
         background: var(--gray-100);
     }
 
-    /* User Name */
     .user-name {
         font-size: 12px;
         font-weight: 500;
@@ -235,13 +233,11 @@
         color: var(--warning);
     }
 
-    /* Date Cell */
     .date-cell {
         font-size: 13px;
         color: var(--gray-600);
     }
 
-    /* Time Cell */
     .time-cell {
         font-family: 'Courier New', monospace;
         font-size: 13px;
@@ -442,7 +438,6 @@
         font-style: italic;
     }
 
-    /* Row clickable style */
     .clickable-row {
         cursor: pointer;
         transition: background-color 0.2s ease;
@@ -452,27 +447,12 @@
         background: var(--gray-50) !important;
     }
 
-    /* Bukti image */
-    .bukti-image {
-        max-width: 100%;
-        max-height: 200px;
-        border-radius: 6px;
-        border: 1px solid var(--gray-200);
-    }
-
+    .bukti-image,
     .foto-image {
         max-width: 100%;
         max-height: 200px;
         border-radius: 6px;
         border: 1px solid var(--gray-200);
-    }
-
-    .bukti-placeholder {
-        padding: 20px;
-        text-align: center;
-        background: var(--gray-100);
-        border-radius: 6px;
-        color: var(--gray-500);
     }
 
     /* Map Styles */
@@ -485,26 +465,12 @@
         background: var(--gray-100);
     }
 
-    .map {
+    #presensiMap {
         width: 100%;
         height: 100%;
     }
 
-    .map-loading {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.9);
-        color: var(--gray-500);
-        gap: 10px;
-    }
-
+    .map-loading,
     .map-error {
         position: absolute;
         top: 0;
@@ -515,85 +481,46 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 10px;
+        pointer-events: none;
+    }
+
+    .map-loading {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--gray-500);
+        z-index: 1000;
+    }
+
+    .map-error {
         background: var(--gray-100);
         color: var(--gray-500);
-        gap: 10px;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-        .admin-dashboard {
-            padding: 15px;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .content-grid {
-            gap: 15px;
-        }
-
+        .admin-dashboard { padding: 15px; }
+        .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+        .content-grid { gap: 15px; }
         .data-table th,
-        .data-table td {
-            padding: 10px 12px;
-            font-size: 12px;
-        }
-
-        .stat-card {
-            padding: 15px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-        }
-
-        .modal-container {
-            width: 95%;
-            margin: 20px;
-        }
-
-        .modal-large {
-            max-width: 95%;
-        }
-
-        .detail-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .modal-actions {
-            flex-direction: column;
-        }
-
-        .modal-actions .inline-form {
-            width: 100%;
-        }
-
-        .modal-actions button {
-            width: 100%;
-        }
-
-        .map-container {
-            height: 250px;
-        }
+        .data-table td { padding: 10px 12px; font-size: 12px; }
+        .stat-card { padding: 15px; }
+        .stat-value { font-size: 24px; }
+        .stat-icon { width: 40px; height: 40px; font-size: 16px; }
+        .modal-container { width: 95%; margin: 20px; }
+        .modal-large { max-width: 95%; }
+        .detail-grid { grid-template-columns: 1fr; gap: 12px; }
+        .modal-actions { flex-direction: column; }
+        .modal-actions .inline-form,
+        .modal-actions button { width: 100%; }
+        .map-container { height: 250px; }
     }
 </style>
 
 <div class="admin-dashboard text-sm">
     <!-- Header -->
     <div class="dashboard-header">
-        <div class="header-content">
-            <h1 class="dashboard-title">Dashboard Admin</h1>
-            <p class="dashboard-subtitle">Ringkasan aktivitas dan statistik sistem</p>
-        </div>
+        <h1 class="dashboard-title">Dashboard Admin</h1>
+        <p class="dashboard-subtitle">Ringkasan aktivitas dan statistik sistem</p>
     </div>
 
     {{-- Statistics Cards --}}
@@ -607,7 +534,6 @@
                 <i class="fas fa-user-check"></i>
             </div>
         </div>
-
         <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
@@ -617,7 +543,6 @@
                 <i class="fas fa-users"></i>
             </div>
         </div>
-
         <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
@@ -653,7 +578,6 @@
                         <tbody id="presensiPendingTable">
                             @forelse($presensiPending ?? [] as $index => $p)
                             <tr class="clickable-row"
-                                data-presensi-id="{{ $p->id }}"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $p->jenis ?? '' }}"
@@ -661,18 +585,14 @@
                                 data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
                                 data-latitude="{{ $p->latitude ?? '' }}"
                                 data-longitude="{{ $p->longitude ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
+                                data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
                                 data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
                                 data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
-                                <td class="date-cell">
-                                    {{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}
-                                </td>
+                                <td class="date-cell">{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}</td>
                                 <td>
-                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
-                                        {{ ucfirst($p->jenis ?? '') }}
-                                    </span>
+                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
@@ -711,7 +631,6 @@
             </div>
         </div>
 
-
         {{-- Pengajuan Pending --}}
         <div class="content-card">
             <div class="card-header">
@@ -733,24 +652,18 @@
                         <tbody id="pengajuanPendingTable">
                             @forelse($pengajuanPending ?? [] as $index => $peng)
                             <tr class="clickable-row"
-                                data-pengajuan-id="{{ $peng->id }}"
                                 data-user-name="{{ $peng->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
-                                data-bukti="{{ $peng->bukti ?? '' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
-                                <td class="date-cell">
-                                    {{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}
-                                </td>
+                                <td class="date-cell">{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}</td>
                                 <td>
-                                    <span class="badge jenis-badge {{ $peng->jenis ?? '' }}">
-                                        {{ ucfirst($peng->jenis ?? '') }}
-                                    </span>
+                                    <span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
@@ -772,7 +685,6 @@
                                         @endif
                                     </div>
                                 </td>
-
                             </tr>
                             @empty
                             <tr>
@@ -814,26 +726,24 @@
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td>
-                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
-                                        {{ ucfirst($p->jenis ?? '') }}
-                                    </span>
+                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
                                 </td>
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if(($p->jenis ?? '') === 'masuk')
-                                    @if($p->terlambat)
-                                    <span class="status-badge late">Terlambat</span>
-                                    @else
-                                    <span class="status-badge on-time">Tepat Waktu</span>
-                                    @endif
+                                        @if($p->terlambat)
+                                            <span class="status-badge late">Terlambat</span>
+                                        @else
+                                            <span class="status-badge on-time">Tepat Waktu</span>
+                                        @endif
                                     @elseif(($p->jenis ?? '') === 'pulang')
-                                    @if($p->waktu_kurang_menit > 0)
-                                    <span class="status-badge late">Waktu Kurang</span>
+                                        @if($p->waktu_kurang_menit > 0)
+                                            <span class="status-badge late">Waktu Kurang</span>
+                                        @else
+                                            <span class="status-badge on-time">Tepat Waktu</span>
+                                        @endif
                                     @else
-                                    <span class="status-badge on-time">Tepat Waktu</span>
-                                    @endif
-                                    @else
-                                    <span class="status-badge neutral">-</span>
+                                        <span class="status-badge neutral">-</span>
                                     @endif
                                 </td>
                             </tr>
@@ -852,10 +762,12 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-{{-- Modal Detail Presensi Pending --}}
+    </div>{{-- end .content-grid --}}
+</div>{{-- end .admin-dashboard --}}
+
+
+{{-- ========== MODAL PRESENSI PENDING ========== --}}
 <div id="modalPresensiPending" class="modal-overlay">
     <div class="modal-container modal-large">
         <div class="modal-header">
@@ -882,14 +794,14 @@
                     <label>Jam</label>
                     <span id="detailJamPresensi">-</span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item full-width">
                     <label>Lokasi</label>
                     <span id="detailLokasiPresensi">-</span>
                 </div>
                 <div class="detail-item full-width">
                     <label>Peta Lokasi</label>
-                    <div id="mapContainer" class="map-container">
-                        <div id="presensiMap" class="map"></div>
+                    <div class="map-container">
+                        <div id="presensiMap"></div>
                         <div id="mapLoading" class="map-loading">
                             <i class="fas fa-spinner fa-spin"></i>
                             <span>Memuat peta...</span>
@@ -906,23 +818,23 @@
                         <span class="text-muted">Tidak ada foto</span>
                     </div>
                 </div>
-                <div class="detail-item full-width">
+                <div class="detail-item">
                     <label>Status</label>
-                    <span id="detailStatusPresensi" class="status-badge pending">Pending</span>
+                    <span class="status-badge pending">Pending</span>
                 </div>
             </div>
             <div class="modal-actions">
                 @if(Auth::user()->can_approve_pengajuan)
                 <form id="formApprovePresensi" method="POST" class="inline-form">
                     @csrf
-                    <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i>
+                    <button type="submit" class="btn-success" title="Setujui">
+                        <i class="fas fa-check"></i> Setujui
                     </button>
                 </form>
                 <form id="formRejectPresensi" method="POST" class="inline-form">
                     @csrf
-                    <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i> 
+                    <button type="submit" class="btn-danger" title="Tolak">
+                        <i class="fas fa-times"></i> Tolak
                     </button>
                 </form>
                 @endif
@@ -934,7 +846,8 @@
     </div>
 </div>
 
-{{-- Modal Detail Pengajuan Pending --}}
+
+{{-- ========== MODAL PENGAJUAN PENDING ========== --}}
 <div id="modalPengajuanPending" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -953,7 +866,7 @@
                     <label>Tanggal</label>
                     <span id="detailTanggalPengajuan">-</span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item full-width">
                     <label>Jenis Pengajuan</label>
                     <span id="detailJenisPengajuan">-</span>
                 </div>
@@ -961,7 +874,7 @@
                     <label>Alasan</label>
                     <span id="detailAlasanPengajuan">-</span>
                 </div>
-                <div class="detail-item full-width" id="buktiContainer">
+                <div class="detail-item full-width">
                     <label>Bukti</label>
                     <div id="detailBuktiPengajuan">
                         <span class="text-muted">Tidak ada bukti</span>
@@ -969,21 +882,21 @@
                 </div>
                 <div class="detail-item">
                     <label>Status</label>
-                    <span id="detailStatusPengajuan" class="status-badge pending">Pending</span>
+                    <span class="status-badge pending">Pending</span>
                 </div>
             </div>
             <div class="modal-actions">
                 @if(Auth::user()->can_approve_pengajuan)
                 <form id="formApprovePengajuan" method="POST" class="inline-form">
                     @csrf
-                    <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i> 
+                    <button type="submit" class="btn-success" title="Setujui">
+                        <i class="fas fa-check"></i> Setujui
                     </button>
                 </form>
                 <form id="formRejectPengajuan" method="POST" class="inline-form">
                     @csrf
-                    <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i> 
+                    <button type="submit" class="btn-danger" title="Tolak">
+                        <i class="fas fa-times"></i> Tolak
                     </button>
                 </form>
                 @endif
@@ -995,327 +908,234 @@
     </div>
 </div>
 
+
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin="" />
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-<!-- Leaflet JavaScript -->
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Klik pada baris presensi pending
-        document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(row => {
-            row.addEventListener('click', function() {
-                document.getElementById('detailPegawaiPresensi').textContent = this.dataset.userName;
-                document.getElementById('detailTanggalPresensi').textContent = this.dataset.tanggal;
-                document.getElementById('detailJenisPresensi').textContent = this.dataset.jenis;
-                document.getElementById('detailJamPresensi').textContent = this.dataset.jam;
-                document.getElementById('detailLokasiPresensi').textContent = this.dataset.lokasi;
+    // ─── State ───────────────────────────────────────────────────────────────
+    let presensiMap    = null;
+    let currentMarker  = null;
+    let pendingCoords  = null; // koordinat yang menunggu untuk dirender
 
-                // Update form action
-                document.getElementById('formApprovePresensi').action = this.dataset.approveUrl;
-                document.getElementById('formRejectPresensi').action = this.dataset.rejectUrl;
+    // ─── DOM Ready ───────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
 
-                // Tampilkan modal
-                openModal('modalPresensiPending');
+        // Klik baris presensi pending
+        document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                // Abaikan klik pada tombol aksi
+                if (e.target.closest('.action-buttons')) return;
+
+                openPresensiModal({
+                    user_name         : this.dataset.userName,
+                    tanggal           : this.dataset.tanggal,
+                    jenis             : this.dataset.jenis,
+                    jam               : this.dataset.jam,
+                    lokasi            : this.dataset.lokasi,
+                    latitude          : this.dataset.latitude,
+                    longitude         : this.dataset.longitude,
+                    foto_url          : this.dataset.fotoUrl,
+                    approve_url       : this.dataset.approveUrl,
+                    reject_url        : this.dataset.rejectUrl
+                });
             });
         });
 
-        // Klik pada baris pengajuan pending
-        document.querySelectorAll('#pengajuanPendingTable .clickable-row').forEach(row => {
-            row.addEventListener('click', function() {
-                document.getElementById('detailPegawaiPengajuan').textContent = this.dataset.userName;
-                document.getElementById('detailTanggalPengajuan').textContent = this.dataset.tanggal;
-                document.getElementById('detailJenisPengajuan').textContent = this.dataset.jenis;
-                document.getElementById('detailAlasanPengajuan').textContent = this.dataset.alasan;
+        // Klik baris pengajuan pending
+        document.querySelectorAll('#pengajuanPendingTable .clickable-row').forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                if (e.target.closest('.action-buttons')) return;
 
-                const buktiContainer = document.getElementById('detailBuktiPengajuan');
-                buktiContainer.innerHTML = this.dataset.buktiUrl ?
-                    `<a href="${this.dataset.buktiUrl}" target="_blank"><img src="${this.dataset.buktiUrl}" class="bukti-image"></a>` :
-                    '<span class="text-muted">Tidak ada bukti</span>';
-
-                document.getElementById('formApprovePengajuan').action = this.dataset.approveUrl;
-                document.getElementById('formRejectPengajuan').action = this.dataset.rejectUrl;
-
-                openModal('modalPengajuanPending');
-            });
-        });
-    });
-
-    // Fungsi buka/tutup modal
-    function openModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'none';
-    }
-</script>
-
-
-<script>
-    // Global map variable
-    let presensiMap = null;
-    let currentMarker = null;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('✅ DOM Content Loaded');
-        initializeEventListeners();
-
-        // Tutup modal ketika klik di luar konten modal
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal(this.id);
-                }
+                openPengajuanModal({
+                    user_name         : this.dataset.userName,
+                    tanggal           : this.dataset.tanggal,
+                    jenis             : this.dataset.jenis,
+                    alasan            : this.dataset.alasan,
+                    bukti_url         : this.dataset.buktiUrl,
+                    approve_url       : this.dataset.approveUrl,
+                    reject_url        : this.dataset.rejectUrl
+                });
             });
         });
 
-        // Tutup modal dengan tombol ESC
-        document.addEventListener('keydown', function(e) {
+        // Tutup modal klik di luar container
+        document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === this) closeModal(this.id);
+            });
+        });
+
+        // Tutup modal dengan ESC
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay').forEach(modal => {
-                    closeModal(modal.id);
+                document.querySelectorAll('.modal-overlay').forEach(function (m) {
+                    closeModal(m.id);
                 });
             }
         });
     });
 
-    // Initialize event listeners
-    function initializeEventListeners() {
-        console.log('🔄 Initializing event listeners...');
+    // ─── Modal Presensi ───────────────────────────────────────────────────────
+    function openPresensiModal(data) {
+        document.getElementById('detailPegawaiPresensi').textContent = data.user_name || 'N/A';
+        document.getElementById('detailTanggalPresensi').textContent  = data.tanggal  || '-';
+        document.getElementById('detailJenisPresensi').textContent    = capitalize(data.jenis);
+        document.getElementById('detailJamPresensi').textContent      = data.jam      || '-';
+        document.getElementById('detailLokasiPresensi').textContent   = data.lokasi   || 'Tidak ada lokasi';
 
-        // Handle klik pada baris presensi pending
-        const presensiRows = document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row');
-        console.log('🔍 Found presensi rows:', presensiRows.length);
+        // Foto
+        var fotoEl = document.getElementById('detailFotoPresensi');
+        fotoEl.innerHTML = data.foto_url
+            ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
+            : '<span class="text-muted">Tidak ada foto</span>';
 
-        presensiRows.forEach((row, index) => {
-            row.removeEventListener('click', handlePresensiClick);
-            row.addEventListener('click', handlePresensiClick);
-        });
+        // Form action
+        setFormAction('formApprovePresensi', data.approve_url);
+        setFormAction('formRejectPresensi',  data.reject_url);
 
-        // Handle klik pada baris pengajuan pending
-        const pengajuanRows = document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row');
-        console.log('🔍 Found pengajuan rows:', pengajuanRows.length);
-
-        pengajuanRows.forEach((row, index) => {
-            row.removeEventListener('click', handlePengajuanClick);
-            row.addEventListener('click', handlePengajuanClick);
-        });
-
-        console.log('✅ Event listeners initialized');
-    }
-
-    // Event handler untuk presensi
-    function handlePresensiClick(e) {
-        console.log('🟡 Presensi row clicked', this);
-
-        // Jangan trigger jika klik pada tombol aksi
-        if (e.target.closest('.action-buttons')) {
-            console.log('⏹️ Click on action buttons, ignoring');
-            return;
-        }
-
-        const presensiData = {
-            user_name: this.getAttribute('data-user-name'),
-            tanggal_formatted: this.getAttribute('data-tanggal'),
-            jenis: this.getAttribute('data-jenis'),
-            jam: this.getAttribute('data-jam'),
-            lokasi: this.getAttribute('data-lokasi'),
-            latitude: this.getAttribute('data-latitude'),
-            longitude: this.getAttribute('data-longitude'),
-            foto_url: this.getAttribute('data-foto-url'),
-            approve_url: this.getAttribute('data-approve-url'),
-            reject_url: this.getAttribute('data-reject-url')
+        // Simpan koordinat — akan dirender setelah modal tampil
+        pendingCoords = {
+            lat   : parseFloat(data.latitude),
+            lng   : parseFloat(data.longitude),
+            lokasi: data.lokasi || 'Lokasi tidak tersedia'
         };
-
-        console.log('📦 Presensi data:', presensiData);
-        openPresensiModal(presensiData);
-    }
-
-    // Event handler untuk pengajuan
-    function handlePengajuanClick(e) {
-        console.log('🟡 Pengajuan row clicked', this);
-
-        // Jangan trigger jika klik pada tombol aksi
-        if (e.target.closest('.action-buttons')) {
-            console.log('⏹️ Click on action buttons, ignoring');
-            return;
-        }
-
-        const pengajuanData = {
-            user_name: this.getAttribute('data-user-name'),
-            tanggal_formatted: this.getAttribute('data-tanggal'),
-            jenis: this.getAttribute('data-jenis'),
-            alasan: this.getAttribute('data-alasan'),
-            bukti: this.getAttribute('data-bukti'),
-            bukti_url: this.getAttribute('data-bukti-url'),
-            approve_url: this.getAttribute('data-approve-url'),
-            reject_url: this.getAttribute('data-reject-url')
-        };
-
-        console.log('📦 Pengajuan data:', pengajuanData);
-        openPengajuanModal(pengajuanData);
-    }
-
-    // Fungsi untuk membuka modal presensi pending
-    function openPresensiModal(presensi) {
-        console.log('🟡 Opening presensi modal:', presensi);
-
-        // Update modal content
-        document.getElementById('detailPegawaiPresensi').textContent = presensi.user_name || 'N/A';
-        document.getElementById('detailTanggalPresensi').textContent = presensi.tanggal_formatted || '-';
-        document.getElementById('detailJenisPresensi').textContent = presensi.jenis ? presensi.jenis.charAt(0).toUpperCase() + presensi.jenis.slice(1) : '-';
-        document.getElementById('detailJamPresensi').textContent = presensi.jam || '-';
-        document.getElementById('detailLokasiPresensi').textContent = presensi.lokasi || 'Tidak ada lokasi';
-
-        // Handle foto
-        const fotoContainer = document.getElementById('detailFotoPresensi');
-        if (presensi.foto_url) {
-            fotoContainer.innerHTML = `<img src="${presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="this.style.display='none'">`;
-        } else {
-            fotoContainer.innerHTML = '<span class="text-muted">Tidak ada foto</span>';
-        }
-
-        // Set form action URLs
-        const approveForm = document.getElementById('formApprovePresensi');
-        const rejectForm = document.getElementById('formRejectPresensi');
-
-        if (approveForm) approveForm.action = presensi.approve_url;
-        if (rejectForm) rejectForm.action = presensi.reject_url;
-
-        // Initialize map
-        initializeMap(presensi.latitude, presensi.longitude, presensi.lokasi);
 
         openModal('modalPresensiPending');
     }
 
-    // Fungsi untuk membuka modal pengajuan pending
-    function openPengajuanModal(pengajuan) {
-        console.log('🟡 Opening pengajuan modal:', pengajuan);
+    // ─── Modal Pengajuan ──────────────────────────────────────────────────────
+    function openPengajuanModal(data) {
+        document.getElementById('detailPegawaiPengajuan').textContent = data.user_name || 'N/A';
+        document.getElementById('detailTanggalPengajuan').textContent  = data.tanggal  || '-';
+        document.getElementById('detailJenisPengajuan').textContent    = capitalize(data.jenis);
+        document.getElementById('detailAlasanPengajuan').textContent   = data.alasan   || 'Tidak ada alasan';
 
-        // Update modal content
-        document.getElementById('detailPegawaiPengajuan').textContent = pengajuan.user_name || 'N/A';
-        document.getElementById('detailTanggalPengajuan').textContent = pengajuan.tanggal_formatted || '-';
-        document.getElementById('detailJenisPengajuan').textContent = pengajuan.jenis ? pengajuan.jenis.charAt(0).toUpperCase() + pengajuan.jenis.slice(1) : '-';
-        document.getElementById('detailAlasanPengajuan').textContent = pengajuan.alasan || 'Tidak ada alasan';
+        var buktiEl = document.getElementById('detailBuktiPengajuan');
+        buktiEl.innerHTML = data.bukti_url
+            ? '<a href="' + data.bukti_url + '" target="_blank"><img src="' + data.bukti_url + '" class="bukti-image" onerror="this.style.display=\'none\'"></a>'
+            : '<span class="text-muted">Tidak ada bukti</span>';
 
-        // Handle bukti
-        const buktiContainer = document.getElementById('detailBuktiPengajuan');
-        if (pengajuan.bukti_url) {
-            buktiContainer.innerHTML = `<img src="${pengajuan.bukti_url}" alt="Bukti" class="bukti-image" onerror="this.style.display='none'">`;
-        } else {
-            buktiContainer.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
-        }
-
-        // Set form action URLs
-        const approveForm = document.getElementById('formApprovePengajuan');
-        const rejectForm = document.getElementById('formRejectPengajuan');
-
-        if (approveForm) approveForm.action = pengajuan.approve_url;
-        if (rejectForm) rejectForm.action = pengajuan.reject_url;
+        setFormAction('formApprovePengajuan', data.approve_url);
+        setFormAction('formRejectPengajuan',  data.reject_url);
 
         openModal('modalPengajuanPending');
     }
 
-    // Initialize map function
-    function initializeMap(latitude, longitude, lokasi) {
-        const mapContainer = document.getElementById('presensiMap');
-        const mapLoading = document.getElementById('mapLoading');
-        const mapError = document.getElementById('mapError');
+    // ─── Modal Helpers ────────────────────────────────────────────────────────
+    function openModal(id) {
+        var modal = document.getElementById(id);
+        if (!modal) return;
 
-        // Reset state
-        mapLoading.style.display = 'flex';
-        mapError.style.display = 'none';
-        mapContainer.innerHTML = '';
+        modal.style.display    = 'flex';
+        document.body.style.overflow = 'hidden';
 
-        // Check if coordinates are available
-        if (!latitude || !longitude || latitude === 'null' || longitude === 'null') {
-            mapLoading.style.display = 'none';
-            mapError.style.display = 'flex';
-            return;
+        // Render peta SETELAH modal benar-benar tampil (ada dimensi)
+        if (id === 'modalPresensiPending') {
+            renderMap();
         }
-
-        const lat = parseFloat(latitude);
-        const lng = parseFloat(longitude);
-
-        if (isNaN(lat) || isNaN(lng)) {
-            mapLoading.style.display = 'none';
-            mapError.style.display = 'flex';
-            return;
-        }
-
-        // Initialize map after a small delay to ensure DOM is ready
-        setTimeout(() => {
-            try {
-                // Initialize map
-                presensiMap = L.map('presensiMap').setView([lat, lng], 16);
-
-                // Add tile layer
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(presensiMap);
-
-                // Add marker
-                currentMarker = L.marker([lat, lng])
-                    .addTo(presensiMap)
-                    .bindPopup(`<b>Lokasi Presensi</b><br>${lokasi || 'Lokasi tidak tersedia'}`)
-                    .openPopup();
-
-                // Hide loading
-                mapLoading.style.display = 'none';
-
-                console.log('✅ Map initialized successfully');
-            } catch (error) {
-                console.error('❌ Error initializing map:', error);
-                mapLoading.style.display = 'none';
-                mapError.style.display = 'flex';
-            }
-        }, 100);
     }
 
-    // Clean up map when modal is closed
-    function cleanupMap() {
+    function closeModal(id) {
+        var modal = document.getElementById(id);
+        if (!modal) return;
+
+        modal.style.display          = 'none';
+        document.body.style.overflow = 'auto';
+
+        if (id === 'modalPresensiPending') {
+            destroyMap();
+        }
+    }
+
+    // ─── Map ──────────────────────────────────────────────────────────────────
+    function renderMap() {
+        var mapLoading = document.getElementById('mapLoading');
+        var mapError   = document.getElementById('mapError');
+        var mapEl      = document.getElementById('presensiMap');
+
+        // Reset tampilan
+        mapLoading.style.display = 'flex';
+        mapError.style.display   = 'none';
+
+        // Hancurkan instance lama jika ada
+        destroyMap();
+
+        // Validasi koordinat
+        if (!pendingCoords || isNaN(pendingCoords.lat) || isNaN(pendingCoords.lng)) {
+            mapLoading.style.display = 'none';
+            mapError.style.display   = 'flex';
+            return;
+        }
+
+        var lat    = pendingCoords.lat;
+        var lng    = pendingCoords.lng;
+        var lokasi = pendingCoords.lokasi;
+
+        /*
+         * Delay 200ms agar browser selesai me-render modal (display:flex)
+         * sehingga mapEl sudah memiliki lebar/tinggi yang nyata.
+         * Leaflet butuh dimensi container untuk menginisialisasi tile grid.
+         */
+        setTimeout(function () {
+            // Pastikan modal masih terbuka
+            var modal = document.getElementById('modalPresensiPending');
+            if (!modal || modal.style.display === 'none') return;
+
+            // Pastikan container memiliki dimensi
+            if (mapEl.offsetWidth === 0 || mapEl.offsetHeight === 0) {
+                mapLoading.style.display = 'none';
+                mapError.style.display   = 'flex';
+                return;
+            }
+
+            try {
+                presensiMap = L.map('presensiMap', { zoomControl: true }).setView([lat, lng], 16);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    maxZoom     : 19
+                }).addTo(presensiMap);
+
+                currentMarker = L.marker([lat, lng])
+                    .addTo(presensiMap)
+                    .bindPopup('<b>Lokasi Presensi</b><br>' + lokasi)
+                    .openPopup();
+
+                // Paksa Leaflet hitung ulang ukuran — kunci utama agar tile muncul
+                presensiMap.invalidateSize();
+
+                mapLoading.style.display = 'none';
+            } catch (err) {
+                console.error('Map error:', err);
+                mapLoading.style.display = 'none';
+                mapError.style.display   = 'flex';
+            }
+        }, 200);
+    }
+
+    function destroyMap() {
         if (presensiMap) {
             presensiMap.remove();
-            presensiMap = null;
-        }
-        if (currentMarker) {
+            presensiMap   = null;
             currentMarker = null;
         }
     }
 
-    // Fungsi umum untuk membuka modal
-    function openModal(modalId) {
-        console.log('🟡 Opening modal:', modalId);
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        } else {
-            console.error('❌ Modal not found:', modalId);
-        }
+    // ─── Utilities ────────────────────────────────────────────────────────────
+    function capitalize(str) {
+        if (!str) return '-';
+        return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // Fungsi untuk menutup modal
-    function closeModal(modalId) {
-        console.log('🟡 Closing modal:', modalId);
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-
-            // Clean up map if it's the presensi modal
-            if (modalId === 'modalPresensiPending') {
-                cleanupMap();
-            }
-        }
+    function setFormAction(formId, url) {
+        var form = document.getElementById(formId);
+        if (form && url) form.action = url;
     }
 </script>
 
