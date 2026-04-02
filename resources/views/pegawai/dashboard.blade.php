@@ -728,7 +728,6 @@
         }
     }
 
-   
     function initializeDetailModals() {
         if (!window.L) return;
 
