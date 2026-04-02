@@ -826,13 +826,13 @@
                 <form id="formApprovePresensi" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-success" title="Setujui">
-                        <i class="fas fa-check"></i> Setujui
+                        <i class="fas fa-check"></i> 
                     </button>
                 </form>
                 <form id="formRejectPresensi" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-danger" title="Tolak">
-                        <i class="fas fa-times"></i> Tolak
+                        <i class="fas fa-times"></i>
                     </button>
                 </form>
                 @endif
@@ -888,13 +888,12 @@
                 <form id="formApprovePengajuan" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-success" title="Setujui">
-                        <i class="fas fa-check"></i> Setujui
-                    </button>
+                        <i class="fas fa-check"></i> 
                 </form>
                 <form id="formRejectPengajuan" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-danger" title="Tolak">
-                        <i class="fas fa-times"></i> Tolak
+                        <i class="fas fa-times"></i> 
                     </button>
                 </form>
                 @endif
