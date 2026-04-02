@@ -30,9 +30,7 @@
         min-height: 100vh;
     }
 
-    .dashboard-header {
-        margin-bottom: 30px;
-    }
+    .dashboard-header { margin-bottom: 30px; }
 
     .dashboard-title {
         font-size: 24px;
@@ -47,7 +45,6 @@
         font-size: 14px;
     }
 
-    /* Statistics Grid */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -59,16 +56,14 @@
         background: var(--white);
         padding: 20px;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-left: 4px solid var(--primary);
     }
 
-    .stat-content {
-        flex: 1;
-    }
+    .stat-content { flex: 1; }
 
     .stat-value {
         font-size: 28px;
@@ -78,11 +73,7 @@
         line-height: 1;
     }
 
-    .stat-label {
-        color: var(--gray-500);
-        font-size: 14px;
-        margin: 0;
-    }
+    .stat-label { color: var(--gray-500); font-size: 14px; margin: 0; }
 
     .stat-icon {
         width: 50px;
@@ -96,7 +87,6 @@
         font-size: 20px;
     }
 
-    /* Content Grid */
     .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -104,15 +94,13 @@
     }
 
     @media (max-width: 1024px) {
-        .content-grid {
-            grid-template-columns: 1fr;
-        }
+        .content-grid { grid-template-columns: 1fr; }
     }
 
     .content-card {
         background: var(--white);
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         overflow: hidden;
     }
 
@@ -122,15 +110,9 @@
         align-items: center;
         padding: 15px 20px;
         border-bottom: 1px solid var(--gray-200);
-
     }
 
-    .card-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--dark);
-        margin: 0;
-    }
+    .card-title { font-size: 16px; font-weight: 600; color: var(--dark); margin: 0; }
 
     .card-badge {
         padding: 4px 10px;
@@ -141,22 +123,10 @@
         font-weight: 500;
     }
 
-    .card-content {
-        padding: 0;
-    }
-
-    .table-container {
-        overflow-x: auto;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .data-table thead {
-        background: var(--gray-100);
-    }
+    .card-content { padding: 0; }
+    .table-container { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead { background: var(--gray-100); }
 
     .data-table th {
         padding: 12px 15px;
@@ -168,9 +138,7 @@
         border-bottom: 1px solid var(--gray-200);
     }
 
-    .data-table th.text-center {
-        text-align: center;
-    }
+    .data-table th.text-center { text-align: center; }
 
     .data-table td {
         padding: 12px 15px;
@@ -178,22 +146,10 @@
         vertical-align: middle;
     }
 
-    .data-table td.text-center {
-        text-align: center;
-    }
+    .data-table td.text-center { text-align: center; }
+    .data-table tbody tr:hover { background: var(--gray-100); }
+    .user-name { font-size: 12px; font-weight: 500; color: var(--dark); }
 
-    .data-table tbody tr:hover {
-        background: var(--gray-100);
-    }
-
-    /* User Name */
-    .user-name {
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--dark);
-    }
-
-    /* Badges */
     .badge {
         padding: 4px 8px;
         border-radius: 6px;
@@ -203,397 +159,152 @@
     }
 
     .jenis-badge {
-        background: rgba(59, 130, 246, 0.1);
+        background: rgba(59,130,246,0.1);
         color: var(--primary);
-        border: 1px solid rgba(59, 130, 246, 0.2);
+        border: 1px solid rgba(59,130,246,0.2);
     }
 
-    .status-badge {
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 500;
+    .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+    .status-badge.on-time { background: rgba(16,185,129,0.1); color: var(--success); }
+    .status-badge.late    { background: rgba(239,68,68,0.1);  color: var(--danger); }
+    .status-badge.neutral { background: rgba(100,116,139,0.1); color: var(--gray-500); }
+    .status-badge.pending { background: rgba(245,158,11,0.1); color: var(--warning); }
+
+    .date-cell { font-size: 13px; color: var(--gray-600); }
+    .time-cell { font-family: 'Courier New', monospace; font-size: 13px; color: var(--dark); }
+
+    .action-buttons { display: flex; gap: 5px; justify-content: center; }
+    .inline-form { display: inline; }
+
+    .btn-success, .btn-danger {
+        width: 30px; height: 30px;
+        border: none; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.2s ease; font-size: 12px;
     }
 
-    .status-badge.on-time {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
+    .btn-success { background: rgba(16,185,129,0.1); color: var(--success); }
+    .btn-success:hover { background: var(--success); color: var(--white); }
+    .btn-danger  { background: rgba(239,68,68,0.1);  color: var(--danger); }
+    .btn-danger:hover  { background: var(--danger);  color: var(--white); }
 
-    .status-badge.late {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
+    .empty-state { text-align: center; padding: 30px 20px; }
+    .empty-content { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--gray-400); }
+    .empty-content i { font-size: 32px; }
+    .empty-content p { margin: 0; font-size: 13px; }
 
-    .status-badge.neutral {
-        background: rgba(100, 116, 139, 0.1);
-        color: var(--gray-500);
-    }
-
-    .status-badge.pending {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--warning);
-    }
-
-    /* Date Cell */
-    .date-cell {
-        font-size: 13px;
-        color: var(--gray-600);
-    }
-
-    /* Time Cell */
-    .time-cell {
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
-        color: var(--dark);
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 5px;
-        justify-content: center;
-    }
-
-    .inline-form {
-        display: inline;
-    }
-
-    .btn-success,
-    .btn-danger {
-        width: 30px;
-        height: 30px;
-        border: none;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 12px;
-    }
-
-    .btn-success {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .btn-success:hover {
-        background: var(--success);
-        color: var(--white);
-    }
-
-    .btn-danger {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-
-    .btn-danger:hover {
-        background: var(--danger);
-        color: var(--white);
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 30px 20px;
-    }
-
-    .empty-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        color: var(--gray-400);
-    }
-
-    .empty-content i {
-        font-size: 32px;
-    }
-
-    .empty-content p {
-        margin: 0;
-        font-size: 13px;
-    }
-
-    /* Modal Styles */
+    /* Modal */
     .modal-overlay {
         display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
         z-index: 9999;
-        align-items: center;
-        justify-content: center;
+        align-items: center; justify-content: center;
     }
 
     .modal-container {
         background: var(--white);
         border-radius: 12px;
-        width: 90%;
-        max-width: 500px;
-        max-height: 90vh;
+        width: 90%; max-width: 500px; max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        z-index: 10000;
-        position: relative;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        z-index: 10000; position: relative;
     }
 
-    .modal-large {
-        max-width: 700px;
-    }
+    .modal-large { max-width: 700px; }
 
     .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-        border-bottom: 1px solid var(--gray-200);
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 20px; border-bottom: 1px solid var(--gray-200);
     }
 
-    .modal-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--dark);
-        margin: 0;
-    }
+    .modal-title { font-size: 18px; font-weight: 600; color: var(--dark); margin: 0; }
 
     .modal-close {
-        background: none;
-        border: none;
-        font-size: 18px;
-        color: var(--gray-500);
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        background: none; border: none; font-size: 18px;
+        color: var(--gray-500); cursor: pointer; padding: 5px;
+        border-radius: 4px; transition: all 0.2s ease;
     }
 
-    .modal-close:hover {
-        background: var(--gray-100);
-        color: var(--danger);
-    }
+    .modal-close:hover { background: var(--gray-100); color: var(--danger); }
+    .modal-content { padding: 20px; }
 
-    .modal-content {
-        padding: 20px;
-    }
-
-    .detail-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .detail-item.full-width {
-        grid-column: 1 / -1;
-    }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    .detail-item { display: flex; flex-direction: column; gap: 5px; }
+    .detail-item.full-width { grid-column: 1 / -1; }
 
     .detail-item label {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--gray-600);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-size: 12px; font-weight: 600;
+        color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    .detail-item span {
-        font-size: 14px;
-        color: var(--dark);
-        word-break: break-word;
-    }
+    .detail-item span { font-size: 14px; color: var(--dark); word-break: break-word; }
 
     .modal-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        border-top: 1px solid var(--gray-200);
-        padding-top: 20px;
+        display: flex; gap: 10px; justify-content: flex-end;
+        flex-wrap: wrap; border-top: 1px solid var(--gray-200); padding-top: 20px;
     }
 
     .btn-secondary {
-        padding: 8px 16px;
-        background: var(--gray-300);
-        color: var(--gray-700);
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        padding: 8px 16px; background: var(--gray-300); color: var(--gray-700);
+        border: none; border-radius: 6px; cursor: pointer;
+        font-size: 12px; font-weight: 500; transition: all 0.2s ease;
     }
 
-    .btn-secondary:hover {
-        background: var(--gray-400);
+    .btn-secondary:hover { background: var(--gray-400); }
+    .text-muted { color: var(--gray-400); font-style: italic; }
+
+    .clickable-row { cursor: pointer; transition: background-color 0.2s ease; }
+    .clickable-row:hover { background: var(--gray-50) !important; }
+
+    .bukti-image, .foto-image {
+        max-width: 100%; max-height: 200px;
+        border-radius: 6px; border: 1px solid var(--gray-200);
     }
 
-    .text-muted {
-        color: var(--gray-400);
-        font-style: italic;
-    }
-
-    /* Row clickable style */
-    .clickable-row {
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    }
-
-    .clickable-row:hover {
-        background: var(--gray-50) !important;
-    }
-
-    /* Bukti image */
-    .bukti-image {
-        max-width: 100%;
-        max-height: 200px;
-        border-radius: 6px;
-        border: 1px solid var(--gray-200);
-    }
-
-    .foto-image {
-        max-width: 100%;
-        max-height: 200px;
-        border-radius: 6px;
-        border: 1px solid var(--gray-200);
-    }
-
-    .bukti-placeholder {
-        padding: 20px;
-        text-align: center;
-        background: var(--gray-100);
-        border-radius: 6px;
-        color: var(--gray-500);
-    }
-
-    /* Map Styles */
+    /* Map */
     .map-container {
-        position: relative;
-        height: 300px;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid var(--gray-200);
-        background: var(--gray-100);
+        position: relative; height: 300px;
+        border-radius: 8px; overflow: hidden;
+        border: 1px solid var(--gray-200); background: var(--gray-100);
     }
 
-    .map {
-        width: 100%;
-        height: 100%;
+    .map { width: 100%; height: 100%; }
+
+    .map-loading, .map-error {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 10px; z-index: 1000;
     }
 
-    .map-loading {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.9);
-        color: var(--gray-500);
-        gap: 10px;
-    }
+    .map-loading { background: rgba(255,255,255,0.9); color: var(--gray-500); }
+    .map-error   { background: var(--gray-100); color: var(--gray-500); }
 
-    .map-error {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: var(--gray-100);
-        color: var(--gray-500);
-        gap: 10px;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-        .admin-dashboard {
-            padding: 15px;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .content-grid {
-            gap: 15px;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 10px 12px;
-            font-size: 12px;
-        }
-
-        .stat-card {
-            padding: 15px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-        }
-
-        .modal-container {
-            width: 95%;
-            margin: 20px;
-        }
-
-        .modal-large {
-            max-width: 95%;
-        }
-
-        .detail-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .modal-actions {
-            flex-direction: column;
-        }
-
-        .modal-actions .inline-form {
-            width: 100%;
-        }
-
-        .modal-actions button {
-            width: 100%;
-        }
-
-        .map-container {
-            height: 250px;
-        }
+        .admin-dashboard { padding: 15px; }
+        .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+        .content-grid { gap: 15px; }
+        .data-table th, .data-table td { padding: 10px 12px; font-size: 12px; }
+        .stat-card { padding: 15px; }
+        .stat-value { font-size: 24px; }
+        .stat-icon { width: 40px; height: 40px; font-size: 16px; }
+        .modal-container { width: 95%; margin: 20px; }
+        .modal-large { max-width: 95%; }
+        .detail-grid { grid-template-columns: 1fr; gap: 12px; }
+        .modal-actions { flex-direction: column; }
+        .modal-actions .inline-form { width: 100%; }
+        .modal-actions button { width: 100%; }
+        .map-container { height: 250px; }
     }
 </style>
 
 <div class="admin-dashboard text-sm">
-    <!-- Header -->
     <div class="dashboard-header">
-        <div class="header-content">
-            <h1 class="dashboard-title">Dashboard Admin</h1>
-            <p class="dashboard-subtitle">Ringkasan aktivitas dan statistik sistem</p>
-        </div>
+        <h1 class="dashboard-title">Dashboard Admin</h1>
+        <p class="dashboard-subtitle">Ringkasan aktivitas dan statistik sistem</p>
     </div>
 
     {{-- Statistics Cards --}}
@@ -603,33 +314,24 @@
                 <h3 class="stat-value">{{ $jumlahHadir ?? 0 }}</h3>
                 <p class="stat-label">Hadir Hari Ini</p>
             </div>
-            <div class="stat-icon">
-                <i class="fas fa-user-check"></i>
-            </div>
+            <div class="stat-icon"><i class="fas fa-user-check"></i></div>
         </div>
-
         <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
                 <p class="stat-label">Total Pegawai</p>
             </div>
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
         </div>
-
         <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
                 <p class="stat-label">Pengajuan Pending</p>
             </div>
-            <div class="stat-icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
+            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
         </div>
     </div>
 
-    {{-- Content Grid --}}
     <div class="content-grid">
 
         {{-- Presensi Diluar Radius --}}
@@ -653,15 +355,12 @@
                         <tbody id="presensiPendingTable">
                             @forelse($presensiPending ?? [] as $index => $p)
                             <tr class="clickable-row"
-                                data-presensi-id="{{ $p->id }}"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $p->jenis ?? '' }}"
                                 data-jam="{{ $p->jam ?? '-' }}"
-                                data-lokasi="{{ $p->lokasi ?? 'Tidak ada lokasi' }}"
-                                data-latitude="{{ $p->latitude ?? '' }}"
-                                data-longitude="{{ $p->longitude ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
+                                data-lokasi="{{ $p->lokasi ?? '' }}"
+                                data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
                                 data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
                                 data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -670,9 +369,7 @@
                                     {{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}
                                 </td>
                                 <td>
-                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
-                                        {{ ucfirst($p->jenis ?? '') }}
-                                    </span>
+                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
@@ -711,7 +408,6 @@
             </div>
         </div>
 
-
         {{-- Pengajuan Pending --}}
         <div class="content-card">
             <div class="card-header">
@@ -733,13 +429,11 @@
                         <tbody id="pengajuanPendingTable">
                             @forelse($pengajuanPending ?? [] as $index => $peng)
                             <tr class="clickable-row"
-                                data-pengajuan-id="{{ $peng->id }}"
                                 data-user-name="{{ $peng->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
-                                data-bukti="{{ $peng->bukti ?? '' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -748,9 +442,7 @@
                                     {{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}
                                 </td>
                                 <td>
-                                    <span class="badge jenis-badge {{ $peng->jenis ?? '' }}">
-                                        {{ ucfirst($peng->jenis ?? '') }}
-                                    </span>
+                                    <span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
@@ -772,7 +464,6 @@
                                         @endif
                                     </div>
                                 </td>
-
                             </tr>
                             @empty
                             <tr>
@@ -814,26 +505,24 @@
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td>
-                                    <span class="badge jenis-badge {{ $p->jenis ?? '' }}">
-                                        {{ ucfirst($p->jenis ?? '') }}
-                                    </span>
+                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
                                 </td>
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if(($p->jenis ?? '') === 'masuk')
-                                    @if($p->terlambat)
-                                    <span class="status-badge late">Terlambat</span>
-                                    @else
-                                    <span class="status-badge on-time">Tepat Waktu</span>
-                                    @endif
+                                        @if($p->terlambat)
+                                            <span class="status-badge late">Terlambat</span>
+                                        @else
+                                            <span class="status-badge on-time">Tepat Waktu</span>
+                                        @endif
                                     @elseif(($p->jenis ?? '') === 'pulang')
-                                    @if($p->waktu_kurang_menit > 0)
-                                    <span class="status-badge late">Waktu Kurang</span>
+                                        @if($p->waktu_kurang_menit > 0)
+                                            <span class="status-badge late">Waktu Kurang</span>
+                                        @else
+                                            <span class="status-badge on-time">Tepat Waktu</span>
+                                        @endif
                                     @else
-                                    <span class="status-badge on-time">Tepat Waktu</span>
-                                    @endif
-                                    @else
-                                    <span class="status-badge neutral">-</span>
+                                        <span class="status-badge neutral">-</span>
                                     @endif
                                 </td>
                             </tr>
@@ -852,6 +541,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -882,7 +572,7 @@
                     <label>Jam</label>
                     <span id="detailJamPresensi">-</span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item full-width">
                     <label>Lokasi</label>
                     <span id="detailLokasiPresensi">-</span>
                 </div>
@@ -894,7 +584,7 @@
                             <i class="fas fa-spinner fa-spin"></i>
                             <span>Memuat peta...</span>
                         </div>
-                        <div id="mapError" class="map-error" style="display: none;">
+                        <div id="mapError" class="map-error" style="display:none;">
                             <i class="fas fa-exclamation-triangle"></i>
                             <span>Koordinat tidak tersedia</span>
                         </div>
@@ -908,7 +598,7 @@
                 </div>
                 <div class="detail-item full-width">
                     <label>Status</label>
-                    <span id="detailStatusPresensi" class="status-badge pending">Pending</span>
+                    <span class="status-badge pending">Pending</span>
                 </div>
             </div>
             <div class="modal-actions">
@@ -916,13 +606,13 @@
                 <form id="formApprovePresensi" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i>
+                        <i class="fas fa-check"></i> Setujui
                     </button>
                 </form>
                 <form id="formRejectPresensi" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i> 
+                        <i class="fas fa-times"></i> Tolak
                     </button>
                 </form>
                 @endif
@@ -953,7 +643,7 @@
                     <label>Tanggal</label>
                     <span id="detailTanggalPengajuan">-</span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item full-width">
                     <label>Jenis Pengajuan</label>
                     <span id="detailJenisPengajuan">-</span>
                 </div>
@@ -961,15 +651,15 @@
                     <label>Alasan</label>
                     <span id="detailAlasanPengajuan">-</span>
                 </div>
-                <div class="detail-item full-width" id="buktiContainer">
+                <div class="detail-item full-width">
                     <label>Bukti</label>
                     <div id="detailBuktiPengajuan">
                         <span class="text-muted">Tidak ada bukti</span>
                     </div>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item full-width">
                     <label>Status</label>
-                    <span id="detailStatusPengajuan" class="status-badge pending">Pending</span>
+                    <span class="status-badge pending">Pending</span>
                 </div>
             </div>
             <div class="modal-actions">
@@ -977,13 +667,13 @@
                 <form id="formApprovePengajuan" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-success">
-                        <i class="fas fa-check"></i> 
+                        <i class="fas fa-check"></i> Setujui
                     </button>
                 </form>
                 <form id="formRejectPengajuan" method="POST" class="inline-form">
                     @csrf
                     <button type="submit" class="btn-danger">
-                        <i class="fas fa-times"></i> 
+                        <i class="fas fa-times"></i> Tolak
                     </button>
                 </form>
                 @endif
@@ -997,326 +687,244 @@
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin="" />
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-<!-- Leaflet JavaScript -->
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Klik pada baris presensi pending
-        document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(row => {
-            row.addEventListener('click', function() {
-                document.getElementById('detailPegawaiPresensi').textContent = this.dataset.userName;
-                document.getElementById('detailTanggalPresensi').textContent = this.dataset.tanggal;
-                document.getElementById('detailJenisPresensi').textContent = this.dataset.jenis;
-                document.getElementById('detailJamPresensi').textContent = this.dataset.jam;
-                document.getElementById('detailLokasiPresensi').textContent = this.dataset.lokasi;
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+var presensiMap   = null;
+var currentMarker = null;
 
-                // Update form action
-                document.getElementById('formApprovePresensi').action = this.dataset.approveUrl;
-                document.getElementById('formRejectPresensi').action = this.dataset.rejectUrl;
+// ============================================================
+// DOM READY
+// ============================================================
+document.addEventListener('DOMContentLoaded', function () {
 
-                // Tampilkan modal
-                openModal('modalPresensiPending');
-            });
-        });
+    document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row').forEach(function (row) {
+        row.addEventListener('click', handlePresensiClick);
+    });
 
-        // Klik pada baris pengajuan pending
-        document.querySelectorAll('#pengajuanPendingTable .clickable-row').forEach(row => {
-            row.addEventListener('click', function() {
-                document.getElementById('detailPegawaiPengajuan').textContent = this.dataset.userName;
-                document.getElementById('detailTanggalPengajuan').textContent = this.dataset.tanggal;
-                document.getElementById('detailJenisPengajuan').textContent = this.dataset.jenis;
-                document.getElementById('detailAlasanPengajuan').textContent = this.dataset.alasan;
+    document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row').forEach(function (row) {
+        row.addEventListener('click', handlePengajuanClick);
+    });
 
-                const buktiContainer = document.getElementById('detailBuktiPengajuan');
-                buktiContainer.innerHTML = this.dataset.buktiUrl ?
-                    `<a href="${this.dataset.buktiUrl}" target="_blank"><img src="${this.dataset.buktiUrl}" class="bukti-image"></a>` :
-                    '<span class="text-muted">Tidak ada bukti</span>';
-
-                document.getElementById('formApprovePengajuan').action = this.dataset.approveUrl;
-                document.getElementById('formRejectPengajuan').action = this.dataset.rejectUrl;
-
-                openModal('modalPengajuanPending');
-            });
+    // Klik backdrop tutup modal
+    document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (e) {
+            if (e.target === this) closeModal(this.id);
         });
     });
 
-    // Fungsi buka/tutup modal
-    function openModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'none';
-    }
-</script>
-
-
-<script>
-    // Global map variable
-    let presensiMap = null;
-    let currentMarker = null;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('✅ DOM Content Loaded');
-        initializeEventListeners();
-
-        // Tutup modal ketika klik di luar konten modal
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal(this.id);
-                }
+    // ESC tutup modal
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(function (m) {
+                closeModal(m.id);
             });
-        });
-
-        // Tutup modal dengan tombol ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay').forEach(modal => {
-                    closeModal(modal.id);
-                });
-            }
-        });
+        }
     });
+});
 
-    // Initialize event listeners
-    function initializeEventListeners() {
-        console.log('🔄 Initializing event listeners...');
+// ============================================================
+// CLICK HANDLERS
+// ============================================================
+function handlePresensiClick(e) {
+    if (e.target.closest('.action-buttons')) return;
 
-        // Handle klik pada baris presensi pending
-        const presensiRows = document.querySelectorAll('#presensiPendingTable tbody tr.clickable-row');
-        console.log('🔍 Found presensi rows:', presensiRows.length);
+    openPresensiModal({
+        user_name:   this.getAttribute('data-user-name'),
+        tanggal:     this.getAttribute('data-tanggal'),
+        jenis:       this.getAttribute('data-jenis'),
+        jam:         this.getAttribute('data-jam'),
+        lokasi:      this.getAttribute('data-lokasi'),      // "lat,lng" — satu-satunya sumber koordinat
+        foto_url:    this.getAttribute('data-foto-url'),
+        approve_url: this.getAttribute('data-approve-url'),
+        reject_url:  this.getAttribute('data-reject-url'),
+    });
+}
 
-        presensiRows.forEach((row, index) => {
-            row.removeEventListener('click', handlePresensiClick);
-            row.addEventListener('click', handlePresensiClick);
-        });
+function handlePengajuanClick(e) {
+    if (e.target.closest('.action-buttons')) return;
 
-        // Handle klik pada baris pengajuan pending
-        const pengajuanRows = document.querySelectorAll('#pengajuanPendingTable tbody tr.clickable-row');
-        console.log('🔍 Found pengajuan rows:', pengajuanRows.length);
+    openPengajuanModal({
+        user_name:   this.getAttribute('data-user-name'),
+        tanggal:     this.getAttribute('data-tanggal'),
+        jenis:       this.getAttribute('data-jenis'),
+        alasan:      this.getAttribute('data-alasan'),
+        bukti_url:   this.getAttribute('data-bukti-url'),
+        approve_url: this.getAttribute('data-approve-url'),
+        reject_url:  this.getAttribute('data-reject-url'),
+    });
+}
 
-        pengajuanRows.forEach((row, index) => {
-            row.removeEventListener('click', handlePengajuanClick);
-            row.addEventListener('click', handlePengajuanClick);
-        });
+// ============================================================
+// OPEN MODALS
+// ============================================================
+function openPresensiModal(data) {
+    document.getElementById('detailPegawaiPresensi').textContent = data.user_name || 'N/A';
+    document.getElementById('detailTanggalPresensi').textContent = data.tanggal   || '-';
+    document.getElementById('detailJenisPresensi').textContent   = data.jenis
+        ? data.jenis.charAt(0).toUpperCase() + data.jenis.slice(1) : '-';
+    document.getElementById('detailJamPresensi').textContent     = data.jam       || '-';
+    document.getElementById('detailLokasiPresensi').textContent  = data.lokasi    || 'Tidak ada lokasi';
 
-        console.log('✅ Event listeners initialized');
+    // Foto
+    var fotoEl = document.getElementById('detailFotoPresensi');
+    fotoEl.innerHTML = data.foto_url
+        ? '<a href="' + data.foto_url + '" target="_blank">' +
+          '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">' +
+          '</a>'
+        : '<span class="text-muted">Tidak ada foto</span>';
+
+    // Form actions
+    var fApprove = document.getElementById('formApprovePresensi');
+    var fReject  = document.getElementById('formRejectPresensi');
+    if (fApprove) fApprove.action = data.approve_url;
+    if (fReject)  fReject.action  = data.reject_url;
+
+    // Buka modal dulu agar container sudah visible, baru init map
+    openModal('modalPresensiPending');
+    initializeMap(data.lokasi);
+}
+
+function openPengajuanModal(data) {
+    document.getElementById('detailPegawaiPengajuan').textContent = data.user_name || 'N/A';
+    document.getElementById('detailTanggalPengajuan').textContent = data.tanggal   || '-';
+    document.getElementById('detailJenisPengajuan').textContent   = data.jenis
+        ? data.jenis.charAt(0).toUpperCase() + data.jenis.slice(1) : '-';
+    document.getElementById('detailAlasanPengajuan').textContent  = data.alasan   || 'Tidak ada alasan';
+
+    // Bukti
+    var buktiEl = document.getElementById('detailBuktiPengajuan');
+    buktiEl.innerHTML = data.bukti_url
+        ? '<a href="' + data.bukti_url + '" target="_blank">' +
+          '<img src="' + data.bukti_url + '" alt="Bukti" class="bukti-image" onerror="this.style.display=\'none\'">' +
+          '</a>'
+        : '<span class="text-muted">Tidak ada bukti</span>';
+
+    // Form actions
+    var fApprove = document.getElementById('formApprovePengajuan');
+    var fReject  = document.getElementById('formRejectPengajuan');
+    if (fApprove) fApprove.action = data.approve_url;
+    if (fReject)  fReject.action  = data.reject_url;
+
+    openModal('modalPengajuanPending');
+}
+
+// ============================================================
+// MAP — FIX UTAMA
+// ============================================================
+
+/**
+ * Destroy instance Leaflet lama + rebuild elemen #presensiMap
+ * agar tidak throw "Map container is already initialized"
+ */
+function cleanupMap() {
+    if (presensiMap) {
+        presensiMap.remove();
+        presensiMap = null;
     }
+    currentMarker = null;
 
-    // Event handler untuk presensi
-    function handlePresensiClick(e) {
-        console.log('🟡 Presensi row clicked', this);
+    var wrapper = document.getElementById('mapContainer');
+    var oldMap  = document.getElementById('presensiMap');
+    if (oldMap) oldMap.remove();
 
-        // Jangan trigger jika klik pada tombol aksi
-        if (e.target.closest('.action-buttons')) {
-            console.log('⏹️ Click on action buttons, ignoring');
-            return;
+    var newDiv     = document.createElement('div');
+    newDiv.id        = 'presensiMap';
+    newDiv.className = 'map';
+    if (wrapper) wrapper.insertBefore(newDiv, wrapper.firstChild);
+}
+
+/**
+ * initializeMap — menerima 1 parameter: string lokasi "lat,lng"
+ *
+ * PENYEBAB BUG:
+ *   Kolom `presensis`.`lokasi` di DB menyimpan koordinat sebagai
+ *   satu string, contoh: "2.1477755,117.4334728"
+ *   Tidak ada kolom latitude / longitude terpisah.
+ *   Kode lama meneruskan data-latitude="" (kosong) → parseFloat("") = NaN
+ *   → map tidak pernah bisa diinisialisasi.
+ *
+ * FIX:
+ *   Parse koordinat langsung dari string lokasi dengan split(',').
+ */
+function initializeMap(lokasi) {
+    cleanupMap();
+
+    var mapLoading = document.getElementById('mapLoading');
+    var mapError   = document.getElementById('mapError');
+    mapLoading.style.display = 'flex';
+    mapError.style.display   = 'none';
+
+    var lat = NaN, lng = NaN;
+
+    if (lokasi && lokasi.trim() !== '' && lokasi !== 'Tidak ada lokasi') {
+        var parts = lokasi.split(',');
+        if (parts.length === 2) {
+            lat = parseFloat(parts[0].trim());
+            lng = parseFloat(parts[1].trim());
         }
-
-        const presensiData = {
-            user_name: this.getAttribute('data-user-name'),
-            tanggal_formatted: this.getAttribute('data-tanggal'),
-            jenis: this.getAttribute('data-jenis'),
-            jam: this.getAttribute('data-jam'),
-            lokasi: this.getAttribute('data-lokasi'),
-            latitude: this.getAttribute('data-latitude'),
-            longitude: this.getAttribute('data-longitude'),
-            foto_url: this.getAttribute('data-foto-url'),
-            approve_url: this.getAttribute('data-approve-url'),
-            reject_url: this.getAttribute('data-reject-url')
-        };
-
-        console.log('📦 Presensi data:', presensiData);
-        openPresensiModal(presensiData);
     }
 
-    // Event handler untuk pengajuan
-    function handlePengajuanClick(e) {
-        console.log('🟡 Pengajuan row clicked', this);
-
-        // Jangan trigger jika klik pada tombol aksi
-        if (e.target.closest('.action-buttons')) {
-            console.log('⏹️ Click on action buttons, ignoring');
-            return;
-        }
-
-        const pengajuanData = {
-            user_name: this.getAttribute('data-user-name'),
-            tanggal_formatted: this.getAttribute('data-tanggal'),
-            jenis: this.getAttribute('data-jenis'),
-            alasan: this.getAttribute('data-alasan'),
-            bukti: this.getAttribute('data-bukti'),
-            bukti_url: this.getAttribute('data-bukti-url'),
-            approve_url: this.getAttribute('data-approve-url'),
-            reject_url: this.getAttribute('data-reject-url')
-        };
-
-        console.log('📦 Pengajuan data:', pengajuanData);
-        openPengajuanModal(pengajuanData);
+    if (isNaN(lat) || isNaN(lng)) {
+        mapLoading.style.display = 'none';
+        mapError.style.display   = 'flex';
+        return;
     }
 
-    // Fungsi untuk membuka modal presensi pending
-    function openPresensiModal(presensi) {
-        console.log('🟡 Opening presensi modal:', presensi);
+    // Delay 200ms: tunggu modal & container selesai render
+    setTimeout(function () {
+        try {
+            presensiMap = L.map('presensiMap').setView([lat, lng], 16);
 
-        // Update modal content
-        document.getElementById('detailPegawaiPresensi').textContent = presensi.user_name || 'N/A';
-        document.getElementById('detailTanggalPresensi').textContent = presensi.tanggal_formatted || '-';
-        document.getElementById('detailJenisPresensi').textContent = presensi.jenis ? presensi.jenis.charAt(0).toUpperCase() + presensi.jenis.slice(1) : '-';
-        document.getElementById('detailJamPresensi').textContent = presensi.jam || '-';
-        document.getElementById('detailLokasiPresensi').textContent = presensi.lokasi || 'Tidak ada lokasi';
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+            }).addTo(presensiMap);
 
-        // Handle foto
-        const fotoContainer = document.getElementById('detailFotoPresensi');
-        if (presensi.foto_url) {
-            fotoContainer.innerHTML = `<img src="${presensi.foto_url}" alt="Foto Presensi" class="foto-image" onerror="this.style.display='none'">`;
-        } else {
-            fotoContainer.innerHTML = '<span class="text-muted">Tidak ada foto</span>';
-        }
+            currentMarker = L.marker([lat, lng])
+                .addTo(presensiMap)
+                .bindPopup('<b>Lokasi Presensi</b><br>' + (lokasi || '-'))
+                .openPopup();
 
-        // Set form action URLs
-        const approveForm = document.getElementById('formApprovePresensi');
-        const rejectForm = document.getElementById('formRejectPresensi');
-
-        if (approveForm) approveForm.action = presensi.approve_url;
-        if (rejectForm) rejectForm.action = presensi.reject_url;
-
-        // Initialize map
-        initializeMap(presensi.latitude, presensi.longitude, presensi.lokasi);
-
-        openModal('modalPresensiPending');
-    }
-
-    // Fungsi untuk membuka modal pengajuan pending
-    function openPengajuanModal(pengajuan) {
-        console.log('🟡 Opening pengajuan modal:', pengajuan);
-
-        // Update modal content
-        document.getElementById('detailPegawaiPengajuan').textContent = pengajuan.user_name || 'N/A';
-        document.getElementById('detailTanggalPengajuan').textContent = pengajuan.tanggal_formatted || '-';
-        document.getElementById('detailJenisPengajuan').textContent = pengajuan.jenis ? pengajuan.jenis.charAt(0).toUpperCase() + pengajuan.jenis.slice(1) : '-';
-        document.getElementById('detailAlasanPengajuan').textContent = pengajuan.alasan || 'Tidak ada alasan';
-
-        // Handle bukti
-        const buktiContainer = document.getElementById('detailBuktiPengajuan');
-        if (pengajuan.bukti_url) {
-            buktiContainer.innerHTML = `<img src="${pengajuan.bukti_url}" alt="Bukti" class="bukti-image" onerror="this.style.display='none'">`;
-        } else {
-            buktiContainer.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
-        }
-
-        // Set form action URLs
-        const approveForm = document.getElementById('formApprovePengajuan');
-        const rejectForm = document.getElementById('formRejectPengajuan');
-
-        if (approveForm) approveForm.action = pengajuan.approve_url;
-        if (rejectForm) rejectForm.action = pengajuan.reject_url;
-
-        openModal('modalPengajuanPending');
-    }
-
-    // Initialize map function
-    function initializeMap(latitude, longitude, lokasi) {
-        const mapContainer = document.getElementById('presensiMap');
-        const mapLoading = document.getElementById('mapLoading');
-        const mapError = document.getElementById('mapError');
-
-        // Reset state
-        mapLoading.style.display = 'flex';
-        mapError.style.display = 'none';
-        mapContainer.innerHTML = '';
-
-        // Check if coordinates are available
-        if (!latitude || !longitude || latitude === 'null' || longitude === 'null') {
             mapLoading.style.display = 'none';
-            mapError.style.display = 'flex';
-            return;
-        }
 
-        const lat = parseFloat(latitude);
-        const lng = parseFloat(longitude);
+            // Paksa Leaflet recalculate ukuran container
+            presensiMap.invalidateSize();
 
-        if (isNaN(lat) || isNaN(lng)) {
+        } catch (err) {
+            console.error('Map error:', err);
             mapLoading.style.display = 'none';
-            mapError.style.display = 'flex';
-            return;
+            mapError.style.display   = 'flex';
         }
+    }, 200);
+}
 
-        // Initialize map after a small delay to ensure DOM is ready
-        setTimeout(() => {
-            try {
-                // Initialize map
-                presensiMap = L.map('presensiMap').setView([lat, lng], 16);
-
-                // Add tile layer
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(presensiMap);
-
-                // Add marker
-                currentMarker = L.marker([lat, lng])
-                    .addTo(presensiMap)
-                    .bindPopup(`<b>Lokasi Presensi</b><br>${lokasi || 'Lokasi tidak tersedia'}`)
-                    .openPopup();
-
-                // Hide loading
-                mapLoading.style.display = 'none';
-
-                console.log('✅ Map initialized successfully');
-            } catch (error) {
-                console.error('❌ Error initializing map:', error);
-                mapLoading.style.display = 'none';
-                mapError.style.display = 'flex';
-            }
-        }, 100);
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function openModal(modalId) {
+    var modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
+}
 
-    // Clean up map when modal is closed
-    function cleanupMap() {
-        if (presensiMap) {
-            presensiMap.remove();
-            presensiMap = null;
-        }
-        if (currentMarker) {
-            currentMarker = null;
-        }
+function closeModal(modalId) {
+    var modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        if (modalId === 'modalPresensiPending') cleanupMap();
     }
-
-    // Fungsi umum untuk membuka modal
-    function openModal(modalId) {
-        console.log('🟡 Opening modal:', modalId);
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        } else {
-            console.error('❌ Modal not found:', modalId);
-        }
-    }
-
-    // Fungsi untuk menutup modal
-    function closeModal(modalId) {
-        console.log('🟡 Closing modal:', modalId);
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-
-            // Clean up map if it's the presensi modal
-            if (modalId === 'modalPresensiPending') {
-                cleanupMap();
-            }
-        }
-    }
+}
 </script>
 
 @endsection
