@@ -543,7 +543,7 @@
                 <i class="fas fa-users"></i>
             </div>
         </div>
-        <div class="stat-card">
+        <!-- <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
                 <p class="stat-label">Pengajuan Pending</p>
@@ -551,7 +551,7 @@
             <div class="stat-icon">
                 <i class="fas fa-file-alt"></i>
             </div>
-        </div>
+        </div> -->
     </div>
 
     {{-- Content Grid --}}
