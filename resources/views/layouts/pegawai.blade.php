@@ -926,10 +926,10 @@
                 <div>Riwayat</div>
             </a>
 
-            <a href="{{ route('pegawai.pengajuan.index') }}" class="nav-item {{ Route::is('pegawai.pengajuan.index') ? 'active' : '' }}">
+            <!-- <a href="{{ route('pegawai.pengajuan.index') }}" class="nav-item {{ Route::is('pegawai.pengajuan.index') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="fas fa-file-upload"></i></div>
                 <div>Pengajuan</div>
-            </a>
+            </a> -->
 
             <a href="{{ route('pegawai.daftar') }}" class="nav-item {{ Route::is('pegawai.daftar') ? 'active' : '' }}">
                 <div class="nav-icon">
