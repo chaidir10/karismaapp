@@ -630,7 +630,7 @@
         </div>
 
         {{-- Pengajuan Pending --}}
-        <div class="content-card">
+        <!-- <div class="content-card">
             <div class="card-header">
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) }} menunggu</span>
@@ -698,7 +698,7 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         {{-- Presensi Hari Ini --}}
         <div class="content-card">
