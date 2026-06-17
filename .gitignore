@@ -38,3 +38,5 @@ Thumbs.db
 # Homestead
 Homestead.json
 Homestead.yaml
+composer.json
+composer.lock
