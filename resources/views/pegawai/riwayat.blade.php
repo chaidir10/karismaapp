@@ -677,10 +677,14 @@
                         </div>
                         
                         <div class="detail-location-address" id="locationAddress{{ $p->id }}">
+                            @if($p->lokasi)
                             <div class="loading-address">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span>Mendeteksi alamat...</span>
                             </div>
+                            @else
+                            <span>Lokasi tidak tersedia</span>
+                            @endif
                         </div>
                     </div>
 
@@ -699,35 +703,44 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
 <script>
-    // Initialize detail modals when shown
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize all detail modals
         @foreach($riwayat as $tanggal => $items)
             @foreach($items as $p)
                 @if($p->lokasi)
                 const modal{{ $p->id }} = document.getElementById('detailModal{{ $p->id }}');
                 if (modal{{ $p->id }}) {
                     modal{{ $p->id }}.addEventListener('shown.bs.modal', function() {
-                        const coords = "{{ $p->lokasi }}".split(',');
+                        const coords = @json($p->lokasi).split(',');
                         const lat = parseFloat(coords[0]);
                         const lng = parseFloat(coords[1]);
-                        
-                        // Initialize map
-                        const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '© OpenStreetMap contributors'
-                        }).addTo(map);
-                        L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
-                        
-                        // Get address from coordinates
+
+                        if (isNaN(lat) || isNaN(lng)) {
+                            const el = document.getElementById('locationAddress{{ $p->id }}');
+                            if (el) el.innerHTML = '<span>Koordinat tidak valid</span>';
+                            return;
+                        }
+
+                        try {
+                            const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 19
+                            }).addTo(map);
+                            L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+                            this._map = map;
+
+                            setTimeout(() => {
+                                try { map.invalidateSize(); } catch (e) {}
+                            }, 300);
+                        } catch (e) {
+                            console.error('Map error:', e);
+                        }
+
                         getAddressFromCoordinates(lat, lng, 'locationAddress{{ $p->id }}');
-                        
-                        this._map = map;
                     });
 
                     modal{{ $p->id }}.addEventListener('hidden.bs.modal', function() {
                         if (this._map) {
-                            this._map.remove();
+                            try { this._map.remove(); } catch (e) {}
                             this._map = null;
                         }
                     });
@@ -737,25 +750,25 @@
         @endforeach
     });
 
-    // Function to get address from coordinates
     function getAddressFromCoordinates(lat, lng, elementId) {
-        const addressElement = document.getElementById(elementId);
-        
-        // Show loading state
-        addressElement.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
-        
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-            .then(response => response.json())
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
             .then(data => {
-                if (data && data.display_name) {
-                    addressElement.innerHTML = data.display_name;
-                } else {
-                    addressElement.innerHTML = '<span>Alamat tidak dapat ditemukan</span>';
-                }
+                el.innerHTML = (data && data.display_name) ? data.display_name : '<span>Alamat tidak dapat ditemukan</span>';
             })
             .catch(error => {
                 console.error('Error getting address:', error);
-                addressElement.innerHTML = '<span>Gagal mendapatkan alamat</span>';
+                el.innerHTML = '<span>Gagal mendapatkan alamat</span>';
             });
     }
 
