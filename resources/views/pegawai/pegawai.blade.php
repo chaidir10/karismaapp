@@ -1,729 +1,658 @@
-@extends('layouts.pegawai')
-@section('title', 'Daftar Pegawai')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-@section('content')
-<style>
-    /* CSS Variables */
-    :root {
-        --primary: #5AB6EA;
-        --primary-light: #87CEEB;
-        --primary-dark: #2E97D4;
-        --primary-soft: #E6F4F9;
-        --accent: #FEAA2B;
-        --light: #f8fafc;
-        --gray-light: #f1f5f9;
-        --gray: #94a3b8;
-        --gray-dark: #64748b;
-        --dark: #1e293b;
-        --white: #ffffff;
-        --danger: #ef4444;
-        --danger-light: #fee2e2;
-        --success: #10b981;
-        --success-light: #d1fae5;
-        --warning: #f59e0b;
-        --warning-light: #fef3c7;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KARISMA | @yield('title')</title>
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
+    <link rel="manifest" href="public/pwa/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KARISMA">
+    <link rel="apple-touch-icon" href="public/pwa/icons/icon-192x192.png">
 
-    /* Employee Section */
-    .employee-section {
-        background-color: var(--white);
-        margin: 20px;
-        position: relative;
-        z-index: 2;
-        padding: 25px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.1);
-        border: 1px solid rgba(109, 40, 217, 0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        margin-bottom: 100px;
-    }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
 
-    .employee-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(109, 40, 217, 0.2);
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .section-title {
-        font-weight: 700;
-        font-size: 17px;
-        color: var(--dark);
-        margin: 0;
-    }
-
-    .employee-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .employee-item {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        background-color: var(--light);
-        border-radius: 16px;
-        transition: all 0.2s ease;
-        border: 1px solid var(--gray-light);
-        cursor: pointer;
-    }
-
-    .employee-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(109, 40, 217, 0.1);
-    }
-
-    /* PERBAIKAN UTAMA: Styling untuk avatar */
-    .employee-avatar {
-        width: 50px;
-        height: 50px;
-        margin-right: 15px;
-        flex-shrink: 0;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid var(--gray-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-    }
-
-    .employee-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .btn-secondary {
-        background: var(--gray-light);
-        color: var(--dark);
-        border: none;
-        border-radius: 10px;
-        padding: 12px 15px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        flex: 1;
-        transition: all 0.2s ease;
-    }
-    .btn-secondary:hover {
-        background: var(--gray);
-        color: var(--white);
-    }
-
-    /* Container untuk avatar modal - PERBAIKAN PENTING */
-    .employee-avatar-container {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-    }
-
-    /* Avatar besar untuk modal */
-    .employee-avatar-large {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .employee-avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, var(--primary), var(--primary-light));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 24px;
-        border-radius: 50%;
-    }
-
-    .employee-info {
-        flex-grow: 1;
-        min-width: 0;
-    }
-
-    .employee-name {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 2px;
-        color: var(--dark);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .employee-position {
-        font-size: 12px;
-        color: var(--gray);
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .employee-department .badge {
-        font-size: 10px;
-        font-weight: 500;
-        padding: 4px 8px;
-        border-radius: 6px;
-        white-space: nowrap;
-    }
-
-    .employee-status .badge {
-        font-size: 11px;
-        padding: 5px 10px;
-        font-weight: 500;
-        border-radius: 6px;
-        white-space: nowrap;
-    }
-
-    /* Badge Color Variants */
-    .bg-primary-light {
-        background-color: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
-    }
-
-    .bg-warning-light {
-        background-color: rgba(254, 170, 43, 0.1);
-        color: var(--accent);
-    }
-
-    .bg-danger-light {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-
-    .bg-info-light {
-        background-color: rgba(6, 182, 212, 0.1);
-        color: #06b6d4;
-    }
-
-    .bg-success-light {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .bg-secondary-light {
-        background-color: rgba(100, 116, 139, 0.1);
-        color: var(--gray-dark);
-    }
-
-    /* Search Box */
-    .search-box {
-        margin-bottom: 20px;
-    }
-
-    .search-box .input-group {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .search-box .input-group-text {
-        border: none;
-        background-color: var(--white);
-        padding-left: 15px;
-    }
-
-    .search-box .form-control {
-        border: none;
-        font-size: 14px;
-        padding: 12px 15px;
-        background-color: var(--white);
-    }
-
-    .search-box .form-control:focus {
-        box-shadow: none;
-    }
-
-    /* Button Styles */
-    .btn-scale {
-        transition: transform 0.2s ease;
-    }
-
-    .btn-scale:active {
-        transform: scale(0.96);
-    }
-
-    .btn-sm {
-        padding: 0.35rem 0.75rem;
-        font-size: 0.8rem;
-        border-radius: 10px;
-    }
-
-    .btn-outline-primary {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-
-    .btn-outline-primary:hover {
-        background-color: var(--primary);
-        color: white;
-    }
-
-    /* Modal Styles - Improved for Mobile */
-    .modal-dialog.modal-md {
-        max-width: 100%;
-        margin: 1rem auto;
-    }
-
-    .modal-content {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.2);
-        overflow-y: auto;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid var(--gray-light);
-        padding: 15px 20px;
-    }
-
-    .modal-footer {
-        border-top: 1px solid var(--gray-light);
-        padding: 15px 20px;
-    }
-
-    .modal-title {
-        font-weight: 600;
-        color: var(--dark);
-        font-size: 18px;
-    }
-
-    .btn-close {
-        font-size: 12px;
-    }
-
-    /* Detail Grid Layout */
-    .detail-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .detail-item.full-width {
-        grid-column: 1 / -1;
-    }
-
-    .detail-label {
-        font-size: 12px;
-        color: var(--gray);
-        font-weight: 500;
-        margin-bottom: 4px;
-    }
-
-    .detail-value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--dark);
-        padding: 6px 0;
-        border-bottom: 1px solid var(--gray-light);
-        word-break: break-word;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --primary-dark: #1D4ED8;
+            --primary-light: #EFF6FF;
+            --secondary: #6366F1;
+            --accent: #F59E0B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --surface: #F8FAFC;
+            --surface-2: #F1F5F9;
+            --border: #E2E8F0;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --text-muted: #94A3B8;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 32px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .employee-section {
-        animation: fadeIn 0.2s 0.1s ease-out forwards;
-        opacity: 0;
-    }
-
-    .employee-item {
-        animation: fadeIn 0.2s ease-out forwards;
-        opacity: 0;
-    }
-
-    .employee-item:nth-child(1) {
-        animation-delay: 0.15s;
-    }
-
-    .employee-item:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .employee-item:nth-child(3) {
-        animation-delay: 0.25s;
-    }
-
-    .employee-item:nth-child(4) {
-        animation-delay: 0.3s;
-    }
-
-    .employee-item:nth-child(5) {
-        animation-delay: 0.35s;
-    }
-
-    .search-box {
-        animation: fadeIn 0.2s 0.05s ease-out forwards;
-        opacity: 0;
-    }
-
-    /* Responsive adjustments */
-    @media (min-width: 576px) {
-        .detail-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        body {
+            background: #E8EFF9;
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
 
-        .modal-dialog.modal-md {
-            max-width: 500px;
+        .app-shell {
+            width: 100%;
+            max-width: 480px;
+            background: var(--surface);
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        .employee-avatar-container {
-            width: 120px;
-            height: 120px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        .employee-item {
-            padding: 12px;
-        }
-
-        .employee-avatar {
-            width: 45px;
-            height: 45px;
-            margin-right: 12px;
+        @media (min-width: 768px) {
+            body { padding: 24px 0; background: #D6E4FA; }
+            .app-shell {
+                border-radius: 28px;
+                overflow: hidden;
+                min-height: calc(100vh - 48px);
+                box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+            }
         }
 
-        .employee-avatar-container {
-            width: 80px;
-            height: 80px;
+        @media (max-width: 767px) {
+            .app-shell { max-width: 100%; }
         }
 
-        .employee-name {
+        /* ── Header ─────────────────────────── */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px 20px 36px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px; left: -20px;
+            width: 100px; height: 100px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
             font-size: 13px;
+            color: white;
+            letter-spacing: -0.5px;
         }
 
-        .employee-position {
+        .brand-text {
+            color: rgba(255,255,255,0.9);
             font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .employee-status .badge {
-            font-size: 10px;
-            padding: 4px 8px;
+        .header-greeting {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2px;
         }
-    }
 
-    /* Fix untuk gambar yang loading atau error */
-    .avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, var(--primary), var(--primary-light));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 18px;
-        border-radius: 50%;
-    }
-</style>
+        .header-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
 
-<div class="container">
-    <!-- Employee List Section -->
-    <div class="employee-section">
-        <div class="section-header">
-            <h3 class="section-title">Daftar Pegawai</h3>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-primary btn-scale">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
-            </div>
-        </div>
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        <div class="search-box">
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search text-muted"></i>
-                </span>
-                <input type="text" class="form-control" placeholder="Cari pegawai..." id="searchInput">
-            </div>
-        </div>
+        .header-notif {
+            width: 38px;
+            height: 38px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
 
-        <div class="employee-list">
-            @forelse($pegawai as $p)
-            <!-- Bagian employee-item -->
-            <div class="employee-item"
-                data-employee-id="{{ $p->id }}"
-                data-employee-nip="{{ $p->nip }}"
-                data-employee-email="{{ $p->email }}"
-                data-employee-phone="{{ $p->no_hp ?? '-' }}"
-                data-employee-address="{{ $p->alamat ?? '-' }}"
-                data-employee-status="{{ $p->status ?? 'Aktif' }}"
-                data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
+        .header-notif:hover { background: rgba(255,255,255,0.25); }
 
-                <div class="employee-avatar">
-                    @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
-                    <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
-                        onerror="handleAvatarError(this, '{{ $p->name }}')">
-                    @else
-                    <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
-                    @endif
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ── Content ─────────────────────────── */
+        .main-content {
+            flex: 1;
+            padding-bottom: 90px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Bottom Nav ──────────────────────── */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 8px 4px 12px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .bottom-nav { left: 50%; transform: translateX(-50%); border-radius: 0 0 28px 28px; }
+        }
+
+        @media (max-width: 767px) {
+            .bottom-nav { max-width: 100%; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item i { font-size: 18px; transition: all 0.2s; }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-item.active i { transform: scale(1.1); }
+        .nav-item:hover { color: var(--primary); }
+
+        /* ── Modals – Camera Full Screen ─────── */
+        .modal-fullscreen-mobile {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            max-width: none;
+            padding: 0;
+        }
+
+        .modal-fullscreen-mobile .modal-content {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            border: none;
+            background: #000;
+        }
+
+        .camera-container-full {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .camera-container-full video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Camera UI overlay elements */
+        .camera-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Corner guides */
+        .camera-overlay::before, .camera-overlay::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+        }
+
+        .camera-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+            pointer-events: all;
+        }
+
+        .camera-close-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .camera-title {
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Mini map inside camera */
+        .mini-map-wrapper {
+            position: absolute;
+            top: 72px;
+            right: 16px;
+            z-index: 10;
+        }
+
+        .mini-map-container {
+            width: 160px;
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .mini-map { width: 100%; height: 90px; }
+
+        .location-info-mini {
+            padding: 6px 8px;
+            font-size: 9px;
+            color: white;
+            background: var(--primary);
+            line-height: 1.3;
+        }
+
+        .location-info-mini i { margin-right: 3px; }
+
+        /* Camera bottom action bar */
+        .camera-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            z-index: 10;
+        }
+
+        .capture-btn {
+            width: 100%;
+            height: 58px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 18px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(59,130,246,0.5);
+        }
+
+        .capture-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(59,130,246,0.6);
+        }
+
+        .capture-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* ── Detail Modal ─────────────────────── */
+        .detail-modal .modal-fullscreen-mobile .modal-content {
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-media-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex: 1;
+        }
+
+        .detail-photo, .detail-map-pane {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-photo { border-right: 1px solid var(--border); }
+        .detail-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .detail-map-pane .detail-map { width: 100%; height: 100%; }
+
+        .detail-info-bar {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        .detail-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .detail-type-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .detail-time {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-address {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .detail-back-btn {
+            width: 100%;
+            height: 48px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .detail-back-btn:hover { background: var(--primary); color: white; }
+
+        /* ── Loading ─────────────────────────── */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s, visibility 0.25s;
+            gap: 12px;
+        }
+
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+
+        .loading-ring {
+            width: 44px;
+            height: 44px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-transition { animation: fadeUp 0.3s ease-out; }
+
+        /* ── Generic Modal ───────────────────── */
+        .modal-content {
+            border: none;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        @media (max-width: 576px) {
+            .detail-media-grid { grid-template-rows: 1fr 1fr; grid-template-columns: 1fr; height: 70dvh; }
+            .detail-photo { border-right: none; border-bottom: 1px solid var(--border); }
+            .mini-map-container { width: 140px; }
+        }
+
+        @media (max-width: 768px) {
+            .modal-fullscreen-mobile .modal-content { border-radius: 0; }
+        }
+
+        @stack('layout-styles')
+    </style>
+
+    @stack('styles')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- Header -->
+        @if(!request()->is('pegawai/akun*') && !request()->is('akun*'))
+        <div class="app-header">
+            <div class="header-inner">
+                <div class="header-brand">
+                    <div class="brand-logo">K</div>
+                    <div class="brand-text">Karisma</div>
                 </div>
-
-                <div class="employee-info">
-                    <h5 class="employee-name">{{ $p->name }}</h5>
-                    <p class="employee-position">{{ $p->jabatan ?? '-' }}</p>
-                    <div class="employee-department">
-                        <span class="badge bg-primary-light">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
+                <div>
+                    <div class="header-greeting" id="greeting">Selamat pagi</div>
+                    <div class="header-name">{{ Auth::user()->name ?? 'User' }}</div>
+                </div>
+                <div class="header-right">
+                    <div class="header-notif">
+                        <i class="fas fa-bell"></i>
                     </div>
-                </div>
-
-                <div class="employee-status">
-                    @php
-                    $statusClass = 'bg-success-light';
-                    $statusText = 'Aktif';
-                    if(isset($p->status)) {
-                    if($p->status == 'Cuti') {
-                    $statusClass = 'bg-warning-light';
-                    $statusText = 'Cuti';
-                    } elseif($p->status == 'Tidak Aktif') {
-                    $statusClass = 'bg-danger-light';
-                    $statusText = 'Tidak Aktif';
-                    }
-                    }
-                    @endphp
-                    <span class="badge {{ $statusClass }}">
-                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> {{ $statusText }}
-                    </span>
+                    <a href="{{ route('pegawai.akun.index') }}" class="header-avatar">
+                        @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
+                        <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}"
+                            alt="{{ Auth::user()->name }}"
+                            onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3B82F6&color=fff&size=128'">
+                        @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3B82F6&color=fff&size=128"
+                            alt="{{ Auth::user()->name }}">
+                        @endif
+                    </a>
                 </div>
             </div>
-
-            @empty
-            <div class="text-center py-4">
-                <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada data pegawai.</p>
-            </div>
-            @endforelse
         </div>
+        @endif
+
+        <!-- Main Content -->
+        <main class="main-content">
+            @yield('content')
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="{{ route('pegawai.dashboard') }}" class="nav-item {{ Route::is('pegawai.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="{{ route('pegawai.riwayat') }}" class="nav-item {{ Route::is('pegawai.riwayat') ? 'active' : '' }}">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span>Riwayat</span>
+            </a>
+            <a href="{{ route('pegawai.pengajuan.index') }}" class="nav-item {{ Route::is('pegawai.pengajuan.index') ? 'active' : '' }}">
+                <i class="fas fa-paper-plane"></i>
+                <span>Pengajuan</span>
+            </a>
+            <a href="{{ route('pegawai.daftar') }}" class="nav-item {{ Route::is('pegawai.daftar') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span>Pegawai</span>
+            </a>
+            <a href="{{ route('pegawai.akun.index') }}" class="nav-item {{ Route::is('pegawai.akun.index') ? 'active' : '' }}">
+                <i class="fas fa-circle-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
     </div>
-</div>
 
-<!-- Modal Detail Pegawai -->
-<div class="modal fade" id="employeeDetailModal" tabindex="-1" aria-labelledby="employeeDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-body p-0 pt-2">
-                <div class="text-center mb-2">
-                    <div id="modalEmployeeAvatarContainer" class="employee-avatar-container">
-                        <!-- Avatar akan dimuat di sini melalui JavaScript -->
-                    </div>
-                </div>
-
-                <div class="employee-detail-section">
-                    <h5 class="text-center" id="modalEmployeeName">Nama Pegawai</h5>
-                    <div class="text-center mb-4">
-                        <span class="badge bg-primary-light" id="modalEmployeePosition">-</span>
-                    </div>
-
-                    <div class="detail-grid full-width">
-                        <div class="detail-item">
-                            <div class="detail-label">Unit Kerja</div>
-                            <div class="detail-value" id="modalEmployeeDepartment">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Status</div>
-                            <div class="detail-value" id="modalEmployeeStatus">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">NIP</div>
-                            <div class="detail-value" id="modalEmployeeNip">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">No. Telepon</div>
-                            <div class="detail-value d-flex align-items-center justify-content-between">
-                                <span id="modalEmployeePhone">-</span>
-                                <a href="#" id="whatsappLink" target="_blank" style="text-decoration: none;">
-                                    <i class="fab fa-whatsapp" style="color: #25D366; font-size: 18px;"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Email</div>
-                            <div class="detail-value" id="modalEmployeeEmail">-</div>
-                        </div>
-
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Alamat</div>
-                            <div class="detail-value" id="modalEmployeeAddress">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer pb-0 pt-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-ring"></div>
+        <div class="loading-label" id="loadingText">Memuat...</div>
     </div>
-</div>
 
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const employeeItems = document.querySelectorAll('.employee-item');
-        const employeeModal = new bootstrap.Modal(document.getElementById('employeeDetailModal'));
-        const searchInput = document.getElementById('searchInput');
-        const modalAvatarContainer = document.getElementById('modalEmployeeAvatarContainer');
-
-        // Fungsi untuk membuat placeholder avatar berdasarkan nama
-        function createAvatarPlaceholder(name) {
-            const initials = name.split(' ').map(word => word[0]).join('').toUpperCase();
-            return `<div class="employee-avatar-placeholder">${initials}</div>`;
-        }
-
-        // Fungsi untuk membuat avatar dengan gambar
-        function createAvatarImage(avatarUrl, name) {
-            return `<img src="${avatarUrl}" class="employee-avatar-large" alt="${name}" onerror="handleModalAvatarError(this, '${name}')">`;
-        }
-
-        // Fungsi untuk menangani error gambar di list
-        function handleAvatarError(imgElement, name) {
-            imgElement.style.display = 'none';
-            imgElement.parentElement.innerHTML = `<div class="avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
-        }
-
-        // Fungsi untuk menangani error gambar di modal
-        function handleModalAvatarError(imgElement, name) {
-            imgElement.style.display = 'none';
-            modalAvatarContainer.innerHTML = createAvatarPlaceholder(name);
-        }
-
-        // Fungsi untuk mengisi data modal
-        function fillModalData(employeeItem) {
-            const employeeName = employeeItem.querySelector('.employee-name').textContent;
-            const employeePosition = employeeItem.querySelector('.employee-position').textContent;
-            const employeeDepartment = employeeItem.querySelector('.employee-department .badge').textContent;
-            const employeeAvatar = employeeItem.getAttribute('data-employee-avatar');
-            const employeeNip = employeeItem.getAttribute('data-employee-nip');
-            const employeeEmail = employeeItem.getAttribute('data-employee-email');
-            const employeePhone = employeeItem.getAttribute('data-employee-phone');
-            const employeeAddress = employeeItem.getAttribute('data-employee-address');
-            const employeeStatus = employeeItem.getAttribute('data-employee-status');
-
-            // Set avatar di modal
-            if (employeeAvatar && employeeAvatar.trim() !== '') {
-                modalAvatarContainer.innerHTML = createAvatarImage(employeeAvatar, employeeName);
-            } else {
-                modalAvatarContainer.innerHTML = createAvatarPlaceholder(employeeName);
-            }
-
-            // Set data lainnya
-            document.getElementById('modalEmployeeName').textContent = employeeName;
-            document.getElementById('modalEmployeePosition').textContent = employeePosition;
-            document.getElementById('modalEmployeeDepartment').textContent = employeeDepartment;
-            document.getElementById('modalEmployeeStatus').textContent = employeeStatus;
-            document.getElementById('modalEmployeeNip').textContent = employeeNip || '-';
-            document.getElementById('modalEmployeeEmail').textContent = employeeEmail || '-';
-            document.getElementById('modalEmployeePhone').textContent = employeePhone || '-';
-            document.getElementById('modalEmployeeAddress').textContent = employeeAddress || '-';
-
-            // Set WhatsApp link
-            const whatsappLink = document.getElementById('whatsappLink');
-            if (employeePhone && employeePhone !== '-') {
-                let phoneNumber = employeePhone.replace(/[^0-9]/g, '');
-                if (phoneNumber.startsWith('0')) {
-                    phoneNumber = '62' + phoneNumber.substring(1);
-                }
-                whatsappLink.href = `https://wa.me/${phoneNumber}`;
-                whatsappLink.style.pointerEvents = 'auto';
-                whatsappLink.style.opacity = '1';
-            } else {
-                whatsappLink.href = '#';
-                whatsappLink.style.pointerEvents = 'none';
-                whatsappLink.style.opacity = '0.5';
-            }
-        }
-
-        // Tambahkan event listener untuk setiap item pegawai
-        employeeItems.forEach((item) => {
-            // Setup error handling untuk avatar di list
-            const avatarImg = item.querySelector('.employee-avatar img');
-            const employeeName = item.querySelector('.employee-name').textContent;
-
-            if (avatarImg) {
-                avatarImg.addEventListener('error', function() {
-                    handleAvatarError(this, employeeName);
-                });
-            }
-
-            // Click handler untuk modal - PERBAIKAN: Gunakan event delegation yang lebih baik
-            item.addEventListener('click', function() {
-                fillModalData(this);
-                employeeModal.show();
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ asset('public/pwa/service-worker.js') }}")
+                    .catch(err => console.warn('SW failed:', err));
             });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Greeting
+            const h = new Date().getHours();
+            const g = document.getElementById('greeting');
+            if (g) {
+                g.textContent = h < 12 ? 'Selamat pagi,' : h < 15 ? 'Selamat siang,' : h < 19 ? 'Selamat sore,' : 'Selamat malam,';
+            }
+
+            // Loading manager
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+
+            document.querySelectorAll('a[href]').forEach(a => {
+                const href = a.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || a.target === '_blank' || a.dataset.noLoading) return;
+                try {
+                    const u = new URL(href, window.location.origin);
+                    if (u.origin !== window.location.origin) return;
+                } catch { return; }
+                a.addEventListener('click', () => {
+                    overlay.classList.add('active');
+                    setTimeout(() => { window.location.href = a.href; }, 80);
+                });
+            });
+
+            document.addEventListener('submit', () => {
+                if (loadingText) loadingText.textContent = 'Mengirim...';
+                overlay.classList.add('active');
+            });
+
+            window.addEventListener('pageshow', () => overlay.classList.remove('active'));
         });
 
-        // Search functionality
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                const employees = document.querySelectorAll('.employee-item');
-
-                employees.forEach(employee => {
-                    const name = employee.querySelector('.employee-name').textContent.toLowerCase();
-                    const position = employee.querySelector('.employee-position').textContent.toLowerCase();
-                    const department = employee.querySelector('.employee-department .badge').textContent.toLowerCase();
-
-                    if (name.includes(searchTerm) || position.includes(searchTerm) || department.includes(searchTerm)) {
-                        employee.style.display = 'flex';
-                    } else {
-                        employee.style.display = 'none';
-                    }
-                });
-            });
+        function showLoading(msg) {
+            document.getElementById('loadingText').textContent = msg || 'Memuat...';
+            document.getElementById('loadingOverlay').classList.add('active');
         }
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+    </script>
 
-        // PERBAIKAN PENTING: Reset modal ketika ditutup
-        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function () {
-            // Kosongkan container avatar untuk memastikan tidak ada konflik
-            modalAvatarContainer.innerHTML = '';
-        });
-    });
-
-    // Export fungsi ke global scope untuk digunakan di inline event handlers
-    window.handleAvatarError = function(imgElement, name) {
-        imgElement.style.display = 'none';
-        imgElement.parentElement.innerHTML = `<div class="avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
-    };
-
-    window.handleModalAvatarError = function(imgElement, name) {
-        imgElement.style.display = 'none';
-        document.getElementById('modalEmployeeAvatarContainer').innerHTML = `<div class="employee-avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
-    };
-</script>
-@endsection
+    @stack('scripts')
+</body>
+</html>
