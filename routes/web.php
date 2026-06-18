@@ -66,7 +66,6 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         // Presensi
         Route::post('/presensi', [PresensiController::class, 'store'])->name('presensi.store');
         Route::get('/riwayat', [PresensiController::class, 'riwayat'])->name('riwayat');
-        Route::get('/reverse-geocode', [PresensiController::class, 'reverseGeocode'])->name('reverse-geocode');
 
         // Pengajuan presensi
         Route::get('/pengajuan', [PengajuanController::class, 'index'])->name('pengajuan.index');

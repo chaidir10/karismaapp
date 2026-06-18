@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
 
 class PresensiController extends Controller
 {
@@ -228,31 +227,4 @@ class PresensiController extends Controller
         return $angle * $earthRadius;
     }
 
-    public function reverseGeocode(Request $request)
-    {
-        $request->validate([
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-        ]);
-
-        try {
-            $response = Http::withHeaders([
-                'User-Agent' => 'KarismaApp/1.0 (presensi)',
-            ])->timeout(5)->get('https://nominatim.openstreetmap.org/reverse', [
-                'format'         => 'json',
-                'lat'            => $request->lat,
-                'lon'            => $request->lng,
-                'zoom'           => 18,
-                'addressdetails' => 1,
-            ]);
-
-            if ($response->successful() && $response->json('display_name')) {
-                return response()->json(['address' => $response->json('display_name')]);
-            }
-
-            return response()->json(['address' => null], 404);
-        } catch (\Exception $e) {
-            return response()->json(['address' => null], 500);
-        }
-    }
 }
