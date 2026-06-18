@@ -684,8 +684,8 @@ function buildBarChart() {
     }
 
     // Use server data if available, otherwise fallback to zeros
-    const hadirData = @json($chartDataHadir ?? [0,0,0,0,0,0,0]);
-    const terlambatData = @json($chartDataTerlambat ?? [0,0,0,0,0,0,0]);
+    const hadirData = {!! json_encode($chartDataHadir ?? [0,0,0,0,0,0,0]) !!};
+    const terlambatData = {!! json_encode($chartDataTerlambat ?? [0,0,0,0,0,0,0]) !!};
 
     new Chart(ctx, {
         type: 'bar',
