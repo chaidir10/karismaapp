@@ -756,23 +756,27 @@
 
         el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
-                headers: { 'Accept': 'application/json' }
+        fetch(`{{ route('pegawai.reverse-geocode') }}?lat=${lat}&lng=${lng}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             })
             .then(response => {
                 if (!response.ok) throw new Error('HTTP ' + response.status);
                 return response.json();
             })
             .then(data => {
-                el.innerHTML = (data && data.display_name) ? data.display_name : '<span>Alamat tidak dapat ditemukan</span>';
+                el.innerHTML = data.address
+                    ? '<i class="fas fa-map-marker-alt me-1"></i> ' + data.address
+                    : '<span>Alamat tidak dapat ditemukan</span>';
             })
             .catch(error => {
-                console.error('Error getting address:', error);
+                console.error('Geocode error:', error);
                 el.innerHTML = '<span>Gagal mendapatkan alamat</span>';
             });
     }
 
-    // Add touch improvements for mobile
     document.addEventListener('touchstart', function() {}, { passive: true });
 </script>
 @endsection
