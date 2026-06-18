@@ -476,8 +476,7 @@
                  data-pengajuan-jenis="{{ $p->jenis }}"
                  data-pengajuan-tanggal="{{ $p->tanggal }}"
                  data-pengajuan-alasan="{{ $p->alasan }}"
-                 data-pengajuan-bukti="{{ $p->bukti ? asset('public/storage/' . str_replace('public/', '', $p->bukti)) : '' }}"
-                 
+                 data-pengajuan-bukti="{{ $p->bukti ? (str_starts_with($p->bukti, 'public/') ? asset('public/storage/' . str_replace('public/', '', $p->bukti)) : asset($p->bukti)) : '' }}"
                  data-pengajuan-status="{{ $p->status }}">
 
                 <div class="pengajuan-icon">
