@@ -1,5 +1,15 @@
 <?php
 
+if (
+    !class_exists(\Intervention\Image\Facades\Image::class)
+    && class_exists(\Intervention\Image\Laravel\Facades\Image::class)
+) {
+    class_alias(
+        \Intervention\Image\Laravel\Facades\Image::class,
+        \Intervention\Image\Facades\Image::class
+    );
+}
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
