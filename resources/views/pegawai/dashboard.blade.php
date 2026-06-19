@@ -32,40 +32,84 @@
         color: var(--gray) !important;
     }
 
-    /* Work Timer Banner */
-    .work-timer-banner {
-        margin: 20px 5px 10px;
-        padding: 13px  13px 10px;
-        border-radius: 10px;
+    /* Work Timer Card */
+    .work-timer-card {
+        margin: -10px 20px 20px;
+        padding: 14px 18px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        font-size: 12px;
-        font-weight: 600;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
     }
 
-    .work-timer-banner.timer-yellow {
-        background: #fef3c7;
-        color: #92400e;
-        border: 1px solid #fde68a;
+    .work-timer-card.timer-yellow {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
     }
 
-    .work-timer-banner.timer-green {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
+    .work-timer-card.timer-green {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
     }
 
-    .work-timer-banner.timer-blue {
-        background: #dbeafe;
-        color: #1e40af;
-        border: 1px solid #bfdbfe;
+    .work-timer-card.timer-blue {
+        background: linear-gradient(135deg, #60a5fa, #3b82f6);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
     }
 
-    .work-timer-banner .timer-clock {
+    .timer-icon-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .timer-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .timer-label {
+        font-size: 11px;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    .timer-clock-text {
+        font-size: 20px;
+        font-weight: 800;
         font-variant-numeric: tabular-nums;
-        font-size: 14px;
-        font-weight: 700;
+        letter-spacing: 1px;
+        line-height: 1.2;
+    }
+
+    .timer-badge {
+        font-size: 10px;
+        font-weight: 600;
+        background: rgba(255,255,255,0.25);
+        padding: 4px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    /* History item clickable */
+    .history-item {
+        cursor: pointer;
+    }
+
+    .history-item:active {
+        background: var(--gray-light);
+        border-radius: 8px;
     }
 </style>
 
@@ -108,19 +152,27 @@
         </button>
     </div>
 
-    {{-- Timer Jam Kerja --}}
-    @if($sudahPresensiMasuk && $jamMasukHariIni)
-    @php
-        $pulangRec = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
-    @endphp
-    <div class="work-timer-banner {{ $pulangRec ? 'timer-blue' : 'timer-yellow' }}" id="workTimerBanner"
-        data-stopped="{{ $pulangRec ? '1' : '0' }}"
-        data-pulang-jam="{{ $pulangRec->jam ?? '' }}">
-        <span><i class="fas {{ $pulangRec ? 'fa-check-circle' : 'fa-hourglass-half' }}"></i> <span id="workTimerLabel">{{ $pulangRec ? 'Selesai' : 'Jam kerja berjalan' }}</span></span>
-        <span class="timer-clock" id="workTimerClock">00:00:00</span>
     </div>
-    @endif
 </div>
+
+{{-- Timer Jam Kerja — terpisah dari card --}}
+@if($sudahPresensiMasuk && $jamMasukHariIni)
+@php
+    $pulangRec = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
+@endphp
+<div class="work-timer-card {{ $pulangRec ? 'timer-blue' : 'timer-yellow' }}" id="workTimerBanner"
+    data-stopped="{{ $pulangRec ? '1' : '0' }}"
+    data-pulang-jam="{{ $pulangRec->jam ?? '' }}">
+    <div class="timer-icon-circle">
+        <i class="fas {{ $pulangRec ? 'fa-check' : 'fa-stopwatch' }}"></i>
+    </div>
+    <div class="timer-info">
+        <div class="timer-label" id="workTimerLabel">{{ $pulangRec ? 'Total jam kerja hari ini' : 'Jam kerja berjalan' }}</div>
+        <div class="timer-clock-text" id="workTimerClock">00:00:00</div>
+    </div>
+    <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : '...' }}</div>
+</div>
+@endif
 
 {{-- Floating Lembur Button --}}
 @if(!$sudahLemburMasuk)
@@ -157,12 +209,12 @@
     </div>
     <div>
         @forelse($riwayatHariIni as $p)
-        <div class="history-item">
+        <div class="history-item" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
             <div>
                 <span class="history-time">{{ $p->jam }}</span>
                 <div class="history-type">{{ $p->is_lembur ? '⏰ Lembur ' : '' }}{{ ucfirst($p->jenis) }}</div>
             </div>
-            <i class="fas fa-chevron-right text-info cursor-pointer" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}" title="Lihat Detail"></i>
+            <i class="fas fa-chevron-right" style="color:var(--gray);font-size:12px;"></i>
         </div>
         @empty
         <div class="empty-state">Belum ada riwayat absensi hari ini</div>
@@ -811,13 +863,14 @@
     var workTimerFulfilled = false;
 
     (function() {
-        var banner = document.getElementById('workTimerBanner');
+        var card = document.getElementById('workTimerBanner');
         var clockEl = document.getElementById('workTimerClock');
         var labelEl = document.getElementById('workTimerLabel');
-        if (!banner || !clockEl) return;
+        var badgeEl = document.getElementById('workTimerBadge');
+        if (!card || !clockEl) return;
 
-        var stopped = banner.getAttribute('data-stopped') === '1';
-        var pulangJam = banner.getAttribute('data-pulang-jam') || '';
+        var stopped = card.getAttribute('data-stopped') === '1';
+        var pulangJam = card.getAttribute('data-pulang-jam') || '';
 
         var jamMasuk = @json($jamMasukHariIni ?? '');
         var jamPulang = @json($jamPulangTarget ?? '16:00:00');
@@ -840,39 +893,39 @@
         var totalTarget = Math.floor((endTime - jadwalStart) / 1000);
         if (totalTarget <= 0) totalTarget = 8 * 3600;
 
+        function formatTime(sec) {
+            return String(Math.floor(sec / 3600)).padStart(2, '0') + ':' +
+                String(Math.floor((sec % 3600) / 60)).padStart(2, '0') + ':' +
+                String(sec % 60).padStart(2, '0');
+        }
+
         if (stopped && pulangJam) {
             var ppParts = pulangJam.split(':');
             var pulangTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
                 parseInt(ppParts[0]), parseInt(ppParts[1]), parseInt(ppParts[2] || 0));
-            var elapsed = Math.floor((pulangTime - startTime) / 1000);
-            if (elapsed < 0) elapsed = 0;
-            var h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-            var m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-            var s = String(elapsed % 60).padStart(2, '0');
-            clockEl.textContent = h + ':' + m + ':' + s;
+            var elapsed = Math.max(0, Math.floor((pulangTime - startTime) / 1000));
+            clockEl.textContent = formatTime(elapsed);
             workTimerFulfilled = elapsed >= totalTarget;
+            if (badgeEl) badgeEl.textContent = workTimerFulfilled ? '✓ Terpenuhi' : 'Kurang';
             return;
         }
 
         function update() {
-            var elapsed = Math.floor((new Date() - startTime) / 1000);
-            if (elapsed < 0) elapsed = 0;
-
-            var h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-            var m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-            var s = String(elapsed % 60).padStart(2, '0');
-            clockEl.textContent = h + ':' + m + ':' + s;
+            var elapsed = Math.max(0, Math.floor((new Date() - startTime) / 1000));
+            clockEl.textContent = formatTime(elapsed);
 
             if (elapsed >= totalTarget) {
-                banner.classList.remove('timer-yellow');
-                banner.classList.add('timer-green');
-                labelEl.innerHTML = '<i class="fas fa-check-circle"></i> Jam kerja terpenuhi';
+                card.classList.remove('timer-yellow');
+                card.classList.add('timer-green');
+                if (labelEl) labelEl.textContent = 'Jam kerja terpenuhi';
+                if (badgeEl) badgeEl.textContent = '✓ Terpenuhi';
                 workTimerFulfilled = true;
             } else {
                 var sisa = totalTarget - elapsed;
                 var sh = Math.floor(sisa / 3600);
                 var sm = Math.floor((sisa % 3600) / 60);
-                labelEl.innerHTML = '<i class="fas fa-hourglass-half"></i> Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                if (labelEl) labelEl.textContent = 'Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                if (badgeEl) badgeEl.textContent = 'Berjalan';
                 workTimerFulfilled = false;
             }
         }
