@@ -39,17 +39,17 @@ class DashboardController extends Controller
             }
         }
 
-        // Cek apakah sudah presensi masuk hari ini
         $sudahPresensiMasuk = Presensi::where('user_id', $user->id)
-            ->where('tanggal', $today)
-            ->where('jenis', 'masuk')
-            ->exists();
+            ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', false)->exists();
 
-        // Cek apakah sudah presensi pulang hari ini  
         $sudahPresensiPulang = Presensi::where('user_id', $user->id)
-            ->where('tanggal', $today)
-            ->where('jenis', 'pulang')
-            ->exists();
+            ->where('tanggal', $today)->where('jenis', 'pulang')->where('is_lembur', false)->exists();
+
+        $sudahLemburMasuk = Presensi::where('user_id', $user->id)
+            ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', true)->exists();
+
+        $sudahLemburPulang = Presensi::where('user_id', $user->id)
+            ->where('tanggal', $today)->where('jenis', 'pulang')->where('is_lembur', true)->exists();
 
         // Ambil jam kerja, misal shift pertama
         $jamKerja = JamKerja::first();
@@ -81,6 +81,8 @@ class DashboardController extends Controller
             'jamKerja',
             'sudahPresensiMasuk',
             'sudahPresensiPulang',
+            'sudahLemburMasuk',
+            'sudahLemburPulang',
             'wilayahList',
             'wilayahJson'
         ));

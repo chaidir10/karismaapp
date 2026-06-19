@@ -47,9 +47,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
     public function headings(): array
     {
+        $shiftInfo = ($this->data['is_shift'] ?? false) ? ' | ' . $this->data['shift_nama'] : '';
         return [
             ['LAPORAN PRESENSI PEGAWAI'],
-            ['Nama: ' . $this->data['user']->name],
+            ['Nama: ' . $this->data['user']->name . $shiftInfo],
             ['NIP: ' . $this->data['user']->nip],
             [],
             ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur'],
@@ -69,7 +70,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
                 $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
                 $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
                 $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
-                $row['lembur'] !== '-' ? $this->formatLembur($row['lembur']) : '-',
+                is_numeric($row['lembur']) && $row['lembur'] > 0
+                    ? $this->formatMenit($row['lembur']) . (($row['lembur_masuk'] ?? '-') !== '-' ? ' (' . $row['lembur_masuk'] . '-' . $row['lembur_pulang'] . ')' : '')
+                    : '-',
             ];
         }
 
@@ -82,7 +85,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
         $rows[] = ['Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
         $rows[] = ['Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Lembur', '', $this->formatLembur($this->data['summary']['total_lembur'])];
+        $rows[] = ['Total Lembur', '', $this->formatMenit($this->data['summary']['total_lembur'])];
 
         return $rows;
     }

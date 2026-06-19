@@ -17,11 +17,16 @@ class Presensi extends Model
     protected $fillable = [
         'user_id',
         'tanggal',
-        'jenis',   // 'masuk' atau 'pulang'
+        'jenis',
         'jam',
         'foto',
         'lokasi',
-        'status',  // 'pending', 'approved', 'rejected'
+        'status',
+        'is_lembur',
+    ];
+
+    protected $casts = [
+        'is_lembur' => 'boolean',
     ];
 
     // Tanggal otomatis dikonversi ke Carbon

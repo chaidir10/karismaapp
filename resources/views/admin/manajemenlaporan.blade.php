@@ -118,6 +118,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Pulang Cepat</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jam Kerja</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Waktu Kurang</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lembur</th>
                     </tr>
                 </thead>
                 <tbody id="laporanBody" class="bg-white divide-y divide-gray-200 text-xs">
@@ -237,6 +238,10 @@
 <td class="px-4 py-3 text-xs text-gray-900">${jamKerja}</td>
 <td class="px-4 py-3 text-xs ${waktuKurangClass}">
     ${row.waktu_kurang && row.waktu_kurang != '-' && row.waktu_kurang != 0 ? row.waktu_kurang + ' menit' : '-'}
+</td>
+                                <td class="px-4 py-3 text-xs ${row.lembur && row.lembur != '-' && row.lembur > 0 ? 'text-orange-600 font-medium' : 'text-gray-600'}">
+    ${row.lembur && row.lembur != '-' && row.lembur > 0 ? Math.floor(row.lembur/60) + ' jam ' + (row.lembur%60) + ' menit' : '-'}
+    ${row.lembur_masuk && row.lembur_masuk != '-' ? '<br><small>' + row.lembur_masuk + ' - ' + row.lembur_pulang + '</small>' : ''}
 </td>
 
                             </tr>

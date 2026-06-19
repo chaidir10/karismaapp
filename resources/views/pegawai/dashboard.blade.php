@@ -50,7 +50,7 @@
             id="clock-in-btn"
             data-bs-toggle="modal"
             data-bs-target="#presensiModal"
-            onclick="setJenis('masuk')"
+            onclick="setJenis('masuk'); setLembur(false)"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
             <i class="fas fa-sign-in-alt attendance-icon"></i>
             {{ $sudahPresensiMasuk ? 'Sudah Masuk' : 'Masuk' }}
@@ -59,12 +59,36 @@
             id="clock-out-btn"
             data-bs-toggle="modal"
             data-bs-target="#presensiModal"
-            onclick="handlePulangClick()"
+            onclick="handlePulangClick(); setLembur(false)"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
             <i class="fas fa-sign-out-alt attendance-icon"></i>
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
+
+    {{-- Tombol Lembur — muncul setelah masuk+pulang reguler selesai --}}
+    @if($sudahPresensiMasuk && $sudahPresensiPulang)
+    <div class="attendance-actions" style="margin-top:8px">
+        <button class="attendance-btn {{ $sudahLemburMasuk ? 'btn-disabled' : '' }}"
+            style="background: linear-gradient(135deg, #f59e0b, #d97706); font-size:12px"
+            data-bs-toggle="modal"
+            data-bs-target="#presensiModal"
+            onclick="setJenis('masuk'); setLembur(true)"
+            {{ $sudahLemburMasuk ? 'disabled' : '' }}>
+            <i class="fas fa-clock attendance-icon"></i>
+            {{ $sudahLemburMasuk ? 'Sudah Masuk Lembur' : 'Masuk Lembur' }}
+        </button>
+        <button class="attendance-btn {{ !$sudahLemburMasuk || $sudahLemburPulang ? 'btn-disabled' : '' }}"
+            style="background: linear-gradient(135deg, #f59e0b, #d97706); font-size:12px"
+            data-bs-toggle="modal"
+            data-bs-target="#presensiModal"
+            onclick="setJenis('pulang'); setLembur(true)"
+            {{ !$sudahLemburMasuk || $sudahLemburPulang ? 'disabled' : '' }}>
+            <i class="fas fa-clock attendance-icon"></i>
+            {{ $sudahLemburPulang ? 'Sudah Pulang Lembur' : 'Pulang Lembur' }}
+        </button>
+    </div>
+    @endif
 </div>
 
 <!-- Riwayat Hari Ini -->
@@ -77,7 +101,7 @@
         <div class="history-item">
             <div>
                 <span class="history-time">{{ $p->jam }}</span>
-                <div class="history-type">{{ ucfirst($p->jenis) }}</div>
+                <div class="history-type">{{ $p->is_lembur ? '⏰ Lembur ' : '' }}{{ ucfirst($p->jenis) }}</div>
             </div>
             <i class="fas fa-chevron-right text-info cursor-pointer" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}" title="Lihat Detail"></i>
         </div>
@@ -116,7 +140,7 @@
 
             <div class="detail-info-section">
                 <div class="detail-datetime-info">
-                    <div class="detail-type-badge fw-bold">{{ ucfirst($p->jenis) }} - {{ $p->jam }}</div>
+                    <div class="detail-type-badge fw-bold">{{ $p->is_lembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }} - {{ $p->jam }}</div>
                     <div class="detail-day">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l') }}, {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('d F Y') }}</div>
                 </div>
 
@@ -158,6 +182,7 @@
                     <input type="hidden" name="jenis" id="jenisPresensi">
                     <input type="hidden" name="foto" id="fotoInput">
                     <input type="hidden" name="lokasi" id="lokasiInput">
+                    <input type="hidden" name="is_lembur" id="isLemburInput" value="0">
 
                     <div class="camera-container-full">
                         <video id="video" autoplay playsinline></video>
@@ -542,13 +567,17 @@
     let faceDetected = false;
     let faceModelLoaded = false;
 
-    // Variabel status presensi dari controller
     const sudahPresensiMasuk = @json($sudahPresensiMasuk);
     const sudahPresensiPulang = @json($sudahPresensiPulang);
 
     function setJenis(jenis) {
         const el = document.getElementById('jenisPresensi');
         if (el) el.value = jenis;
+    }
+
+    function setLembur(val) {
+        const el = document.getElementById('isLemburInput');
+        if (el) el.value = val ? '1' : '0';
     }
 
     function handlePulangClick() {

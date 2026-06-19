@@ -103,8 +103,8 @@
     @endif
 
     {{-- LAPORAN PER PEGAWAI --}}
-    @foreach($laporan as $item)
-    <div class="page-break">
+    @foreach($laporan as $idx => $item)
+    <div @if(!$loop->last) class="page-break" @endif>
         <h3>{{ $item['user']->name }} (NIP. {{ $item['user']->nip }}) - {{ $item['user']->jabatan }}
             @if($item['is_shift'] ?? false)
                 | <span style="color:#4f46e5">{{ $item['shift_nama'] }}</span>
@@ -120,6 +120,7 @@
                     <th>Pulang Cepat</th>
                     <th>Jam Kerja</th>
                     <th>Waktu Kurang</th>
+                    <th>Lembur</th>
                 </tr>
             </thead>
             <tbody>
@@ -130,32 +131,29 @@
                     <td>{{ $row['pulang'] }}</td>
                     <td>{{ formatMenitOnly($row['keterlambatan']) }}</td>
                     <td>{{ formatMenitOnly($row['pulang_cepat']) }}</td>
+                    <td>{{ is_numeric($row['jam_kerja']) ? formatJamMenit($row['jam_kerja']) : $row['jam_kerja'] }}</td>
+                    <td>{{ formatMenitOnly($row['waktu_kurang']) }}</td>
                     <td>
-                        @if(is_numeric($row['jam_kerja']))
-                        @if($row['is_weekend'])
-                        {{-- Weekend = lembur --}}
-                        {{ formatJamOnly($row['jam_kerja']) }}
+                        @if(is_numeric($row['lembur']) && $row['lembur'] > 0)
+                            {{ formatJamMenit($row['lembur']) }}
+                            <br><small>{{ $row['lembur_masuk'] ?? '-' }} - {{ $row['lembur_pulang'] ?? '-' }}</small>
                         @else
-                        {{-- Hari kerja normal --}}
-                        {{ formatJamMenit($row['jam_kerja']) }}
-                        @endif
-                        @else
-                        {{ $row['jam_kerja'] }}
+                            -
                         @endif
                     </td>
-                    <td>{{ formatMenitOnly($row['waktu_kurang']) }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
 
         <div class="summary">
-            <strong>Total Hari Kerja:</strong> {{ $item['total_hari_kerja'] }} |
-            <strong>Total Keterlambatan:</strong> {{ formatMenitOnly($item['summary']['total_keterlambatan']) }} |
-            <strong>Total Pulang Cepat:</strong> {{ formatMenitOnly($item['summary']['total_pulang_cepat']) }} |
-            <strong>Total Jam Kerja:</strong> {{ formatJamMenit($item['summary']['total_jam_kerja']) }} |
-            <strong>Total Waktu Kurang:</strong> {{ formatMenitOnly($item['summary']['total_kekurangan']) }} |
-            <strong>Total Lembur:</strong> {{ formatJamOnly($item['summary']['total_lembur']) }}
+            <strong>Hari Kerja:</strong> {{ $item['total_hari_kerja'] }} |
+            <strong>Hari Telat:</strong> {{ $item['total_hari_telat'] }} |
+            <strong>Keterlambatan:</strong> {{ formatMenitOnly($item['summary']['total_keterlambatan']) }} |
+            <strong>Pulang Cepat:</strong> {{ formatMenitOnly($item['summary']['total_pulang_cepat']) }} |
+            <strong>Jam Kerja:</strong> {{ formatJamMenit($item['summary']['total_jam_kerja']) }} |
+            <strong>Waktu Kurang:</strong> {{ formatMenitOnly($item['summary']['total_kekurangan']) }} |
+            <strong>Lembur:</strong> {{ formatJamMenit($item['summary']['total_lembur']) }}
         </div>
     </div>
     @endforeach

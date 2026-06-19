@@ -61,48 +61,66 @@ class PresensiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis'  => 'required|in:masuk,pulang',
-            'lokasi' => 'nullable|string|max:255',
-            'foto'   => 'required',
+            'jenis'      => 'required|in:masuk,pulang',
+            'lokasi'     => 'nullable|string|max:255',
+            'foto'       => 'required',
+            'is_lembur'  => 'nullable|boolean',
         ]);
 
         $today = now()->format('Y-m-d');
         $userId = Auth::id();
+        $isLembur = $request->boolean('is_lembur', false);
 
-        // === VALIDASI: Cek apakah sudah presensi masuk untuk pulang ===
-        if ($request->jenis === 'pulang') {
-            $sudahMasuk = Presensi::where('user_id', $userId)
-                ->where('tanggal', $today)
-                ->where('jenis', 'masuk')
-                ->exists();
+        if ($isLembur) {
+            // Lembur: harus sudah masuk + pulang reguler
+            $sudahPulangReguler = Presensi::where('user_id', $userId)
+                ->where('tanggal', $today)->where('jenis', 'pulang')->where('is_lembur', false)->exists();
 
-            if (!$sudahMasuk) {
+            if (!$sudahPulangReguler) {
                 return redirect()->route('pegawai.dashboard')
-                    ->with('error', 'Anda belum melakukan presensi masuk hari ini!');
+                    ->with('error', 'Selesaikan presensi reguler (masuk & pulang) terlebih dahulu!');
             }
 
-            // === VALIDASI: Cek apakah sudah presensi pulang ===
-            $sudahPulang = Presensi::where('user_id', $userId)
-                ->where('tanggal', $today)
-                ->where('jenis', 'pulang')
-                ->exists();
-
-            if ($sudahPulang) {
-                return redirect()->route('pegawai.dashboard')
-                    ->with('error', 'Anda sudah melakukan presensi pulang hari ini!');
+            if ($request->jenis === 'pulang') {
+                $sudahMasukLembur = Presensi::where('user_id', $userId)
+                    ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', true)->exists();
+                if (!$sudahMasukLembur) {
+                    return redirect()->route('pegawai.dashboard')
+                        ->with('error', 'Anda belum melakukan presensi masuk lembur!');
+                }
             }
-        }
 
-        // === VALIDASI: Cek apakah sudah presensi masuk (untuk jenis masuk) ===
-        if ($request->jenis === 'masuk') {
-            $sudahMasuk = Presensi::where('user_id', $userId)
-                ->where('tanggal', $today)
-                ->where('jenis', 'masuk')
-                ->exists();
-
-            if ($sudahMasuk) {
+            $sudahAda = Presensi::where('user_id', $userId)
+                ->where('tanggal', $today)->where('jenis', $request->jenis)->where('is_lembur', true)->exists();
+            if ($sudahAda) {
                 return redirect()->route('pegawai.dashboard')
-                    ->with('error', 'Anda sudah melakukan presensi masuk hari ini!');
+                    ->with('error', 'Anda sudah melakukan presensi ' . $request->jenis . ' lembur hari ini!');
+            }
+        } else {
+            // Reguler: validasi seperti biasa
+            if ($request->jenis === 'pulang') {
+                $sudahMasuk = Presensi::where('user_id', $userId)
+                    ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', false)->exists();
+                if (!$sudahMasuk) {
+                    return redirect()->route('pegawai.dashboard')
+                        ->with('error', 'Anda belum melakukan presensi masuk hari ini!');
+                }
+
+                $sudahPulang = Presensi::where('user_id', $userId)
+                    ->where('tanggal', $today)->where('jenis', 'pulang')->where('is_lembur', false)->exists();
+                if ($sudahPulang) {
+                    return redirect()->route('pegawai.dashboard')
+                        ->with('error', 'Anda sudah melakukan presensi pulang hari ini!');
+                }
+            }
+
+            if ($request->jenis === 'masuk') {
+                $sudahMasuk = Presensi::where('user_id', $userId)
+                    ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', false)->exists();
+                if ($sudahMasuk) {
+                    return redirect()->route('pegawai.dashboard')
+                        ->with('error', 'Anda sudah melakukan presensi masuk hari ini!');
+                }
             }
         }
 
@@ -176,20 +194,21 @@ class PresensiController extends Controller
                 }
             }
 
-            // === Simpan data presensi ===
             Presensi::create([
-                'user_id' => $userId,
-                'jenis'   => $request->jenis,
-                'foto'    => $foto_db,
-                'lokasi'  => $request->lokasi,
-                'tanggal' => $today,
-                'jam'     => now()->format('H:i:s'),
-                'status'  => $status,
+                'user_id'    => $userId,
+                'jenis'      => $request->jenis,
+                'foto'       => $foto_db,
+                'lokasi'     => $request->lokasi,
+                'tanggal'    => $today,
+                'jam'        => now()->format('H:i:s'),
+                'status'     => $status,
+                'is_lembur'  => $isLembur,
             ]);
 
-            $message = $request->jenis === 'masuk' ? 'Presensi masuk berhasil' : 'Presensi pulang berhasil';
+            $label = $isLembur ? 'Lembur ' : 'Presensi ';
+            $label .= $request->jenis === 'masuk' ? 'masuk' : 'pulang';
             return redirect()->route('pegawai.dashboard')
-                ->with('success', $message . ' - Status: ' . strtoupper($status) . '!');
+                ->with('success', $label . ' berhasil - Status: ' . strtoupper($status) . '!');
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);

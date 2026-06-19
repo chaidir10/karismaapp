@@ -31,11 +31,13 @@ class LaporanController extends Controller
         $laporan = [];
 
         foreach ($users as $user) {
-            $presensi = Presensi::where('user_id', $user->id)
+            $allPresensi = Presensi::where('user_id', $user->id)
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->where('status', 'approved')
-                ->get()
-                ->groupBy('tanggal');
+                ->get();
+
+            $presensiReguler = $allPresensi->where('is_lembur', false)->groupBy('tanggal');
+            $presensiLembur  = $allPresensi->where('is_lembur', true)->groupBy('tanggal');
 
             $rows = [];
             $totalKeterlambatan = 0;
@@ -53,8 +55,11 @@ class LaporanController extends Controller
                 $dayOfWeek = $date->dayOfWeek;
                 $isWeekend = ($dayOfWeek == 0 || $dayOfWeek == 6);
 
-                $masuk  = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'masuk') : null;
-                $pulang = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'pulang') : null;
+                $masuk  = $presensiReguler->has($tanggal) ? $presensiReguler[$tanggal]->firstWhere('jenis', 'masuk') : null;
+                $pulang = $presensiReguler->has($tanggal) ? $presensiReguler[$tanggal]->firstWhere('jenis', 'pulang') : null;
+
+                $lemburMasuk  = $presensiLembur->has($tanggal) ? $presensiLembur[$tanggal]->firstWhere('jenis', 'masuk') : null;
+                $lemburPulang = $presensiLembur->has($tanggal) ? $presensiLembur[$tanggal]->firstWhere('jenis', 'pulang') : null;
 
                 $jadwal = $user->getJadwalKerja($date);
                 $jamMasukDefault  = Carbon::createFromTimeString($jadwal['jam_masuk']);
@@ -62,64 +67,72 @@ class LaporanController extends Controller
                 $jamPulangDefault = Carbon::createFromTimeString($jadwal['jam_pulang']);
 
                 $row = [
-                    'tanggal'       => $date->format('d/m/Y'),
-                    'masuk'         => $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-',
-                    'pulang'        => $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-',
-                    'keterlambatan' => '-',
-                    'pulang_cepat'  => '-',
-                    'jam_kerja'     => '-',
-                    'waktu_kurang'  => '-',
-                    'lembur'        => '-',
-                    'is_weekend'    => $isWeekend,
-                    'status_masuk'  => 'Tidak Hadir',
+                    'tanggal'        => $date->format('d/m/Y'),
+                    'masuk'          => $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-',
+                    'pulang'         => $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-',
+                    'keterlambatan'  => '-',
+                    'pulang_cepat'   => '-',
+                    'jam_kerja'      => '-',
+                    'waktu_kurang'   => '-',
+                    'lembur'         => '-',
+                    'lembur_masuk'   => $lemburMasuk ? Carbon::parse($lemburMasuk->jam)->format('H:i') : '-',
+                    'lembur_pulang'  => $lemburPulang ? Carbon::parse($lemburPulang->jam)->format('H:i') : '-',
+                    'is_weekend'     => $isWeekend,
+                    'status_masuk'   => 'Tidak Hadir',
                 ];
 
                 if ($masuk && $pulang) {
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
-
                     $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
-                    if ($isWeekend && !$isShiftUser) {
-                        $row['jam_kerja'] = $jamKerja;
-                        $row['lembur']    = $jamKerja;
-                        $row['status_masuk'] = 'Lembur';
-                        $totalLembur     += $jamKerja;
-                    } else {
-                        $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
+                    $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
-                        $keterlambatan = $jamMasukObj->gte($jamToleransi)
-                            ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
-                            : 0;
+                    $keterlambatan = $jamMasukObj->gte($jamToleransi)
+                        ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
+                        : 0;
 
-                        if ($keterlambatan > 0) {
-                            $totalHariTelat++;
-                        }
+                    if ($keterlambatan > 0) $totalHariTelat++;
 
-                        $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
-                            ? $this->calculateMinutesWithoutSeconds($jamPulangObj, $jamPulangDefault, true)
-                            : 0;
+                    $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
+                        ? $this->calculateMinutesWithoutSeconds($jamPulangObj, $jamPulangDefault, true)
+                        : 0;
 
-                        $waktuKurang = ($jamKerja < $jamKerjaWajib)
-                            ? $this->roundUpToNearestMinute($jamKerjaWajib - $jamKerja)
-                            : 0;
+                    $waktuKurang = ($jamKerja < $jamKerjaWajib)
+                        ? $this->roundUpToNearestMinute($jamKerjaWajib - $jamKerja)
+                        : 0;
 
-                        $row['status_masuk']  = $keterlambatan > 0 ? 'Telat' : 'Tepat Waktu';
-                        $row['keterlambatan'] = $keterlambatan ?: '-';
-                        $row['pulang_cepat']  = $pulangCepat ?: '-';
-                        $row['jam_kerja']     = $jamKerja ?: '-';
-                        $row['waktu_kurang']  = $waktuKurang ?: '-';
+                    $row['status_masuk']  = $keterlambatan > 0 ? 'Telat' : 'Tepat Waktu';
+                    $row['keterlambatan'] = $keterlambatan ?: '-';
+                    $row['pulang_cepat']  = $pulangCepat ?: '-';
+                    $row['jam_kerja']     = $jamKerja ?: '-';
+                    $row['waktu_kurang']  = $waktuKurang ?: '-';
 
-                        $totalKeterlambatan += $keterlambatan;
-                        $totalPulangCepat   += $pulangCepat;
-                        $totalJamKerja      += $jamKerja;
-                        $totalKekurangan    += $waktuKurang;
-                        $totalHariKerja++;
-                    }
+                    $totalKeterlambatan += $keterlambatan;
+                    $totalPulangCepat   += $pulangCepat;
+                    $totalJamKerja      += $jamKerja;
+                    $totalKekurangan    += $waktuKurang;
+                    $totalHariKerja++;
                 } elseif ($masuk || $pulang) {
-                    if (!$isWeekend || $isShiftUser) $totalHariKerja++;
+                    $totalHariKerja++;
                     $row['status_masuk'] = 'Data Tidak Lengkap';
                 }
+
+                // Hitung lembur dari record lembur (bukan dari weekend)
+                $lemburMenit = 0;
+                if ($lemburMasuk && $lemburPulang) {
+                    $lemburMenit = $this->calculateMinutesWithoutSeconds(
+                        Carbon::parse($lemburMasuk->jam),
+                        Carbon::parse($lemburPulang->jam)
+                    );
+                    $row['lembur'] = $lemburMenit;
+                    $row['lembur_masuk'] = Carbon::parse($lemburMasuk->jam)->format('H:i');
+                    $row['lembur_pulang'] = Carbon::parse($lemburPulang->jam)->format('H:i');
+                    if (!$masuk && !$pulang) {
+                        $row['status_masuk'] = 'Lembur';
+                    }
+                }
+                $totalLembur += $lemburMenit;
 
                 $rows[] = $row;
             }
