@@ -41,7 +41,7 @@
         align-items: center;
         justify-content: space-between;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 800;
     }
 
     .work-timer-banner.timer-yellow {
