@@ -162,7 +162,10 @@
                     <div class="camera-container-full">
                         <video id="video" autoplay playsinline></video>
                         <canvas id="canvas" class="d-none"></canvas>
-                        <canvas id="faceOverlay"></canvas>
+                        <div class="face-guide">
+                            <div class="face-guide-oval" id="faceGuideOval"></div>
+                            <div class="face-guide-text">Posisikan wajah di dalam lingkaran</div>
+                        </div>
                         <div id="faceStatus" class="face-status no-face">
                             <i class="fas fa-user-slash"></i> Wajah tidak terdeteksi
                         </div>
@@ -455,8 +458,8 @@
         border: 2px solid #10b981;
     }
 
-    /* Face Detection */
-    #faceOverlay {
+    /* Face Guide */
+    .face-guide {
         position: absolute;
         top: 0;
         left: 0;
@@ -464,6 +467,31 @@
         height: 100%;
         z-index: 2;
         pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .face-guide-oval {
+        width: 55%;
+        max-width: 220px;
+        aspect-ratio: 3 / 4;
+        border: 3px dashed rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .face-guide-oval.detected {
+        border-color: #10b981;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .face-guide-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 11px;
+        margin-top: 8px;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
 
     .face-status {
@@ -502,7 +530,7 @@
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
 <script>
     let videoStream = null;
     let mapInstance = null;
@@ -651,6 +679,7 @@
         const statusEl = document.getElementById('faceStatus');
 
         if (typeof faceapi === 'undefined') {
+            console.warn('face-api.js tidak termuat, face detection dinonaktifkan');
             if (statusEl) statusEl.style.display = 'none';
             return;
         }
@@ -664,10 +693,11 @@
                     statusEl.className = 'face-status no-face';
                     statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...';
                 }
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
                 faceModelLoaded = true;
             } catch (e) {
-                console.error('Gagal memuat model face detection:', e);
+                console.error('Gagal memuat model:', e);
                 if (statusEl) statusEl.style.display = 'none';
                 if (submitBtn) submitBtn.disabled = false;
                 return;
@@ -681,76 +711,53 @@
         const video = document.getElementById('video');
         if (!video) return;
 
-        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 });
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.35 });
         let detecting = false;
 
         async function detect() {
             if (!videoStream) return;
-            if (video.readyState < 2 || detecting) {
-                faceDetectionLoop = setTimeout(detect, 300);
+            if (video.readyState < 2 || video.paused || detecting) {
+                faceDetectionLoop = setTimeout(detect, 500);
                 return;
             }
 
             detecting = true;
             try {
-                const result = await faceapi.detectAllFaces(video, options);
-                const found = result.length > 0;
+                const detections = await faceapi.detectAllFaces(video, options);
+                const found = detections.length > 0;
 
                 if (found !== faceDetected) {
                     faceDetected = found;
                     updateFaceStatus(found);
                 }
-                drawFaceOverlay(result);
-            } catch (e) {}
+            } catch (e) {
+                console.error('Detect error:', e);
+            }
             detecting = false;
 
-            if (videoStream) {
-                faceDetectionLoop = setTimeout(detect, 300);
-            }
+            if (videoStream) faceDetectionLoop = setTimeout(detect, 500);
         }
 
-        faceDetectionLoop = setTimeout(detect, 500);
+        faceDetectionLoop = setTimeout(detect, 1000);
     }
 
     function updateFaceStatus(detected) {
         const statusEl = document.getElementById('faceStatus');
         const submitBtn = document.querySelector('.submit-btn-large');
+        const ovalEl = document.getElementById('faceGuideOval');
 
         if (statusEl) {
-            if (detected) {
-                statusEl.className = 'face-status face-ok';
-                statusEl.innerHTML = '<i class="fas fa-user-check"></i> Wajah terdeteksi';
-            } else {
-                statusEl.className = 'face-status no-face';
-                statusEl.innerHTML = '<i class="fas fa-user-slash"></i> Wajah tidak terdeteksi';
-            }
+            statusEl.className = detected ? 'face-status face-ok' : 'face-status no-face';
+            statusEl.innerHTML = detected
+                ? '<i class="fas fa-user-check"></i> Wajah terdeteksi'
+                : '<i class="fas fa-user-slash"></i> Wajah tidak terdeteksi';
+        }
+
+        if (ovalEl) {
+            ovalEl.classList.toggle('detected', detected);
         }
 
         if (submitBtn) submitBtn.disabled = !detected;
-    }
-
-    function drawFaceOverlay(detections) {
-        const video = document.getElementById('video');
-        const overlay = document.getElementById('faceOverlay');
-        if (!video || !overlay) return;
-
-        overlay.width = overlay.offsetWidth;
-        overlay.height = overlay.offsetHeight;
-        const ctx = overlay.getContext('2d');
-        ctx.clearRect(0, 0, overlay.width, overlay.height);
-
-        if (!detections || detections.length === 0) return;
-
-        const scaleX = overlay.width / video.videoWidth;
-        const scaleY = overlay.height / video.videoHeight;
-
-        detections.forEach(det => {
-            const box = det.box;
-            ctx.strokeStyle = '#10b981';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([6, 4]);
-            ctx.strokeRect(box.x * scaleX, box.y * scaleY, box.width * scaleX, box.height * scaleY);
-        });
     }
 
     function stopFaceDetection() {
@@ -760,11 +767,8 @@
         }
         faceDetected = false;
 
-        const overlay = document.getElementById('faceOverlay');
-        if (overlay) {
-            const ctx = overlay.getContext('2d');
-            ctx.clearRect(0, 0, overlay.width, overlay.height);
-        }
+        const ovalEl = document.getElementById('faceGuideOval');
+        if (ovalEl) ovalEl.classList.remove('detected');
     }
 
     function initializeLocation() {
