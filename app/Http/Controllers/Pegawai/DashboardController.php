@@ -46,13 +46,19 @@ class DashboardController extends Controller
             $fotoProfilUrl = asset('storage/foto_profil/' . $user->foto_profil);
         }
 
+        $wilayahList = $user->wilayahKerjaList;
+        if ($wilayahList->isEmpty() && $user->wilayahKerja) {
+            $wilayahList = collect([$user->wilayahKerja]);
+        }
+
         return view('pegawai.dashboard', compact(
-            'riwayatHariIni', 
-            'user', 
-            'fotoProfilUrl', 
+            'riwayatHariIni',
+            'user',
+            'fotoProfilUrl',
             'jamKerja',
             'sudahPresensiMasuk',
-            'sudahPresensiPulang'
+            'sudahPresensiPulang',
+            'wilayahList'
         ));
     }
 }

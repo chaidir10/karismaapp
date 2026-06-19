@@ -50,7 +50,8 @@ class PresensiController extends Controller
         return view('pegawai.riwayat', [
             'riwayat'       => $riwayat,
             'bulan'         => $bulan,
-            'wilayahAlamat' => Auth::user()->wilayahKerja->alamat ?? '',
+            'wilayahAlamat' => Auth::user()->wilayahKerjaList->pluck('alamat')->filter()->first()
+                ?? Auth::user()->wilayahKerja->alamat ?? '',
         ]);
     }
 
@@ -147,14 +148,20 @@ class PresensiController extends Controller
             $userLat = isset($userLocation[0]) ? floatval($userLocation[0]) : null;
             $userLng = isset($userLocation[1]) ? floatval($userLocation[1]) : null;
 
-            // === Cek di semua titik wilayah kerja ===
+            // === Cek di wilayah kerja yang di-assign ke user ===
             $status = 'pending';
 
             if ($userLat && $userLng) {
-                $semuaWilayah = WilayahKerja::all();
+                $wilayahUser = Auth::user()->wilayahKerjaList;
 
-                foreach ($semuaWilayah as $wilayah) {
-                    $radius = $wilayah->radius ?? 100; // default 100 meter
+                if ($wilayahUser->isEmpty()) {
+                    $wilayahUser = collect();
+                    $wk = Auth::user()->wilayahKerja;
+                    if ($wk) $wilayahUser->push($wk);
+                }
+
+                foreach ($wilayahUser as $wilayah) {
+                    $radius = $wilayah->radius ?? 100;
                     $distance = $this->haversineDistance(
                         $userLat,
                         $userLng,
@@ -164,7 +171,7 @@ class PresensiController extends Controller
 
                     if ($distance <= $radius) {
                         $status = 'approved';
-                        break; // cukup satu titik cocok
+                        break;
                     }
                 }
             }

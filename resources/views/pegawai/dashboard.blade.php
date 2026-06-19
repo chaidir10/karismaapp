@@ -795,6 +795,13 @@
         );
     }
 
+    const wilayahList = @json($wilayahList->map(fn($w) => [
+        'lat' => (float) $w->latitude,
+        'lng' => (float) $w->longitude,
+        'radius' => (float) ($w->radius ?? 100),
+        'alamat' => $w->alamat ?? '',
+    ])->values());
+
     function updateLocationInfo(position) {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
@@ -802,27 +809,29 @@
         const lokasiInput = document.getElementById('lokasiInput');
         if (lokasiInput) lokasiInput.value = `${lat},${lng}`;
 
-        const wilayahLat = parseFloat("{{ Auth::user()->wilayahKerja->latitude ?? 0 }}");
-        const wilayahLng = parseFloat("{{ Auth::user()->wilayahKerja->longitude ?? 0 }}");
-        const wilayahAlamat = @json(Auth::user()->wilayahKerja->alamat ?? '');
-        const radius = parseFloat("{{ Auth::user()->wilayahKerja->radius ?? 100 }}");
-
-        const distance = haversineDistance(lat, lng, wilayahLat, wilayahLng);
-
         const infoEl = document.getElementById('locationRadiusInfo');
         const submitBtn = document.querySelector('.submit-btn-large');
         const addrEl = document.getElementById('location-address-mini');
 
         if (infoEl) infoEl.style.fontSize = "10px";
 
-        if (distance <= radius) {
+        let matched = null;
+        for (const w of wilayahList) {
+            const distance = haversineDistance(lat, lng, w.lat, w.lng);
+            if (distance <= w.radius) {
+                matched = w;
+                break;
+            }
+        }
+
+        if (matched) {
             if (infoEl) {
                 infoEl.innerHTML = '<span class="badge bg-success">✔ Anda berada di dalam wilayah kerja</span>';
                 infoEl.classList.remove('text-danger', 'text-warning');
                 infoEl.classList.add('text-success');
             }
             if (submitBtn) submitBtn.disabled = false;
-            if (addrEl) addrEl.textContent = wilayahAlamat || 'Di dalam wilayah kerja';
+            if (addrEl) addrEl.textContent = matched.alamat || 'Di dalam wilayah kerja';
             isOutsideRadius = false;
         } else {
             if (infoEl) {
@@ -833,7 +842,6 @@
             if (submitBtn) submitBtn.disabled = false;
             isOutsideRadius = true;
 
-            // ambil alamat real
             const miniEl = document.getElementById('location-address-mini');
             if (miniEl) getAddressFromCoordinates(lat, lng, miniEl);
         }
@@ -909,7 +917,7 @@
         }
     }
 
-    const detailWilayahAlamat = @json(Auth::user()->wilayahKerja->alamat ?? '');
+    const detailWilayahAlamat = @json($wilayahList->pluck('alamat')->filter()->first() ?? '');
 
     function initializeDetailModals() {
         if (!window.L) return;

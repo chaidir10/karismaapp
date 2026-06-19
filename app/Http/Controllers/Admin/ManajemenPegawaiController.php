@@ -16,7 +16,7 @@ class ManajemenPegawaiController extends Controller
      */
     public function index()
     {
-        $users = User::with('wilayahKerja')->get();
+        $users = User::with(['wilayahKerja', 'wilayahKerjaList'])->get();
         $units = WilayahKerja::all();
 
         return view('admin.manajemenpegawai', compact('users', 'units'));
@@ -33,6 +33,8 @@ class ManajemenPegawaiController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'unit_id' => 'nullable|exists:wilayah_kerja,id',
+            'wilayah_ids' => 'nullable|array',
+            'wilayah_ids.*' => 'exists:wilayah_kerja,id',
             'jabatan' => 'nullable|string|max:255',
             'jenis_pegawai' => 'required|in:asn,non_asn,outsourcing',
             'no_hp' => 'nullable|string|max:20',
@@ -42,12 +44,12 @@ class ManajemenPegawaiController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        User::create([
+        $user = User::create([
             'nip' => $request->nip,
             'name' => $request->name,
             'email' => $request->email,
@@ -57,11 +59,15 @@ class ManajemenPegawaiController extends Controller
             'jenis_pegawai' => $request->jenis_pegawai,
             'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
-            'can_shift' => $request->has('can_shift'), // ✅ tambahan
+            'can_shift' => $request->has('can_shift'),
         ]);
 
+        if ($request->has('wilayah_ids')) {
+            $user->wilayahKerjaList()->sync($request->wilayah_ids);
+        }
+
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'Pegawai berhasil ditambahkan'
         ]);
     }
@@ -71,9 +77,12 @@ class ManajemenPegawaiController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('wilayahKerja')->findOrFail($id);
+        $user = User::with(['wilayahKerja', 'wilayahKerjaList'])->findOrFail($id);
 
-        return response()->json($user);
+        $data = $user->toArray();
+        $data['wilayah_ids'] = $user->wilayahKerjaList->pluck('id')->toArray();
+
+        return response()->json($data);
     }
 
     /**
@@ -89,6 +98,8 @@ class ManajemenPegawaiController extends Controller
             'email' => 'required|email|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:6',
             'unit_id' => 'nullable|exists:wilayah_kerja,id',
+            'wilayah_ids' => 'nullable|array',
+            'wilayah_ids.*' => 'exists:wilayah_kerja,id',
             'jabatan' => 'nullable|string|max:255',
             'jenis_pegawai' => 'required|in:asn,non_asn,outsourcing',
             'no_hp' => 'nullable|string|max:20',
@@ -98,7 +109,7 @@ class ManajemenPegawaiController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -111,16 +122,17 @@ class ManajemenPegawaiController extends Controller
         $user->jenis_pegawai = $request->jenis_pegawai;
         $user->no_hp = $request->no_hp;
         $user->alamat = $request->alamat;
-        $user->can_shift = $request->boolean('can_shift', false);// ✅ tambahan
+        $user->can_shift = $request->boolean('can_shift', false);
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
         $user->save();
+        $user->wilayahKerjaList()->sync($request->wilayah_ids ?? []);
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'Pegawai berhasil diperbarui'
         ]);
     }

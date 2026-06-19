@@ -17,9 +17,13 @@ class WilayahKerja extends Model
         'radius',
     ];
 
-    // Relasi ke users
     public function users()
     {
         return $this->hasMany(User::class, 'unit_id');
+    }
+
+    public function assignedUsers()
+    {
+        return $this->belongsToMany(User::class, 'user_wilayah_kerja', 'wilayah_kerja_id', 'user_id')->withTimestamps();
     }
 }

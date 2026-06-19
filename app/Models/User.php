@@ -62,10 +62,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke wilayah kerja.
+     * Relasi ke wilayah kerja (utama, backward-compatible).
      */
     public function wilayahKerja()
     {
         return $this->belongsTo(WilayahKerja::class, 'unit_id');
+    }
+
+    /**
+     * Relasi many-to-many ke semua wilayah kerja yang di-assign.
+     */
+    public function wilayahKerjaList()
+    {
+        return $this->belongsToMany(WilayahKerja::class, 'user_wilayah_kerja', 'user_id', 'wilayah_kerja_id')->withTimestamps();
     }
 }

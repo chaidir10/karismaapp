@@ -105,7 +105,12 @@
                             <small class="font-semibold text-blue-500">{{ ucwords(str_replace('_', ' ', $user->jenis_pegawai)) }}</small>
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">{{ $user->wilayahKerja->nama ?? '-' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {{ $user->wilayahKerja->nama ?? '-' }}
+                            @if($user->wilayahKerjaList->count() > 1)
+                            <br><small class="text-blue-500">+{{ $user->wilayahKerjaList->count() - 1 }} lokasi lain</small>
+                            @endif
+                        </td>
 
 
                         <td class="px-6 py-4 text-right text-sm font-medium">
@@ -153,13 +158,25 @@
                     <input type="text" name="jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Utama</label>
                     <select name="unit_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi Presensi (boleh pilih lebih dari 1)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 border border-gray-300 rounded-xl max-h-40 overflow-y-auto">
+                    @foreach($units as $u)
+                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
+                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">{{ $u->nama }}</span>
+                    </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -293,7 +310,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-6">
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Lokasi Presensi</label>
+                        <div id="detailLokasiPresensi" class="bg-blue-50 rounded-lg p-3 text-blue-800 border border-blue-200 text-sm">-</div>
+                    </div>
+
+                    <div class="mt-4">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Alamat</label>
                         <div id="detailAlamat" class="bg-gray-50 rounded-lg p-4 text-gray-800 border border-gray-200"></div>
                     </div>
@@ -340,13 +362,25 @@
                     <input type="text" name="jabatan" id="edit_jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Utama</label>
                     <select name="unit_id" id="edit_unit" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi Presensi (boleh pilih lebih dari 1)</label>
+                <div id="editWilayahCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 border border-gray-300 rounded-xl max-h-40 overflow-y-auto">
+                    @foreach($units as $u)
+                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
+                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 edit-wilayah-cb">
+                        <span class="text-sm text-gray-700">{{ $u->nama }}</span>
+                    </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -727,6 +761,13 @@
                 document.getElementById('detailJenis').textContent = user.jenis_pegawai.replace(/_/g, ' ').toUpperCase();
                 document.getElementById('detailAlamat').textContent = user.alamat || '-';
 
+                // Tampilkan lokasi presensi
+                const lokasiEl = document.getElementById('detailLokasiPresensi');
+                if (lokasiEl) {
+                    const list = (user.wilayah_kerja_list || []).map(w => w.nama);
+                    lokasiEl.textContent = list.length > 0 ? list.join(', ') : '-';
+                }
+
                 openModal('modalDetail');
             })
             .catch(error => {
@@ -761,6 +802,12 @@
                 document.getElementById('edit_no_hp').value = user.no_hp ?? '';
                 document.getElementById('edit_can_shift').value = user.can_shift ? '1' : '0';
                 document.getElementById('edit_alamat').value = user.alamat ?? '';
+
+                // Set lokasi presensi checkboxes
+                const wilayahIds = user.wilayah_ids || [];
+                document.querySelectorAll('.edit-wilayah-cb').forEach(cb => {
+                    cb.checked = wilayahIds.includes(parseInt(cb.value));
+                });
 
                 openModal('modalEdit');
             })

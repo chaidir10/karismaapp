@@ -449,20 +449,20 @@
     }
 
     .modal-content {
-        padding: 20px;
+        padding: 15px 20px;
     }
 
     .detail-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 20px;
+        gap: 8px 15px;
+        margin-bottom: 12px;
     }
 
     .detail-item {
         display: flex;
-        flex-direction: column;
-        gap: 5px;
+        align-items: baseline;
+        gap: 6px;
     }
 
     .detail-item.full-width {
@@ -470,22 +470,29 @@
     }
 
     .detail-item label {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
-        color: var(--gray-600);
+        color: var(--gray-500);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        min-width: fit-content;
+        margin: 0;
+    }
+
+    .detail-item label::after {
+        content: ':';
     }
 
     .detail-item span {
-        font-size: 14px;
+        font-size: 13px;
         color: var(--dark);
         word-break: break-word;
     }
 
     .modal-actions {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         justify-content: flex-end;
         flex-wrap: wrap;
         border-top: 1px solid var(--gray-200);
@@ -536,7 +543,7 @@
         display: flex !important;
         flex-direction: row !important;
         gap: 15px;
-        margin-top: 5px;
+        margin-bottom: 12px;
         width: 100%;
         align-items: stretch;
     }
@@ -557,6 +564,10 @@
         text-transform: uppercase;
         margin-bottom: 6px;
         flex-shrink: 0;
+    }
+
+    .media-col label::after {
+        content: '' !important;
     }
 
     .foto-wrapper {
@@ -919,7 +930,7 @@
         <div class="modal-content">
             <div class="detail-grid">
                 <div class="detail-item">
-                    <label>Nama Pegawai</label>
+                    <label>Pegawai</label>
                     <span id="detailPegawaiPresensi">-</span>
                 </div>
                 <div class="detail-item">
@@ -927,44 +938,42 @@
                     <span id="detailTanggalPresensi">-</span>
                 </div>
                 <div class="detail-item">
-                    <label>Jenis Presensi</label>
+                    <label>Jenis</label>
                     <span id="detailJenisPresensi">-</span>
                 </div>
                 <div class="detail-item">
                     <label>Jam</label>
                     <span id="detailJamPresensi">-</span>
                 </div>
-                <div class="detail-item full-width">
+                <div class="detail-item">
                     <label>Lokasi</label>
-                    <span id="detailLokasiPresensi">-</span>
-                </div>
-                <div class="detail-item full-width">
-                    <div class="media-row">
-                        <div class="media-col">
-                            <label>Foto</label>
-                            <div class="foto-wrapper" id="detailFotoPresensi">
-                                <span class="text-muted">Tidak ada foto</span>
-                            </div>
-                        </div>
-                        <div class="media-col">
-                            <label>Peta Lokasi</label>
-                            <div class="map-container">
-                                <div id="presensiMap"></div>
-                                <div id="mapLoading" class="map-loading">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>Memuat peta...</span>
-                                </div>
-                                <div id="mapError" class="map-error" style="display: none;">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <span>Koordinat tidak tersedia</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <span id="detailLokasiPresensi" style="font-size:11px">-</span>
                 </div>
                 <div class="detail-item">
                     <label>Status</label>
                     <span class="status-badge pending">Pending</span>
+                </div>
+            </div>
+            <div class="media-row">
+                <div class="media-col">
+                    <label>Foto</label>
+                    <div class="foto-wrapper" id="detailFotoPresensi">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
+                </div>
+                <div class="media-col">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="presensiMap"></div>
+                        <div id="mapLoading" class="map-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat peta...</span>
+                        </div>
+                        <div id="mapError" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Koordinat tidak tersedia</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-actions">
@@ -1003,30 +1012,30 @@
         <div class="modal-content">
             <div class="detail-grid">
                 <div class="detail-item">
-                    <label>Nama Pegawai</label>
+                    <label>Pegawai</label>
                     <span id="detailPegawaiPengajuan">-</span>
                 </div>
                 <div class="detail-item">
                     <label>Tanggal</label>
                     <span id="detailTanggalPengajuan">-</span>
                 </div>
-                <div class="detail-item full-width">
-                    <label>Jenis Pengajuan</label>
+                <div class="detail-item">
+                    <label>Jenis</label>
                     <span id="detailJenisPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Status</label>
+                    <span class="status-badge pending">Pending</span>
                 </div>
                 <div class="detail-item full-width">
                     <label>Alasan</label>
                     <span id="detailAlasanPengajuan">-</span>
                 </div>
-                <div class="detail-item full-width">
-                    <label>Bukti</label>
-                    <div id="detailBuktiPengajuan">
-                        <span class="text-muted">Tidak ada bukti</span>
-                    </div>
-                </div>
-                <div class="detail-item">
-                    <label>Status</label>
-                    <span class="status-badge pending">Pending</span>
+            </div>
+            <div style="margin-bottom:12px">
+                <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;margin-bottom:6px">Bukti</label>
+                <div id="detailBuktiPengajuan">
+                    <span class="text-muted">Tidak ada bukti</span>
                 </div>
             </div>
             <div class="modal-actions">
@@ -1063,32 +1072,8 @@
         </div>
         <div class="modal-content">
             <div class="detail-grid">
-                <div class="detail-item full-width">
-                    <div class="media-row">
-                        <div class="media-col">
-                            <label>Foto</label>
-                            <div class="foto-wrapper" id="detailFotoHariIni">
-                                <span class="text-muted">Tidak ada foto</span>
-                            </div>
-                        </div>
-                        <div class="media-col">
-                            <label>Peta Lokasi</label>
-                            <div class="map-container">
-                                <div id="hariIniMap"></div>
-                                <div id="hariIniMapLoading" class="map-loading">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>Memuat peta...</span>
-                                </div>
-                                <div id="hariIniMapError" class="map-error" style="display: none;">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <span>Koordinat tidak tersedia</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="detail-item">
-                    <label>Nama Pegawai</label>
+                    <label>Pegawai</label>
                     <span id="detailNamaHariIni">-</span>
                 </div>
                 <div class="detail-item">
@@ -1096,7 +1081,7 @@
                     <span id="detailTanggalHariIni">-</span>
                 </div>
                 <div class="detail-item">
-                    <label>Jenis Presensi</label>
+                    <label>Jenis</label>
                     <span id="detailJenisHariIni">-</span>
                 </div>
                 <div class="detail-item">
@@ -1104,18 +1089,39 @@
                     <span id="detailJamHariIni">-</span>
                 </div>
                 <div class="detail-item">
-                    <label>Status Kehadiran</label>
+                    <label>Kehadiran</label>
                     <span id="detailStatusHariIni">-</span>
                 </div>
                 <div class="detail-item">
-                    <label>Status Verifikasi</label>
+                    <label>Verifikasi</label>
                     <span id="detailVerifikasiHariIni">-</span>
                 </div>
                 <div class="detail-item full-width">
                     <label>Lokasi</label>
-                    <span id="detailLokasiHariIni">-</span>
+                    <span id="detailLokasiHariIni" style="font-size:11px">-</span>
                 </div>
-                
+            </div>
+            <div class="media-row">
+                <div class="media-col">
+                    <label>Foto</label>
+                    <div class="foto-wrapper" id="detailFotoHariIni">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
+                </div>
+                <div class="media-col">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="hariIniMap"></div>
+                        <div id="hariIniMapLoading" class="map-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat peta...</span>
+                        </div>
+                        <div id="hariIniMapError" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Koordinat tidak tersedia</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')">
