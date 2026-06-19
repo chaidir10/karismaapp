@@ -43,25 +43,21 @@
     </div>
     <div class="attendance-time">
         <i class="far fa-clock time-icon"></i>
-        <span>Jam Kerja (07:30 - 16:00)</span>
+        @if($shiftHariIni ?? false)
+            <span>{{ $shiftHariIni->nama }} ({{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }})</span>
+        @else
+            <span>Jam Kerja (07:30 - 16:00)</span>
+        @endif
     </div>
-    @if($user->can_shift && $shifts->count() > 0)
-    <div style="padding:0 15px; margin-bottom:8px">
-        <select id="shiftSelector" class="form-select" style="border-radius:12px; font-size:13px; padding:10px 14px; border:1px solid var(--gray-light);"
-            onchange="document.getElementById('jamShiftIdInput').value = this.value">
-            <option value="">-- Jam Kerja Normal --</option>
-            @foreach($shifts as $s)
-            <option value="{{ $s->id }}">{{ $s->nama }} ({{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }})</option>
-            @endforeach
-        </select>
-    </div>
-    @endif
 
     <div class="attendance-actions">
         <button class="attendance-btn {{ $sudahPresensiMasuk ? 'btn-disabled' : '' }}"
             id="clock-in-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#presensiModal"
+            @if($user->can_shift && $shifts->count() > 0 && !$sudahPresensiMasuk)
+                data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
+            @else
+                data-bs-toggle="modal" data-bs-target="#presensiModal"
+            @endif
             onclick="setJenis('masuk'); setLembur(false)"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
             <i class="fas fa-sign-in-alt attendance-icon"></i>
@@ -71,7 +67,7 @@
             id="clock-out-btn"
             data-bs-toggle="modal"
             data-bs-target="#presensiModal"
-            onclick="handlePulangClick(); setLembur(false)"
+            onclick="handlePulangClick(); setLembur(false); @if($shiftHariIni ?? false) document.getElementById('jamShiftIdInput').value='{{ $shiftHariIni->id }}'; @endif"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
             <i class="fas fa-sign-out-alt attendance-icon"></i>
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
@@ -79,8 +75,8 @@
     </div>
 </div>
 
-{{-- Floating Lembur Button --}}
-@if($sudahPresensiMasuk && $sudahPresensiPulang && !$sudahLemburPulang)
+{{-- Floating Lembur Button — selalu muncul kecuali lembur sudah complete --}}
+@if(!$sudahLemburPulang)
 <div class="lembur-fab" id="lemburFab" onclick="toggleLemburMenu()">
     <i class="fas fa-clock"></i>
 </div>
@@ -90,7 +86,7 @@
         onclick="setJenis('masuk'); setLembur(true); closeLemburMenu()">
         <i class="fas fa-sign-in-alt"></i> Masuk Lembur
     </button>
-    @elseif(!$sudahLemburPulang)
+    @else
     <button class="lembur-menu-btn" data-bs-toggle="modal" data-bs-target="#presensiModal"
         onclick="setJenis('pulang'); setLembur(true); closeLemburMenu()">
         <i class="fas fa-sign-out-alt"></i> Pulang Lembur
@@ -175,6 +171,33 @@
     </div>
 </div>
 @endforeach
+
+{{-- Modal Pilih Shift --}}
+@if($user->can_shift && $shifts->count() > 0)
+<div class="modal fade" id="shiftPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:20px; border:none;">
+            <div class="modal-body p-4">
+                <h5 style="font-weight:700; font-size:16px; text-align:center; margin-bottom:16px;">Pilih Jadwal Kerja</h5>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="shift-pick-btn" onclick="pickShift('')"
+                        style="padding:14px; border-radius:12px; border:2px solid var(--gray-light); background:var(--white); font-size:14px; font-weight:500; cursor:pointer; text-align:left; transition:all 0.2s;">
+                        <div style="font-weight:600;">Jam Kerja Normal</div>
+                        <div style="font-size:12px; color:var(--gray); margin-top:2px;">07:30 - 16:00</div>
+                    </button>
+                    @foreach($shifts as $s)
+                    <button class="shift-pick-btn" onclick="pickShift('{{ $s->id }}')"
+                        style="padding:14px; border-radius:12px; border:2px solid var(--primary); background:rgba(90,182,234,0.05); font-size:14px; font-weight:500; cursor:pointer; text-align:left; transition:all 0.2s;">
+                        <div style="font-weight:600; color:var(--primary-dark);">{{ $s->nama }}</div>
+                        <div style="font-size:12px; color:var(--gray); margin-top:2px;">{{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }}</div>
+                    </button>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Modal Presensi -->
 <div class="modal fade" id="presensiModal" tabindex="-1" aria-hidden="true">
@@ -649,6 +672,16 @@
     function setLembur(val) {
         const el = document.getElementById('isLemburInput');
         if (el) el.value = val ? '1' : '0';
+    }
+
+    function pickShift(shiftId) {
+        document.getElementById('jamShiftIdInput').value = shiftId;
+        var shiftModal = bootstrap.Modal.getInstance(document.getElementById('shiftPickerModal'));
+        if (shiftModal) shiftModal.hide();
+        setTimeout(function() {
+            var presensiModal = new bootstrap.Modal(document.getElementById('presensiModal'));
+            presensiModal.show();
+        }, 300);
     }
 
     function toggleLemburMenu() {

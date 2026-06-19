@@ -77,6 +77,17 @@ class DashboardController extends Controller
 
         $shifts = $user->can_shift ? JamShift::all() : collect();
 
+        // Cek shift yang sudah dipilih saat masuk hari ini
+        $shiftHariIni = null;
+        if ($user->can_shift && $sudahPresensiMasuk) {
+            $presensiMasuk = Presensi::where('user_id', $user->id)
+                ->where('tanggal', $today)->where('jenis', 'masuk')
+                ->where('is_lembur', false)->first();
+            if ($presensiMasuk && $presensiMasuk->jam_shift_id) {
+                $shiftHariIni = JamShift::find($presensiMasuk->jam_shift_id);
+            }
+        }
+
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
             'user',
@@ -88,7 +99,8 @@ class DashboardController extends Controller
             'sudahLemburPulang',
             'wilayahList',
             'wilayahJson',
-            'shifts'
+            'shifts',
+            'shiftHariIni'
         ));
     }
 }
