@@ -32,44 +32,35 @@
         color: var(--gray) !important;
     }
 
-    /* Work Progress Bar */
-    .work-progress {
-        padding: 8px 15px 12px;
-    }
-
-    .work-progress-bar {
-        height: 8px;
-        background: var(--gray-light);
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .work-progress-fill {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 1s linear, background 0.5s;
-        width: 0%;
-    }
-
-    .fill-yellow, .work-progress-fill:not(.fill-green) {
-        background: linear-gradient(90deg, #f59e0b, #fbbf24);
-    }
-
-    .fill-green {
-        background: linear-gradient(90deg, #10b981, #34d399);
-    }
-
-    .work-progress-info {
+    /* Work Timer Banner */
+    .work-timer-banner {
+        margin: 0 15px 10px;
+        padding: 8px 14px;
+        border-radius: 10px;
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        margin-top: 4px;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
-        color: var(--gray-dark);
     }
 
-    .work-progress-info .text-success { color: #10b981; }
-    .work-progress-info .text-warning { color: #f59e0b; }
+    .work-timer-banner.timer-yellow {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    .work-timer-banner.timer-green {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .work-timer-banner .timer-clock {
+        font-variant-numeric: tabular-nums;
+        font-size: 14px;
+        font-weight: 700;
+    }
 </style>
 
 @section('content')
@@ -104,44 +95,18 @@
         </button>
         <button class="attendance-btn {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'btn-disabled' : '' }}"
             id="clock-out-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#presensiModal"
-            onclick="handlePulangClick(); setLembur(false); @if($shiftHariIni ?? false) document.getElementById('jamShiftIdInput').value='{{ $shiftHariIni->id }}'; @endif"
+            onclick="handlePulangWithCheck()"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
             <i class="fas fa-sign-out-alt attendance-icon"></i>
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
 
-    {{-- Progress Bar Jam Kerja --}}
-    @if($sudahPresensiMasuk && $jamMasukHariIni && !$sudahPresensiPulang)
-    <div class="work-progress" id="workProgress">
-        <div class="work-progress-bar">
-            <div class="work-progress-fill" id="workProgressFill"></div>
-        </div>
-        <div class="work-progress-info">
-            <span id="workElapsed">00:00:00</span>
-            <span id="workTarget">/ {{ \Carbon\Carbon::parse($jamPulangTarget)->format('H:i') }}</span>
-        </div>
-    </div>
-    @elseif($sudahPresensiMasuk && $sudahPresensiPulang)
-    @php
-        $masukObj = \Carbon\Carbon::parse($jamMasukHariIni);
-        $pulangRecord = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
-        $pulangObj = $pulangRecord ? \Carbon\Carbon::parse($pulangRecord->jam) : null;
-        $totalKerja = $pulangObj ? $masukObj->diffInMinutes($pulangObj) : 0;
-        $targetMenit = \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_masuk'])->diffInMinutes(\Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang']));
-        $persen = $targetMenit > 0 ? min(100, round(($totalKerja / $targetMenit) * 100)) : 0;
-        $cukup = $totalKerja >= $targetMenit;
-    @endphp
-    <div class="work-progress">
-        <div class="work-progress-bar">
-            <div class="work-progress-fill {{ $cukup ? 'fill-green' : 'fill-yellow' }}" style="width:{{ $persen }}%"></div>
-        </div>
-        <div class="work-progress-info">
-            <span>{{ floor($totalKerja/60) }}j {{ $totalKerja%60 }}m</span>
-            <span class="{{ $cukup ? 'text-success' : 'text-warning' }}">{{ $cukup ? '✓ Terpenuhi' : 'Kurang ' . ($targetMenit - $totalKerja) . ' menit' }}</span>
-        </div>
+    {{-- Timer Jam Kerja --}}
+    @if($sudahPresensiMasuk && $jamMasukHariIni)
+    <div class="work-timer-banner timer-yellow" id="workTimerBanner">
+        <span><i class="fas fa-hourglass-half"></i> <span id="workTimerLabel">Jam kerja berjalan</span></span>
+        <span class="timer-clock" id="workTimerClock">00:00:00</span>
     </div>
     @endif
 </div>
@@ -246,6 +211,26 @@
     </div>
 </div>
 @endforeach
+
+{{-- Modal Peringatan Jam Kerja Belum Terpenuhi --}}
+<div class="modal fade" id="earlyPulangModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:20px; border:none;">
+            <div class="modal-body p-4 text-center">
+                <div style="width:60px;height:60px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:24px;color:#f59e0b;"></i>
+                </div>
+                <h5 style="font-weight:700; font-size:16px; margin-bottom:8px;">Jam Kerja Belum Terpenuhi</h5>
+                <p style="font-size:13px; color:var(--gray-dark); margin-bottom:16px;" id="earlyPulangMsg">Apakah Anda yakin ingin absen pulang?</p>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-secondary" style="flex:1;" data-bs-dismiss="modal">Batal</button>
+                    <button style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;"
+                        onclick="proceedPulang()">Ya, Pulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {{-- Modal Pilih Shift --}}
 @if($user->can_shift && $shifts->count() > 0)
@@ -775,51 +760,97 @@
         setInterval(update, 1000);
     })();
 
-    // Timer jam kerja reguler
+    // Timer jam kerja reguler + cek pulang
+    var workTimerFulfilled = false;
+
     (function() {
-        var progressFill = document.getElementById('workProgressFill');
-        var elapsedEl = document.getElementById('workElapsed');
-        if (!progressFill || !elapsedEl) return;
+        var banner = document.getElementById('workTimerBanner');
+        var clockEl = document.getElementById('workTimerClock');
+        var labelEl = document.getElementById('workTimerLabel');
+        if (!banner || !clockEl) return;
 
         var jamMasuk = @json($jamMasukHariIni ?? '');
         var jamPulang = @json($jamPulangTarget ?? '16:00:00');
+        var jadwalMasuk = @json($jadwalKerjaHariIni['jam_masuk'] ?? '07:30:00');
         if (!jamMasuk) return;
 
         var now = new Date();
         var mParts = jamMasuk.split(':');
+        var jParts = jadwalMasuk.split(':');
         var pParts = jamPulang.split(':');
-        var startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+
+        // Jam mulai hitung: jam_masuk jadwal atau jam masuk aktual (mana yg lebih lambat)
+        var jadwalStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+            parseInt(jParts[0]), parseInt(jParts[1]), parseInt(jParts[2] || 0));
+        var actualStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
             parseInt(mParts[0]), parseInt(mParts[1]), parseInt(mParts[2] || 0));
+        var startTime = actualStart > jadwalStart ? actualStart : jadwalStart;
+
         var endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
             parseInt(pParts[0]), parseInt(pParts[1]), parseInt(pParts[2] || 0));
-
-        var totalTarget = (endTime - startTime) / 1000;
+        var totalTarget = Math.floor((endTime - jadwalStart) / 1000);
         if (totalTarget <= 0) totalTarget = 8 * 3600;
 
         function update() {
             var elapsed = Math.floor((new Date() - startTime) / 1000);
             if (elapsed < 0) elapsed = 0;
 
-            var pct = Math.min(100, (elapsed / totalTarget) * 100);
-            progressFill.style.width = pct + '%';
-
-            if (pct >= 100) {
-                progressFill.classList.add('fill-green');
-                progressFill.classList.remove('fill-yellow');
-            } else {
-                progressFill.classList.add('fill-yellow');
-                progressFill.classList.remove('fill-green');
-            }
-
             var h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
             var m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
             var s = String(elapsed % 60).padStart(2, '0');
-            elapsedEl.textContent = h + ':' + m + ':' + s;
+            clockEl.textContent = h + ':' + m + ':' + s;
+
+            if (elapsed >= totalTarget) {
+                banner.classList.remove('timer-yellow');
+                banner.classList.add('timer-green');
+                labelEl.innerHTML = '<i class="fas fa-check-circle"></i> Jam kerja terpenuhi';
+                workTimerFulfilled = true;
+            } else {
+                var sisa = totalTarget - elapsed;
+                var sh = Math.floor(sisa / 3600);
+                var sm = Math.floor((sisa % 3600) / 60);
+                labelEl.innerHTML = '<i class="fas fa-hourglass-half"></i> Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                workTimerFulfilled = false;
+            }
         }
 
         update();
         setInterval(update, 1000);
     })();
+
+    function handlePulangWithCheck() {
+        if (!sudahPresensiMasuk) {
+            if (window.bootstrap?.Modal) {
+                new bootstrap.Modal(document.getElementById('warningModal')).show();
+            }
+            return;
+        }
+
+        setJenis('pulang');
+        setLembur(false);
+        @if($shiftHariIni ?? false)
+        document.getElementById('jamShiftIdInput').value = '{{ $shiftHariIni->id ?? '' }}';
+        @endif
+
+        if (!workTimerFulfilled) {
+            var clockEl = document.getElementById('workTimerClock');
+            var msg = document.getElementById('earlyPulangMsg');
+            if (msg) {
+                msg.textContent = 'Jam kerja hari ini belum terpenuhi (' + (clockEl ? clockEl.textContent : '') + '). Apakah yakin ingin absen pulang?';
+            }
+            new bootstrap.Modal(document.getElementById('earlyPulangModal')).show();
+        } else {
+            new bootstrap.Modal(document.getElementById('presensiModal')).show();
+        }
+    }
+
+    function proceedPulang() {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('earlyPulangModal'));
+        if (modal) modal.hide();
+        setTimeout(function() {
+            new bootstrap.Modal(document.getElementById('presensiModal')).show();
+        }, 300);
+    }
 
     function handlePulangClick() {
         if (!sudahPresensiMasuk) {
