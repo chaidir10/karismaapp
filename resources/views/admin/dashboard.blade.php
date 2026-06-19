@@ -525,15 +525,61 @@
     .bukti-image,
     .foto-image {
         max-width: 100%;
-        max-height: 200px;
+        max-height: 300px;
         border-radius: 6px;
         border: 1px solid var(--gray-200);
+        object-fit: cover;
+    }
+
+    /* Foto + Map Side by Side */
+    .media-row {
+        display: flex;
+        gap: 15px;
+        margin-top: 5px;
+    }
+
+    .media-col {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .media-col label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    .foto-wrapper {
+        height: 280px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--gray-200);
+        background: var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .foto-wrapper .foto-image {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        object-fit: cover;
+        border: none;
+        border-radius: 0;
+    }
+
+    .foto-wrapper .text-muted {
+        font-size: 13px;
     }
 
     /* Map Styles */
     .map-container {
         position: relative;
-        height: 300px;
+        height: 280px;
         border-radius: 8px;
         overflow: hidden;
         border: 1px solid var(--gray-200);
@@ -588,7 +634,9 @@
         .modal-actions { flex-direction: column; }
         .modal-actions .inline-form,
         .modal-actions button { width: 100%; }
-        .map-container { height: 250px; }
+        .map-container { height: 220px; }
+        .media-row { flex-direction: column; }
+        .foto-wrapper { height: 200px; }
     }
 </style>
 
@@ -881,23 +929,27 @@
                     <span id="detailLokasiPresensi">-</span>
                 </div>
                 <div class="detail-item full-width">
-                    <label>Peta Lokasi</label>
-                    <div class="map-container">
-                        <div id="presensiMap"></div>
-                        <div id="mapLoading" class="map-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Memuat peta...</span>
+                    <div class="media-row">
+                        <div class="media-col">
+                            <label>Foto</label>
+                            <div class="foto-wrapper" id="detailFotoPresensi">
+                                <span class="text-muted">Tidak ada foto</span>
+                            </div>
                         </div>
-                        <div id="mapError" class="map-error" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Koordinat tidak tersedia</span>
+                        <div class="media-col">
+                            <label>Peta Lokasi</label>
+                            <div class="map-container">
+                                <div id="presensiMap"></div>
+                                <div id="mapLoading" class="map-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Memuat peta...</span>
+                                </div>
+                                <div id="mapError" class="map-error" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Koordinat tidak tersedia</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Foto</label>
-                    <div id="detailFotoPresensi">
-                        <span class="text-muted">Tidak ada foto</span>
                     </div>
                 </div>
                 <div class="detail-item">
@@ -1030,23 +1082,27 @@
                     <span id="detailLokasiHariIni">-</span>
                 </div>
                 <div class="detail-item full-width">
-                    <label>Peta Lokasi</label>
-                    <div class="map-container">
-                        <div id="hariIniMap"></div>
-                        <div id="hariIniMapLoading" class="map-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Memuat peta...</span>
+                    <div class="media-row">
+                        <div class="media-col">
+                            <label>Foto</label>
+                            <div class="foto-wrapper" id="detailFotoHariIni">
+                                <span class="text-muted">Tidak ada foto</span>
+                            </div>
                         </div>
-                        <div id="hariIniMapError" class="map-error" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Koordinat tidak tersedia</span>
+                        <div class="media-col">
+                            <label>Peta Lokasi</label>
+                            <div class="map-container">
+                                <div id="hariIniMap"></div>
+                                <div id="hariIniMapLoading" class="map-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Memuat peta...</span>
+                                </div>
+                                <div id="hariIniMapError" class="map-error" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Koordinat tidak tersedia</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Foto</label>
-                    <div id="detailFotoHariIni">
-                        <span class="text-muted">Tidak ada foto</span>
                     </div>
                 </div>
             </div>
