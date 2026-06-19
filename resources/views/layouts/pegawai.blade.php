@@ -39,16 +39,23 @@
     <style>
         :root, [data-theme="light"] {
             --primary: #5AB6EA;
+            --primary-light: #87CEEB;
             --primary-dark: #2E97D4;
+            --primary-soft: #E6F4F9;
             --accent: #FEAA2B;
+            --accent-light: #FFE4BC;
             --light: #f8fafc;
             --gray-light: #f1f5f9;
             --gray: #94a3b8;
             --gray-dark: #64748b;
             --dark: #1e293b;
             --white: #ffffff;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
             --success: #10b981;
+            --success-light: #d1fae5;
             --warning: #f59e0b;
+            --warning-light: #fef3c7;
             --body-bg: #E6F4F9;
             --body-bg-desktop: #d1e8f5;
             --container-bg: #ffffff;
@@ -63,12 +70,19 @@
         }
 
         [data-theme="dark"] {
+            --primary-light: #4a9bc7;
+            --primary-soft: #1a2e3d;
+            --accent-light: #4a3a1a;
             --light: #1e293b;
             --gray-light: #334155;
             --gray: #94a3b8;
             --gray-dark: #cbd5e1;
             --dark: #f1f5f9;
             --white: #0f172a;
+            --danger: #f87171;
+            --danger-light: #4a1c1c;
+            --success-light: #064e3b;
+            --warning-light: #78350f;
             --body-bg: #0c1322;
             --body-bg-desktop: #080e1a;
             --container-bg: #0f172a;
@@ -447,7 +461,7 @@
 
         .loading-content {
             text-align: center;
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(90, 182, 234, 0.2);
@@ -569,7 +583,7 @@
             width: 90%;
             max-width: 360px;
             z-index: 10;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             overflow: hidden;
@@ -661,7 +675,7 @@
         }
 
         .detail-image-container {
-            border-right: 1px solid #e0e0e0;
+            border-right: 1px solid var(--card-border);
         }
 
         .detail-image {
@@ -678,8 +692,8 @@
 
         .detail-info-section {
             padding: 15px 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+            background: var(--card-bg);
+            border-top: 1px solid var(--card-border);
         }
 
         .detail-location-name {
@@ -726,7 +740,7 @@
         /* Loading states */
         .detail-image-container,
         .detail-map-container {
-            background: #f8f9fa;
+            background: var(--gray-light);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -878,7 +892,7 @@
 
             .detail-image-container {
                 border-right: none;
-                border-bottom: 1px solid #e0e0e0;
+                border-bottom: 1px solid var(--card-border);
             }
 
             .mini-map-container {

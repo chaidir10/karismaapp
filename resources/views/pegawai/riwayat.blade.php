@@ -4,28 +4,6 @@
 
 @section('content')
 <style>
-    /* VARIABLES */
-    :root {
-        --primary: #5AB6EA;
-        --primary-light: #87CEEB;
-        --primary-dark: #2E97D4;
-        --primary-soft: #E6F4F9;
-        --accent: #FEAA2B;
-        --accent-light: #FFE4BC;
-        --light: #f8fafc;
-        --gray-light: #f1f5f9;
-        --gray: #94a3b8;
-        --gray-dark: #64748b;
-        --dark: #1e293b;
-        --white: #ffffff;
-        --danger: #ef4444;
-        --danger-light: #fee2e2;
-        --success: #10b981;
-        --success-light: #d1fae5;
-        --warning: #f59e0b;
-        --warning-light: #fef3c7;
-    }
-
     /* Main Container */
 
 
@@ -340,7 +318,7 @@
         position: relative;
         margin: 0;
         padding: 0;
-        border-right: 1px solid #e0e0e0;
+        border-right: 1px solid var(--card-border);
     }
 
     .detail-map-container {
@@ -542,7 +520,7 @@
         .detail-image-container {
             flex: 3;
             border-right: none;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--card-border);
         }
 
         .detail-map-container {

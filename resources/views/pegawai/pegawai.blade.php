@@ -3,27 +3,6 @@
 
 @section('content')
 <style>
-    /* CSS Variables */
-    :root {
-        --primary: #5AB6EA;
-        --primary-light: #87CEEB;
-        --primary-dark: #2E97D4;
-        --primary-soft: #E6F4F9;
-        --accent: #FEAA2B;
-        --light: #f8fafc;
-        --gray-light: #f1f5f9;
-        --gray: #94a3b8;
-        --gray-dark: #64748b;
-        --dark: #1e293b;
-        --white: #ffffff;
-        --danger: #ef4444;
-        --danger-light: #fee2e2;
-        --success: #10b981;
-        --success-light: #d1fae5;
-        --warning: #f59e0b;
-        --warning-light: #fef3c7;
-    }
-
     /* Employee Section */
     .employee-section {
         background-color: var(--white);
