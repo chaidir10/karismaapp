@@ -47,6 +47,7 @@ class LaporanController extends Controller
             $totalKekurangan    = 0;
             $totalHariKerja     = 0;
             $totalLembur        = 0;
+            $totalHariLembur    = 0;
             $totalHariTelat     = 0;
 
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
@@ -92,6 +93,7 @@ class LaporanController extends Controller
                         $row['jam_kerja']    = $jamKerja;
                         $row['status_masuk'] = 'Lembur';
                         $totalLembur += $jamKerja;
+                        $totalHariLembur++;
                     } else {
                         // Hari kerja normal
                         $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
@@ -136,6 +138,7 @@ class LaporanController extends Controller
                     $currentLembur = is_numeric($row['lembur']) ? $row['lembur'] : 0;
                     $row['lembur'] = $currentLembur + $lemburMenit;
                     $totalLembur += $lemburMenit;
+                    $totalHariLembur++;
                     if (!$masuk && !$pulang) {
                         $row['status_masuk'] = 'Lembur';
                     }
@@ -148,8 +151,9 @@ class LaporanController extends Controller
 
             $laporan[] = [
                 'user'             => $user,
-                'total_hari_kerja' => $totalHariKerja,
-                'total_hari_telat' => $totalHariTelat,
+                'total_hari_kerja'   => $totalHariKerja,
+                'total_hari_telat'   => $totalHariTelat,
+                'total_hari_lembur'  => $totalHariLembur,
                 'is_shift'         => $isShiftUser,
                 'shift_nama'       => $isShiftUser ? 'Pegawai Shift' : null,
                 'rows'             => $rows,
@@ -249,7 +253,7 @@ class LaporanController extends Controller
 
         $laporan = $this->generateLaporan($request->user_id, $request->bulan);
         $pdf = PDF::loadView('admin.manajemenlaporan_pdf', compact('laporan'))
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'landscape');
 
         $bulanNama = Carbon::createFromFormat('Y-m', $request->bulan)->isoFormat('MMMM Y');
         $filename = $request->user_id

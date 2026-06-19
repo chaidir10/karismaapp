@@ -96,13 +96,50 @@ class DashboardAdminController extends Controller
             ]);
         }
 
+        // Lembur hari ini
+        $lemburHariIni = Presensi::with('user')
+            ->whereDate('tanggal', $today)
+            ->where('is_lembur', true)
+            ->where('status', 'approved')
+            ->orderBy('jam', 'asc')
+            ->get();
+
+        // Statistik kehadiran 7 hari terakhir
+        $chartLabels = [];
+        $chartHadir = [];
+        $chartTelat = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $chartLabels[] = $date->translatedFormat('D d/m');
+
+            $hadirCount = Presensi::whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_lembur', false)
+                ->where('status', 'approved')->distinct('user_id')->count('user_id');
+            $chartHadir[] = $hadirCount;
+
+            $telatCount = 0;
+            $masukRecords = Presensi::with('user')->whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_lembur', false)
+                ->where('status', 'approved')->get();
+            foreach ($masukRecords as $m) {
+                $jadwal = $m->user->getJadwalKerja($date);
+                $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
+                if ($m->jam > $batas) $telatCount++;
+            }
+            $chartTelat[] = $telatCount;
+        }
+
         return view('admin.dashboard', compact(
             'jumlahHadir',
             'jumlahPegawai',
             'jumlahPengajuan',
             'presensiHariIni',
             'pengajuanPending',
-            'presensiPending'
+            'presensiPending',
+            'lemburHariIni',
+            'chartLabels',
+            'chartHadir',
+            'chartTelat'
         ));
     }
 

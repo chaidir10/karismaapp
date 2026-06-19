@@ -914,7 +914,59 @@
             </div>
         </div>
 
+        {{-- Lembur Hari Ini --}}
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">Lembur Hari Ini</h2>
+                <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburHariIni->where('jenis','masuk')->count() }} pegawai</span>
+            </div>
+            <div class="card-content">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Pegawai</th>
+                                <th>Jenis</th>
+                                <th>Jam</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lemburHariIniTable" data-paginate="10">
+                            @forelse($lemburHariIni as $index => $l)
+                            <tr>
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                                <td class="user-name">{{ $l->user->name ?? 'N/A' }}</td>
+                                <td><span class="badge" style="background:rgba(245,158,11,0.1);color:#d97706;border:1px solid rgba(245,158,11,0.2);">Lembur {{ ucfirst($l->jenis) }}</span></td>
+                                <td class="time-cell">{{ $l->jam ?? '-' }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    <div class="empty-content">
+                                        <i class="fas fa-moon"></i>
+                                        <p>Tidak ada lembur hari ini</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>{{-- end .content-grid --}}
+
+    {{-- Grafik Kehadiran 7 Hari --}}
+    <div class="content-card" style="margin-top:20px;">
+        <div class="card-header">
+            <h2 class="card-title">Tren Kehadiran 7 Hari Terakhir</h2>
+        </div>
+        <div class="card-content" style="padding:20px;">
+            <canvas id="attendanceChart" height="200"></canvas>
+        </div>
+    </div>
+
 </div>{{-- end .admin-dashboard --}}
 
 
@@ -1552,6 +1604,48 @@
         initTable('presensiPendingTable');
         initTable('pengajuanPendingTable');
         initTable('presensiHariIniTable');
+        initTable('lemburHariIniTable');
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('attendanceChart');
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @json($chartLabels),
+                datasets: [
+                    {
+                        label: 'Hadir',
+                        data: @json($chartHadir),
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    },
+                    {
+                        label: 'Terlambat',
+                        data: @json($chartTelat),
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 12 } } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+                }
+            }
+        });
     });
 </script>
 

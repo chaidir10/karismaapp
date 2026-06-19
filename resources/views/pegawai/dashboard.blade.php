@@ -34,31 +34,37 @@
 
     /* Work Timer Banner */
     .work-timer-banner {
-    margin: 20px 5px 0px;
-    padding: 13px 25px 13px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    font-weight: 800;
+        margin: 0 15px 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .work-timer-banner.timer-yellow {
         background: #fef3c7;
         color: #92400e;
-        border: 2px dashed #fde68a;
+        border: 1px solid #fde68a;
     }
 
     .work-timer-banner.timer-green {
         background: #d1fae5;
         color: #065f46;
-        border: 2px dashed #a7f3d0;
+        border: 1px solid #a7f3d0;
+    }
+
+    .work-timer-banner.timer-blue {
+        background: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
     }
 
     .work-timer-banner .timer-clock {
         font-variant-numeric: tabular-nums;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
     }
 </style>
@@ -104,8 +110,13 @@
 
     {{-- Timer Jam Kerja --}}
     @if($sudahPresensiMasuk && $jamMasukHariIni)
-    <div class="work-timer-banner timer-yellow" id="workTimerBanner">
-        <span><i class="fas fa-hourglass-half"></i> <span id="workTimerLabel">Jam kerja berjalan</span></span>
+    @php
+        $pulangRec = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
+    @endphp
+    <div class="work-timer-banner {{ $pulangRec ? 'timer-blue' : 'timer-yellow' }}" id="workTimerBanner"
+        data-stopped="{{ $pulangRec ? '1' : '0' }}"
+        data-pulang-jam="{{ $pulangRec->jam ?? '' }}">
+        <span><i class="fas {{ $pulangRec ? 'fa-check-circle' : 'fa-hourglass-half' }}"></i> <span id="workTimerLabel">{{ $pulangRec ? 'Selesai' : 'Jam kerja berjalan' }}</span></span>
         <span class="timer-clock" id="workTimerClock">00:00:00</span>
     </div>
     @endif
@@ -113,9 +124,10 @@
 
 {{-- Floating Lembur Button --}}
 @if(!$sudahLemburMasuk)
-<button class="lembur-floating lembur-masuk" data-bs-toggle="modal" data-bs-target="#presensiModal"
+<button class="lembur-fab lembur-idle" data-bs-toggle="modal" data-bs-target="#presensiModal"
     onclick="setJenis('masuk'); setLembur(true)">
-    <i class="fas fa-clock"></i> Masuk Lembur
+    <div class="lembur-fab-icon"><i class="fas fa-bolt"></i></div>
+    <div class="lembur-fab-text">Mulai Lembur</div>
 </button>
 @elseif(!$sudahLemburPulang)
 @php
@@ -123,15 +135,18 @@
         ->where('tanggal', now()->format('Y-m-d'))
         ->where('jenis', 'masuk')->where('is_lembur', true)->first();
 @endphp
-<button class="lembur-floating lembur-pulang" data-bs-toggle="modal" data-bs-target="#presensiModal"
+<button class="lembur-fab lembur-active" data-bs-toggle="modal" data-bs-target="#presensiModal"
     onclick="setJenis('pulang'); setLembur(true)">
-    <i class="fas fa-clock"></i>
-    <span>Lembur Pulang</span>
-    <span class="lembur-timer" id="lemburTimer" data-start="{{ $lemburMasukRecord->jam ?? '' }}">00:00:00</span>
+    <div class="lembur-fab-icon pulse"><i class="fas fa-bolt"></i></div>
+    <div class="lembur-fab-text">
+        <span class="lembur-fab-label">Selesai Lembur</span>
+        <span class="lembur-fab-timer" id="lemburTimer" data-start="{{ $lemburMasukRecord->jam ?? '' }}">00:00:00</span>
+    </div>
 </button>
 @else
-<div class="lembur-floating lembur-done">
-    <i class="fas fa-check-circle"></i> Lembur Selesai
+<div class="lembur-fab lembur-done">
+    <div class="lembur-fab-icon"><i class="fas fa-check"></i></div>
+    <div class="lembur-fab-text">Lembur Selesai</div>
 </div>
 @endif
 
@@ -644,57 +659,89 @@
         filter: grayscale(0.5);
     }
 
-    /* Floating Lembur Button */
-    .lembur-floating {
+    /* Floating Lembur FAB */
+    .lembur-fab {
         position: fixed;
         bottom: 80px;
         right: 15px;
         z-index: 50;
         border: none;
-        border-radius: 16px;
-        padding: 10px 16px;
-        font-size: 13px;
-        font-weight: 700;
+        border-radius: 14px;
+        padding: 10px 14px;
         color: #fff;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        transition: transform 0.2s;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .lembur-floating:active { transform: scale(0.95); }
+    .lembur-fab:active { transform: scale(0.95); }
 
-    .lembur-masuk {
+    .lembur-fab-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .lembur-fab-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+
+    .lembur-fab-label {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .lembur-fab-timer {
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0.85;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .lembur-idle {
         background: linear-gradient(135deg, #f59e0b, #d97706);
     }
 
-    .lembur-pulang {
+    .lembur-idle .lembur-fab-text {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .lembur-active {
         background: linear-gradient(135deg, #10b981, #059669);
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 2px;
-    }
-
-    .lembur-pulang span:first-of-type {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .lembur-timer {
-        font-size: 11px;
-        font-weight: 600;
-        opacity: 0.9;
-        font-variant-numeric: tabular-nums;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
     }
 
     .lembur-done {
         background: #94a3b8;
         cursor: default;
         pointer-events: none;
-        opacity: 0.7;
+        opacity: 0.6;
+    }
+
+    .lembur-done .lembur-fab-text {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .pulse {
+        animation: fabPulse 2s infinite;
+    }
+
+    @keyframes fabPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+        50% { box-shadow: 0 0 0 6px rgba(255,255,255,0); }
     }
 </style>
 @endpush
@@ -769,6 +816,9 @@
         var labelEl = document.getElementById('workTimerLabel');
         if (!banner || !clockEl) return;
 
+        var stopped = banner.getAttribute('data-stopped') === '1';
+        var pulangJam = banner.getAttribute('data-pulang-jam') || '';
+
         var jamMasuk = @json($jamMasukHariIni ?? '');
         var jamPulang = @json($jamPulangTarget ?? '16:00:00');
         var jadwalMasuk = @json($jadwalKerjaHariIni['jam_masuk'] ?? '07:30:00');
@@ -779,7 +829,6 @@
         var jParts = jadwalMasuk.split(':');
         var pParts = jamPulang.split(':');
 
-        // Jam mulai hitung: jam_masuk jadwal atau jam masuk aktual (mana yg lebih lambat)
         var jadwalStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
             parseInt(jParts[0]), parseInt(jParts[1]), parseInt(jParts[2] || 0));
         var actualStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
@@ -790,6 +839,20 @@
             parseInt(pParts[0]), parseInt(pParts[1]), parseInt(pParts[2] || 0));
         var totalTarget = Math.floor((endTime - jadwalStart) / 1000);
         if (totalTarget <= 0) totalTarget = 8 * 3600;
+
+        if (stopped && pulangJam) {
+            var ppParts = pulangJam.split(':');
+            var pulangTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+                parseInt(ppParts[0]), parseInt(ppParts[1]), parseInt(ppParts[2] || 0));
+            var elapsed = Math.floor((pulangTime - startTime) / 1000);
+            if (elapsed < 0) elapsed = 0;
+            var h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            var m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            var s = String(elapsed % 60).padStart(2, '0');
+            clockEl.textContent = h + ':' + m + ':' + s;
+            workTimerFulfilled = elapsed >= totalTarget;
+            return;
+        }
 
         function update() {
             var elapsed = Math.floor((new Date() - startTime) / 1000);
@@ -809,7 +872,7 @@
                 var sisa = totalTarget - elapsed;
                 var sh = Math.floor(sisa / 3600);
                 var sm = Math.floor((sisa % 3600) / 60);
-                labelEl.innerHTML = '</i> Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                labelEl.innerHTML = '<i class="fas fa-hourglass-half"></i> Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
                 workTimerFulfilled = false;
             }
         }

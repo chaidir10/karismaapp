@@ -83,6 +83,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
         $rows[] = ['Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
         $rows[] = ['Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Hari Lembur', '', $this->data['total_hari_lembur'] ?? 0];
         $rows[] = ['Total Lembur', '', $this->formatMenit($this->data['summary']['total_lembur'])];
 
         return $rows;
@@ -146,11 +147,11 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         // merge ringkasan
         $highestRow = $sheet->getHighestRow();
-        for ($r = $highestRow - 5; $r <= $highestRow; $r++) {
+        for ($r = $highestRow - 6; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");
         }
-        $sheet->getStyle("A" . ($highestRow - 5) . ":D{$highestRow}")
+        $sheet->getStyle("A" . ($highestRow - 6) . ":D{$highestRow}")
             ->getFont()->setBold(true);
 
         // ====================================================
@@ -158,7 +159,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         // ====================================================
         $dataStart = 6; // baris pertama data setelah header
 
-        for ($r = $dataStart; $r <= $highestRow - 7; $r++) {
+        for ($r = $dataStart; $r <= $highestRow - 8; $r++) {
             $tanggal = $sheet->getCell("A{$r}")->getValue();
             if (!$tanggal) continue;
 
