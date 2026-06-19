@@ -654,7 +654,8 @@
             isOutsideRadius = true;
 
             // ambil alamat real
-            getAddressFromCoordinates(lat, lng, 'location-address-mini');
+            const miniEl = document.getElementById('location-address-mini');
+            if (miniEl) getAddressFromCoordinates(lat, lng, miniEl);
         }
     }
 
@@ -728,57 +729,70 @@
         }
     }
 
+    const detailWilayahAlamat = @json(Auth::user()->wilayahKerja->alamat ?? '');
+
     function initializeDetailModals() {
         if (!window.L) return;
 
         @foreach($riwayatHariIni as $p)
             @if($p->lokasi)
-                const modal{{ $p->id }} = document.getElementById('detailModal{{ $p->id }}');
-                if (modal{{ $p->id }}) {
-                    modal{{ $p->id }}.addEventListener('shown.bs.modal', function () {
-                        const coords = @json($p->lokasi).split(',');
-                        const lat = parseFloat(coords[0]);
-                        const lng = parseFloat(coords[1]);
+            (function() {
+                const modal = document.getElementById('detailModal{{ $p->id }}');
+                const status = @json($p->status);
+                if (!modal) return;
 
-                        const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-                        L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+                modal.addEventListener('shown.bs.modal', function () {
+                    const coords = @json($p->lokasi).split(',');
+                    const lat = parseFloat(coords[0]);
+                    const lng = parseFloat(coords[1]);
 
-                        getAddressFromCoordinates(lat, lng, 'locationAddress{{ $p->id }}');
-                        this._map = map;
+                    const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                    L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+                    this._map = map;
 
-                        setTimeout(() => {
-                            try { map.invalidateSize(); } catch (e) {}
-                        }, 300);
-                    });
-
-                    modal{{ $p->id }}.addEventListener('hidden.bs.modal', function () {
-                        if (this._map) {
-                            try { this._map.remove(); } catch (e) {}
-                            this._map = null;
+                    const addrEl = document.getElementById('locationAddress{{ $p->id }}');
+                    if (addrEl) {
+                        if (status === 'approved' && detailWilayahAlamat) {
+                            addrEl.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + detailWilayahAlamat;
+                        } else {
+                            getAddressFromCoordinates(lat, lng, addrEl);
                         }
-                    });
-                }
+                    }
+
+                    setTimeout(() => {
+                        try { map.invalidateSize(); } catch (e) {}
+                    }, 300);
+                });
+
+                modal.addEventListener('hidden.bs.modal', function () {
+                    if (this._map) {
+                        try { this._map.remove(); } catch (e) {}
+                        this._map = null;
+                    }
+                });
+            })();
             @endif
         @endforeach
     }
 
-    function getAddressFromCoordinates(lat, lng, elementId) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-
+    function getAddressFromCoordinates(lat, lng, el) {
         el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin me-2"></i>Mendeteksi alamat...</div>';
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
-            headers: { 'Accept': 'application/json' }
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+        .then(r => {
+            if (!r.ok) throw new Error(r.status);
+            return r.json();
         })
-        .then(r => r.json())
         .then(data => {
-            el.innerHTML = (data && data.display_name) ? data.display_name : '<span class="text-warning">Alamat tidak dapat ditemukan</span>';
+            if (data && data.display_name) {
+                el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + data.display_name;
+            } else {
+                throw new Error('no data');
+            }
         })
-        .catch(e => {
-            console.error(e);
-            el.innerHTML = '<span class="text-danger">Gagal mendapatkan alamat</span>';
+        .catch(() => {
+            el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
         });
     }
 
