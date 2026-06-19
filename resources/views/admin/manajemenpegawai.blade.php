@@ -113,9 +113,9 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            @if($user->can_shift && $user->jamShift)
+                            @if($user->can_shift)
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                {{ $user->jamShift->nama }}
+                                Shift
                             </span>
                             @else
                             <span class="text-gray-400 text-xs">Normal</span>
@@ -783,7 +783,7 @@
                 // Tampilkan info shift
                 const shiftEl = document.getElementById('detailShift');
                 if (shiftEl) {
-                    shiftEl.textContent = user.can_shift && user.shift_nama ? user.shift_nama : 'Jam Kerja Normal';
+                    shiftEl.textContent = user.can_shift ? 'Pegawai Shift' : 'Jam Kerja Normal';
                 }
 
                 openModal('modalDetail');
