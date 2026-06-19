@@ -34,7 +34,7 @@
 
     /* Work Timer Card */
     .work-timer-card {
-        margin: -10px 20px 20px;
+        margin: 0 20px 15px;
         padding: 14px 18px;
         border-radius: 16px;
         display: flex;
@@ -151,11 +151,9 @@
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
-
-    </div>
 </div>
 
-{{-- Timer Jam Kerja — terpisah dari card --}}
+{{-- Timer Jam Kerja --}}
 @if($sudahPresensiMasuk && $jamMasukHariIni)
 @php
     $pulangRec = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
