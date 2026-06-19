@@ -290,11 +290,11 @@
         margin-bottom: 0;
         background: var(--white);
         border-bottom: 1px solid var(--gray-light);
-        padding: 16px 20px;
+        padding: 8px 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        min-height: 60px;
+        min-height: 44px;
         box-sizing: border-box;
     }
 
@@ -385,9 +385,9 @@
     }
 
     .detail-info-section {
-        padding: 20px;
+        padding: 12px 16px;
         background: var(--white);
-        flex: 1;
+        flex-shrink: 0;
         overflow-y: auto;
         border-top: 1px solid var(--gray-light);
         box-sizing: border-box;
@@ -396,19 +396,19 @@
     .detail-datetime-info {
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
-        padding: 20px;
-        border-radius: 16px;
-        margin-bottom: 20px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 10px;
         text-align: center;
     }
 
     .detail-type-badge {
         display: inline-block;
-        padding: 8px 16px;
+        padding: 5px 12px;
         border-radius: 20px;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin-bottom: 6px;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(10px);
     }
@@ -422,16 +422,16 @@
     }
 
     .detail-date {
-        font-size: 16px;
+        font-size: 13px;
         opacity: 0.9;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
         font-weight: 500;
     }
 
     .detail-location-address {
-        margin-top: 12px;
-        font-size: 14px;
-        line-height: 1.5;
+        margin-top: 6px;
+        font-size: 12px;
+        line-height: 1.4;
         color: rgba(255, 255, 255, 0.9);
         word-break: break-word;
     }
@@ -442,16 +442,16 @@
         justify-content: center;
         gap: 8px;
         color: rgba(255, 255, 255, 0.9);
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .detail-back-btn {
         width: 100%;
-        padding: 16px;
+        padding: 10px;
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
         border: none;
-        border-radius: 12px;
+        border-radius: 10px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s;
@@ -459,8 +459,8 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-size: 16px;
-        min-height: 52px;
+        font-size: 14px;
+        min-height: 40px;
         box-sizing: border-box;
         box-shadow: 0 4px 8px rgba(90, 182, 234, 0.3);
     }
