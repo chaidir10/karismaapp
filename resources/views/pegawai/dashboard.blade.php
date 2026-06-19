@@ -34,8 +34,8 @@
 
     /* Work Timer Banner */
     .work-timer-banner {
-        margin: 15px 10px 10px;
-        padding: 8px 14px;
+        margin: 12px 10px 4px;
+        padding: 14px 18px;
         border-radius: 10px;
         display: flex;
         align-items: center;
@@ -47,18 +47,18 @@
     .work-timer-banner.timer-yellow {
         background: #fef3c7;
         color: #92400e;
-        border: 1px solid #fde68a;
+        border: 2px dashed #fde68a;
     }
 
     .work-timer-banner.timer-green {
         background: #d1fae5;
         color: #065f46;
-        border: 1px solid #a7f3d0;
+        border: 2px dashed #a7f3d0;
     }
 
     .work-timer-banner .timer-clock {
         font-variant-numeric: tabular-nums;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
     }
 </style>
@@ -74,9 +74,9 @@
     <div class="attendance-time">
         <i class="far fa-clock time-icon"></i>
         @if($shiftHariIni ?? false)
-            <span>{{ $shiftHariIni->nama }} ({{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }})</span>
+        <span>{{ $shiftHariIni->nama }} ({{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }})</span>
         @else
-            <span>Jam Kerja (07:30 - 16:00)</span>
+        <span>Jam Kerja (07:30 - 16:00)</span>
         @endif
     </div>
 
@@ -84,9 +84,9 @@
         <button class="attendance-btn {{ $sudahPresensiMasuk ? 'btn-disabled' : '' }}"
             id="clock-in-btn"
             @if($user->can_shift && $shifts->count() > 0 && !$sudahPresensiMasuk)
-                data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
+            data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
             @else
-                data-bs-toggle="modal" data-bs-target="#presensiModal"
+            data-bs-toggle="modal" data-bs-target="#presensiModal"
             @endif
             onclick="setJenis('masuk'); setLembur(false)"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
@@ -119,9 +119,9 @@
 </button>
 @elseif(!$sudahLemburPulang)
 @php
-    $lemburMasukRecord = \App\Models\Presensi::where('user_id', Auth::id())
-        ->where('tanggal', now()->format('Y-m-d'))
-        ->where('jenis', 'masuk')->where('is_lembur', true)->first();
+$lemburMasukRecord = \App\Models\Presensi::where('user_id', Auth::id())
+->where('tanggal', now()->format('Y-m-d'))
+->where('jenis', 'masuk')->where('is_lembur', true)->first();
 @endphp
 <button class="lembur-floating lembur-pulang" data-bs-toggle="modal" data-bs-target="#presensiModal"
     onclick="setJenis('pulang'); setLembur(true)">
@@ -608,7 +608,7 @@
         color: rgba(255, 255, 255, 0.8);
         font-size: 11px;
         margin-top: 8px;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     }
 
     .face-status {
@@ -660,11 +660,13 @@
         align-items: center;
         gap: 8px;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s;
     }
 
-    .lembur-floating:active { transform: scale(0.95); }
+    .lembur-floating:active {
+        transform: scale(0.95);
+    }
 
     .lembur-masuk {
         background: linear-gradient(135deg, #f59e0b, #d97706);
@@ -829,7 +831,8 @@
         setJenis('pulang');
         setLembur(false);
         @if($shiftHariIni ?? false)
-        document.getElementById('jamShiftIdInput').value = '{{ $shiftHariIni->id ?? '' }}';
+        document.getElementById('jamShiftIdInput').value = '{{ $shiftHariIni->id ?? '
+        ' }}';
         @endif
 
         if (!workTimerFulfilled) {
@@ -889,15 +892,15 @@
 
         // Handle response dari server
         @if(session('success'))
-            showSuccess(@json(session('success')));
+        showSuccess(@json(session('success')));
         @endif
 
         @if(session('error'))
-            showError(@json(session('error')));
+        showError(@json(session('error')));
         @endif
 
         @if(session('warning'))
-            showWarning(@json(session('warning')));
+        showWarning(@json(session('warning')));
         @endif
     });
 
@@ -915,7 +918,9 @@
         }
 
         if (mapInstance) {
-            try { mapInstance.remove(); } catch (e) {}
+            try {
+                mapInstance.remove();
+            } catch (e) {}
             mapInstance = null;
         }
 
@@ -958,25 +963,29 @@
         }
 
         navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            },
-            audio: false
-        })
-        .then(stream => {
-            videoStream = stream;
-            video.srcObject = stream;
-            return video.play().catch(() => {});
-        })
-        .then(() => {
-            initFaceDetection();
-        })
-        .catch(err => {
-            console.error(err);
-            showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
-        });
+                video: {
+                    facingMode: 'user',
+                    width: {
+                        ideal: 1280
+                    },
+                    height: {
+                        ideal: 720
+                    }
+                },
+                audio: false
+            })
+            .then(stream => {
+                videoStream = stream;
+                video.srcObject = stream;
+                return video.play().catch(() => {});
+            })
+            .then(() => {
+                initFaceDetection();
+            })
+            .catch(err => {
+                console.error(err);
+                showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
+            });
     }
 
     async function initFaceDetection() {
@@ -1016,7 +1025,10 @@
         const video = document.getElementById('video');
         if (!video) return;
 
-        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.35 });
+        const options = new faceapi.TinyFaceDetectorOptions({
+            inputSize: 160,
+            scoreThreshold: 0.35
+        });
         let detecting = false;
 
         async function detect() {
@@ -1053,9 +1065,9 @@
 
         if (statusEl) {
             statusEl.className = detected ? 'face-status face-ok' : 'face-status no-face';
-            statusEl.innerHTML = detected
-                ? '<i class="fas fa-user-check"></i> Wajah terdeteksi'
-                : '<i class="fas fa-user-slash"></i> Wajah tidak terdeteksi';
+            statusEl.innerHTML = detected ?
+                '<i class="fas fa-user-check"></i> Wajah terdeteksi' :
+                '<i class="fas fa-user-slash"></i> Wajah tidak terdeteksi';
         }
 
         if (ovalEl) {
@@ -1095,8 +1107,11 @@
                 console.error(err);
                 if (addrEl) addrEl.textContent = "Gagal mendapatkan lokasi (izin ditolak / GPS mati)";
                 initializeMiniMapWithDefault();
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            }, {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 60000
+            }
         );
     }
 
@@ -1183,15 +1198,17 @@
 
             L.marker([lat, lng]).addTo(mapInstance);
 
-            ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
-                .forEach(f => mapInstance[f] && mapInstance[f].disable());
+            ['dragging', 'touchZoom', 'doubleClickZoom', 'scrollWheelZoom', 'boxZoom', 'keyboard']
+            .forEach(f => mapInstance[f] && mapInstance[f].disable());
         } else {
             mapInstance.setView([lat, lng], 17);
         }
 
         // penting: setelah modal tampil, map perlu invalidateSize
         setTimeout(() => {
-            try { mapInstance.invalidateSize(); } catch (e) {}
+            try {
+                mapInstance.invalidateSize();
+            } catch (e) {}
         }, 300);
     }
 
@@ -1212,7 +1229,9 @@
             }).addTo(mapInstance);
 
             setTimeout(() => {
-                try { mapInstance.invalidateSize(); } catch (e) {}
+                try {
+                    mapInstance.invalidateSize();
+                } catch (e) {}
             }, 300);
         }
     }
@@ -1223,14 +1242,14 @@
         if (!window.L) return;
 
         @foreach($riwayatHariIni as $p)
-            @if($p->lokasi)
+        @if($p - > lokasi)
             (function() {
                 const modal = document.getElementById('detailModal{{ $p->id }}');
-                const status = @json($p->status);
+                const status = @json($p - > status);
                 if (!modal) return;
 
                 modal.addEventListener('shown.bs.modal', function() {
-                    const coords = @json($p->lokasi).split(',');
+                    const coords = @json($p - > lokasi).split(',');
                     const lat = parseFloat(coords[0]);
                     const lng = parseFloat(coords[1]);
                     const addrEl = document.getElementById('locationAddress{{ $p->id }}');
@@ -1242,10 +1261,16 @@
 
                     try {
                         const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19
+                        }).addTo(map);
                         L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
                         this._map = map;
-                        setTimeout(() => { try { map.invalidateSize(); } catch(e){} }, 300);
+                        setTimeout(() => {
+                            try {
+                                map.invalidateSize();
+                            } catch (e) {}
+                        }, 300);
                     } catch (e) {
                         console.error('Map error:', e);
                     }
@@ -1261,12 +1286,14 @@
 
                 modal.addEventListener('hidden.bs.modal', function() {
                     if (this._map) {
-                        try { this._map.remove(); } catch(e){}
+                        try {
+                            this._map.remove();
+                        } catch (e) {}
                         this._map = null;
                     }
                 });
             })();
-            @endif
+        @endif
         @endforeach
     }
 
@@ -1339,7 +1366,10 @@
 
     function showConfirmationModal() {
         const jenis = document.getElementById('jenisPresensi')?.value || '';
-        const waktu = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const waktu = new Date().toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
 
         document.getElementById('confirmationJenis').textContent = jenis.toUpperCase();
         document.getElementById('confirmationWaktu').textContent = waktu;
