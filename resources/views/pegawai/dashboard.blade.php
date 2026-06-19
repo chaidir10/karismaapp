@@ -34,8 +34,8 @@
 
     /* Work Timer Banner */
     .work-timer-banner {
-    margin: -10px 10px 4px;
-    padding: 20px 14px 18px;
+    margin: -15px 10px 4px;
+    padding: 25px 14px 25px;
     border-radius: 10px;
     display: flex;
     align-items: center;
