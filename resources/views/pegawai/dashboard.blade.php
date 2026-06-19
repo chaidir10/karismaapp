@@ -502,6 +502,7 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script>
     let videoStream = null;
     let mapInstance = null;
@@ -509,10 +510,9 @@
     let isOutsideRadius = false;
     let capturedPhotoData = null;
     let autoCloseTimer = null;
-    let faceDetector = null;
     let faceDetectionLoop = null;
     let faceDetected = false;
-    let faceDetectionSupported = false;
+    let faceModelLoaded = false;
 
     // Variabel status presensi dari controller
     const sudahPresensiMasuk = @json($sudahPresensiMasuk);
@@ -646,64 +646,75 @@
         });
     }
 
-    function initFaceDetection() {
-        if (typeof window.FaceDetector === 'undefined') {
-            faceDetectionSupported = false;
-            updateFaceStatus(true);
+    async function initFaceDetection() {
+        const submitBtn = document.querySelector('.submit-btn-large');
+        const statusEl = document.getElementById('faceStatus');
+
+        if (typeof faceapi === 'undefined') {
+            if (statusEl) statusEl.style.display = 'none';
             return;
         }
 
-        faceDetectionSupported = true;
-        faceDetector = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
-
-        const submitBtn = document.querySelector('.submit-btn-large');
         if (submitBtn) submitBtn.disabled = true;
         updateFaceStatus(false);
+
+        if (!faceModelLoaded) {
+            try {
+                if (statusEl) {
+                    statusEl.className = 'face-status no-face';
+                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...';
+                }
+                await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+                faceModelLoaded = true;
+            } catch (e) {
+                console.error('Gagal memuat model face detection:', e);
+                if (statusEl) statusEl.style.display = 'none';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+        }
 
         startFaceDetectionLoop();
     }
 
     function startFaceDetectionLoop() {
         const video = document.getElementById('video');
-        if (!video || !faceDetector) return;
+        if (!video) return;
+
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 });
+        let detecting = false;
 
         async function detect() {
-            if (!videoStream || !faceDetector) return;
-            if (video.readyState < 2) {
-                faceDetectionLoop = requestAnimationFrame(detect);
+            if (!videoStream) return;
+            if (video.readyState < 2 || detecting) {
+                faceDetectionLoop = setTimeout(detect, 300);
                 return;
             }
 
+            detecting = true;
             try {
-                const faces = await faceDetector.detect(video);
-                const found = faces.length > 0;
+                const result = await faceapi.detectAllFaces(video, options);
+                const found = result.length > 0;
 
                 if (found !== faceDetected) {
                     faceDetected = found;
                     updateFaceStatus(found);
-                    drawFaceOverlay(faces);
-                } else {
-                    drawFaceOverlay(faces);
                 }
-            } catch (e) {
-                // detect can fail if video frame not ready
-            }
+                drawFaceOverlay(result);
+            } catch (e) {}
+            detecting = false;
 
-            faceDetectionLoop = requestAnimationFrame(detect);
+            if (videoStream) {
+                faceDetectionLoop = setTimeout(detect, 300);
+            }
         }
 
-        faceDetectionLoop = requestAnimationFrame(detect);
+        faceDetectionLoop = setTimeout(detect, 500);
     }
 
     function updateFaceStatus(detected) {
         const statusEl = document.getElementById('faceStatus');
         const submitBtn = document.querySelector('.submit-btn-large');
-
-        if (!faceDetectionSupported) {
-            if (statusEl) statusEl.style.display = 'none';
-            if (submitBtn) submitBtn.disabled = false;
-            return;
-        }
 
         if (statusEl) {
             if (detected) {
@@ -715,46 +726,38 @@
             }
         }
 
-        if (submitBtn) {
-            submitBtn.disabled = !detected;
-        }
+        if (submitBtn) submitBtn.disabled = !detected;
     }
 
-    function drawFaceOverlay(faces) {
+    function drawFaceOverlay(detections) {
         const video = document.getElementById('video');
         const overlay = document.getElementById('faceOverlay');
         if (!video || !overlay) return;
 
-        const ctx = overlay.getContext('2d');
         overlay.width = overlay.offsetWidth;
         overlay.height = overlay.offsetHeight;
+        const ctx = overlay.getContext('2d');
         ctx.clearRect(0, 0, overlay.width, overlay.height);
 
-        if (!faces || faces.length === 0) return;
+        if (!detections || detections.length === 0) return;
 
         const scaleX = overlay.width / video.videoWidth;
         const scaleY = overlay.height / video.videoHeight;
 
-        faces.forEach(face => {
-            const box = face.boundingBox;
-            const x = box.x * scaleX;
-            const y = box.y * scaleY;
-            const w = box.width * scaleX;
-            const h = box.height * scaleY;
-
+        detections.forEach(det => {
+            const box = det.box;
             ctx.strokeStyle = '#10b981';
             ctx.lineWidth = 2;
             ctx.setLineDash([6, 4]);
-            ctx.strokeRect(x, y, w, h);
+            ctx.strokeRect(box.x * scaleX, box.y * scaleY, box.width * scaleX, box.height * scaleY);
         });
     }
 
     function stopFaceDetection() {
         if (faceDetectionLoop) {
-            cancelAnimationFrame(faceDetectionLoop);
+            clearTimeout(faceDetectionLoop);
             faceDetectionLoop = null;
         }
-        faceDetector = null;
         faceDetected = false;
 
         const overlay = document.getElementById('faceOverlay');
