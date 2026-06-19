@@ -963,7 +963,9 @@
             <h2 class="card-title">Tren Kehadiran 7 Hari Terakhir</h2>
         </div>
         <div class="card-content" style="padding:20px;">
-            <canvas id="attendanceChart" height="200"></canvas>
+            <div style="position:relative; height:280px;">
+                <canvas id="attendanceChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -1613,36 +1615,73 @@
     document.addEventListener('DOMContentLoaded', function() {
         var ctx = document.getElementById('attendanceChart');
         if (!ctx) return;
+
         new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: @json($chartLabels),
                 datasets: [
                     {
                         label: 'Hadir',
                         data: @json($chartHadir),
-                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                        borderRadius: 6,
-                        barPercentage: 0.6
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     },
                     {
                         label: 'Terlambat',
                         data: @json($chartTelat),
-                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                        borderRadius: 6,
-                        barPercentage: 0.6
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#ef4444',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 12 } } }
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 10, boxHeight: 10, borderRadius: 5, useBorderRadius: true, padding: 20, font: { size: 12, weight: '500' } }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(30,41,59,0.9)',
+                        titleFont: { size: 12 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        boxWidth: 8, boxHeight: 8, boxPadding: 4
+                    }
                 },
                 scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                    x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, font: { size: 11 }, color: '#94a3b8' },
+                        grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+                        border: { display: false }
+                    },
+                    x: {
+                        ticks: { font: { size: 10 }, color: '#94a3b8' },
+                        grid: { display: false },
+                        border: { display: false }
+                    }
                 }
             }
         });

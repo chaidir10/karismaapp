@@ -29,10 +29,11 @@ class DashboardAdminController extends Controller
         // Total pengajuan pending
         $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
 
-        // Presensi hari ini (masuk & pulang, hanya yang approved)
+        // Presensi hari ini (reguler saja, bukan lembur)
         $presensiHariIni = Presensi::with('user')
             ->whereDate('tanggal', $today)
             ->where('status', 'approved')
+            ->where('is_lembur', false)
             ->orderBy('jam', 'asc')
             ->get();
 
