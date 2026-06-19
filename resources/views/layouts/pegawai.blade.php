@@ -528,9 +528,10 @@
         .mini-map-container {
             position: absolute;
             top: 70px;
-            right: 15px;
-            width: 300px;
-            height: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 360px;
             z-index: 10;
             background: white;
             border-radius: 12px;
@@ -846,13 +847,12 @@
 
             .mini-map-container {
                 top: 60px;
-                right: 10px;
-                width: 370px;
-                height: 130px;
+                width: 92%;
+                max-width: 400px;
             }
 
             .mini-map {
-                height: 85px;
+                height: 100px;
             }
 
             .submit-btn-large {

@@ -334,17 +334,21 @@
         overflow: hidden;
     }
 
-    .detail-image-container,
-    .detail-map-container {
-        flex: 1;
+    .detail-image-container {
+        flex: 3;
         height: 100%;
         position: relative;
         margin: 0;
         padding: 0;
+        border-right: 1px solid #e0e0e0;
     }
 
-    .detail-image-container {
-        border-right: 1px solid #e0e0e0;
+    .detail-map-container {
+        flex: 2;
+        height: 100%;
+        position: relative;
+        margin: 0;
+        padding: 0;
     }
 
     .detail-image {
@@ -533,18 +537,16 @@
     @media (max-width: 576px) {
         .detail-content-container {
             flex-direction: column;
-            height: 70vh;
-        }
-
-        .detail-image-container,
-        .detail-map-container {
-            flex: 1;
-            min-height: 50%;
         }
 
         .detail-image-container {
+            flex: 3;
             border-right: none;
             border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-map-container {
+            flex: 2;
         }
     }
 
