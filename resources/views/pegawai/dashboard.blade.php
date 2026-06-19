@@ -77,8 +77,6 @@
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
-
-    </div>
 </div>
 
 {{-- Floating Lembur Button --}}
