@@ -51,6 +51,15 @@ class DashboardController extends Controller
             $wilayahList = collect([$user->wilayahKerja]);
         }
 
+        $wilayahJson = $wilayahList->map(function ($w) {
+            return [
+                'lat' => (float) $w->latitude,
+                'lng' => (float) $w->longitude,
+                'radius' => (float) ($w->radius ?? 100),
+                'alamat' => $w->alamat ?? '',
+            ];
+        })->values()->toArray();
+
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
             'user',
@@ -58,7 +67,8 @@ class DashboardController extends Controller
             'jamKerja',
             'sudahPresensiMasuk',
             'sudahPresensiPulang',
-            'wilayahList'
+            'wilayahList',
+            'wilayahJson'
         ));
     }
 }

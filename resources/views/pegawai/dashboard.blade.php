@@ -795,12 +795,7 @@
         );
     }
 
-    const wilayahList = @json($wilayahList->map(fn($w) => [
-        'lat' => (float) $w->latitude,
-        'lng' => (float) $w->longitude,
-        'radius' => (float) ($w->radius ?? 100),
-        'alamat' => $w->alamat ?? '',
-    ])->values());
+    const wilayahList = @json($wilayahJson);
 
     function updateLocationInfo(position) {
         const lat = position.coords.latitude;
@@ -917,7 +912,7 @@
         }
     }
 
-    const detailWilayahAlamat = @json($wilayahList->pluck('alamat')->filter()->first() ?? '');
+    const detailWilayahAlamat = @json($wilayahJson[0]['alamat'] ?? '');
 
     function initializeDetailModals() {
         if (!window.L) return;
