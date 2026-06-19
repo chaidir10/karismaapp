@@ -34,7 +34,7 @@
 
     /* Work Timer Card */
     .work-timer-card {
-        margin: 0 20px 15px;
+        margin: -30px 20px 15px;
         padding: 14px 18px;
         border-radius: 16px;
         display: flex;
