@@ -34,31 +34,31 @@
 
     /* Work Timer Banner */
     .work-timer-banner {
-        margin: 15px 10px 10px;
-        padding: 8px 14px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 12px;
-        font-weight: 800;
+    margin: 12px 10px 4px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 800;
     }
 
     .work-timer-banner.timer-yellow {
         background: #fef3c7;
         color: #92400e;
-        border: 1px solid #fde68a;
+        border: 2px dashed #fde68a;
     }
 
     .work-timer-banner.timer-green {
         background: #d1fae5;
         color: #065f46;
-        border: 1px solid #a7f3d0;
+        border: 2px dashed #a7f3d0;
     }
 
     .work-timer-banner .timer-clock {
         font-variant-numeric: tabular-nums;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
     }
 </style>
