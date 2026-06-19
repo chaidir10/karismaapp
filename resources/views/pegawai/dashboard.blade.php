@@ -741,17 +741,27 @@
                 const status = @json($p->status);
                 if (!modal) return;
 
-                modal.addEventListener('shown.bs.modal', function () {
+                modal.addEventListener('shown.bs.modal', function() {
                     const coords = @json($p->lokasi).split(',');
                     const lat = parseFloat(coords[0]);
                     const lng = parseFloat(coords[1]);
-
-                    const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-                    L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
-                    this._map = map;
-
                     const addrEl = document.getElementById('locationAddress{{ $p->id }}');
+
+                    if (isNaN(lat) || isNaN(lng)) {
+                        if (addrEl) addrEl.innerHTML = '<span>Koordinat tidak valid</span>';
+                        return;
+                    }
+
+                    try {
+                        const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                        L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+                        this._map = map;
+                        setTimeout(() => { try { map.invalidateSize(); } catch(e){} }, 300);
+                    } catch (e) {
+                        console.error('Map error:', e);
+                    }
+
                     if (addrEl) {
                         if (status === 'approved' && detailWilayahAlamat) {
                             addrEl.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + detailWilayahAlamat;
@@ -759,15 +769,11 @@
                             getAddressFromCoordinates(lat, lng, addrEl);
                         }
                     }
-
-                    setTimeout(() => {
-                        try { map.invalidateSize(); } catch (e) {}
-                    }, 300);
                 });
 
-                modal.addEventListener('hidden.bs.modal', function () {
+                modal.addEventListener('hidden.bs.modal', function() {
                     if (this._map) {
-                        try { this._map.remove(); } catch (e) {}
+                        try { this._map.remove(); } catch(e){}
                         this._map = null;
                     }
                 });
@@ -777,23 +783,23 @@
     }
 
     function getAddressFromCoordinates(lat, lng, el) {
-        el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin me-2"></i>Mendeteksi alamat...</div>';
+        el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
 
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-        .then(r => {
-            if (!r.ok) throw new Error(r.status);
-            return r.json();
-        })
-        .then(data => {
-            if (data && data.display_name) {
-                el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + data.display_name;
-            } else {
-                throw new Error('no data');
-            }
-        })
-        .catch(() => {
-            el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
-        });
+            .then(r => {
+                if (!r.ok) throw new Error(r.status);
+                return r.json();
+            })
+            .then(data => {
+                if (data && data.display_name) {
+                    el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + data.display_name;
+                } else {
+                    throw new Error('no data');
+                }
+            })
+            .catch(() => {
+                el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+            });
     }
 
     function captureAndProcess() {
