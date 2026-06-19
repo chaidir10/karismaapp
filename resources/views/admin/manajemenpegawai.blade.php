@@ -73,6 +73,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jabatan</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Shift</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -111,7 +112,15 @@
                             <br><small class="text-blue-500">+{{ $user->wilayahKerjaList->count() - 1 }} lokasi lain</small>
                             @endif
                         </td>
-
+                        <td class="px-6 py-4 text-sm">
+                            @if($user->can_shift && $user->jamShift)
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                {{ $user->jamShift->nama }}
+                            </span>
+                            @else
+                            <span class="text-gray-400 text-xs">Normal</span>
+                            @endif
+                        </td>
 
                         <td class="px-6 py-4 text-right text-sm font-medium">
                             <div class="flex justify-end space-x-2">
@@ -207,10 +216,19 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Bisa Shift?</label>
-                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
+                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none add-shift-toggle" onchange="toggleShiftSelect(this, '.add-shift-select')">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
+                    </select>
+                </div>
+                <div class="add-shift-select" style="display:none">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Shift</label>
+                    <select name="jam_shift_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                        <option value="">-- Pilih Shift --</option>
+                        @foreach($shifts as $s)
+                        <option value="{{ $s->id }}">{{ $s->nama }} ({{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }})</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -316,6 +334,11 @@
                     </div>
 
                     <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Jadwal Kerja</label>
+                        <div id="detailShift" class="bg-indigo-50 rounded-lg p-3 text-indigo-800 border border-indigo-200 text-sm">Jam Kerja Normal</div>
+                    </div>
+
+                    <div class="mt-4">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Alamat</label>
                         <div id="detailAlamat" class="bg-gray-50 rounded-lg p-4 text-gray-800 border border-gray-200"></div>
                     </div>
@@ -405,15 +428,23 @@
                     <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                 </div>
                 <div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Bisa Shift?</label>
-                        <select name="can_shift" id="edit_can_shift"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
-                            <option value="0">Tidak</option>
-                            <option value="1">Ya</option>
-                        </select>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
+                    <select name="can_shift" id="edit_can_shift"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" onchange="toggleShiftSelect(this, '.edit-shift-select')">
+                        <option value="0">Tidak</option>
+                        <option value="1">Ya</option>
+                    </select>
                 </div>
+            </div>
+
+            <div class="edit-shift-select" style="display:none">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Shift</label>
+                <select name="jam_shift_id" id="edit_jam_shift_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <option value="">-- Pilih Shift --</option>
+                    @foreach($shifts as $s)
+                    <option value="{{ $s->id }}">{{ $s->nama }} ({{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }})</option>
+                    @endforeach
+                </select>
             </div>
 
             <div>
@@ -768,6 +799,12 @@
                     lokasiEl.textContent = list.length > 0 ? list.join(', ') : '-';
                 }
 
+                // Tampilkan info shift
+                const shiftEl = document.getElementById('detailShift');
+                if (shiftEl) {
+                    shiftEl.textContent = user.can_shift && user.shift_nama ? user.shift_nama : 'Jam Kerja Normal';
+                }
+
                 openModal('modalDetail');
             })
             .catch(error => {
@@ -802,6 +839,17 @@
                 document.getElementById('edit_no_hp').value = user.no_hp ?? '';
                 document.getElementById('edit_can_shift').value = user.can_shift ? '1' : '0';
                 document.getElementById('edit_alamat').value = user.alamat ?? '';
+
+                // Set shift select
+                const shiftSelect = document.querySelector('.edit-shift-select');
+                const shiftId = document.getElementById('edit_jam_shift_id');
+                if (user.can_shift && shiftSelect) {
+                    shiftSelect.style.display = '';
+                    if (shiftId) shiftId.value = user.jam_shift_id ?? '';
+                } else if (shiftSelect) {
+                    shiftSelect.style.display = 'none';
+                    if (shiftId) shiftId.value = '';
+                }
 
                 // Set lokasi presensi checkboxes
                 const wilayahIds = user.wilayah_ids || [];
@@ -904,6 +952,16 @@
                 hideLoading();
                 showErrorNotification('Error!', 'Terjadi kesalahan saat menghapus data!');
             });
+    }
+
+    function toggleShiftSelect(selectEl, targetSelector) {
+        var target = document.querySelector(targetSelector);
+        if (!target) return;
+        target.style.display = selectEl.value === '1' ? '' : 'none';
+        if (selectEl.value !== '1') {
+            var shiftSelect = target.querySelector('select');
+            if (shiftSelect) shiftSelect.value = '';
+        }
     }
 </script>
 @endpush

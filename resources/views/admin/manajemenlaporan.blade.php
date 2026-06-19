@@ -223,7 +223,7 @@
 
                                 <td class="px-4 py-3">
                                     <div class="font-medium text-xs text-gray-900">${item.user.name}</div>
-                                    <div class="text-gray-500 text-xs mt-1">${item.user.nip || 'Tidak ada NIP'}</div>
+                                    <div class="text-gray-500 text-xs mt-1">${item.user.nip || 'Tidak ada NIP'}${item.is_shift ? ' | <span class="text-indigo-600">' + item.shift_nama + '</span>' : ''}</div>
                                 </td>
                                 <td class="px-4 py-3 text-xs text-gray-900">${row.tanggal}</td>
                                 <td class="px-4 py-3 text-xs text-gray-900">${row.masuk || '-'}</td>

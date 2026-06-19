@@ -36,32 +36,30 @@ class DashboardAdminController extends Controller
             ->orderBy('jam', 'asc')
             ->get();
 
-        // Standar jam kerja
-        $jamMasukStandard = '07:30:00';
-        $jamPulangStandard = '16:00:00';
-
         foreach ($presensiHariIni as $presensi) {
             $presensi->terlambat = false;
             $presensi->waktu_kurang_menit = 0;
             $presensi->lembur_menit = 0;
 
-            $hari = Carbon::parse($presensi->tanggal)->format('l'); // Nama hari (Monday, etc.)
+            $hari = Carbon::parse($presensi->tanggal)->format('l');
+            $jadwal = $presensi->user->getJadwalKerja($presensi->tanggal);
+            $jamMasuk = $jadwal['jam_masuk'];
+            $jamPulang = $jadwal['jam_pulang'];
 
-            // === Cek Terlambat ===
-            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:31:59') {
+            $batasTelat = date('H:i:s', strtotime($jamMasuk) + 60);
+
+            if ($presensi->jenis === 'masuk' && $presensi->jam > $batasTelat) {
                 $presensi->terlambat = true;
-                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasukStandard)) / 60);
+                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasuk)) / 60);
             }
 
-            // === Cek Pulang Kurang Waktu ===
-            if ($presensi->jenis === 'pulang' && $presensi->jam < $jamPulangStandard) {
-                $presensi->waktu_kurang_menit = intval((strtotime($jamPulangStandard) - strtotime($presensi->jam)) / 60);
+            if ($presensi->jenis === 'pulang' && $presensi->jam < $jamPulang) {
+                $presensi->waktu_kurang_menit = intval((strtotime($jamPulang) - strtotime($presensi->jam)) / 60);
             }
 
-            // === Cek Lembur (hanya weekend) ===
             if ($presensi->jenis === 'pulang' && in_array($hari, ['Saturday', 'Sunday'])) {
-                if ($presensi->jam > $jamPulangStandard) {
-                    $presensi->lembur_menit = intval((strtotime($presensi->jam) - strtotime($jamPulangStandard)) / 60);
+                if ($presensi->jam > $jamPulang) {
+                    $presensi->lembur_menit = intval((strtotime($presensi->jam) - strtotime($jamPulang)) / 60);
                 }
             }
         }
@@ -319,18 +317,20 @@ class DashboardAdminController extends Controller
             ->orderBy('jam', 'asc')
             ->get();
 
-        // Hitung status untuk presensi hari ini
         foreach ($presensiHariIni as $presensi) {
             $presensi->terlambat = false;
             $presensi->waktu_kurang_menit = 0;
 
-            if ($presensi->jenis === 'masuk' && $presensi->jam > '07:30:59') {
+            $jadwal = $presensi->user->getJadwalKerja($presensi->tanggal);
+            $batasTelat = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
+
+            if ($presensi->jenis === 'masuk' && $presensi->jam > $batasTelat) {
                 $presensi->terlambat = true;
-                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime('07:30:00')) / 60);
+                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jadwal['jam_masuk'])) / 60);
             }
 
-            if ($presensi->jenis === 'pulang' && $presensi->jam < '16:00:00') {
-                $presensi->waktu_kurang_menit = intval((strtotime('16:00:00') - strtotime($presensi->jam)) / 60);
+            if ($presensi->jenis === 'pulang' && $presensi->jam < $jadwal['jam_pulang']) {
+                $presensi->waktu_kurang_menit = intval((strtotime($jadwal['jam_pulang']) - strtotime($presensi->jam)) / 60);
             }
         }
 

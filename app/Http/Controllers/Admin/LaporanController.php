@@ -24,17 +24,11 @@ class LaporanController extends Controller
         $startDate = Carbon::createFromFormat('Y-m', $bulan)->startOfMonth();
         $endDate   = Carbon::createFromFormat('Y-m', $bulan)->endOfMonth();
 
-        $users = $userId ? User::where('id', $userId)->get() : User::orderBy('name')->get();
-        $laporan = [];
+        $users = $userId
+            ? User::with('jamShift')->where('id', $userId)->get()
+            : User::with('jamShift')->orderBy('name')->get();
 
-        // Konfigurasi jam kerja
-        $config = [
-            'jam_masuk' => '07:30',
-            'batas_telat' => '07:31', // 1 menit toleransi
-            'jam_pulang_hari_biasa' => '16:00',
-            'jam_pulang_jumat' => '16:30',
-            'jam_kerja_harian' => 8 * 60, // 8 jam dalam menit
-        ];
+        $laporan = [];
 
         foreach ($users as $user) {
             $presensi = Presensi::where('user_id', $user->id)
@@ -52,20 +46,20 @@ class LaporanController extends Controller
             $totalLembur        = 0;
             $totalHariTelat     = 0;
 
+            $isShiftUser = $user->can_shift && $user->jam_shift_id;
+
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
                 $tanggal   = $date->format('Y-m-d');
                 $dayOfWeek = $date->dayOfWeek;
                 $isWeekend = ($dayOfWeek == 0 || $dayOfWeek == 6);
-                $isFriday  = ($dayOfWeek == 5); // Jumat
 
                 $masuk  = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'masuk') : null;
                 $pulang = $presensi->has($tanggal) ? $presensi[$tanggal]->firstWhere('jenis', 'pulang') : null;
 
-                $jamMasukDefault  = Carbon::createFromTimeString($config['jam_masuk']);
-                $jamToleransi     = Carbon::createFromTimeString($config['batas_telat']);
-                $jamPulangDefault = $isFriday
-                    ? Carbon::createFromTimeString($config['jam_pulang_jumat'])
-                    : Carbon::createFromTimeString($config['jam_pulang_hari_biasa']);
+                $jadwal = $user->getJadwalKerja($date);
+                $jamMasukDefault  = Carbon::createFromTimeString($jadwal['jam_masuk']);
+                $jamToleransi     = $jamMasukDefault->copy()->addMinute();
+                $jamPulangDefault = Carbon::createFromTimeString($jadwal['jam_pulang']);
 
                 $row = [
                     'tanggal'       => $date->format('d/m/Y'),
@@ -84,46 +78,33 @@ class LaporanController extends Controller
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
 
-                    // Total jam kerja aktual (dalam menit, tanpa detik)
                     $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
-                    if ($isWeekend) {
-                        // Sabtu/Minggu = lembur penuh
+                    if ($isWeekend && !$isShiftUser) {
                         $row['jam_kerja'] = $jamKerja;
                         $row['lembur']    = $jamKerja;
                         $row['status_masuk'] = 'Lembur';
                         $totalLembur     += $jamKerja;
                     } else {
-                        // Jam kerja wajib (dari 07:30 sampai jam pulang)
                         $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
-                        // ✅ Keterlambatan hanya jika >= 07:31 (dibulatkan ke atas)
                         $keterlambatan = $jamMasukObj->gte($jamToleransi)
                             ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
                             : 0;
 
-                        // Hitung hari telat
                         if ($keterlambatan > 0) {
                             $totalHariTelat++;
                         }
 
-                        // ✅ Pulang cepat jika sebelum jam wajib pulang (dibulatkan ke atas)
                         $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
                             ? $this->calculateMinutesWithoutSeconds($jamPulangObj, $jamPulangDefault, true)
                             : 0;
 
-                        // ✅ Kekurangan jam kerja (tidak negatif, dibulatkan ke atas)
                         $waktuKurang = ($jamKerja < $jamKerjaWajib)
                             ? $this->roundUpToNearestMinute($jamKerjaWajib - $jamKerja)
                             : 0;
 
-                        // Tentukan status
-                        if ($keterlambatan > 0) {
-                            $row['status_masuk'] = 'Telat';
-                        } else {
-                            $row['status_masuk'] = 'Tepat Waktu';
-                        }
-
+                        $row['status_masuk']  = $keterlambatan > 0 ? 'Telat' : 'Tepat Waktu';
                         $row['keterlambatan'] = $keterlambatan ?: '-';
                         $row['pulang_cepat']  = $pulangCepat ?: '-';
                         $row['jam_kerja']     = $jamKerja ?: '-';
@@ -136,7 +117,7 @@ class LaporanController extends Controller
                         $totalHariKerja++;
                     }
                 } elseif ($masuk || $pulang) {
-                    if (!$isWeekend) $totalHariKerja++;
+                    if (!$isWeekend || $isShiftUser) $totalHariKerja++;
                     $row['status_masuk'] = 'Data Tidak Lengkap';
                 }
 
@@ -147,6 +128,8 @@ class LaporanController extends Controller
                 'user'             => $user,
                 'total_hari_kerja' => $totalHariKerja,
                 'total_hari_telat' => $totalHariTelat,
+                'is_shift'         => $isShiftUser,
+                'shift_nama'       => $isShiftUser ? ($user->jamShift->nama ?? '-') : null,
                 'rows'             => $rows,
                 'summary'          => [
                     'total_keterlambatan' => $totalKeterlambatan,

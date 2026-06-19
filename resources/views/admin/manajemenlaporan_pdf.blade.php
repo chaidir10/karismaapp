@@ -105,7 +105,11 @@
     {{-- LAPORAN PER PEGAWAI --}}
     @foreach($laporan as $item)
     <div class="page-break">
-        <h3>{{ $item['user']->name }} (NIP. {{ $item['user']->nip }}) - {{ $item['user']->jabatan }}</h3>
+        <h3>{{ $item['user']->name }} (NIP. {{ $item['user']->nip }}) - {{ $item['user']->jabatan }}
+            @if($item['is_shift'] ?? false)
+                | <span style="color:#4f46e5">{{ $item['shift_nama'] }}</span>
+            @endif
+        </h3>
         <table>
             <thead>
                 <tr>

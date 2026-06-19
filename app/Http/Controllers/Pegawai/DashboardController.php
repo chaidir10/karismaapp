@@ -19,11 +19,25 @@ class DashboardController extends Controller
         $user = Auth::user();
         $today = now()->format('Y-m-d');
 
-        // Ambil riwayat presensi hari ini untuk user yang login
+        $jadwalKerjaHariIni = $user->getJadwalKerja($today);
+
         $riwayatHariIni = Presensi::where('user_id', $user->id)
             ->where('tanggal', $today)
             ->orderBy('jam', 'asc')
             ->get();
+
+        $batasTelat = date('H:i:s', strtotime($jadwalKerjaHariIni['jam_masuk']) + 60);
+        foreach ($riwayatHariIni as $p) {
+            $p->terlambat = false;
+            $p->waktu_kurang_menit = 0;
+            if ($p->jenis === 'masuk' && $p->jam > $batasTelat) {
+                $p->terlambat = true;
+                $p->waktu_kurang_menit = intval((strtotime($p->jam) - strtotime($jadwalKerjaHariIni['jam_masuk'])) / 60);
+            }
+            if ($p->jenis === 'pulang' && $p->jam < $jadwalKerjaHariIni['jam_pulang']) {
+                $p->waktu_kurang_menit = intval((strtotime($jadwalKerjaHariIni['jam_pulang']) - strtotime($p->jam)) / 60);
+            }
+        }
 
         // Cek apakah sudah presensi masuk hari ini
         $sudahPresensiMasuk = Presensi::where('user_id', $user->id)

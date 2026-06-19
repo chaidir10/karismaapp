@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Presensi;
 use App\Models\WilayahKerja;
+use App\Models\JamShift;
+use App\Models\JamKerja;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
@@ -23,7 +25,8 @@ class User extends Authenticatable
         'unit_id',
         'role',
         'can_approve_pengajuan',
-        'can_shift', // ✅ tambahkan field baru
+        'can_shift',
+        'jam_shift_id',
         'foto_profil',
         'no_hp',
         'alamat',
@@ -75,5 +78,56 @@ class User extends Authenticatable
     public function wilayahKerjaList()
     {
         return $this->belongsToMany(WilayahKerja::class, 'user_wilayah_kerja', 'user_id', 'wilayah_kerja_id')->withTimestamps();
+    }
+
+    public function jamShift()
+    {
+        return $this->belongsTo(JamShift::class);
+    }
+
+    /**
+     * Ambil jam masuk & jam pulang efektif untuk tanggal tertentu.
+     * Shift employee → pakai jam_shift.
+     * Regular employee → pakai jam_kerja sesuai hari.
+     */
+    public function getJadwalKerja($tanggal = null)
+    {
+        $tanggal = $tanggal ? \Carbon\Carbon::parse($tanggal) : now();
+        $namaHari = $tanggal->translatedFormat('l');
+
+        $hariMap = [
+            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis', 'Friday' => "Jum'at", 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu',
+        ];
+        $hari = $hariMap[$tanggal->format('l')] ?? $namaHari;
+
+        if ($this->can_shift && $this->jam_shift_id) {
+            $shift = $this->jamShift;
+            if ($shift) {
+                return [
+                    'jam_masuk'  => $shift->jam_masuk,
+                    'jam_pulang' => $shift->jam_pulang,
+                    'is_shift'   => true,
+                    'nama_shift' => $shift->nama,
+                ];
+            }
+        }
+
+        $jamKerja = JamKerja::where('hari', $hari)->first();
+        if ($jamKerja) {
+            return [
+                'jam_masuk'  => $jamKerja->jam_masuk,
+                'jam_pulang' => $jamKerja->jam_pulang,
+                'is_shift'   => false,
+                'nama_shift' => null,
+            ];
+        }
+
+        return [
+            'jam_masuk'  => '07:30:00',
+            'jam_pulang' => '16:00:00',
+            'is_shift'   => false,
+            'nama_shift' => null,
+        ];
     }
 }

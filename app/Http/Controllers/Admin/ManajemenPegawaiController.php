@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\WilayahKerja;
+use App\Models\JamShift;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,10 +17,11 @@ class ManajemenPegawaiController extends Controller
      */
     public function index()
     {
-        $users = User::with(['wilayahKerja', 'wilayahKerjaList'])->get();
+        $users = User::with(['wilayahKerja', 'wilayahKerjaList', 'jamShift'])->get();
         $units = WilayahKerja::all();
+        $shifts = JamShift::all();
 
-        return view('admin.manajemenpegawai', compact('users', 'units'));
+        return view('admin.manajemenpegawai', compact('users', 'units', 'shifts'));
     }
 
     /**
@@ -40,6 +42,7 @@ class ManajemenPegawaiController extends Controller
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string|max:500',
             'can_shift' => 'nullable|boolean',
+            'jam_shift_id' => 'nullable|exists:jam_shift,id',
         ]);
 
         if ($validator->fails()) {
@@ -60,6 +63,7 @@ class ManajemenPegawaiController extends Controller
             'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
             'can_shift' => $request->has('can_shift'),
+            'jam_shift_id' => $request->can_shift ? $request->jam_shift_id : null,
         ]);
 
         if ($request->has('wilayah_ids')) {
@@ -77,10 +81,11 @@ class ManajemenPegawaiController extends Controller
      */
     public function show($id)
     {
-        $user = User::with(['wilayahKerja', 'wilayahKerjaList'])->findOrFail($id);
+        $user = User::with(['wilayahKerja', 'wilayahKerjaList', 'jamShift'])->findOrFail($id);
 
         $data = $user->toArray();
         $data['wilayah_ids'] = $user->wilayahKerjaList->pluck('id')->toArray();
+        $data['shift_nama'] = $user->jamShift->nama ?? null;
 
         return response()->json($data);
     }
@@ -105,6 +110,7 @@ class ManajemenPegawaiController extends Controller
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string|max:500',
             'can_shift' => 'nullable|boolean',
+            'jam_shift_id' => 'nullable|exists:jam_shift,id',
         ]);
 
         if ($validator->fails()) {
@@ -123,6 +129,7 @@ class ManajemenPegawaiController extends Controller
         $user->no_hp = $request->no_hp;
         $user->alamat = $request->alamat;
         $user->can_shift = $request->boolean('can_shift', false);
+        $user->jam_shift_id = $request->boolean('can_shift', false) ? $request->jam_shift_id : null;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
