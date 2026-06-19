@@ -64,13 +64,13 @@ class PresensiController extends Controller
             'jenis'        => 'required|in:masuk,pulang',
             'lokasi'       => 'nullable|string|max:255',
             'foto'         => 'required',
-            'is_lembur'    => 'nullable|boolean',
+            'is_lembur'    => 'nullable|in:0,1,true,false',
             'jam_shift_id' => 'nullable|exists:jam_shift,id',
         ]);
 
         $today = now()->format('Y-m-d');
         $userId = Auth::id();
-        $isLembur = $request->boolean('is_lembur', false);
+        $isLembur = in_array($request->input('is_lembur'), ['1', 'true', true, 1], true);
 
         if ($isLembur) {
             if ($request->jenis === 'pulang') {

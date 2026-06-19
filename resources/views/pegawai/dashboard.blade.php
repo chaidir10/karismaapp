@@ -31,6 +31,45 @@
         background: var(--gray-light) !important;
         color: var(--gray) !important;
     }
+
+    /* Work Progress Bar */
+    .work-progress {
+        padding: 8px 15px 12px;
+    }
+
+    .work-progress-bar {
+        height: 8px;
+        background: var(--gray-light);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .work-progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s linear, background 0.5s;
+        width: 0%;
+    }
+
+    .fill-yellow, .work-progress-fill:not(.fill-green) {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+
+    .fill-green {
+        background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .work-progress-info {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-dark);
+    }
+
+    .work-progress-info .text-success { color: #10b981; }
+    .work-progress-info .text-warning { color: #f59e0b; }
 </style>
 
 @section('content')
@@ -73,13 +112,45 @@
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
+
+    {{-- Progress Bar Jam Kerja --}}
+    @if($sudahPresensiMasuk && $jamMasukHariIni && !$sudahPresensiPulang)
+    <div class="work-progress" id="workProgress">
+        <div class="work-progress-bar">
+            <div class="work-progress-fill" id="workProgressFill"></div>
+        </div>
+        <div class="work-progress-info">
+            <span id="workElapsed">00:00:00</span>
+            <span id="workTarget">/ {{ \Carbon\Carbon::parse($jamPulangTarget)->format('H:i') }}</span>
+        </div>
+    </div>
+    @elseif($sudahPresensiMasuk && $sudahPresensiPulang)
+    @php
+        $masukObj = \Carbon\Carbon::parse($jamMasukHariIni);
+        $pulangRecord = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
+        $pulangObj = $pulangRecord ? \Carbon\Carbon::parse($pulangRecord->jam) : null;
+        $totalKerja = $pulangObj ? $masukObj->diffInMinutes($pulangObj) : 0;
+        $targetMenit = \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_masuk'])->diffInMinutes(\Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang']));
+        $persen = $targetMenit > 0 ? min(100, round(($totalKerja / $targetMenit) * 100)) : 0;
+        $cukup = $totalKerja >= $targetMenit;
+    @endphp
+    <div class="work-progress">
+        <div class="work-progress-bar">
+            <div class="work-progress-fill {{ $cukup ? 'fill-green' : 'fill-yellow' }}" style="width:{{ $persen }}%"></div>
+        </div>
+        <div class="work-progress-info">
+            <span>{{ floor($totalKerja/60) }}j {{ $totalKerja%60 }}m</span>
+            <span class="{{ $cukup ? 'text-success' : 'text-warning' }}">{{ $cukup ? '✓ Terpenuhi' : 'Kurang ' . ($targetMenit - $totalKerja) . ' menit' }}</span>
+        </div>
+    </div>
+    @endif
 </div>
 
 {{-- Floating Lembur Button --}}
 @if(!$sudahLemburMasuk)
 <button class="lembur-floating lembur-masuk" data-bs-toggle="modal" data-bs-target="#presensiModal"
     onclick="setJenis('masuk'); setLembur(true)">
-    <i class="fas fa-clock"></i> Lembur Masuk
+    <i class="fas fa-clock"></i> Masuk Lembur
 </button>
 @elseif(!$sudahLemburPulang)
 @php
@@ -704,6 +775,52 @@
         setInterval(update, 1000);
     })();
 
+    // Timer jam kerja reguler
+    (function() {
+        var progressFill = document.getElementById('workProgressFill');
+        var elapsedEl = document.getElementById('workElapsed');
+        if (!progressFill || !elapsedEl) return;
+
+        var jamMasuk = @json($jamMasukHariIni ?? '');
+        var jamPulang = @json($jamPulangTarget ?? '16:00:00');
+        if (!jamMasuk) return;
+
+        var now = new Date();
+        var mParts = jamMasuk.split(':');
+        var pParts = jamPulang.split(':');
+        var startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+            parseInt(mParts[0]), parseInt(mParts[1]), parseInt(mParts[2] || 0));
+        var endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+            parseInt(pParts[0]), parseInt(pParts[1]), parseInt(pParts[2] || 0));
+
+        var totalTarget = (endTime - startTime) / 1000;
+        if (totalTarget <= 0) totalTarget = 8 * 3600;
+
+        function update() {
+            var elapsed = Math.floor((new Date() - startTime) / 1000);
+            if (elapsed < 0) elapsed = 0;
+
+            var pct = Math.min(100, (elapsed / totalTarget) * 100);
+            progressFill.style.width = pct + '%';
+
+            if (pct >= 100) {
+                progressFill.classList.add('fill-green');
+                progressFill.classList.remove('fill-yellow');
+            } else {
+                progressFill.classList.add('fill-yellow');
+                progressFill.classList.remove('fill-green');
+            }
+
+            var h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            var m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            var s = String(elapsed % 60).padStart(2, '0');
+            elapsedEl.textContent = h + ':' + m + ':' + s;
+        }
+
+        update();
+        setInterval(update, 1000);
+    })();
+
     function handlePulangClick() {
         if (!sudahPresensiMasuk) {
             if (window.bootstrap?.Modal) {
@@ -780,6 +897,10 @@
         capturedPhotoData = null;
         currentPosition = null;
         isOutsideRadius = false;
+
+        // Reset is_lembur agar tidak bocor ke submit berikutnya
+        var lemburInput = document.getElementById('isLemburInput');
+        if (lemburInput) lemburInput.value = '0';
 
         if (autoCloseTimer) {
             clearTimeout(autoCloseTimer);
