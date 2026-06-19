@@ -34,7 +34,7 @@
 
     /* Work Timer Banner */
     .work-timer-banner {
-        margin: 15px 15px 10px;
+        margin: 15px 10px 10px;
         padding: 8px 14px;
         border-radius: 10px;
         display: flex;
@@ -809,7 +809,7 @@
                 var sisa = totalTarget - elapsed;
                 var sh = Math.floor(sisa / 3600);
                 var sm = Math.floor((sisa % 3600) / 60);
-                labelEl.innerHTML = '<i class="fas fa-hourglass-half"></i> Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                labelEl.innerHTML = '</i> Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
                 workTimerFulfilled = false;
             }
         }
