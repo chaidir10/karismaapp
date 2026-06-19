@@ -217,18 +217,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
-                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none add-shift-toggle" onchange="toggleShiftSelect(this, '.add-shift-select')">
+                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
-                    </select>
-                </div>
-                <div class="add-shift-select" style="display:none">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Shift</label>
-                    <select name="jam_shift_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
-                        <option value="">-- Pilih Shift --</option>
-                        @foreach($shifts as $s)
-                        <option value="{{ $s->id }}">{{ $s->nama }} ({{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }})</option>
-                        @endforeach
                     </select>
                 </div>
             </div>
@@ -430,21 +421,11 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
                     <select name="can_shift" id="edit_can_shift"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" onchange="toggleShiftSelect(this, '.edit-shift-select')">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="edit-shift-select" style="display:none">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Shift</label>
-                <select name="jam_shift_id" id="edit_jam_shift_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
-                    <option value="">-- Pilih Shift --</option>
-                    @foreach($shifts as $s)
-                    <option value="{{ $s->id }}">{{ $s->nama }} ({{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }})</option>
-                    @endforeach
-                </select>
             </div>
 
             <div>
@@ -840,17 +821,6 @@
                 document.getElementById('edit_can_shift').value = user.can_shift ? '1' : '0';
                 document.getElementById('edit_alamat').value = user.alamat ?? '';
 
-                // Set shift select
-                const shiftSelect = document.querySelector('.edit-shift-select');
-                const shiftId = document.getElementById('edit_jam_shift_id');
-                if (user.can_shift && shiftSelect) {
-                    shiftSelect.style.display = '';
-                    if (shiftId) shiftId.value = user.jam_shift_id ?? '';
-                } else if (shiftSelect) {
-                    shiftSelect.style.display = 'none';
-                    if (shiftId) shiftId.value = '';
-                }
-
                 // Set lokasi presensi checkboxes
                 const wilayahIds = user.wilayah_ids || [];
                 document.querySelectorAll('.edit-wilayah-cb').forEach(cb => {
@@ -954,14 +924,5 @@
             });
     }
 
-    function toggleShiftSelect(selectEl, targetSelector) {
-        var target = document.querySelector(targetSelector);
-        if (!target) return;
-        target.style.display = selectEl.value === '1' ? '' : 'none';
-        if (selectEl.value !== '1') {
-            var shiftSelect = target.querySelector('select');
-            if (shiftSelect) shiftSelect.value = '';
-        }
-    }
 </script>
 @endpush
