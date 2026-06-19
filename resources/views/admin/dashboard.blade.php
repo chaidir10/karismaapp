@@ -167,6 +167,30 @@
         border-bottom: 1px solid var(--gray-200);
     }
 
+    .data-table th[data-sort] {
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+    }
+
+    .data-table th[data-sort]:hover {
+        color: var(--primary);
+    }
+
+    .data-table th .sort-icon {
+        display: inline-block;
+        margin-left: 4px;
+        font-size: 10px;
+        opacity: 0.3;
+        vertical-align: middle;
+    }
+
+    .data-table th.sort-asc .sort-icon,
+    .data-table th.sort-desc .sort-icon {
+        opacity: 1;
+        color: var(--primary);
+    }
+
     .data-table th.text-center {
         text-align: center;
     }
@@ -189,6 +213,57 @@
         font-size: 12px;
         font-weight: 500;
         color: var(--dark);
+    }
+
+    /* Pagination */
+    .table-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        border-top: 1px solid var(--gray-200);
+        font-size: 12px;
+        color: var(--gray-500);
+    }
+
+    .pagination-info {
+        white-space: nowrap;
+    }
+
+    .pagination-buttons {
+        display: flex;
+        gap: 4px;
+    }
+
+    .pagination-buttons button {
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--gray-200);
+        background: var(--white);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .pagination-buttons button:hover:not(:disabled) {
+        background: var(--gray-100);
+        border-color: var(--gray-300);
+    }
+
+    .pagination-buttons button.active {
+        background: var(--primary);
+        color: var(--white);
+        border-color: var(--primary);
+    }
+
+    .pagination-buttons button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
     }
 
     /* Badges */
@@ -543,7 +618,7 @@
                 <i class="fas fa-users"></i>
             </div>
         </div>
-        <!-- <div class="stat-card">
+        <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
                 <p class="stat-label">Pengajuan Pending</p>
@@ -551,7 +626,7 @@
             <div class="stat-icon">
                 <i class="fas fa-file-alt"></i>
             </div>
-        </div> -->
+        </div>
     </div>
 
     {{-- Content Grid --}}
@@ -569,13 +644,13 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th>Pegawai</th>
-                                <th>Tanggal</th>
-                                <th>Jenis</th>
+                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="presensiPendingTable">
+                        <tbody id="presensiPendingTable" data-paginate="10">
                             @forelse($presensiPending ?? [] as $index => $p)
                             <tr class="clickable-row"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
@@ -630,7 +705,7 @@
         </div>
 
         {{-- Pengajuan Pending --}}
-        <!-- <div class="content-card">
+        <div class="content-card">
             <div class="card-header">
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) }} menunggu</span>
@@ -641,13 +716,13 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th>Pegawai</th>
-                                <th>Tanggal</th>
-                                <th>Jenis</th>
+                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="pengajuanPendingTable">
+                        <tbody id="pengajuanPendingTable" data-paginate="10">
                             @forelse($pengajuanPending ?? [] as $index => $peng)
                             <tr class="clickable-row"
                                 data-user-name="{{ $peng->user->name ?? 'N/A' }}"
@@ -698,7 +773,7 @@
                     </table>
                 </div>
             </div>
-        </div> -->
+        </div>
 
         {{-- Presensi Hari Ini --}}
         <div class="content-card">
@@ -712,13 +787,13 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th>Nama Pegawai</th>
-                                <th>Jenis</th>
-                                <th>Jam</th>
-                                <th>Status</th>
+                                <th data-sort="text">Nama Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Status <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="presensiHariIniTable" data-paginate="10">
                             @forelse($presensiHariIni ?? [] as $index => $p)
                             <tr>
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -1145,6 +1220,138 @@
         var form = document.getElementById(formId);
         if (form && url) form.action = url;
     }
+
+    // ===== TABLE SORT + PAGINATION =====
+    var tableInstances = {};
+
+    function initTable(tbodyId) {
+        var tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+
+        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 10;
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+        if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('.empty-state'))) return;
+
+        var table = tbody.closest('table');
+        var container = table.parentElement;
+        var currentPage = 1;
+
+        var paginationDiv = document.createElement('div');
+        paginationDiv.className = 'table-pagination';
+        container.appendChild(paginationDiv);
+
+        var instance = { rows: rows, currentPage: 1 };
+        tableInstances[tbodyId] = instance;
+
+        function render() {
+            var totalRows = instance.rows.length;
+            var totalPages = Math.ceil(totalRows / perPage);
+            if (instance.currentPage > totalPages) instance.currentPage = 1;
+
+            instance.rows.forEach(function(row, i) {
+                var start = (instance.currentPage - 1) * perPage;
+                var end = start + perPage;
+                row.style.display = (i >= start && i < end) ? '' : 'none';
+            });
+
+            // Update nomor urut
+            instance.rows.forEach(function(row, i) {
+                var noCell = row.querySelector('td:first-child');
+                if (noCell) noCell.textContent = i + 1;
+            });
+
+            if (totalRows <= perPage) {
+                paginationDiv.style.display = 'none';
+                return;
+            }
+            paginationDiv.style.display = '';
+
+            var start = (instance.currentPage - 1) * perPage + 1;
+            var end = Math.min(instance.currentPage * perPage, totalRows);
+
+            var html = '<span class="pagination-info">' + start + '-' + end + ' dari ' + totalRows + '</span>';
+            html += '<div class="pagination-buttons">';
+            html += '<button data-page="prev" ' + (instance.currentPage === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+
+            var sp = Math.max(1, instance.currentPage - 2);
+            var ep = Math.min(totalPages, sp + 4);
+            if (ep - sp < 4) sp = Math.max(1, ep - 4);
+
+            for (var p = sp; p <= ep; p++) {
+                html += '<button data-page="' + p + '" class="' + (p === instance.currentPage ? 'active' : '') + '">' + p + '</button>';
+            }
+
+            html += '<button data-page="next" ' + (instance.currentPage === totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+            html += '</div>';
+            paginationDiv.innerHTML = html;
+        }
+
+        paginationDiv.addEventListener('click', function(e) {
+            var btn = e.target.closest('button');
+            if (!btn || btn.disabled) return;
+            var page = btn.getAttribute('data-page');
+            if (page === 'prev') instance.currentPage--;
+            else if (page === 'next') instance.currentPage++;
+            else instance.currentPage = parseInt(page);
+            render();
+        });
+
+        // Sorting
+        var ths = table.querySelectorAll('th[data-sort]');
+        ths.forEach(function(th) {
+            th.addEventListener('click', function() {
+                var colIndex = Array.from(th.parentElement.children).indexOf(th);
+                var sortType = th.getAttribute('data-sort');
+                var dir = th.classList.contains('sort-asc') ? 'desc' : 'asc';
+
+                // Reset all headers in this table
+                ths.forEach(function(h) {
+                    h.classList.remove('sort-asc', 'sort-desc');
+                    var icon = h.querySelector('.sort-icon');
+                    if (icon) icon.className = 'fas fa-sort sort-icon';
+                });
+
+                th.classList.add('sort-' + dir);
+                var icon = th.querySelector('.sort-icon');
+                if (icon) icon.className = 'fas fa-sort-' + (dir === 'asc' ? 'up' : 'down') + ' sort-icon';
+
+                var monthMap = {Jan:1,Feb:2,Mar:3,Apr:4,Mei:5,Jun:6,Jul:7,Agu:8,Sep:9,Okt:10,Nov:11,Des:12};
+
+                instance.rows.sort(function(a, b) {
+                    var aCell = a.children[colIndex];
+                    var bCell = b.children[colIndex];
+                    if (!aCell || !bCell) return 0;
+
+                    var aVal = aCell.textContent.trim();
+                    var bVal = bCell.textContent.trim();
+
+                    if (sortType === 'date') {
+                        var aParts = aVal.split(' ');
+                        var bParts = bVal.split(' ');
+                        var aDate = new Date(parseInt(aParts[2]), (monthMap[aParts[1]] || 1) - 1, parseInt(aParts[0]));
+                        var bDate = new Date(parseInt(bParts[2]), (monthMap[bParts[1]] || 1) - 1, parseInt(bParts[0]));
+                        return dir === 'asc' ? aDate - bDate : bDate - aDate;
+                    }
+
+                    return dir === 'asc'
+                        ? aVal.localeCompare(bVal, 'id')
+                        : bVal.localeCompare(aVal, 'id');
+                });
+
+                instance.rows.forEach(function(row) { tbody.appendChild(row); });
+                instance.currentPage = 1;
+                render();
+            });
+        });
+
+        render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initTable('presensiPendingTable');
+        initTable('pengajuanPendingTable');
+        initTable('presensiHariIniTable');
+    });
 </script>
 
 @endsection
