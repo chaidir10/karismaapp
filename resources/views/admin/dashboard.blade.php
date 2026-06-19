@@ -1063,6 +1063,30 @@
         </div>
         <div class="modal-content">
             <div class="detail-grid">
+                <div class="detail-item full-width">
+                    <div class="media-row">
+                        <div class="media-col">
+                            <label>Foto</label>
+                            <div class="foto-wrapper" id="detailFotoHariIni">
+                                <span class="text-muted">Tidak ada foto</span>
+                            </div>
+                        </div>
+                        <div class="media-col">
+                            <label>Peta Lokasi</label>
+                            <div class="map-container">
+                                <div id="hariIniMap"></div>
+                                <div id="hariIniMapLoading" class="map-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Memuat peta...</span>
+                                </div>
+                                <div id="hariIniMapError" class="map-error" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Koordinat tidak tersedia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="detail-item">
                     <label>Nama Pegawai</label>
                     <span id="detailNamaHariIni">-</span>
@@ -1091,30 +1115,7 @@
                     <label>Lokasi</label>
                     <span id="detailLokasiHariIni">-</span>
                 </div>
-                <div class="detail-item full-width">
-                    <div class="media-row">
-                        <div class="media-col">
-                            <label>Foto</label>
-                            <div class="foto-wrapper" id="detailFotoHariIni">
-                                <span class="text-muted">Tidak ada foto</span>
-                            </div>
-                        </div>
-                        <div class="media-col">
-                            <label>Peta Lokasi</label>
-                            <div class="map-container">
-                                <div id="hariIniMap"></div>
-                                <div id="hariIniMapLoading" class="map-loading">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>Memuat peta...</span>
-                                </div>
-                                <div id="hariIniMapError" class="map-error" style="display: none;">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <span>Koordinat tidak tersedia</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')">
