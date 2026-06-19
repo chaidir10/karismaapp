@@ -45,6 +45,18 @@
         <i class="far fa-clock time-icon"></i>
         <span>Jam Kerja (07:30 - 16:00)</span>
     </div>
+    @if($user->can_shift && $shifts->count() > 0)
+    <div style="padding:0 15px; margin-bottom:8px">
+        <select id="shiftSelector" class="form-select" style="border-radius:12px; font-size:13px; padding:10px 14px; border:1px solid var(--gray-light);"
+            onchange="document.getElementById('jamShiftIdInput').value = this.value">
+            <option value="">-- Jam Kerja Normal --</option>
+            @foreach($shifts as $s)
+            <option value="{{ $s->id }}">{{ $s->nama }} ({{ \Carbon\Carbon::parse($s->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->jam_pulang)->format('H:i') }})</option>
+            @endforeach
+        </select>
+    </div>
+    @endif
+
     <div class="attendance-actions">
         <button class="attendance-btn {{ $sudahPresensiMasuk ? 'btn-disabled' : '' }}"
             id="clock-in-btn"
@@ -66,30 +78,28 @@
         </button>
     </div>
 
-    {{-- Tombol Lembur — muncul setelah masuk+pulang reguler selesai --}}
-    @if($sudahPresensiMasuk && $sudahPresensiPulang)
-    <div class="attendance-actions" style="margin-top:8px">
-        <button class="attendance-btn {{ $sudahLemburMasuk ? 'btn-disabled' : '' }}"
-            style="background: linear-gradient(135deg, #f59e0b, #d97706); font-size:12px"
-            data-bs-toggle="modal"
-            data-bs-target="#presensiModal"
-            onclick="setJenis('masuk'); setLembur(true)"
-            {{ $sudahLemburMasuk ? 'disabled' : '' }}>
-            <i class="fas fa-clock attendance-icon"></i>
-            {{ $sudahLemburMasuk ? 'Sudah Masuk Lembur' : 'Masuk Lembur' }}
-        </button>
-        <button class="attendance-btn {{ !$sudahLemburMasuk || $sudahLemburPulang ? 'btn-disabled' : '' }}"
-            style="background: linear-gradient(135deg, #f59e0b, #d97706); font-size:12px"
-            data-bs-toggle="modal"
-            data-bs-target="#presensiModal"
-            onclick="setJenis('pulang'); setLembur(true)"
-            {{ !$sudahLemburMasuk || $sudahLemburPulang ? 'disabled' : '' }}>
-            <i class="fas fa-clock attendance-icon"></i>
-            {{ $sudahLemburPulang ? 'Sudah Pulang Lembur' : 'Pulang Lembur' }}
-        </button>
     </div>
+</div>
+
+{{-- Floating Lembur Button --}}
+@if($sudahPresensiMasuk && $sudahPresensiPulang && !$sudahLemburPulang)
+<div class="lembur-fab" id="lemburFab" onclick="toggleLemburMenu()">
+    <i class="fas fa-clock"></i>
+</div>
+<div class="lembur-menu" id="lemburMenu">
+    @if(!$sudahLemburMasuk)
+    <button class="lembur-menu-btn" data-bs-toggle="modal" data-bs-target="#presensiModal"
+        onclick="setJenis('masuk'); setLembur(true); closeLemburMenu()">
+        <i class="fas fa-sign-in-alt"></i> Masuk Lembur
+    </button>
+    @elseif(!$sudahLemburPulang)
+    <button class="lembur-menu-btn" data-bs-toggle="modal" data-bs-target="#presensiModal"
+        onclick="setJenis('pulang'); setLembur(true); closeLemburMenu()">
+        <i class="fas fa-sign-out-alt"></i> Pulang Lembur
+    </button>
     @endif
 </div>
+@endif
 
 <!-- Riwayat Hari Ini -->
 <div class="attendance-history">
@@ -183,6 +193,7 @@
                     <input type="hidden" name="foto" id="fotoInput">
                     <input type="hidden" name="lokasi" id="lokasiInput">
                     <input type="hidden" name="is_lembur" id="isLemburInput" value="0">
+                    <input type="hidden" name="jam_shift_id" id="jamShiftIdInput" value="">
 
                     <div class="camera-container-full">
                         <video id="video" autoplay playsinline></video>
@@ -551,6 +562,68 @@
         cursor: not-allowed;
         filter: grayscale(0.5);
     }
+
+    /* Floating Lembur Button */
+    .lembur-fab {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        cursor: pointer;
+        z-index: 50;
+        transition: transform 0.2s;
+    }
+
+    .lembur-fab:active { transform: scale(0.9); }
+
+    .lembur-menu {
+        position: fixed;
+        bottom: 150px;
+        right: 20px;
+        z-index: 50;
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .lembur-menu.show { display: flex; }
+
+    .lembur-menu-btn {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.2s;
+    }
+
+    .lembur-menu-btn:active { transform: scale(0.95); }
+
+    .lembur-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 49;
+        display: none;
+    }
+
+    .lembur-overlay.show { display: block; }
 </style>
 @endpush
 
@@ -579,6 +652,22 @@
         const el = document.getElementById('isLemburInput');
         if (el) el.value = val ? '1' : '0';
     }
+
+    function toggleLemburMenu() {
+        const menu = document.getElementById('lemburMenu');
+        if (menu) menu.classList.toggle('show');
+    }
+
+    function closeLemburMenu() {
+        const menu = document.getElementById('lemburMenu');
+        if (menu) menu.classList.remove('show');
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#lemburFab') && !e.target.closest('#lemburMenu')) {
+            closeLemburMenu();
+        }
+    });
 
     function handlePulangClick() {
         if (!sudahPresensiMasuk) {

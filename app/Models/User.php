@@ -93,23 +93,32 @@ class User extends Authenticatable
     public function getJadwalKerja($tanggal = null)
     {
         $tanggal = $tanggal ? \Carbon\Carbon::parse($tanggal) : now();
-        $namaHari = $tanggal->translatedFormat('l');
 
         $hariMap = [
             'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
             'Thursday' => 'Kamis', 'Friday' => "Jum'at", 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu',
         ];
-        $hari = $hariMap[$tanggal->format('l')] ?? $namaHari;
+        $hari = $hariMap[$tanggal->format('l')] ?? $tanggal->translatedFormat('l');
 
-        if ($this->can_shift && $this->jam_shift_id) {
-            $shift = $this->jamShift;
-            if ($shift) {
-                return [
-                    'jam_masuk'  => $shift->jam_masuk,
-                    'jam_pulang' => $shift->jam_pulang,
-                    'is_shift'   => true,
-                    'nama_shift' => $shift->nama,
-                ];
+        // Cek shift dari record presensi masuk hari itu
+        if ($this->can_shift) {
+            $presensiMasuk = Presensi::where('user_id', $this->id)
+                ->where('tanggal', $tanggal->format('Y-m-d'))
+                ->where('jenis', 'masuk')
+                ->where('is_lembur', false)
+                ->whereNotNull('jam_shift_id')
+                ->first();
+
+            if ($presensiMasuk && $presensiMasuk->jam_shift_id) {
+                $shift = JamShift::find($presensiMasuk->jam_shift_id);
+                if ($shift) {
+                    return [
+                        'jam_masuk'  => $shift->jam_masuk,
+                        'jam_pulang' => $shift->jam_pulang,
+                        'is_shift'   => true,
+                        'nama_shift' => $shift->nama,
+                    ];
+                }
             }
         }
 

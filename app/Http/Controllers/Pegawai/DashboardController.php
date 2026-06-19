@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Presensi;
 use App\Models\JamKerja;
+use App\Models\JamShift;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -74,6 +75,8 @@ class DashboardController extends Controller
             ];
         })->values()->toArray();
 
+        $shifts = $user->can_shift ? JamShift::all() : collect();
+
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
             'user',
@@ -84,7 +87,8 @@ class DashboardController extends Controller
             'sudahLemburMasuk',
             'sudahLemburPulang',
             'wilayahList',
-            'wilayahJson'
+            'wilayahJson',
+            'shifts'
         ));
     }
 }

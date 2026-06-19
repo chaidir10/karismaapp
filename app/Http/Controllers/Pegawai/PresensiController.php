@@ -61,10 +61,11 @@ class PresensiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis'      => 'required|in:masuk,pulang',
-            'lokasi'     => 'nullable|string|max:255',
-            'foto'       => 'required',
-            'is_lembur'  => 'nullable|boolean',
+            'jenis'        => 'required|in:masuk,pulang',
+            'lokasi'       => 'nullable|string|max:255',
+            'foto'         => 'required',
+            'is_lembur'    => 'nullable|boolean',
+            'jam_shift_id' => 'nullable|exists:jam_shift,id',
         ]);
 
         $today = now()->format('Y-m-d');
@@ -195,14 +196,15 @@ class PresensiController extends Controller
             }
 
             Presensi::create([
-                'user_id'    => $userId,
-                'jenis'      => $request->jenis,
-                'foto'       => $foto_db,
-                'lokasi'     => $request->lokasi,
-                'tanggal'    => $today,
-                'jam'        => now()->format('H:i:s'),
-                'status'     => $status,
-                'is_lembur'  => $isLembur,
+                'user_id'      => $userId,
+                'jenis'        => $request->jenis,
+                'foto'         => $foto_db,
+                'lokasi'       => $request->lokasi,
+                'tanggal'      => $today,
+                'jam'          => now()->format('H:i:s'),
+                'status'       => $status,
+                'is_lembur'    => $isLembur,
+                'jam_shift_id' => $request->jam_shift_id,
             ]);
 
             $label = $isLembur ? 'Lembur ' : 'Presensi ';

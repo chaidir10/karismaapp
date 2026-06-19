@@ -241,7 +241,6 @@
 </td>
                                 <td class="px-4 py-3 text-xs ${row.lembur && row.lembur != '-' && row.lembur > 0 ? 'text-orange-600 font-medium' : 'text-gray-600'}">
     ${row.lembur && row.lembur != '-' && row.lembur > 0 ? Math.floor(row.lembur/60) + ' jam ' + (row.lembur%60) + ' menit' : '-'}
-    ${row.lembur_masuk && row.lembur_masuk != '-' ? '<br><small>' + row.lembur_masuk + ' - ' + row.lembur_pulang + '</small>' : ''}
 </td>
 
                             </tr>

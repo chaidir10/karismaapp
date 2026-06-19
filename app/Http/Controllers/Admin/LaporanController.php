@@ -25,9 +25,10 @@ class LaporanController extends Controller
         $endDate   = Carbon::createFromFormat('Y-m', $bulan)->endOfMonth();
 
         $users = $userId
-            ? User::with('jamShift')->where('id', $userId)->get()
-            : User::with('jamShift')->orderBy('name')->get();
+            ? User::where('id', $userId)->get()
+            : User::orderBy('name')->get();
 
+        $holidays = $this->fetchHolidays($startDate->year);
         $laporan = [];
 
         foreach ($users as $user) {
@@ -48,12 +49,12 @@ class LaporanController extends Controller
             $totalLembur        = 0;
             $totalHariTelat     = 0;
 
-            $isShiftUser = $user->can_shift && $user->jam_shift_id;
-
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
                 $tanggal   = $date->format('Y-m-d');
                 $dayOfWeek = $date->dayOfWeek;
                 $isWeekend = ($dayOfWeek == 0 || $dayOfWeek == 6);
+                $isHoliday = in_array($tanggal, $holidays);
+                $isLibur   = $isWeekend || $isHoliday;
 
                 $masuk  = $presensiReguler->has($tanggal) ? $presensiReguler[$tanggal]->firstWhere('jenis', 'masuk') : null;
                 $pulang = $presensiReguler->has($tanggal) ? $presensiReguler[$tanggal]->firstWhere('jenis', 'pulang') : null;
@@ -75,9 +76,8 @@ class LaporanController extends Controller
                     'jam_kerja'      => '-',
                     'waktu_kurang'   => '-',
                     'lembur'         => '-',
-                    'lembur_masuk'   => $lemburMasuk ? Carbon::parse($lemburMasuk->jam)->format('H:i') : '-',
-                    'lembur_pulang'  => $lemburPulang ? Carbon::parse($lemburPulang->jam)->format('H:i') : '-',
-                    'is_weekend'     => $isWeekend,
+                    'is_weekend'     => $isLibur,
+                    'is_holiday'     => $isHoliday,
                     'status_masuk'   => 'Tidak Hadir',
                 ];
 
@@ -86,63 +86,72 @@ class LaporanController extends Controller
                     $jamPulangObj = Carbon::parse($pulang->jam);
                     $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
-                    $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
+                    if ($isLibur) {
+                        // Weekend / libur nasional → kerja reguler otomatis jadi lembur
+                        $row['lembur']       = $jamKerja;
+                        $row['jam_kerja']    = $jamKerja;
+                        $row['status_masuk'] = 'Lembur';
+                        $totalLembur += $jamKerja;
+                    } else {
+                        // Hari kerja normal
+                        $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
-                    $keterlambatan = $jamMasukObj->gte($jamToleransi)
-                        ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
-                        : 0;
+                        $keterlambatan = $jamMasukObj->gte($jamToleransi)
+                            ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
+                            : 0;
 
-                    if ($keterlambatan > 0) $totalHariTelat++;
+                        if ($keterlambatan > 0) $totalHariTelat++;
 
-                    $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
-                        ? $this->calculateMinutesWithoutSeconds($jamPulangObj, $jamPulangDefault, true)
-                        : 0;
+                        $pulangCepat = $jamPulangObj->lt($jamPulangDefault)
+                            ? $this->calculateMinutesWithoutSeconds($jamPulangObj, $jamPulangDefault, true)
+                            : 0;
 
-                    $waktuKurang = ($jamKerja < $jamKerjaWajib)
-                        ? $this->roundUpToNearestMinute($jamKerjaWajib - $jamKerja)
-                        : 0;
+                        $waktuKurang = ($jamKerja < $jamKerjaWajib)
+                            ? $this->roundUpToNearestMinute($jamKerjaWajib - $jamKerja)
+                            : 0;
 
-                    $row['status_masuk']  = $keterlambatan > 0 ? 'Telat' : 'Tepat Waktu';
-                    $row['keterlambatan'] = $keterlambatan ?: '-';
-                    $row['pulang_cepat']  = $pulangCepat ?: '-';
-                    $row['jam_kerja']     = $jamKerja ?: '-';
-                    $row['waktu_kurang']  = $waktuKurang ?: '-';
+                        $row['status_masuk']  = $keterlambatan > 0 ? 'Telat' : 'Tepat Waktu';
+                        $row['keterlambatan'] = $keterlambatan ?: '-';
+                        $row['pulang_cepat']  = $pulangCepat ?: '-';
+                        $row['jam_kerja']     = $jamKerja ?: '-';
+                        $row['waktu_kurang']  = $waktuKurang ?: '-';
 
-                    $totalKeterlambatan += $keterlambatan;
-                    $totalPulangCepat   += $pulangCepat;
-                    $totalJamKerja      += $jamKerja;
-                    $totalKekurangan    += $waktuKurang;
-                    $totalHariKerja++;
+                        $totalKeterlambatan += $keterlambatan;
+                        $totalPulangCepat   += $pulangCepat;
+                        $totalJamKerja      += $jamKerja;
+                        $totalKekurangan    += $waktuKurang;
+                        $totalHariKerja++;
+                    }
                 } elseif ($masuk || $pulang) {
-                    $totalHariKerja++;
+                    if (!$isLibur) $totalHariKerja++;
                     $row['status_masuk'] = 'Data Tidak Lengkap';
                 }
 
-                // Hitung lembur dari record lembur (bukan dari weekend)
-                $lemburMenit = 0;
-                if ($lemburMasuk && $lemburPulang) {
+                // Lembur eksplisit (dari tombol lembur) — di hari kerja biasa
+                if ($lemburMasuk && $lemburPulang && !$isLibur) {
                     $lemburMenit = $this->calculateMinutesWithoutSeconds(
                         Carbon::parse($lemburMasuk->jam),
                         Carbon::parse($lemburPulang->jam)
                     );
-                    $row['lembur'] = $lemburMenit;
-                    $row['lembur_masuk'] = Carbon::parse($lemburMasuk->jam)->format('H:i');
-                    $row['lembur_pulang'] = Carbon::parse($lemburPulang->jam)->format('H:i');
+                    $currentLembur = is_numeric($row['lembur']) ? $row['lembur'] : 0;
+                    $row['lembur'] = $currentLembur + $lemburMenit;
+                    $totalLembur += $lemburMenit;
                     if (!$masuk && !$pulang) {
                         $row['status_masuk'] = 'Lembur';
                     }
                 }
-                $totalLembur += $lemburMenit;
 
                 $rows[] = $row;
             }
+
+            $isShiftUser = $user->can_shift;
 
             $laporan[] = [
                 'user'             => $user,
                 'total_hari_kerja' => $totalHariKerja,
                 'total_hari_telat' => $totalHariTelat,
                 'is_shift'         => $isShiftUser,
-                'shift_nama'       => $isShiftUser ? ($user->jamShift->nama ?? '-') : null,
+                'shift_nama'       => $isShiftUser ? 'Pegawai Shift' : null,
                 'rows'             => $rows,
                 'summary'          => [
                     'total_keterlambatan' => $totalKeterlambatan,
@@ -205,6 +214,19 @@ class LaporanController extends Controller
         $remainingMinutes = $minutes % 60;
         
         return sprintf("%02d:%02d", $hours, $remainingMinutes);
+    }
+
+    private function fetchHolidays($year)
+    {
+        try {
+            $json = @file_get_contents("https://libur.deno.dev/api?year={$year}");
+            if (!$json) return [];
+            $data = @json_decode($json, true);
+            if (!is_array($data)) return [];
+            return array_filter(array_column($data, 'tanggal'));
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     public function getLaporan(Request $request)

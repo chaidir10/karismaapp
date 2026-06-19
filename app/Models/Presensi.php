@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\JamShift;
 
 class Presensi extends Model
 {
@@ -23,6 +24,7 @@ class Presensi extends Model
         'lokasi',
         'status',
         'is_lembur',
+        'jam_shift_id',
     ];
 
     protected $casts = [
@@ -42,5 +44,10 @@ class Presensi extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function jamShift()
+    {
+        return $this->belongsTo(JamShift::class);
     }
 }

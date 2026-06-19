@@ -133,14 +133,7 @@
                     <td>{{ formatMenitOnly($row['pulang_cepat']) }}</td>
                     <td>{{ is_numeric($row['jam_kerja']) ? formatJamMenit($row['jam_kerja']) : $row['jam_kerja'] }}</td>
                     <td>{{ formatMenitOnly($row['waktu_kurang']) }}</td>
-                    <td>
-                        @if(is_numeric($row['lembur']) && $row['lembur'] > 0)
-                            {{ formatJamMenit($row['lembur']) }}
-                            <br><small>{{ $row['lembur_masuk'] ?? '-' }} - {{ $row['lembur_pulang'] ?? '-' }}</small>
-                        @else
-                            -
-                        @endif
-                    </td>
+                    <td>{{ is_numeric($row['lembur']) && $row['lembur'] > 0 ? formatJamMenit($row['lembur']) : '-' }}</td>
                 </tr>
                 @endforeach
             </tbody>
