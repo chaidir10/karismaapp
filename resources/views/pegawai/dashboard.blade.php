@@ -75,23 +75,27 @@
     </div>
 </div>
 
-{{-- Floating Lembur Button — selalu muncul kecuali lembur sudah complete --}}
-@if(!$sudahLemburPulang)
-<div class="lembur-fab" id="lemburFab" onclick="toggleLemburMenu()">
+{{-- Floating Lembur Button --}}
+@if(!$sudahLemburMasuk)
+<button class="lembur-floating lembur-masuk" data-bs-toggle="modal" data-bs-target="#presensiModal"
+    onclick="setJenis('masuk'); setLembur(true)">
+    <i class="fas fa-clock"></i> Lembur Masuk
+</button>
+@elseif(!$sudahLemburPulang)
+@php
+    $lemburMasukRecord = \App\Models\Presensi::where('user_id', Auth::id())
+        ->where('tanggal', now()->format('Y-m-d'))
+        ->where('jenis', 'masuk')->where('is_lembur', true)->first();
+@endphp
+<button class="lembur-floating lembur-pulang" data-bs-toggle="modal" data-bs-target="#presensiModal"
+    onclick="setJenis('pulang'); setLembur(true)">
     <i class="fas fa-clock"></i>
-</div>
-<div class="lembur-menu" id="lemburMenu">
-    @if(!$sudahLemburMasuk)
-    <button class="lembur-menu-btn" data-bs-toggle="modal" data-bs-target="#presensiModal"
-        onclick="setJenis('masuk'); setLembur(true); closeLemburMenu()">
-        <i class="fas fa-sign-in-alt"></i> Masuk Lembur
-    </button>
-    @else
-    <button class="lembur-menu-btn" data-bs-toggle="modal" data-bs-target="#presensiModal"
-        onclick="setJenis('pulang'); setLembur(true); closeLemburMenu()">
-        <i class="fas fa-sign-out-alt"></i> Pulang Lembur
-    </button>
-    @endif
+    <span>Lembur Pulang</span>
+    <span class="lembur-timer" id="lemburTimer" data-start="{{ $lemburMasukRecord->jam ?? '' }}">00:00:00</span>
+</button>
+@else
+<div class="lembur-floating lembur-done">
+    <i class="fas fa-check-circle"></i> Lembur Selesai
 </div>
 @endif
 
@@ -585,66 +589,57 @@
     }
 
     /* Floating Lembur Button */
-    .lembur-fab {
+    .lembur-floating {
         position: fixed;
-        bottom: 90px;
-        right: 20px;
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-        cursor: pointer;
+        bottom: 80px;
+        right: 15px;
         z-index: 50;
-        transition: transform 0.2s;
-    }
-
-    .lembur-fab:active { transform: scale(0.9); }
-
-    .lembur-menu {
-        position: fixed;
-        bottom: 150px;
-        right: 20px;
-        z-index: 50;
-        display: none;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .lembur-menu.show { display: flex; }
-
-    .lembur-menu-btn {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: #fff;
         border: none;
-        padding: 10px 18px;
-        border-radius: 12px;
+        border-radius: 16px;
+        padding: 10px 16px;
         font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        white-space: nowrap;
+        font-weight: 700;
+        color: #fff;
         display: flex;
         align-items: center;
         gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         transition: transform 0.2s;
     }
 
-    .lembur-menu-btn:active { transform: scale(0.95); }
+    .lembur-floating:active { transform: scale(0.95); }
 
-    .lembur-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 49;
-        display: none;
+    .lembur-masuk {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
     }
 
-    .lembur-overlay.show { display: block; }
+    .lembur-pulang {
+        background: linear-gradient(135deg, #10b981, #059669);
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+
+    .lembur-pulang span:first-of-type {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .lembur-timer {
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0.9;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .lembur-done {
+        background: #94a3b8;
+        cursor: default;
+        pointer-events: none;
+        opacity: 0.7;
+    }
 </style>
 @endpush
 
@@ -684,21 +679,30 @@
         }, 300);
     }
 
-    function toggleLemburMenu() {
-        const menu = document.getElementById('lemburMenu');
-        if (menu) menu.classList.toggle('show');
-    }
+    // Timer lembur
+    (function() {
+        var timerEl = document.getElementById('lemburTimer');
+        if (!timerEl) return;
+        var startTime = timerEl.getAttribute('data-start');
+        if (!startTime) return;
 
-    function closeLemburMenu() {
-        const menu = document.getElementById('lemburMenu');
-        if (menu) menu.classList.remove('show');
-    }
+        var parts = startTime.split(':');
+        var now = new Date();
+        var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+            parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2] || 0));
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#lemburFab') && !e.target.closest('#lemburMenu')) {
-            closeLemburMenu();
+        function update() {
+            var diff = Math.floor((new Date() - start) / 1000);
+            if (diff < 0) diff = 0;
+            var h = String(Math.floor(diff / 3600)).padStart(2, '0');
+            var m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+            var s = String(diff % 60).padStart(2, '0');
+            timerEl.textContent = h + ':' + m + ':' + s;
         }
-    });
+
+        update();
+        setInterval(update, 1000);
+    })();
 
     function handlePulangClick() {
         if (!sudahPresensiMasuk) {
