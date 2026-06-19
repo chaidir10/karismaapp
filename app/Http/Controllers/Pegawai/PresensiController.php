@@ -73,15 +73,6 @@ class PresensiController extends Controller
         $isLembur = $request->boolean('is_lembur', false);
 
         if ($isLembur) {
-            // Lembur: harus sudah masuk + pulang reguler
-            $sudahPulangReguler = Presensi::where('user_id', $userId)
-                ->where('tanggal', $today)->where('jenis', 'pulang')->where('is_lembur', false)->exists();
-
-            if (!$sudahPulangReguler) {
-                return redirect()->route('pegawai.dashboard')
-                    ->with('error', 'Selesaikan presensi reguler (masuk & pulang) terlebih dahulu!');
-            }
-
             if ($request->jenis === 'pulang') {
                 $sudahMasukLembur = Presensi::where('user_id', $userId)
                     ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', true)->exists();

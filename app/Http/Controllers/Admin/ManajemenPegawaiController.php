@@ -62,8 +62,7 @@ class ManajemenPegawaiController extends Controller
             'jenis_pegawai' => $request->jenis_pegawai,
             'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
-            'can_shift' => $request->has('can_shift'),
-            'jam_shift_id' => $request->can_shift ? $request->jam_shift_id : null,
+            'can_shift' => $request->boolean('can_shift', false),
         ]);
 
         if ($request->has('wilayah_ids')) {
@@ -129,7 +128,6 @@ class ManajemenPegawaiController extends Controller
         $user->no_hp = $request->no_hp;
         $user->alamat = $request->alamat;
         $user->can_shift = $request->boolean('can_shift', false);
-        $user->jam_shift_id = $request->boolean('can_shift', false) ? $request->jam_shift_id : null;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
