@@ -113,6 +113,33 @@
     {{-- Menu Section --}}
     <div class="mx-4 mb-20 mt-4">
         <div class="space-y-3">
+            {{-- Dark/Light Mode --}}
+            <button type="button" onclick="toggleTheme()" class="w-full flex items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md text-left">
+                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mr-3 text-blue-600">
+                    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-sm">Tampilan</div>
+                    <div class="text-xs text-gray-500">Ubah ke mode gelap / terang</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+
             {{-- Logout --}}
             <form action="{{ route('pegawai.akun.logout') }}" method="POST" id="logoutForm">
                 @csrf
@@ -306,6 +333,17 @@
         modalContent.addEventListener('click', (e) => {
             e.stopPropagation();
         });
+    });
+
+    // Sync theme icon on load
+    document.addEventListener('DOMContentLoaded', function() {
+        var theme = document.documentElement.getAttribute('data-theme');
+        var sunIcon = document.getElementById('theme-icon-sun');
+        var moonIcon = document.getElementById('theme-icon-moon');
+        if (sunIcon && moonIcon) {
+            sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
+            moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+        }
     });
 
     // Handle image loading errors
