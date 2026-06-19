@@ -540,7 +540,8 @@
         background: var(--gray-100);
     }
 
-    #presensiMap {
+    #presensiMap,
+    #hariIniMap {
         width: 100%;
         height: 100%;
     }
@@ -658,7 +659,7 @@
                                 data-jenis="{{ $p->jenis ?? '' }}"
                                 data-jam="{{ $p->jam ?? '-' }}"
                                 data-lokasi="{{ $p->lokasi ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
+                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
                                 data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
                                 data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -729,7 +730,7 @@
                                 data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
-                                data-bukti-url="{{ $peng->bukti ? asset('storage/' . $peng->bukti) : '' }}"
+                                data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -801,7 +802,7 @@
                                 data-jenis="{{ $p->jenis ?? '' }}"
                                 data-jam="{{ $p->jam ?? '-' }}"
                                 data-lokasi="{{ $p->lokasi ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
+                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
                                 data-status="{{ $p->status ?? '' }}"
                                 data-status-label="@if(($p->jenis ?? '') === 'masuk'){{ $p->terlambat ? 'Terlambat' : 'Tepat Waktu' }}@elseif(($p->jenis ?? '') === 'pulang'){{ ($p->waktu_kurang_menit ?? 0) > 0 ? 'Waktu Kurang' : 'Tepat Waktu' }}@else -@endif">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
