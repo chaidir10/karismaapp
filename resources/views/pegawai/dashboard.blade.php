@@ -34,16 +34,12 @@
 
     /* Work Timer Banner */
     .work-timer-banner {
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 12px;
-        padding: 10px 14px;
-
+        margin: 15px 10px 10px;
+        padding: 8px 14px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-
         font-size: 12px;
         font-weight: 800;
     }
@@ -108,15 +104,10 @@
 
     {{-- Timer Jam Kerja --}}
     @if($sudahPresensiMasuk && $jamMasukHariIni)
-        <div class="attendance-actions">
-            <div class="work-timer-banner timer-yellow" id="workTimerBanner">
-                <span>
-                    <i class="fas fa-hourglass-half"></i>
-                    <span id="workTimerLabel">Jam kerja berjalan</span>
-                </span>
-                <span class="timer-clock" id="workTimerClock">00:00:00</span>
-            </div>
-        </div>
+    <div class="work-timer-banner timer-yellow" id="workTimerBanner">
+        <span><i class="fas fa-hourglass-half"></i> <span id="workTimerLabel">Jam kerja berjalan</span></span>
+        <span class="timer-clock" id="workTimerClock">00:00:00</span>
+    </div>
     @endif
 </div>
 
