@@ -64,6 +64,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::get('/dashboard', [PegawaiDashboardController::class, 'index'])->name('dashboard');
 
         // Presensi
+        Route::get('/presensi', fn() => redirect()->route('pegawai.dashboard'));
         Route::post('/presensi', [PresensiController::class, 'store'])->name('presensi.store');
         Route::get('/riwayat', [PresensiController::class, 'riwayat'])->name('riwayat');
 
