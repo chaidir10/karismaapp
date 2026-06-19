@@ -795,7 +795,15 @@
                         </thead>
                         <tbody id="presensiHariIniTable" data-paginate="10">
                             @forelse($presensiHariIni ?? [] as $index => $p)
-                            <tr>
+                            <tr class="clickable-row"
+                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="{{ $p->jenis ?? '' }}"
+                                data-jam="{{ $p->jam ?? '-' }}"
+                                data-lokasi="{{ $p->lokasi ?? '' }}"
+                                data-foto-url="{{ $p->foto ? asset('storage/' . $p->foto) : '' }}"
+                                data-status="{{ $p->status ?? '' }}"
+                                data-status-label="@if(($p->jenis ?? '') === 'masuk'){{ $p->terlambat ? 'Terlambat' : 'Tepat Waktu' }}@elseif(($p->jenis ?? '') === 'pulang'){{ ($p->waktu_kurang_menit ?? 0) > 0 ? 'Waktu Kurang' : 'Tepat Waktu' }}@else -@endif">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td>
@@ -981,6 +989,75 @@
 </div>
 
 
+{{-- ========== MODAL DETAIL PRESENSI HARI INI ========== --}}
+<div id="modalDetailHariIni" class="modal-overlay">
+    <div class="modal-container modal-large">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Presensi</h3>
+            <button class="modal-close" onclick="closeModal('modalDetailHariIni')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nama Pegawai</label>
+                    <span id="detailNamaHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis Presensi</label>
+                    <span id="detailJenisHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jam</label>
+                    <span id="detailJamHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Status Kehadiran</label>
+                    <span id="detailStatusHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Status Verifikasi</label>
+                    <span id="detailVerifikasiHariIni">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Lokasi</label>
+                    <span id="detailLokasiHariIni">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="hariIniMap"></div>
+                        <div id="hariIniMapLoading" class="map-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat peta...</span>
+                        </div>
+                        <div id="hariIniMapError" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Koordinat tidak tersedia</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Foto</label>
+                    <div id="detailFotoHariIni">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -993,7 +1070,11 @@
     // ─── State ───────────────────────────────────────────────────────────────
     let presensiMap    = null;
     let currentMarker  = null;
-    let pendingCoords  = null; // koordinat yang menunggu untuk dirender
+    let pendingCoords  = null;
+
+    let hariIniMap     = null;
+    let hariIniMarker  = null;
+    let hariIniCoords  = null;
 
     // ─── DOM Ready ───────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
@@ -1030,6 +1111,22 @@
                     bukti_url         : this.dataset.buktiUrl,
                     approve_url       : this.dataset.approveUrl,
                     reject_url        : this.dataset.rejectUrl
+                });
+            });
+        });
+
+        // Klik baris presensi hari ini
+        document.querySelectorAll('#presensiHariIniTable .clickable-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                openHariIniModal({
+                    user_name    : this.dataset.userName,
+                    tanggal      : this.dataset.tanggal,
+                    jenis        : this.dataset.jenis,
+                    jam          : this.dataset.jam,
+                    lokasi       : this.dataset.lokasi,
+                    foto_url     : this.dataset.fotoUrl,
+                    status       : this.dataset.status,
+                    status_label : this.dataset.statusLabel
                 });
             });
         });
@@ -1110,6 +1207,48 @@
         openModal('modalPengajuanPending');
     }
 
+    // ─── Modal Detail Hari Ini ───────────────────────────────────────────────
+    function openHariIniModal(data) {
+        document.getElementById('detailNamaHariIni').textContent    = data.user_name || 'N/A';
+        document.getElementById('detailTanggalHariIni').textContent = data.tanggal   || '-';
+        document.getElementById('detailJenisHariIni').textContent   = capitalize(data.jenis);
+        document.getElementById('detailJamHariIni').textContent     = data.jam       || '-';
+        document.getElementById('detailLokasiHariIni').textContent  = data.lokasi    || 'Tidak ada lokasi';
+
+        // Status kehadiran
+        var statusEl = document.getElementById('detailStatusHariIni');
+        var label = (data.status_label || '-').trim();
+        var cls = 'neutral';
+        if (label === 'Tepat Waktu') cls = 'on-time';
+        else if (label === 'Terlambat' || label === 'Waktu Kurang') cls = 'late';
+        statusEl.innerHTML = '<span class="status-badge ' + cls + '">' + label + '</span>';
+
+        // Status verifikasi
+        var verifEl = document.getElementById('detailVerifikasiHariIni');
+        var st = (data.status || '').toLowerCase();
+        var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
+        verifEl.innerHTML = '<span class="status-badge ' + verifCls + '">' + capitalize(st) + '</span>';
+
+        // Foto
+        var fotoEl = document.getElementById('detailFotoHariIni');
+        fotoEl.innerHTML = data.foto_url
+            ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
+            : '<span class="text-muted">Tidak ada foto</span>';
+
+        // Koordinat
+        var lat = NaN, lng = NaN;
+        if (data.lokasi) {
+            var parts = data.lokasi.trim().split(',');
+            if (parts.length === 2) {
+                lat = parseFloat(parts[0].trim());
+                lng = parseFloat(parts[1].trim());
+            }
+        }
+
+        hariIniCoords = { lat: lat, lng: lng, lokasi: data.lokasi || 'Lokasi tidak tersedia' };
+        openModal('modalDetailHariIni');
+    }
+
     // ─── Modal Helpers ────────────────────────────────────────────────────────
     function openModal(id) {
         var modal = document.getElementById(id);
@@ -1118,10 +1257,8 @@
         modal.style.display    = 'flex';
         document.body.style.overflow = 'hidden';
 
-        // Render peta SETELAH modal benar-benar tampil (ada dimensi)
-        if (id === 'modalPresensiPending') {
-            renderMap();
-        }
+        if (id === 'modalPresensiPending') renderMap('presensiMap', 'mapLoading', 'mapError', pendingCoords, 'pending');
+        if (id === 'modalDetailHariIni')   renderMap('hariIniMap', 'hariIniMapLoading', 'hariIniMapError', hariIniCoords, 'hariIni');
     }
 
     function closeModal(id) {
@@ -1131,46 +1268,32 @@
         modal.style.display          = 'none';
         document.body.style.overflow = 'auto';
 
-        if (id === 'modalPresensiPending') {
-            destroyMap();
-        }
+        if (id === 'modalPresensiPending') destroyMap('pending');
+        if (id === 'modalDetailHariIni')   destroyMap('hariIni');
     }
 
     // ─── Map ──────────────────────────────────────────────────────────────────
-    function renderMap() {
-        var mapLoading = document.getElementById('mapLoading');
-        var mapError   = document.getElementById('mapError');
-        var mapEl      = document.getElementById('presensiMap');
+    function renderMap(mapElId, loadingId, errorId, coords, type) {
+        var mapLoading = document.getElementById(loadingId);
+        var mapError   = document.getElementById(errorId);
+        var mapEl      = document.getElementById(mapElId);
 
-        // Reset tampilan
         mapLoading.style.display = 'flex';
         mapError.style.display   = 'none';
 
-        // Hancurkan instance lama jika ada
-        destroyMap();
+        destroyMap(type);
 
-        // Validasi koordinat
-        if (!pendingCoords || isNaN(pendingCoords.lat) || isNaN(pendingCoords.lng)) {
+        if (!coords || isNaN(coords.lat) || isNaN(coords.lng)) {
             mapLoading.style.display = 'none';
             mapError.style.display   = 'flex';
             return;
         }
 
-        var lat    = pendingCoords.lat;
-        var lng    = pendingCoords.lng;
-        var lokasi = pendingCoords.lokasi;
+        var lat    = coords.lat;
+        var lng    = coords.lng;
+        var lokasi = coords.lokasi;
 
-        /*
-         * Delay 200ms agar browser selesai me-render modal (display:flex)
-         * sehingga mapEl sudah memiliki lebar/tinggi yang nyata.
-         * Leaflet butuh dimensi container untuk menginisialisasi tile grid.
-         */
         setTimeout(function () {
-            // Pastikan modal masih terbuka
-            var modal = document.getElementById('modalPresensiPending');
-            if (!modal || modal.style.display === 'none') return;
-
-            // Pastikan container memiliki dimensi
             if (mapEl.offsetWidth === 0 || mapEl.offsetHeight === 0) {
                 mapLoading.style.display = 'none';
                 mapError.style.display   = 'flex';
@@ -1178,22 +1301,21 @@
             }
 
             try {
-                presensiMap = L.map('presensiMap', { zoomControl: true }).setView([lat, lng], 16);
-
+                var map = L.map(mapElId, { zoomControl: true }).setView([lat, lng], 16);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                    maxZoom     : 19
-                }).addTo(presensiMap);
+                    attribution: '&copy; OpenStreetMap', maxZoom: 19
+                }).addTo(map);
 
-                currentMarker = L.marker([lat, lng])
-                    .addTo(presensiMap)
+                var marker = L.marker([lat, lng])
+                    .addTo(map)
                     .bindPopup('<b>Lokasi Presensi</b><br>' + lokasi)
                     .openPopup();
 
-                // Paksa Leaflet hitung ulang ukuran — kunci utama agar tile muncul
-                presensiMap.invalidateSize();
-
+                map.invalidateSize();
                 mapLoading.style.display = 'none';
+
+                if (type === 'pending') { presensiMap = map; currentMarker = marker; }
+                else { hariIniMap = map; hariIniMarker = marker; }
             } catch (err) {
                 console.error('Map error:', err);
                 mapLoading.style.display = 'none';
@@ -1202,11 +1324,16 @@
         }, 200);
     }
 
-    function destroyMap() {
-        if (presensiMap) {
+    function destroyMap(type) {
+        if (type === 'pending' && presensiMap) {
             presensiMap.remove();
-            presensiMap   = null;
+            presensiMap = null;
             currentMarker = null;
+        }
+        if (type === 'hariIni' && hariIniMap) {
+            hariIniMap.remove();
+            hariIniMap = null;
+            hariIniMarker = null;
         }
     }
 
