@@ -533,14 +533,17 @@
 
     /* Foto + Map Side by Side */
     .media-row {
-        display: flex;
+        display: flex !important;
+        flex-direction: row !important;
         gap: 15px;
         margin-top: 5px;
+        width: 100%;
     }
 
     .media-col {
-        flex: 1;
+        flex: 1 1 0%;
         min-width: 0;
+        width: 50%;
     }
 
     .media-col label {
@@ -635,7 +638,8 @@
         .modal-actions .inline-form,
         .modal-actions button { width: 100%; }
         .map-container { height: 220px; }
-        .media-row { flex-direction: column; }
+        .media-row { flex-direction: column !important; }
+        .media-col { width: 100%; }
         .foto-wrapper { height: 200px; }
     }
 </style>
