@@ -98,7 +98,7 @@
     <div class="bg-white rounded-xl p-6 shadow-md mb-6">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">Filter Laporan</h2>
         <form id="formFilter" id="filter-row" style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
-            <div style="width:300px;">
+            <div style="flex:1; min-width:200px; max-width:400px;">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Pilih Pegawai</label>
                 <select name="user_id" id="user_id">
                     <option value="">Semua Pegawai</option>
