@@ -1196,11 +1196,16 @@
 
             // Cleanup before Turbo caches page — close modals, remove backdrops
             document.addEventListener('turbo:before-cache', function() {
-                // Bootstrap modals
-                document.querySelectorAll('.modal.show').forEach(function(m) {
+                // Bootstrap modals — dispose completely
+                document.querySelectorAll('.modal').forEach(function(m) {
+                    m.classList.remove('show');
+                    m.removeAttribute('aria-modal');
+                    m.removeAttribute('role');
+                    m.style.display = 'none';
                     var inst = bootstrap.Modal.getInstance(m);
-                    if(inst) inst.hide();
+                    if(inst) inst.dispose();
                 });
+                // Remove ALL backdrops
                 document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
                 // Custom overlays
                 document.querySelectorAll('.modal-overlay.visible').forEach(function(m) { m.classList.remove('visible'); });
@@ -1210,6 +1215,7 @@
                 // Reset body
                 document.body.style.overflow = '';
                 document.body.classList.remove('modal-open');
+                document.body.style.paddingRight = '';
             });
         })();
 
