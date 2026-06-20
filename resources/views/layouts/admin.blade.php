@@ -362,6 +362,10 @@
                             <i class="fas fa-chart-bar"></i>
                             Laporan
                         </a>
+                        <a href="{{ route('admin.performa.index') }}" class="sidebar-item @if(request()->routeIs('admin.performa.*')) active @endif">
+                            <i class="fas fa-trophy"></i>
+                            Performa
+                        </a>
 
                         <div class="sidebar-title mt-6">Pengaturan</div>
                         <a href="" class="sidebar-item">
@@ -439,6 +443,10 @@
                     <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
                         <i class="fas fa-chart-bar"></i>
                         Laporan
+                    </a>
+                    <a href="{{ route('admin.performa.index') }}" class="sidebar-item @if(request()->routeIs('admin.performa.*')) active @endif">
+                        <i class="fas fa-trophy"></i>
+                        Performa
                     </a>
 
                     <div class="sidebar-title mt-6">Pengaturan</div>

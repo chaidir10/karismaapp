@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ManajemenPegawaiController;
 use App\Http\Controllers\Admin\ManajemenLokasiController;
 use App\Http\Controllers\Admin\JamKerjaController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\PerformaController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
 use Illuminate\Support\Facades\Route;
@@ -149,6 +150,15 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::get('/data', [LaporanController::class, 'getLaporan'])->name('data');
             Route::get('/pdf', [LaporanController::class, 'exportPdf'])->name('pdf');
             Route::get('/excel', [LaporanController::class, 'exportExcel'])->name('excel');
+        });
+
+        // --------------------
+        // Performa Pegawai
+        // --------------------
+        Route::prefix('performa')->name('performa.')->group(function () {
+            Route::get('/', [PerformaController::class, 'index'])->name('index');
+            Route::get('/data', [PerformaController::class, 'getData'])->name('data');
+            Route::get('/pdf', [PerformaController::class, 'exportPdf'])->name('pdf');
         });
     });
 
