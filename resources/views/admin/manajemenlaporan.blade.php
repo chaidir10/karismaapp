@@ -34,8 +34,6 @@
     .ts-dropdown { border: 1px solid #d1d5db; border-radius: 12px; font-size: 14px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .ts-dropdown .option { padding: 9px 16px; }
     .ts-dropdown .option.active { background: #eef2ff; color: #4338ca; }
-    .ts-wrapper .clear-button { position: absolute !important; right: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; line-height: 1; padding: 0 !important; margin: 0 !important; }
-    .ts-wrapper .clear-button:hover { color: #ef4444; }
 
     body {
         font-family: 'Poppins', sans-serif;
@@ -174,7 +172,6 @@
     new TomSelect('#user_id', {
         placeholder: 'Ketik nama atau NIP...',
         allowEmptyOption: true,
-        plugins: { clear_button: { title: 'Hapus pilihan' } },
     });
 
     // Fungsi untuk menampilkan notifikasi
