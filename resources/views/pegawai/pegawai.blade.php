@@ -137,15 +137,25 @@
     </div>
 </div>
 
-<!-- Detail Modal -->
-<div class="modal fade detail-modal" id="employeeDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="modal-avatar" id="modalEmployeeAvatarContainer"></div>
-                <div class="modal-name" id="modalEmployeeName">-</div>
-                <div class="modal-position"><span id="modalEmployeePosition">-</span></div>
-
+<!-- Detail Modal — Fullscreen -->
+<div id="employeeDetailModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
+    <div style="display:flex; flex-direction:column; height:100%;">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div id="modalEmployeeAvatarContainer" style="width:36px; height:36px; border-radius:50%; overflow:hidden; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;"></div>
+                <div>
+                    <div id="modalEmployeeName" style="font-size:14px; font-weight:700; color:var(--dark);">-</div>
+                    <div id="modalEmployeePosition" style="font-size:11px; color:var(--gray);">-</div>
+                </div>
+            </div>
+            <button onclick="closeEmployeeModal()" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+        <!-- Body -->
+        <div style="flex:1; overflow-y:auto; padding:16px;">
+            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
                 <div class="detail-grid">
                     <div>
                         <div class="detail-label">Unit Kerja</div>
@@ -161,7 +171,7 @@
                     </div>
                     <div>
                         <div class="detail-label">No. Telepon</div>
-                        <div class="detail-value">
+                        <div class="detail-value" style="display:flex; align-items:center; justify-content:space-between;">
                             <span id="modalEmployeePhone">-</span>
                             <a href="#" id="whatsappLink" target="_blank" style="text-decoration:none;">
                                 <i class="fab fa-whatsapp" style="color:#25D366; font-size:18px;"></i>
@@ -177,33 +187,38 @@
                         <div class="detail-value" id="modalEmployeeAddress">-</div>
                     </div>
                 </div>
-                <button type="button" class="detail-close-btn" data-bs-dismiss="modal">Tutup</button>
             </div>
+        </div>
+        <!-- Footer -->
+        <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeEmployeeModal()" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('turbo:load', function() {
+    function initials(name) {
+        return name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase();
+    }
+    function closeEmployeeModal() { document.getElementById('employeeDetailModal').style.display = 'none'; }
+
+    function initPegawai() {
         var items = document.querySelectorAll('.e-card');
-        var modal = new bootstrap.Modal(document.getElementById('employeeDetailModal'));
         var avatarBox = document.getElementById('modalEmployeeAvatarContainer');
         var searchInput = document.getElementById('searchInput');
 
-        function initials(name) {
-            return name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase();
-        }
-
         items.forEach(function(item) {
-            item.addEventListener('click', function() {
+            item.onclick = function() {
                 var name = this.querySelector('.e-name').textContent;
                 var position = this.querySelector('.e-position').textContent;
                 var avatar = this.dataset.employeeAvatar;
 
                 if (avatar && avatar.trim()) {
-                    avatarBox.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<div class=modal-avatar-placeholder>' + initials(name) + '</div>\'">';
+                    avatarBox.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
                 } else {
-                    avatarBox.innerHTML = '<div class="modal-avatar-placeholder">' + initials(name) + '</div>';
+                    avatarBox.innerHTML = '<div class="e-avatar-placeholder" style="width:100%;height:100%;font-size:14px;">' + initials(name) + '</div>';
                 }
 
                 document.getElementById('modalEmployeeName').textContent = name;
@@ -229,25 +244,24 @@
                     waLink.style.opacity = '0.5';
                 }
 
-                modal.show();
-            });
+                document.getElementById('employeeDetailModal').style.display = 'block';
+            };
         });
 
         if (searchInput) {
-            searchInput.addEventListener('input', function() {
+            searchInput.oninput = function() {
                 var term = this.value.toLowerCase().trim();
                 items.forEach(function(el) {
                     var name = el.querySelector('.e-name').textContent.toLowerCase();
                     var pos = el.querySelector('.e-position').textContent.toLowerCase();
                     el.style.display = (name.includes(term) || pos.includes(term)) ? 'flex' : 'none';
                 });
-            });
+            };
         }
+    }
 
-        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function() {
-            avatarBox.innerHTML = '';
-        });
-    });
+    document.addEventListener('turbo:load', initPegawai);
+    initPegawai();
 
     window.handleAvatarError = function(img, name) {
         img.style.display = 'none';

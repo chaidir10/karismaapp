@@ -147,6 +147,23 @@
             </button>
         </div>
         <div style="flex:1; overflow-y:auto; padding:16px;">
+            <!-- Bukti Preview -->
+            <div id="modalBuktiPreview" style="display:none; border-radius:16px; overflow:hidden; margin-bottom:12px; background:var(--gray-light);">
+                <img id="modalBuktiImg" src="" style="width:100%; display:block; object-fit:contain; max-height:300px;" alt="Bukti">
+            </div>
+            <div id="modalBuktiPdf" style="display:none; margin-bottom:12px;">
+                <a id="modalBuktiPdfLink" href="#" target="_blank" style="display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--light); border-radius:14px; border:1px solid var(--card-border); text-decoration:none; color:var(--dark);">
+                    <div style="width:44px; height:44px; border-radius:12px; background:var(--danger-light); color:var(--danger); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:14px; font-weight:600;">Lihat Bukti PDF</div>
+                        <div style="font-size:11px; color:var(--gray);">Ketuk untuk membuka</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Info Card -->
             <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
                 <div class="detail-grid">
                     <div>
@@ -160,10 +177,6 @@
                     <div class="full">
                         <div class="detail-label">Alasan</div>
                         <div class="detail-value" id="modalPengajuanAlasan">-</div>
-                    </div>
-                    <div class="full">
-                        <div class="detail-label">Bukti</div>
-                        <div class="detail-value" id="modalPengajuanBukti"><span style="color:var(--gray)">Tidak ada bukti</span></div>
                     </div>
                 </div>
             </div>
@@ -253,8 +266,19 @@
                 document.getElementById('modalPengajuanAlasan').textContent = this.dataset.pengajuanAlasan;
 
                 var bukti = this.dataset.pengajuanBukti;
-                var buktiEl = document.getElementById('modalPengajuanBukti');
-                buktiEl.innerHTML = bukti && bukti.trim() ? '<a href="' + bukti + '" target="_blank" style="color:var(--primary); font-weight:600;">Lihat Bukti</a>' : '<span style="color:var(--gray)">Tidak ada bukti</span>';
+                var imgPreview = document.getElementById('modalBuktiPreview');
+                var pdfPreview = document.getElementById('modalBuktiPdf');
+                imgPreview.style.display = 'none';
+                pdfPreview.style.display = 'none';
+                if (bukti && bukti.trim()) {
+                    if (bukti.match(/\.(pdf)$/i)) {
+                        document.getElementById('modalBuktiPdfLink').href = bukti;
+                        pdfPreview.style.display = 'block';
+                    } else {
+                        document.getElementById('modalBuktiImg').src = bukti;
+                        imgPreview.style.display = 'block';
+                    }
+                }
 
                 document.getElementById('pengajuanDetailModal').style.display = 'block';
             };
