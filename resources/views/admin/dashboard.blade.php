@@ -1562,6 +1562,7 @@
                 mapLoading.style.display = 'none';
 
                 if (type === 'pending') { presensiMap = map; currentMarker = marker; }
+                else if (type === 'lembur') { lemburMapInstance = map; }
                 else { hariIniMap = map; hariIniMarker = marker; }
             } catch (err) {
                 console.error('Map error:', err);
@@ -1570,6 +1571,8 @@
             }
         }, 200);
     }
+
+    var lemburMapInstance = null;
 
     function destroyMap(type) {
         if (type === 'pending' && presensiMap) {
@@ -1581,6 +1584,10 @@
             hariIniMap.remove();
             hariIniMap = null;
             hariIniMarker = null;
+        }
+        if (type === 'lembur' && lemburMapInstance) {
+            lemburMapInstance.remove();
+            lemburMapInstance = null;
         }
     }
 
