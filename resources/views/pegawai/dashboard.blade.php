@@ -1373,13 +1373,16 @@
         return true;
     }
 
-    document.addEventListener('turbo:load', function() {
-        const presensiModal = document.getElementById('presensiModal');
+    // Bind modal events once — not inside turbo:load to avoid stacking
+    (function() {
+        var presensiModal = document.getElementById('presensiModal');
         if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
         }
+    })();
 
+    document.addEventListener('turbo:load', function() {
         // Detail map modals
         initializeDetailModals();
 
