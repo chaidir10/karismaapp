@@ -54,8 +54,15 @@ class LaporanController extends Controller
                 $tanggal   = $date->format('Y-m-d');
                 $dayOfWeek = $date->dayOfWeek;
                 $isWeekend = ($dayOfWeek == 0 || $dayOfWeek == 6);
-                $isHoliday = in_array($tanggal, $holidays);
+                $isHoliday = isset($holidays[$tanggal]);
                 $isLibur   = $isWeekend || $isHoliday;
+
+                $statusLibur = 'Tidak Hadir';
+                if ($isHoliday) {
+                    $statusLibur = $holidays[$tanggal];
+                } elseif ($isWeekend) {
+                    $statusLibur = 'Libur';
+                }
 
                 $masuk  = $presensiReguler->has($tanggal) ? $presensiReguler[$tanggal]->firstWhere('jenis', 'masuk') : null;
                 $pulang = $presensiReguler->has($tanggal) ? $presensiReguler[$tanggal]->firstWhere('jenis', 'pulang') : null;
@@ -79,7 +86,8 @@ class LaporanController extends Controller
                     'lembur'         => '-',
                     'is_weekend'     => $isLibur,
                     'is_holiday'     => $isHoliday,
-                    'status_masuk'   => 'Tidak Hadir',
+                    'holiday_name'   => $isHoliday ? $holidays[$tanggal] : null,
+                    'status_masuk'   => $isLibur ? $statusLibur : 'Tidak Hadir',
                 ];
 
                 if ($masuk && $pulang) {
@@ -229,7 +237,13 @@ class LaporanController extends Controller
             if (!$json) return [];
             $data = @json_decode($json, true);
             if (!is_array($data)) return [];
-            return array_filter(array_column($data, 'tanggal'));
+            $holidays = [];
+            foreach ($data as $item) {
+                if (!empty($item['date'])) {
+                    $holidays[$item['date']] = $item['name'] ?? 'Libur Nasional';
+                }
+            }
+            return $holidays;
         } catch (\Exception $e) {
             return [];
         }

@@ -80,8 +80,8 @@
         <div class="flex items-start gap-2">
             <i class="fas fa-info-circle mt-0.5"></i>
             <div>
-                <strong>Sistem Penilaian:</strong>
-                Skor Masuk Tepat Waktu (bobot 60%) + Skor Pulang Tepat Waktu (bobot 40%) = Total Performa.
+                <strong>Sistem Penilaian (4 Komponen):</strong>
+                Kehadiran (25%) + Kedisiplinan Masuk (30%) + Kedisiplinan Pulang (20%) + Jam Kerja Terpenuhi (25%) = Total Performa.
                 Dihitung dari hari kerja efektif (Senin-Jumat, non-libur nasional). Lembur tidak termasuk penilaian.
             </div>
         </div>
@@ -120,12 +120,13 @@
                         <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Telat</th>
                         <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Pulang Tepat</th>
                         <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Pulang Cepat</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Jam Kerja Cukup</th>
                         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase" style="min-width:180px">Performa</th>
                     </tr>
                 </thead>
                 <tbody id="performaBody" class="bg-white divide-y divide-gray-200 text-sm">
                     <tr>
-                        <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                        <td colspan="9" class="px-4 py-8 text-center text-gray-500">
                             <i class="fas fa-trophy text-4xl text-gray-300 mb-3 block"></i>
                             <p class="text-sm font-medium">Pilih bulan dan tahun, lalu klik "Tampilkan Performa"</p>
                         </td>
@@ -194,7 +195,7 @@
         var tahun = document.getElementById('filterTahun').value;
         var tbody = document.getElementById('performaBody');
 
-        tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><div class="inline-block w-5 h-5 border-3 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-2"></div><p class="text-sm">Memuat data performa...</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><div class="inline-block w-5 h-5 border-3 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-2"></div><p class="text-sm">Memuat data performa...</p></td></tr>';
 
         fetch("{{ route('admin.performa.data') }}?bulan=" + bulan + "&tahun=" + tahun)
             .then(function(r) { return r.json(); })
@@ -203,7 +204,7 @@
                 var hk = data.hari_kerja;
 
                 if (!list || list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-calendar-times text-4xl text-gray-300 mb-3 block"></i><p class="text-sm font-medium">Tidak ada data untuk periode ini</p></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-calendar-times text-4xl text-gray-300 mb-3 block"></i><p class="text-sm font-medium">Tidak ada data untuk periode ini</p></td></tr>';
                     document.getElementById('summaryCards').classList.add('hidden');
                     return;
                 }
@@ -230,6 +231,7 @@
                         '<td class="px-3 py-3 text-center text-red-600 font-semibold">' + item.telat + '</td>' +
                         '<td class="px-3 py-3 text-center text-green-600 font-semibold">' + item.pulang_tepat + '</td>' +
                         '<td class="px-3 py-3 text-center text-orange-600 font-semibold">' + item.pulang_cepat + '</td>' +
+                        '<td class="px-3 py-3 text-center"><span class="font-semibold text-blue-600">' + item.jam_kerja_cukup + '</span><span class="text-gray-400">/' + item.hadir + '</span></td>' +
                         '<td class="px-4 py-3"><div class="flex items-center gap-3"><div class="flex-1"><div class="perf-bar"><div class="perf-bar-fill" style="width:' + Math.min(item.performa, 100) + '%;background:' + color + '"></div></div></div><div class="text-right" style="min-width:70px"><span class="font-bold" style="color:' + color + '">' + item.performa.toFixed(1) + '%</span><div class="text-xs text-gray-400">' + label + '</div></div></div></td>' +
                         '</tr>';
                 });
@@ -237,7 +239,7 @@
                 showNotification('Data performa berhasil dimuat', 'success');
             })
             .catch(function() {
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500"><i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-3 block"></i><p class="text-sm font-medium">Gagal memuat data</p></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-red-500"><i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-3 block"></i><p class="text-sm font-medium">Gagal memuat data</p></td></tr>';
                 showNotification('Gagal memuat data performa', 'error');
             });
     }

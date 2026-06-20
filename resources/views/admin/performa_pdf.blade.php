@@ -10,10 +10,10 @@
         h3 { text-align: center; margin: 0 0 2px; font-size: 11px; font-weight: normal; }
         h4 { text-align: center; margin: 0 0 8px; font-size: 10px; font-weight: normal; color: #333; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-        th, td { border: 1px solid #000; padding: 3px 5px; text-align: center; font-size: 9px; }
-        th { font-weight: bold; font-size: 9px; }
+        th, td { border: 1px solid #000; padding: 3px 4px; text-align: center; font-size: 9px; }
+        th { font-weight: bold; }
         .left { text-align: left; }
-        .notes { margin-top: 10px; font-size: 8px; line-height: 1.5; }
+        .notes { margin-top: 10px; font-size: 8px; line-height: 1.6; }
         .notes strong { font-size: 8px; }
     </style>
 </head>
@@ -25,18 +25,21 @@
     <table>
         <thead>
             <tr>
-                <th style="width:4%">No</th>
-                <th style="width:22%" class="left">Nama Pegawai</th>
-                <th style="width:12%">NIP</th>
-                <th style="width:7%">Hadir</th>
-                <th style="width:7%">Tidak Hadir</th>
-                <th style="width:8%">Tepat Masuk</th>
-                <th style="width:6%">Telat</th>
-                <th style="width:8%">Pulang Tepat</th>
-                <th style="width:8%">Pulang Cepat</th>
-                <th style="width:8%">Skor Masuk (60%)</th>
-                <th style="width:8%">Skor Pulang (40%)</th>
-                <th style="width:8%">Performa</th>
+                <th style="width:3%">No</th>
+                <th style="width:18%" class="left">Nama Pegawai</th>
+                <th style="width:10%">NIP</th>
+                <th style="width:5%">Hadir</th>
+                <th style="width:5%">Tidak Hadir</th>
+                <th style="width:6%">Tepat Masuk</th>
+                <th style="width:5%">Telat</th>
+                <th style="width:6%">Pulang Tepat</th>
+                <th style="width:6%">Pulang Cepat</th>
+                <th style="width:6%">Jam Kerja Cukup</th>
+                <th style="width:7%">Kehadiran (25%)</th>
+                <th style="width:7%">Masuk (30%)</th>
+                <th style="width:7%">Pulang (20%)</th>
+                <th style="width:7%">Jam Kerja (25%)</th>
+                <th style="width:7%">Performa</th>
             </tr>
         </thead>
         <tbody>
@@ -51,8 +54,11 @@
                 <td>{{ $item['telat'] }}</td>
                 <td>{{ $item['pulang_tepat'] }}</td>
                 <td>{{ $item['pulang_cepat'] }}</td>
+                <td>{{ $item['jam_kerja_cukup'] }}</td>
+                <td>{{ number_format($item['skor_kehadiran'], 1) }}</td>
                 <td>{{ number_format($item['skor_masuk'], 1) }}</td>
                 <td>{{ number_format($item['skor_pulang'], 1) }}</td>
+                <td>{{ number_format($item['skor_jam_kerja'], 1) }}</td>
                 <td>{{ number_format($item['performa'], 1) }}%</td>
             </tr>
             @endforeach
@@ -61,10 +67,11 @@
 
     <div class="notes">
         <strong>Keterangan Sistem Penilaian:</strong><br>
-        Skor Masuk = (Hari Tepat Masuk / Hari Kerja Efektif) x 60 &nbsp;&nbsp;|&nbsp;&nbsp;
-        Skor Pulang = (Hari Pulang Tepat / Hari Kerja Efektif) x 40 &nbsp;&nbsp;|&nbsp;&nbsp;
-        Total Performa = Skor Masuk + Skor Pulang (maks. 100%)<br>
-        Penilaian hanya berlaku pada hari kerja (Senin-Jumat, non-libur nasional). Lembur tidak termasuk dalam penilaian performa.
+        1. Kehadiran (25%) = (Hari Hadir / Hari Kerja) x 25<br>
+        2. Kedisiplinan Masuk (30%) = (Hari Tepat Masuk / Hari Kerja) x 30<br>
+        3. Kedisiplinan Pulang (20%) = (Hari Pulang Tepat / Hari Kerja) x 20<br>
+        4. Jam Kerja Terpenuhi (25%) = (Hari dgn Durasi Kerja >= Standar / Hari Kerja) x 25<br>
+        Total Performa = Kehadiran + Masuk + Pulang + Jam Kerja (maks. 100%). Lembur tidak termasuk penilaian.
     </div>
 </body>
 </html>

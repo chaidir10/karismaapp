@@ -88,6 +88,7 @@ class PerformaController extends Controller
             $telat = 0;
             $pulangTepat = 0;
             $pulangCepat = 0;
+            $jamKerjaCukup = 0;
 
             for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
                 $tanggal = $d->format('Y-m-d');
@@ -125,11 +126,19 @@ class PerformaController extends Controller
                 } else {
                     $pulangCepat++;
                 }
+
+                $durasiStandar = $jamMasukDefault->diffInMinutes($jamPulangDefault);
+                $durasiAktual = $jamMasukObj->copy()->setSeconds(0)->diffInMinutes($jamPulangObj->copy()->setSeconds(0));
+                if ($durasiAktual >= $durasiStandar) {
+                    $jamKerjaCukup++;
+                }
             }
 
-            $skorMasuk = round(($tepatMasuk / $hariKerja) * 60, 2);
-            $skorPulang = round(($pulangTepat / $hariKerja) * 40, 2);
-            $totalPerforma = round($skorMasuk + $skorPulang, 2);
+            $skorKehadiran = round(($hadir / $hariKerja) * 25, 2);
+            $skorMasuk = round(($tepatMasuk / $hariKerja) * 30, 2);
+            $skorPulang = round(($pulangTepat / $hariKerja) * 20, 2);
+            $skorJamKerja = round(($jamKerjaCukup / $hariKerja) * 25, 2);
+            $totalPerforma = round($skorKehadiran + $skorMasuk + $skorPulang + $skorJamKerja, 2);
 
             $performa[] = [
                 'nama' => $user->name,
@@ -142,14 +151,18 @@ class PerformaController extends Controller
                 'telat' => $telat,
                 'pulang_tepat' => $pulangTepat,
                 'pulang_cepat' => $pulangCepat,
+                'jam_kerja_cukup' => $jamKerjaCukup,
+                'skor_kehadiran' => $skorKehadiran,
                 'skor_masuk' => $skorMasuk,
                 'skor_pulang' => $skorPulang,
+                'skor_jam_kerja' => $skorJamKerja,
                 'performa' => $totalPerforma,
             ];
         }
 
         usort($performa, function ($a, $b) {
             if ($b['performa'] !== $a['performa']) return $b['performa'] <=> $a['performa'];
+            if ($b['jam_kerja_cukup'] !== $a['jam_kerja_cukup']) return $b['jam_kerja_cukup'] <=> $a['jam_kerja_cukup'];
             if ($b['hadir'] !== $a['hadir']) return $b['hadir'] <=> $a['hadir'];
             return $a['telat'] <=> $b['telat'];
         });
@@ -167,7 +180,7 @@ class PerformaController extends Controller
             if (!$json) return [];
             $data = @json_decode($json, true);
             if (!is_array($data)) return [];
-            return array_filter(array_column($data, 'tanggal'));
+            return array_filter(array_column($data, 'date'));
         } catch (\Exception $e) {
             return [];
         }
