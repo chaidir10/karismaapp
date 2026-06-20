@@ -29,7 +29,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com" defer></script>
-    <meta name="turbo-cache-control" content="no-cache">
+    <meta name="turbo-cache-control" content="no-preview">
 
     <script>
         (function() {
@@ -419,6 +419,12 @@
             40% { opacity:1; transform:scale(1.1); }
         }
         .loading-text { color:var(--gray); font-size:13px; font-weight:500; }
+
+        /* Turbo progress bar */
+        .turbo-progress-bar {
+            background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
+            height: 3px !important;
+        }
 
         .page-transition { animation: pageFade 0.4s ease-out; }
         @keyframes pageFade {
@@ -1151,40 +1157,35 @@
             });
         }
 
-        // Turbo Drive loading integration
+        // Turbo Drive — no overlay, use native progress bar
         (function() {
-            var overlay = document.getElementById('loadingOverlay');
-            var timeout = null;
+            // Turbo progress bar appears after 100ms delay (configurable)
+            if (window.Turbo) {
+                Turbo.setProgressBarDelay(80);
+            } else {
+                document.addEventListener('turbo:before-render', function() {
+                    if (window.Turbo) Turbo.setProgressBarDelay(80);
+                }, { once: true });
+            }
 
-            function showLoading(msg) {
+            // Hide old overlay on load
+            var overlay = document.getElementById('loadingOverlay');
+            function hideOverlay() { if (overlay) overlay.classList.remove('active'); }
+
+            document.addEventListener('turbo:load', function() { hideOverlay(); updateGreeting(); });
+            document.addEventListener('DOMContentLoaded', function() { hideOverlay(); updateGreeting(); });
+
+            // Only show overlay for form submits (not navigation)
+            window.showLoading = function(msg) {
                 if (!overlay) return;
                 var txt = overlay.querySelector('.loading-text');
-                if (txt) txt.textContent = msg || 'Memuat...';
+                if (txt) txt.textContent = msg || 'Mengirim...';
                 overlay.classList.add('active');
-                clearTimeout(timeout);
-                timeout = setTimeout(hideLoading, 10000);
-            }
+            };
+            window.hideLoading = hideOverlay;
 
-            function hideLoading() {
-                if (!overlay) return;
-                overlay.classList.remove('active');
-                clearTimeout(timeout);
-            }
-
-            window.showLoading = showLoading;
-            window.hideLoading = hideLoading;
-
-            // Turbo events
-            document.addEventListener('turbo:before-visit', function() { showLoading(); });
-            document.addEventListener('turbo:load', function() { hideLoading(); updateGreeting(); });
-            document.addEventListener('turbo:before-fetch-response', function() { hideLoading(); });
-
-            // Form submit loading
-            document.addEventListener('turbo:submit-start', function() { showLoading('Mengirim...'); });
-            document.addEventListener('turbo:submit-end', function() { hideLoading(); });
-
-            // Fallback for non-Turbo (first load)
-            document.addEventListener('DOMContentLoaded', function() { hideLoading(); updateGreeting(); });
+            document.addEventListener('turbo:submit-start', function() { window.showLoading('Mengirim...'); });
+            document.addEventListener('turbo:submit-end', hideOverlay);
         })();
 
         function updateGreeting() {
