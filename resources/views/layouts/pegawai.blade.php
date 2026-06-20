@@ -29,7 +29,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com" defer></script>
-    <meta name="turbo-cache-control" content="no-preview">
+    <meta name="turbo-prefetch" content="true">
 
     <script>
         (function() {
@@ -433,11 +433,6 @@
             height: 3px !important;
         }
 
-        .page-transition { animation: pageFade 0.4s ease-out; }
-        @keyframes pageFade {
-            from { opacity:0; transform:translateY(8px); }
-            to { opacity:1; transform:translateY(0); }
-        }
 
         /* Bootstrap modal override — slide up consistently */
         .modal.fade .modal-dialog {
@@ -1168,10 +1163,10 @@
         (function() {
             // Turbo progress bar appears after 100ms delay (configurable)
             if (window.Turbo) {
-                Turbo.setProgressBarDelay(80);
+                Turbo.setProgressBarDelay(300);
             } else {
                 document.addEventListener('turbo:before-render', function() {
-                    if (window.Turbo) Turbo.setProgressBarDelay(80);
+                    if (window.Turbo) Turbo.setProgressBarDelay(300);
                 }, { once: true });
             }
 
