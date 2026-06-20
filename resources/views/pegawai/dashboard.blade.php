@@ -1,10 +1,6 @@
 @extends('layouts.pegawai')
 @section('title', 'Home')
 
-@push('head')
-<meta name="turbo-cache-control" content="no-cache">
-@endpush
-
 <style>
     .btn-secondary {
         background: var(--gray-light);
@@ -1091,7 +1087,6 @@
         track.onclick = function(e) { if(Math.abs(dragCurrentX-dragStartX)>10) e.stopPropagation(); };
     }
 
-    document.addEventListener('turbo:load', initCarousel);
     initCarousel();
 
     function openInfoModal(id) {
@@ -1377,7 +1372,7 @@
         return true;
     }
 
-    document.addEventListener('turbo:load', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         var presensiModal = document.getElementById('presensiModal');
         if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
