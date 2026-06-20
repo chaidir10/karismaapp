@@ -180,7 +180,7 @@
     <div class="create-box">
         <button class="create-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
         <h3>Buat Pengajuan Presensi</h3>
-        <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false">
             @csrf
             <div class="form-group">
                 <label for="jenis">Jenis Pengajuan</label>
@@ -212,7 +212,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('turbo:load', function() {
         var items = document.querySelectorAll('.p-card');
         var detailModal = new bootstrap.Modal(document.getElementById('pengajuanDetailModal'));
         var iconBox = document.getElementById('modalPengajuanIconBox');

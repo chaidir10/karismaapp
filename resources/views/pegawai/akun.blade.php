@@ -296,7 +296,7 @@
 
         <!-- Scrollable Content -->
         <div style="flex:1; overflow-y:auto; padding:20px;">
-            <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data" id="editForm">
+            <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data" id="editForm" data-turbo="false">
                 @csrf
 
                 <!-- Foto Section -->
@@ -395,7 +395,7 @@
     document.getElementById('photoPreview').addEventListener('click', function(e) { if (e.target === this) closePhotoPreview(); });
 
     // Logout
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('turbo:load', function() {
         document.getElementById('logoutCancelBtn').addEventListener('click', closeLogoutModal);
         document.getElementById('logoutConfirmBtn').addEventListener('click', function() { document.getElementById('logoutForm').submit(); });
         document.getElementById('logoutModal').addEventListener('click', function(e) { if (e.target === this) closeLogoutModal(); });

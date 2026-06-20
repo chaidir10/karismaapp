@@ -293,7 +293,7 @@
     }
 
     // Maps
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('turbo:load', function() {
         @foreach($riwayat as $tanggal => $items)
             @foreach($items as $p)
                 @if($p->lokasi)

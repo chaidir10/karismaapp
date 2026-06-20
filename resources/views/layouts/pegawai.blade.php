@@ -1140,245 +1140,58 @@
     <!-- External JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8/dist/turbo.es2017-esm.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register("{{ asset('public/pwa/service-worker.js') }}")
-                    .then(function(registration) {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.error('Service Worker registration failed:', error);
-                    });
+                    .then(function(r) {})
+                    .catch(function(e) { console.error('SW failed:', e); });
             });
         }
 
-        // Loading handler
-        class LoadingManager {
-            constructor() {
-                this.loadingOverlay = document.getElementById('loadingOverlay');
-                this.isLoading = false;
-                this.init();
+        // Turbo Drive loading integration
+        (function() {
+            var overlay = document.getElementById('loadingOverlay');
+            var timeout = null;
+
+            function showLoading(msg) {
+                if (!overlay) return;
+                var txt = overlay.querySelector('.loading-text');
+                if (txt) txt.textContent = msg || 'Memuat...';
+                overlay.classList.add('active');
+                clearTimeout(timeout);
+                timeout = setTimeout(hideLoading, 10000);
             }
 
-            init() {
-                // Intercept all link clicks
-                document.addEventListener('click', (e) => {
-                    const link = e.target.closest('a');
-                    if (link && this.shouldShowLoading(link)) {
-                        e.preventDefault();
-                        this.show();
-                        
-                        // Navigate after showing loading
-                        setTimeout(() => {
-                            window.location.href = link.href;
-                        }, 100);
-                    }
-                });
-
-                // Handle browser back/forward buttons
-                window.addEventListener('popstate', () => {
-                    this.show();
-                });
-
-                // Show loading when page is about to unload
-                window.addEventListener('beforeunload', () => {
-                    this.show();
-                });
-
-                // Hide loading when page is fully loaded
-                window.addEventListener('load', () => {
-                    this.hide();
-                });
-
-                // Also hide loading when DOM is ready
-                document.addEventListener('DOMContentLoaded', () => {
-                    setTimeout(() => this.hide(), 500);
-                });
-
-                // Intercept form submissions
-                document.addEventListener('submit', (e) => {
-                    this.show('Mengirim data...');
-                });
-
-                // Intercept AJAX requests
-                this.interceptAjax();
+            function hideLoading() {
+                if (!overlay) return;
+                overlay.classList.remove('active');
+                clearTimeout(timeout);
             }
 
-            shouldShowLoading(link) {
-                // Don't show loading for same page anchors, external links, or links with no-href
-                const href = link.getAttribute('href');
-                if (!href || href.startsWith('#') || href.startsWith('javascript:') || 
-                    link.target === '_blank' || link.hasAttribute('download')) {
-                    return false;
-                }
-                
-                // Only show for internal links
-                try {
-                    const url = new URL(href, window.location.origin);
-                    return url.origin === window.location.origin;
-                } catch {
-                    return true; // Assume internal for relative URLs
-                }
-            }
+            window.showLoading = showLoading;
+            window.hideLoading = hideLoading;
 
-            interceptAjax() {
-                const originalFetch = window.fetch;
-                const originalXHROpen = XMLHttpRequest.prototype.open;
-                const originalXHRSend = XMLHttpRequest.prototype.send;
+            // Turbo events
+            document.addEventListener('turbo:before-visit', function() { showLoading(); });
+            document.addEventListener('turbo:load', function() { hideLoading(); updateGreeting(); });
+            document.addEventListener('turbo:before-fetch-response', function() { hideLoading(); });
 
-                let activeRequests = 0;
+            // Form submit loading
+            document.addEventListener('turbo:submit-start', function() { showLoading('Mengirim...'); });
+            document.addEventListener('turbo:submit-end', function() { hideLoading(); });
 
-                // Intercept fetch
-                window.fetch = (...args) => {
-                    activeRequests++;
-                    this.show();
-                    
-                    return originalFetch.apply(this, args)
-                        .then(response => {
-                            activeRequests--;
-                            if (activeRequests === 0) {
-                                setTimeout(() => this.hide(), 300);
-                            }
-                            return response;
-                        })
-                        .catch(error => {
-                            activeRequests--;
-                            if (activeRequests === 0) {
-                                this.hide();
-                            }
-                            throw error;
-                        });
-                };
+            // Fallback for non-Turbo (first load)
+            document.addEventListener('DOMContentLoaded', function() { hideLoading(); updateGreeting(); });
+        })();
 
-                // Intercept XMLHttpRequest
-                XMLHttpRequest.prototype.open = function(...args) {
-                    this._url = args[1];
-                    return originalXHROpen.apply(this, args);
-                };
-
-                XMLHttpRequest.prototype.send = function(...args) {
-                    // Don't show loading for specific endpoints if needed
-                    if (this._url && !this._url.includes('/api/')) {
-                        activeRequests++;
-                        this.show();
-                    }
-
-                    this.addEventListener('loadend', () => {
-                        if (this._url && !this._url.includes('/api/')) {
-                            activeRequests--;
-                            if (activeRequests === 0) {
-                                setTimeout(() => this.hide(), 300);
-                            }
-                        }
-                    });
-
-                    return originalXHRSend.apply(this, args);
-                };
-            }
-
-            show(message = 'Memuat...') {
-                if (this.isLoading) return;
-                
-                this.isLoading = true;
-                const textElement = this.loadingOverlay.querySelector('.loading-text');
-                if (textElement) {
-                    textElement.textContent = message;
-                }
-                
-                this.loadingOverlay.classList.add('active');
-                
-                // Auto hide after 10 seconds as fallback
-                this.timeout = setTimeout(() => {
-                    this.hide();
-                }, 10000);
-            }
-
-            hide() {
-                this.isLoading = false;
-                clearTimeout(this.timeout);
-                this.loadingOverlay.classList.remove('active');
-            }
-        }
-
-        // Initialize loading manager when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            window.loadingManager = new LoadingManager();
-            
-            // Add page transition class to main content
-            const mainContent = document.querySelector('.main-content');
-            if (mainContent) {
-                mainContent.classList.add('page-transition');
-            }
-
-            // Update greeting based on time
-            updateGreeting();
-        });
-
-        // Function to show loading manually (can be called from other scripts)
-        function showLoading(message = 'Memuat...') {
-            if (window.loadingManager) {
-                window.loadingManager.show(message);
-            }
-        }
-
-        // Function to hide loading manually
-        function hideLoading() {
-            if (window.loadingManager) {
-                window.loadingManager.hide();
-            }
-        }
-
-        // Update greeting based on time
         function updateGreeting() {
-            const hour = new Date().getHours();
-            const greetingElement = document.getElementById('greeting');
-            
-            if (greetingElement) {
-                let greeting = 'Selamat pagi';
-                if (hour >= 12 && hour < 15) {
-                    greeting = 'Selamat siang';
-                } else if (hour >= 15 && hour < 19) {
-                    greeting = 'Selamat sore';
-                } else if (hour >= 19 || hour < 4) {
-                    greeting = 'Selamat malam';
-                }
-                greetingElement.textContent = greeting;
-            }
+            var el = document.getElementById('greeting');
+            if (!el) return;
+            var h = new Date().getHours();
+            el.textContent = h >= 19 || h < 4 ? 'Selamat malam' : h >= 15 ? 'Selamat sore' : h >= 12 ? 'Selamat siang' : 'Selamat pagi';
         }
-
-        // Handle Turbolinks if used (for Laravel Livewire, Inertia.js, etc.)
-        if (typeof Turbolinks !== 'undefined') {
-            document.addEventListener('turbolinks:click', () => {
-                showLoading();
-            });
-            
-            document.addEventListener('turbolinks:load', () => {
-                setTimeout(hideLoading, 500);
-            });
-        }
-
-        // Handle Livewire if used
-        if (typeof Livewire !== 'undefined') {
-            Livewire.hook('request', ({ uri, options }) => {
-                showLoading('Memproses...');
-            });
-
-            Livewire.hook('response', ({ component, success }) => {
-                setTimeout(hideLoading, 300);
-            });
-        }
-
-        // Example usage for custom buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Attach loading to all buttons with data-loading attribute
-            document.querySelectorAll('[data-loading]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const message = this.getAttribute('data-loading-message') || 'Memproses...';
-                    showLoading(message);
-                });
-            });
-        });
     </script>
 
     <script>

@@ -184,7 +184,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('turbo:load', function() {
         var items = document.querySelectorAll('.e-card');
         var modal = new bootstrap.Modal(document.getElementById('employeeDetailModal'));
         var avatarBox = document.getElementById('modalEmployeeAvatarContainer');

@@ -610,7 +610,7 @@
                 <button type="button" class="close-btn" data-bs-dismiss="modal">×</button>
             </div>
             <div class="modal-body p-0 position-relative">
-                <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data">
+                <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" data-turbo="false">
                     @csrf
                     <input type="hidden" name="jenis" id="jenisPresensi">
                     <input type="hidden" name="foto" id="fotoInput">
@@ -1403,7 +1403,7 @@
         return true;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('turbo:load', function() {
         const presensiModal = document.getElementById('presensiModal');
         if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
