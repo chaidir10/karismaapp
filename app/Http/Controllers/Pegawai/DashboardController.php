@@ -101,21 +101,11 @@ class DashboardController extends Controller
             $isLiburHariIni = true;
             $namaLibur = 'Libur';
         } else {
-            try {
-                $json = @file_get_contents("https://libur.deno.dev/api?year={$todayCarbon->year}");
-                if ($json) {
-                    $holidays = @json_decode($json, true);
-                    if (is_array($holidays)) {
-                        foreach ($holidays as $h) {
-                            if (($h['date'] ?? '') === $today) {
-                                $isLiburHariIni = true;
-                                $namaLibur = $h['name'] ?? 'Libur Nasional';
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (\Exception $e) {}
+            $holidayName = \App\Helpers\HolidayHelper::getName($today);
+            if ($holidayName) {
+                $isLiburHariIni = true;
+                $namaLibur = $holidayName;
+            }
         }
 
         $pengumumans = Pengumuman::where('is_active', true)

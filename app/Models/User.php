@@ -122,7 +122,7 @@ class User extends Authenticatable
             }
         }
 
-        $jamKerja = JamKerja::where('hari', $hari)->first();
+        $jamKerja = \App\Helpers\JadwalHelper::getJamKerja($hari);
         if ($jamKerja) {
             return [
                 'jam_masuk'  => $jamKerja->jam_masuk,

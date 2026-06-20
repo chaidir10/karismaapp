@@ -59,7 +59,7 @@ class PerformaController extends Controller
             return ['performa' => [], 'hari_kerja' => 0];
         }
 
-        $holidays = $this->fetchHolidays($tahun);
+        $holidays = \App\Helpers\HolidayHelper::getDates($tahun);
 
         $hariKerja = 0;
         for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
@@ -180,16 +180,4 @@ class PerformaController extends Controller
         ];
     }
 
-    private function fetchHolidays($year)
-    {
-        try {
-            $json = @file_get_contents("https://libur.deno.dev/api?year={$year}");
-            if (!$json) return [];
-            $data = @json_decode($json, true);
-            if (!is_array($data)) return [];
-            return array_filter(array_column($data, 'date'));
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
 }

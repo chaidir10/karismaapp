@@ -140,7 +140,7 @@ class DashboardAdminController extends Controller
         $startMonth = Carbon::now()->startOfMonth();
         $endToday = Carbon::today();
 
-        $holidays = $this->fetchHolidays($startMonth->year);
+        $holidays = \App\Helpers\HolidayHelper::getDates($startMonth->year);
 
         $hariKerjaBulanIni = 0;
         for ($d = $startMonth->copy(); $d->lte($endToday); $d->addDay()) {
@@ -549,16 +549,4 @@ class DashboardAdminController extends Controller
         }
     }
 
-    private function fetchHolidays($year)
-    {
-        try {
-            $json = @file_get_contents("https://libur.deno.dev/api?year={$year}");
-            if (!$json) return [];
-            $data = @json_decode($json, true);
-            if (!is_array($data)) return [];
-            return array_filter(array_column($data, 'date'));
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
 }

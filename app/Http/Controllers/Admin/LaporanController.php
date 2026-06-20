@@ -28,7 +28,7 @@ class LaporanController extends Controller
             ? User::where('id', $userId)->get()
             : User::orderBy('name')->get();
 
-        $holidays = $this->fetchHolidays($startDate->year);
+        $holidays = \App\Helpers\HolidayHelper::get($startDate->year);
         $laporan = [];
 
         foreach ($users as $user) {
@@ -243,24 +243,6 @@ class LaporanController extends Controller
         return sprintf("%02d:%02d", $hours, $remainingMinutes);
     }
 
-    private function fetchHolidays($year)
-    {
-        try {
-            $json = @file_get_contents("https://libur.deno.dev/api?year={$year}");
-            if (!$json) return [];
-            $data = @json_decode($json, true);
-            if (!is_array($data)) return [];
-            $holidays = [];
-            foreach ($data as $item) {
-                if (!empty($item['date'])) {
-                    $holidays[$item['date']] = $item['name'] ?? 'Libur Nasional';
-                }
-            }
-            return $holidays;
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
 
     public function getLaporan(Request $request)
     {
