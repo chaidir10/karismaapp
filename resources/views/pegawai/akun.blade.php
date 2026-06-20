@@ -134,20 +134,35 @@
     .form-field input[type="file"] { padding:10px; font-size:13px; }
     .field-error { font-size:12px; color:var(--danger); margin-top:4px; }
 
-    /* Photo Crop Preview */
-    .photo-edit-area { margin-top:10px; display:none; }
-    .photo-edit-preview {
-        width:120px; height:120px; border-radius:50%; margin:0 auto;
-        overflow:hidden; border:3px solid var(--primary); position:relative;
+    /* Photo Crop Modal (WA-style) */
+    .crop-modal {
+        display:none; position:fixed; inset:0; background:#000; z-index:200;
+        flex-direction:column; align-items:center; justify-content:center;
     }
-    .photo-edit-preview img {
-        position:absolute; cursor:move; max-width:none;
-        -webkit-user-drag:none; user-select:none;
+    .crop-modal.visible { display:flex; }
+    .crop-header {
+        position:absolute; top:0; left:0; right:0; z-index:2;
+        display:flex; align-items:center; justify-content:space-between;
+        padding:14px 16px;
     }
-    .photo-edit-hint { text-align:center; font-size:11px; color:var(--gray); margin-top:8px; }
-    .photo-edit-zoom { display:flex; align-items:center; gap:10px; justify-content:center; margin-top:8px; }
-    .photo-edit-zoom input[type="range"] { width:120px; accent-color:var(--primary); }
-    .photo-edit-zoom span { font-size:11px; color:var(--gray); }
+    .crop-header button { background:none; border:none; color:#fff; font-size:14px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .crop-area {
+        position:relative; width:100%; flex:1; display:flex; align-items:center; justify-content:center;
+        overflow:hidden; touch-action:none;
+    }
+    .crop-area img {
+        position:absolute; max-width:none; -webkit-user-drag:none; user-select:none; cursor:move;
+    }
+    .crop-circle-mask {
+        position:absolute; inset:0; z-index:1; pointer-events:none;
+    }
+    .crop-footer {
+        position:absolute; bottom:0; left:0; right:0; z-index:2;
+        display:flex; align-items:center; justify-content:center; gap:16px;
+        padding:20px 16px 30px;
+    }
+    .crop-footer span { color:rgba(255,255,255,0.5); font-size:14px; }
+    .crop-footer input[type="range"] { width:160px; accent-color:#fff; }
 
     @keyframes modalSlideIn {
         from { opacity:0; transform:translateY(30px); }
@@ -300,18 +315,6 @@
                     </div>
                     <input type="file" name="foto_profil" id="fotoInput" accept="image/*" onchange="onPhotoSelected(this)" style="display:none;">
                     @error('foto_profil')<div class="field-error" style="margin-top:8px;">{{ $message }}</div>@enderror
-
-                    <div class="photo-edit-area" id="photoEditArea">
-                        <div class="photo-edit-preview" id="cropPreview">
-                            <img id="cropImg" src="" alt="Preview" draggable="false">
-                        </div>
-                        <div class="photo-edit-hint">Geser foto untuk mengatur posisi</div>
-                        <div class="photo-edit-zoom">
-                            <span><i class="fas fa-magnifying-glass-minus"></i></span>
-                            <input type="range" id="zoomSlider" min="100" max="300" value="150" oninput="onZoomChange(this.value)">
-                            <span><i class="fas fa-magnifying-glass-plus"></i></span>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Form Fields -->
@@ -355,6 +358,32 @@
     </div>
 </div>
 
+<!-- WA-style Crop Modal -->
+<div id="cropModal" class="crop-modal">
+    <div class="crop-header">
+        <button onclick="cancelCrop()"><i class="fas fa-chevron-left" style="margin-right:6px;"></i> Batal</button>
+        <button onclick="confirmCrop()" style="background:var(--primary); padding:8px 20px; border-radius:10px;">Selesai</button>
+    </div>
+    <div class="crop-area" id="cropArea">
+        <img id="cropImg" src="" alt="" draggable="false">
+        <svg class="crop-circle-mask" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+                <mask id="circleMask">
+                    <rect width="100" height="100" fill="white"/>
+                    <circle cx="50" cy="50" r="36" fill="black"/>
+                </mask>
+            </defs>
+            <rect width="100" height="100" fill="rgba(0,0,0,0.6)" mask="url(#circleMask)"/>
+            <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>
+        </svg>
+    </div>
+    <div class="crop-footer">
+        <span><i class="fas fa-magnifying-glass-minus"></i></span>
+        <input type="range" id="zoomSlider" min="100" max="400" value="150" oninput="onZoomChange(this.value)">
+        <span><i class="fas fa-magnifying-glass-plus"></i></span>
+    </div>
+</div>
+
 <script>
     function openModal(id) { document.getElementById(id).classList.add('visible'); document.body.style.overflow='hidden'; }
     function closeModal(id) { document.getElementById(id).classList.remove('visible'); document.body.style.overflow='auto'; }
@@ -385,60 +414,96 @@
         document.getElementById('theme-icon-moon').style.display = theme === 'dark' ? 'inline' : 'none';
     });
 
-    // Photo crop/position
-    var cropState = { isDragging:false, startX:0, startY:0, imgX:0, imgY:0, zoom:150 };
+    // WA-style crop
+    var crop = { dragging:false, sx:0, sy:0, ix:0, iy:0, zoom:150, file:null, pinchDist:0 };
+    var cropArea = document.getElementById('cropArea');
+    var cropImg = document.getElementById('cropImg');
 
     function onPhotoSelected(input) {
         if (!input.files || !input.files[0]) return;
+        crop.file = input.files[0];
         var reader = new FileReader();
         reader.onload = function(e) {
-            var img = document.getElementById('cropImg');
-            img.src = e.target.result;
-            document.getElementById('photoEditArea').style.display = 'block';
+            cropImg.src = e.target.result;
+            crop.zoom = 150; crop.ix = 0; crop.iy = 0;
             document.getElementById('zoomSlider').value = 150;
-            cropState.zoom = 150; cropState.imgX = 0; cropState.imgY = 0;
-            img.onload = function() { applyCrop(); };
+            cropImg.onload = function() { centerCrop(); };
+            document.getElementById('cropModal').classList.add('visible');
         };
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(crop.file);
+    }
+
+    function centerCrop() {
+        var area = cropArea.getBoundingClientRect();
+        var scale = crop.zoom / 100;
+        var w = area.width * scale;
+        var h = (cropImg.naturalHeight / cropImg.naturalWidth) * w;
+        cropImg.style.width = w + 'px';
+        cropImg.style.height = h + 'px';
+        crop.ix = (area.width - w) / 2;
+        crop.iy = (area.height - h) / 2;
+        cropImg.style.left = crop.ix + 'px';
+        cropImg.style.top = crop.iy + 'px';
     }
 
     function applyCrop() {
-        var img = document.getElementById('cropImg');
-        var box = document.getElementById('cropPreview');
-        var size = box.offsetWidth;
-        var scale = cropState.zoom / 100;
-        var w = size * scale;
-        var h = (img.naturalHeight / img.naturalWidth) * w;
-        img.style.width = w + 'px';
-        img.style.height = h + 'px';
-        var maxX = 0, minX = size - w;
-        var maxY = 0, minY = size - h;
-        cropState.imgX = Math.min(maxX, Math.max(minX, cropState.imgX));
-        cropState.imgY = Math.min(maxY, Math.max(minY, cropState.imgY));
-        img.style.left = cropState.imgX + 'px';
-        img.style.top = cropState.imgY + 'px';
+        var area = cropArea.getBoundingClientRect();
+        var scale = crop.zoom / 100;
+        var w = area.width * scale;
+        var h = (cropImg.naturalHeight / cropImg.naturalWidth) * w;
+        cropImg.style.width = w + 'px';
+        cropImg.style.height = h + 'px';
+        cropImg.style.left = crop.ix + 'px';
+        cropImg.style.top = crop.iy + 'px';
     }
 
     function onZoomChange(val) {
-        cropState.zoom = parseInt(val);
-        applyCrop();
+        crop.zoom = parseInt(val);
+        centerCrop();
     }
 
-    (function() {
-        var preview = document.getElementById('cropPreview');
-        if (!preview) return;
+    function cancelCrop() {
+        document.getElementById('cropModal').classList.remove('visible');
+        document.getElementById('fotoInput').value = '';
+    }
 
-        function startDrag(x, y) { cropState.isDragging = true; cropState.startX = x - cropState.imgX; cropState.startY = y - cropState.imgY; }
-        function moveDrag(x, y) { if (!cropState.isDragging) return; cropState.imgX = x - cropState.startX; cropState.imgY = y - cropState.startY; applyCrop(); }
-        function endDrag() { cropState.isDragging = false; }
+    function confirmCrop() {
+        document.getElementById('cropModal').classList.remove('visible');
+        var avatarBox = document.getElementById('editAvatarPreview');
+        avatarBox.innerHTML = '<img src="' + cropImg.src + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
+    }
 
-        preview.addEventListener('mousedown', function(e) { e.preventDefault(); startDrag(e.clientX, e.clientY); });
-        document.addEventListener('mousemove', function(e) { moveDrag(e.clientX, e.clientY); });
-        document.addEventListener('mouseup', endDrag);
+    // Drag
+    cropArea.addEventListener('mousedown', function(e) { e.preventDefault(); crop.dragging = true; crop.sx = e.clientX - crop.ix; crop.sy = e.clientY - crop.iy; });
+    document.addEventListener('mousemove', function(e) { if (!crop.dragging) return; crop.ix = e.clientX - crop.sx; crop.iy = e.clientY - crop.sy; applyCrop(); });
+    document.addEventListener('mouseup', function() { crop.dragging = false; });
 
-        preview.addEventListener('touchstart', function(e) { var t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive:true });
-        document.addEventListener('touchmove', function(e) { if (cropState.isDragging) { var t = e.touches[0]; moveDrag(t.clientX, t.clientY); } }, { passive:true });
-        document.addEventListener('touchend', endDrag);
-    })();
+    cropArea.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            crop.dragging = true;
+            crop.sx = e.touches[0].clientX - crop.ix;
+            crop.sy = e.touches[0].clientY - crop.iy;
+        } else if (e.touches.length === 2) {
+            crop.dragging = false;
+            crop.pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        }
+    }, { passive:true });
+
+    cropArea.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 1 && crop.dragging) {
+            crop.ix = e.touches[0].clientX - crop.sx;
+            crop.iy = e.touches[0].clientY - crop.sy;
+            applyCrop();
+        } else if (e.touches.length === 2) {
+            var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            var delta = dist - crop.pinchDist;
+            crop.zoom = Math.max(100, Math.min(400, crop.zoom + delta * 0.5));
+            crop.pinchDist = dist;
+            document.getElementById('zoomSlider').value = crop.zoom;
+            applyCrop();
+        }
+    }, { passive:true });
+
+    cropArea.addEventListener('touchend', function() { crop.dragging = false; });
 </script>
 @endsection
