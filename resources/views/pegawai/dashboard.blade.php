@@ -136,6 +136,34 @@
     .history-empty { text-align:center; padding:40px 20px; color:var(--gray); background:var(--white); border-radius:14px; }
     .history-empty i { font-size:32px; opacity:0.25; display:block; margin-bottom:10px; }
     .history-empty p { font-size:13px; margin:0; }
+
+    /* Carousel */
+    .info-carousel { margin:0 20px 20px; position:relative; overflow:hidden; border-radius:16px; }
+    .carousel-track { display:flex; transition:transform 0.35s ease; }
+    .carousel-slide { min-width:100%; cursor:pointer; }
+
+    .slide-content {
+        background:var(--white); border-radius:16px; padding:16px; display:flex; gap:14px; align-items:flex-start;
+        box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid var(--gray-light);
+    }
+    .slide-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .slide-body { flex:1; min-width:0; }
+    .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
+    .slide-tag { font-size:9px; font-weight:700; color:#fff; padding:2px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px; }
+    .slide-date { font-size:10px; color:var(--gray); }
+    .slide-title { font-size:14px; font-weight:700; color:var(--dark); margin-bottom:4px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-desc { font-size:12px; color:var(--gray); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-link { font-size:11px; font-weight:600; color:var(--primary); margin-top:6px; }
+
+    .slide-image { width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+    .slide-image-overlay { position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,0.7) 0%,transparent 60%); display:flex; flex-direction:column; justify-content:flex-end; padding:14px 16px; }
+    .slide-image-title { font-size:14px; font-weight:700; color:#fff; line-height:1.3; }
+
+    .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
+    .dot.active { background:var(--primary); width:20px; border-radius:4px; }
+
+    .ql-content img { max-width:100%; border-radius:8px; margin:10px 0; }
 </style>
 
 @section('content')
@@ -216,6 +244,90 @@
     </div>
     <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : '...' }}</div>
 </div>
+@endif
+
+{{-- Carousel Pengumuman --}}
+@if(isset($pengumumans) && $pengumumans->count() > 0)
+<div class="info-carousel" id="infoCarousel">
+    <div class="carousel-track" id="carouselTrack">
+        @foreach($pengumumans as $pm)
+        @php
+            $pmIcon = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['icon'] ?? 'fa-bell';
+            $pmColor = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['color'] ?? '#64748b';
+            $pmLabel = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? $pm->jenis;
+        @endphp
+        <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})">
+            @if($pm->gambar)
+            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}')">
+                <div class="slide-image-overlay">
+                    <span class="slide-tag" style="background:{{ $pmColor }}">{{ $pmLabel }}</span>
+                    <div class="slide-image-title">{{ $pm->judul }}</div>
+                </div>
+            </div>
+            @else
+            <div class="slide-content">
+                <div class="slide-icon" style="background:{{ $pmColor }}15; color:{{ $pmColor }}">
+                    <i class="fas {{ $pmIcon }}"></i>
+                </div>
+                <div class="slide-body">
+                    <div class="slide-tag-row">
+                        <span class="slide-tag" style="background:{{ $pmColor }}">{{ $pmLabel }}</span>
+                        @if($pm->tanggal_mulai)
+                        <span class="slide-date">{{ $pm->tanggal_mulai->format('d M Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->format('d M Y') }}@endif</span>
+                        @endif
+                    </div>
+                    <div class="slide-title">{{ $pm->judul }}</div>
+                    <div class="slide-desc">{!! \Illuminate\Support\Str::limit(strip_tags($pm->isi), 80) !!}</div>
+                    <div class="slide-link">Baca selengkapnya <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+                </div>
+            </div>
+            @endif
+        </div>
+        @endforeach
+    </div>
+    @if($pengumumans->count() > 1)
+    <div class="carousel-dots" id="carouselDots">
+        @foreach($pengumumans as $i => $pm)
+        <span class="dot {{ $i === 0 ? 'active' : '' }}" onclick="goToSlide({{ $i }})"></span>
+        @endforeach
+    </div>
+    @endif
+</div>
+
+{{-- Modal Info Detail --}}
+@foreach($pengumumans as $pm)
+<div class="modal fade" id="infoModal{{ $pm->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
+        <div class="modal-content" style="border-radius:0; height:100vh; display:flex; flex-direction:column;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--gray-light); flex-shrink:0;">
+                <h5 style="font-weight:700; font-size:16px; margin:0; color:var(--dark);">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? 'Info' }}</h5>
+                <button type="button" data-bs-dismiss="modal" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--gray); width:40px; height:40px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="flex:1; overflow-y:auto; padding:20px;">
+                @if($pm->gambar)
+                <img src="{{ asset('public/storage/'.$pm->gambar) }}" style="width:100%; border-radius:12px; margin-bottom:16px; object-fit:cover; max-height:200px;" alt="">
+                @endif
+                <h2 style="font-size:20px; font-weight:800; color:var(--dark); margin-bottom:8px; line-height:1.3;">{{ $pm->judul }}</h2>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px; font-size:12px; color:var(--gray);">
+                    <span style="background:{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['color'] ?? '#64748b' }}; color:#fff; padding:3px 10px; border-radius:8px; font-weight:600; font-size:11px;">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? $pm->jenis }}</span>
+                    @if($pm->tanggal_mulai)
+                    <span><i class="far fa-calendar-alt" style="margin-right:4px;"></i>{{ $pm->tanggal_mulai->translatedFormat('d F Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->translatedFormat('d F Y') }}@endif</span>
+                    @endif
+                    @if($pm->waktu)
+                    <span><i class="far fa-clock" style="margin-right:4px;"></i>{{ \Carbon\Carbon::parse($pm->waktu)->format('H:i') }}</span>
+                    @endif
+                </div>
+                <div style="font-size:14px; line-height:1.8; color:#334155;" class="ql-content">{!! $pm->isi !!}</div>
+            </div>
+            <div style="padding:12px 16px; border-top:1px solid var(--gray-light); flex-shrink:0;">
+                <button type="button" data-bs-dismiss="modal" style="width:100%; padding:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer;">
+                    <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Kembali
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 @endif
 
 {{-- Floating Lembur Button --}}
@@ -881,6 +993,45 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
 <script>
+    // Carousel
+    var currentSlide = 0;
+    var track = document.getElementById('carouselTrack');
+    var totalSlides = track ? track.children.length : 0;
+    var autoSlideTimer = null;
+
+    function goToSlide(i) {
+        currentSlide = i;
+        if (track) track.style.transform = 'translateX(-' + (i * 100) + '%)';
+        var dots = document.querySelectorAll('#carouselDots .dot');
+        dots.forEach(function(d, idx) { d.classList.toggle('active', idx === i); });
+        resetAutoSlide();
+    }
+
+    function nextSlide() { goToSlide((currentSlide + 1) % totalSlides); }
+
+    function resetAutoSlide() {
+        if (autoSlideTimer) clearInterval(autoSlideTimer);
+        if (totalSlides > 1) autoSlideTimer = setInterval(nextSlide, 5000);
+    }
+
+    if (totalSlides > 1) {
+        resetAutoSlide();
+        var startX = 0;
+        if (track) {
+            track.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+            track.addEventListener('touchend', function(e) {
+                var diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) { diff > 0 ? goToSlide(Math.min(currentSlide + 1, totalSlides - 1)) : goToSlide(Math.max(currentSlide - 1, 0)); }
+            });
+        }
+    }
+
+    function openInfoModal(id) {
+        if (window.bootstrap && window.bootstrap.Modal) {
+            new bootstrap.Modal(document.getElementById('infoModal' + id)).show();
+        }
+    }
+
     let videoStream = null;
     let mapInstance = null;
     let currentPosition = null;

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Presensi;
 use App\Models\JamKerja;
 use App\Models\JamShift;
+use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -93,6 +94,13 @@ class DashboardController extends Controller
 
         $jamPulangTarget = $jadwalKerjaHariIni['jam_pulang'];
 
+        $pengumumans = Pengumuman::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $jadwalKerjaHariIni = $jadwalKerjaHariIni;
+
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
             'user',
@@ -107,7 +115,9 @@ class DashboardController extends Controller
             'shifts',
             'shiftHariIni',
             'jamMasukHariIni',
-            'jamPulangTarget'
+            'jamPulangTarget',
+            'pengumumans',
+            'jadwalKerjaHariIni'
         ));
     }
 }

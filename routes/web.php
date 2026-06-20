@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\ManajemenLokasiController;
 use App\Http\Controllers\Admin\JamKerjaController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PerformaController;
+use App\Http\Controllers\Admin\PengumumanController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
 use Illuminate\Support\Facades\Route;
@@ -160,6 +161,19 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::get('/', [PerformaController::class, 'index'])->name('index');
             Route::get('/data', [PerformaController::class, 'getData'])->name('data');
             Route::get('/pdf', [PerformaController::class, 'exportPdf'])->name('pdf');
+        });
+
+        // --------------------
+        // Pengumuman
+        // --------------------
+        Route::prefix('pengumuman')->name('pengumuman.')->group(function () {
+            Route::get('/', [PengumumanController::class, 'index'])->name('index');
+            Route::post('/', [PengumumanController::class, 'store'])->name('store');
+            Route::get('/{id}', [PengumumanController::class, 'show'])->name('show');
+            Route::put('/{id}', [PengumumanController::class, 'update'])->name('update');
+            Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle', [PengumumanController::class, 'toggle'])->name('toggle');
+            Route::post('/upload-image', [PengumumanController::class, 'uploadImage'])->name('upload-image');
         });
     });
 

@@ -366,6 +366,10 @@
                             <i class="fas fa-trophy"></i>
                             Performa
                         </a>
+                        <a href="{{ route('admin.pengumuman.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengumuman.*')) active @endif">
+                            <i class="fas fa-bullhorn"></i>
+                            Pengumuman
+                        </a>
 
                         <div class="sidebar-title mt-6">Pengaturan</div>
                         <a href="" class="sidebar-item">
@@ -447,6 +451,10 @@
                     <a href="{{ route('admin.performa.index') }}" class="sidebar-item @if(request()->routeIs('admin.performa.*')) active @endif">
                         <i class="fas fa-trophy"></i>
                         Performa
+                    </a>
+                    <a href="{{ route('admin.pengumuman.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengumuman.*')) active @endif">
+                        <i class="fas fa-bullhorn"></i>
+                        Pengumuman
                     </a>
 
                     <div class="sidebar-title mt-6">Pengaturan</div>
