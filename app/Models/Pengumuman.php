@@ -36,13 +36,13 @@ class Pengumuman extends Model
     public static function jenisOptions(): array
     {
         return [
-            'pengumuman' => ['label' => 'Pengumuman', 'icon' => 'fa-newspaper', 'color' => '#3b82f6'],
-            'rapat' => ['label' => 'Rapat', 'icon' => 'fa-handshake', 'color' => '#8b5cf6'],
-            'info' => ['label' => 'Informasi', 'icon' => 'fa-lightbulb', 'color' => '#06b6d4'],
-            'tugas' => ['label' => 'Tugas', 'icon' => 'fa-list-check', 'color' => '#f59e0b'],
-            'kegiatan' => ['label' => 'Kegiatan', 'icon' => 'fa-calendar-day', 'color' => '#10b981'],
-            'pengingat' => ['label' => 'Pengingat', 'icon' => 'fa-bell-concierge', 'color' => '#ec4899'],
-            'lainnya' => ['label' => 'Lainnya', 'icon' => 'fa-circle-info', 'color' => '#64748b'],
+            'pengumuman' => ['label' => 'Pengumuman', 'icon' => 'fa-newspaper', 'color' => '#3b82f6', 'gradient' => ['#3b82f6','#1d4ed8']],
+            'rapat' => ['label' => 'Rapat', 'icon' => 'fa-handshake', 'color' => '#8b5cf6', 'gradient' => ['#8b5cf6','#6d28d9']],
+            'info' => ['label' => 'Informasi', 'icon' => 'fa-lightbulb', 'color' => '#06b6d4', 'gradient' => ['#06b6d4','#0e7490']],
+            'tugas' => ['label' => 'Tugas', 'icon' => 'fa-list-check', 'color' => '#f59e0b', 'gradient' => ['#f59e0b','#d97706']],
+            'kegiatan' => ['label' => 'Kegiatan', 'icon' => 'fa-calendar-day', 'color' => '#10b981', 'gradient' => ['#10b981','#059669']],
+            'pengingat' => ['label' => 'Pengingat', 'icon' => 'fa-bell-concierge', 'color' => '#ec4899', 'gradient' => ['#ec4899','#be185d']],
+            'lainnya' => ['label' => 'Lainnya', 'icon' => 'fa-circle-info', 'color' => '#64748b', 'gradient' => ['#64748b','#475569']],
         ];
     }
 

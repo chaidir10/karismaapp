@@ -144,24 +144,24 @@
 
     .slide-content {
         border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center;
-        border:1px solid rgba(0,0,0,0.06);
+        color:#fff;
     }
     .slide-icon {
         width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center;
-        font-size:20px; flex-shrink:0; color:#fff;
+        font-size:20px; flex-shrink:0; background:rgba(255,255,255,0.2); color:#fff;
     }
     .slide-body { flex:1; min-width:0; }
     .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
-    .slide-tag { font-size:9px; font-weight:700; color:#fff; padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px; }
-    .slide-date { font-size:10px; color:#64748b; }
-    .slide-title { font-size:14px; font-weight:700; color:#1e293b; margin-bottom:3px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .slide-desc { font-size:12px; color:#475569; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .slide-link { font-size:11px; font-weight:600; margin-top:6px; }
+    .slide-tag { font-size:9px; font-weight:700; padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px; background:rgba(255,255,255,0.2); color:#fff; }
+    .slide-date { font-size:10px; color:rgba(255,255,255,0.7); }
+    .slide-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:3px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-desc { font-size:12px; color:rgba(255,255,255,0.8); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-link { font-size:11px; font-weight:600; margin-top:6px; color:rgba(255,255,255,0.9); }
 
     .slide-image {
         width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center;
         position:relative; overflow:hidden;
-        box-shadow:0 4px 16px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.06);
+        border:1.5px solid var(--primary-light);
     }
 
     .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
@@ -258,37 +258,33 @@
     <div class="carousel-track" id="carouselTrack">
         @foreach($pengumumans as $pm)
         @php
-            $pmIcon = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['icon'] ?? 'fa-bell';
-            $pmColor = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['color'] ?? '#64748b';
-            $pmLabel = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? $pm->jenis;
+            $pmOpt = \App\Models\Pengumuman::jenisOptions()[$pm->jenis] ?? ['icon'=>'fa-circle-info','color'=>'#64748b','label'=>$pm->jenis,'gradient'=>['#64748b','#475569']];
+            $g1 = $pmOpt['gradient'][0]; $g2 = $pmOpt['gradient'][1];
         @endphp
         <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})">
             @if($pm->gambar && ($pm->sembunyikan_detail ?? false))
-            {{-- Gambar only, no overlay --}}
-            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}')"></div>
+            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}'); border-color:{{ $g1 }}40;"></div>
             @elseif($pm->gambar)
-            {{-- Gambar with subtle tag overlay --}}
-            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}')">
-                <div style="position:absolute; top:12px; left:12px;">
-                    <span class="slide-tag" style="background:{{ $pmColor }}; opacity:0.75;">{{ $pmLabel }}</span>
+            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}'); border-color:{{ $g1 }}40;">
+                <div style="position:absolute; top:10px; left:10px;">
+                    <span class="slide-tag" style="background:{{ $g1 }}; opacity:0.8;">{{ $pmOpt['label'] }}</span>
                 </div>
             </div>
             @else
-            {{-- No image, card with left accent --}}
-            <div class="slide-content" style="background:#fff; border-left:4px solid {{ $pmColor }};">
-                <div class="slide-icon" style="background:{{ $pmColor }};">
-                    <i class="fas {{ $pmIcon }}"></i>
+            <div class="slide-content" style="background:linear-gradient(135deg, {{ $g1 }}, {{ $g2 }});">
+                <div class="slide-icon">
+                    <i class="fas {{ $pmOpt['icon'] }}"></i>
                 </div>
                 <div class="slide-body">
                     <div class="slide-tag-row">
-                        <span class="slide-tag" style="background:{{ $pmColor }}">{{ $pmLabel }}</span>
+                        <span class="slide-tag">{{ $pmOpt['label'] }}</span>
                         @if($pm->tanggal_mulai)
-                        <span class="slide-date" style="color:#64748b;">{{ $pm->tanggal_mulai->format('d M Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->format('d M Y') }}@endif</span>
+                        <span class="slide-date">{{ $pm->tanggal_mulai->format('d M Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->format('d M Y') }}@endif</span>
                         @endif
                     </div>
-                    <div class="slide-title" style="color:#1e293b;">{{ $pm->judul }}</div>
-                    <div class="slide-desc" style="color:#475569;">{!! \Illuminate\Support\Str::limit(strip_tags($pm->isi), 80) !!}</div>
-                    <div class="slide-link" style="color:{{ $pmColor }};">Baca selengkapnya <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+                    <div class="slide-title">{{ $pm->judul }}</div>
+                    <div class="slide-desc">{!! \Illuminate\Support\Str::limit(strip_tags($pm->isi), 80) !!}</div>
+                    <div class="slide-link">Baca selengkapnya <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
                 </div>
             </div>
             @endif
