@@ -8,7 +8,7 @@
 
     /* Floating Filter */
     .filter-bar {
-        position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
         width: calc(100% - 40px); max-width: 460px; z-index: 9;
         display: flex; align-items: center; gap: 8px;
         background: var(--card-bg); border-radius: 16px; padding: 10px 12px;
@@ -88,18 +88,18 @@
 
 <!-- Floating Filter Bar -->
 <div class="filter-bar">
-    <select id="filterBulan">
+    <select id="filterBulan" style="flex:3;">
         @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
         @foreach($namaBulan as $i => $nb)
             <option value="{{ $i+1 }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
         @endforeach
     </select>
-    <select id="filterTahun">
+    <select id="filterTahun" style="flex:2;">
         @for($y = now()->year; $y >= 2024; $y--)
             <option value="{{ $y }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('Y') === $y ? 'selected' : '' }}>{{ $y }}</option>
         @endfor
     </select>
-    <a id="btnDownloadPdf" class="btn-download" title="Download PDF">
+    <a id="btnDownloadPdf" class="btn-download" title="Download PDF" style="width:52px; min-width:52px;">
         <i class="fas fa-file-pdf"></i>
     </a>
 </div>

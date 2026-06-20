@@ -1073,12 +1073,20 @@
                 elseif(request()->routeIs('pegawai.pengajuan*')) { $pageIcon = 'fa-paper-plane'; $pageTitle = 'Pengajuan Presensi'; }
                 elseif(request()->routeIs('pegawai.daftar')) { $pageIcon = 'fa-user-group'; $pageTitle = 'Daftar Pegawai'; }
             @endphp
-            <div class="header-content" style="justify-content:center;">
+            <div class="header-content">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <div style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff;">
                         <i class="fas {{ $pageIcon }}"></i>
                     </div>
                     <h1 class="user-name" style="font-size:15px;">{{ $pageTitle }}</h1>
+                </div>
+                <div class="user-avatar" style="width:34px; height:34px;">
+                    @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
+                    <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" alt=""
+                        onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=64'">
+                    @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=64" alt="">
+                    @endif
                 </div>
             </div>
             @endif
