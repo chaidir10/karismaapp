@@ -144,7 +144,7 @@
 
     .slide-content {
         border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center;
-        color:#fff;
+        color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06);
     }
     .slide-icon {
         width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
@@ -161,7 +161,7 @@
     .slide-image {
         width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center;
         position:relative; overflow:hidden;
-        border:1.5px solid var(--primary-light);
+        box-shadow:0 2px 12px rgba(0,0,0,0.06);
     }
 
     .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
@@ -263,9 +263,9 @@
         @endphp
         <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})">
             @if($pm->gambar && ($pm->sembunyikan_detail ?? false))
-            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}'); border-color:{{ $g1 }}40;"></div>
+            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}');"></div>
             @elseif($pm->gambar)
-            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}'); border-color:{{ $g1 }}40;">
+            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}');">
                 <div style="position:absolute; top:10px; left:10px;">
                     <span class="slide-tag" style="background:{{ $g1 }}; opacity:0.8;">{{ $pmOpt['label'] }}</span>
                 </div>
