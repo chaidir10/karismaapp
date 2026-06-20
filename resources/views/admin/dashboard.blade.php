@@ -765,7 +765,7 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="presensiPendingTable" data-paginate="10">
+                        <tbody id="presensiPendingTable" data-paginate="5">
                             @forelse($presensiPending ?? [] as $index => $p)
                             <tr class="clickable-row"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
@@ -837,7 +837,7 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="pengajuanPendingTable" data-paginate="10">
+                        <tbody id="pengajuanPendingTable" data-paginate="5">
                             @forelse($pengajuanPending ?? [] as $index => $peng)
                             <tr class="clickable-row"
                                 data-user-name="{{ $peng->user->name ?? 'N/A' }}"
@@ -908,7 +908,7 @@
                                 <th data-sort="text">Status <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
-                        <tbody id="presensiHariIniTable" data-paginate="10">
+                        <tbody id="presensiHariIniTable" data-paginate="5">
                             @forelse($presensiHariIni ?? [] as $index => $p)
                             <tr class="clickable-row"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
@@ -976,7 +976,7 @@
                                 <th>Jam</th>
                             </tr>
                         </thead>
-                        <tbody id="lemburHariIniTable" data-paginate="10">
+                        <tbody id="lemburHariIniTable" data-paginate="5">
                             @forelse($lemburHariIni as $index => $l)
                             <tr>
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
@@ -1516,7 +1516,7 @@
         var tbody = document.getElementById(tbodyId);
         if (!tbody) return;
 
-        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 10;
+        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
         var rows = Array.from(tbody.querySelectorAll('tr'));
         if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('.empty-state'))) return;
 
