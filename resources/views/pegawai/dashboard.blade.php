@@ -2,8 +2,6 @@
 @section('title', 'Home')
 
 <style>
-    .app-header { padding-bottom: 80px !important; }
-
     .btn-secondary {
         background: var(--gray-light);
         color: var(--dark);

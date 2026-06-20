@@ -1047,7 +1047,7 @@
     <div class="container">
         <!-- App Header -->
         @if(!request()->is('pegawai/akun*') && !request()->is('akun*'))
-        <div class="app-header">
+        <div class="app-header" @if(request()->routeIs('pegawai.dashboard')) style="padding-bottom:80px;" @endif>
             @if(request()->routeIs('pegawai.dashboard'))
             {{-- Dashboard: avatar + greeting --}}
             <div class="header-content">
