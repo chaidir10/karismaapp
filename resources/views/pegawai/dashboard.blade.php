@@ -126,8 +126,9 @@
     .hc-title-row { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
     .hc-label { font-size:13px; font-weight:600; color:var(--dark); }
     .hc-tag { font-size:9px; font-weight:700; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px; }
-    .hc-tag-reguler { background:var(--primary-soft); color:var(--primary-dark); }
-    .hc-tag-lembur { background:var(--accent-light); color:var(--accent); }
+    .hc-tag-success { background:var(--success-light); color:var(--success); }
+    .hc-tag-danger { background:var(--danger-light); color:var(--danger); }
+    .hc-tag-warning { background:var(--warning-light); color:var(--warning); }
     .hc-time { font-size:18px; font-weight:800; color:var(--dark); font-variant-numeric:tabular-nums; line-height:1.2; }
     .hc-right { flex-shrink:0; }
     .hc-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
@@ -373,32 +374,24 @@
     @php
         $isLembur = $p->is_lembur;
         $isMasuk = $p->jenis === 'masuk';
-        if ($isLembur) {
-            $iconCls = $isMasuk ? 'hc-icon-lembur-masuk' : 'hc-icon-lembur-pulang';
-            $iconName = 'fa-bolt';
-            $labelText = $isMasuk ? 'Masuk Lembur' : 'Pulang Lembur';
-            $tagCls = 'hc-tag-lembur';
-            $tagText = 'Lembur';
-        } else {
-            $iconCls = $isMasuk ? 'hc-icon-masuk' : 'hc-icon-pulang';
-            $iconName = $isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket';
-            $labelText = $isMasuk ? 'Masuk' : 'Pulang';
-            $tagCls = 'hc-tag-reguler';
-            $tagText = 'Reguler';
-        }
+        $iconCls = $isLembur
+            ? ($isMasuk ? 'hc-icon-lembur-masuk' : 'hc-icon-lembur-pulang')
+            : ($isMasuk ? 'hc-icon-masuk' : 'hc-icon-pulang');
+        $iconName = $isLembur ? 'fa-bolt' : ($isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
+        $labelText = ($isLembur ? 'Lembur ' : '') . ($isMasuk ? 'Masuk' : 'Pulang');
     @endphp
     <div class="history-card" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
         <div class="hc-icon {{ $iconCls }}"><i class="fas {{ $iconName }}"></i></div>
         <div class="hc-body">
-            <div class="hc-title-row">
-                <span class="hc-label">{{ $labelText }}</span>
-                <span class="hc-tag {{ $tagCls }}">{{ $tagText }}</span>
-            </div>
+            <span class="hc-label">{{ $labelText }}</span>
             <div class="hc-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
         </div>
         <div class="hc-right">
-            <span class="hc-dot hc-dot-{{ $p->status }}"></span>
-            <span class="hc-status">{{ ucfirst($p->status) }}</span>
+            @if($p->status === 'pending')
+                <span class="hc-dot hc-dot-pending"></span>
+            @elseif($p->badge_text)
+                <span class="hc-tag hc-tag-{{ $p->badge_type }}">{{ $p->badge_text }}</span>
+            @endif
         </div>
     </div>
     @empty

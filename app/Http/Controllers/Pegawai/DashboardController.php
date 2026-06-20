@@ -39,6 +39,18 @@ class DashboardController extends Controller
             if ($p->jenis === 'pulang' && $p->jam < $jadwalKerjaHariIni['jam_pulang']) {
                 $p->waktu_kurang_menit = intval((strtotime($jadwalKerjaHariIni['jam_pulang']) - strtotime($p->jam)) / 60);
             }
+
+            if ($p->is_lembur) {
+                $p->badge_text = null;
+                $p->badge_type = null;
+            } elseif ($p->jenis === 'masuk') {
+                $p->badge_text = $p->terlambat ? 'Terlambat' : 'Tepat Waktu';
+                $p->badge_type = $p->terlambat ? 'danger' : 'success';
+            } else {
+                $isPulangCepat = $p->jam < $jadwalKerjaHariIni['jam_pulang'];
+                $p->badge_text = $isPulangCepat ? 'Pulang Cepat' : 'Tepat Waktu';
+                $p->badge_type = $isPulangCepat ? 'warning' : 'success';
+            }
         }
 
         $sudahPresensiMasuk = Presensi::where('user_id', $user->id)

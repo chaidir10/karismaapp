@@ -64,8 +64,9 @@
         font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
         text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .tag-reguler { background: var(--primary-soft); color: var(--primary-dark); }
-    .tag-lembur { background: var(--accent-light); color: var(--accent); }
+    .tag-success { background: var(--success-light); color: var(--success); }
+    .tag-danger { background: var(--danger-light); color: var(--danger); }
+    .tag-warning { background: var(--warning-light); color: var(--warning); }
     .card-time { font-size: 18px; font-weight: 800; color: var(--dark); font-variant-numeric: tabular-nums; line-height: 1.2; }
     .card-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
 
@@ -114,35 +115,26 @@
             @php
                 $isLembur = $p->is_lembur;
                 $isMasuk = $p->jenis === 'masuk';
-                if ($isLembur) {
-                    $iconClass = $isMasuk ? 'icon-lembur-masuk' : 'icon-lembur-pulang';
-                    $iconName = $isMasuk ? 'fa-bolt' : 'fa-bolt';
-                    $label = $isMasuk ? 'Masuk Lembur' : 'Pulang Lembur';
-                    $tag = 'tag-lembur';
-                    $tagText = 'Lembur';
-                } else {
-                    $iconClass = $isMasuk ? 'icon-masuk' : 'icon-pulang';
-                    $iconName = $isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket';
-                    $label = $isMasuk ? 'Masuk' : 'Pulang';
-                    $tag = 'tag-reguler';
-                    $tagText = 'Reguler';
-                }
+                $iconClass = $isLembur
+                    ? ($isMasuk ? 'icon-lembur-masuk' : 'icon-lembur-pulang')
+                    : ($isMasuk ? 'icon-masuk' : 'icon-pulang');
+                $iconName = $isLembur ? 'fa-bolt' : ($isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
+                $label = ($isLembur ? 'Lembur ' : '') . ($isMasuk ? 'Masuk' : 'Pulang');
             @endphp
             <div class="presensi-card" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
                 <div class="card-icon {{ $iconClass }}">
                     <i class="fas {{ $iconName }}"></i>
                 </div>
                 <div class="card-body">
-                    <div class="card-title-row">
-                        <span class="card-title">{{ $label }}</span>
-                        <span class="card-tag {{ $tag }}">{{ $tagText }}</span>
-                    </div>
+                    <div class="card-title">{{ $label }}</div>
                     <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
-                    <div class="card-meta">{{ $p->lokasi ? 'Lokasi tercatat' : 'Tanpa lokasi' }}</div>
                 </div>
                 <div class="card-status">
-                    <span class="status-dot dot-{{ $p->status }}"></span>
-                    <span class="status-text">{{ ucfirst($p->status) }}</span>
+                    @if($p->status === 'pending')
+                        <span class="status-dot dot-pending"></span>
+                    @elseif($p->badge_text)
+                        <span class="card-tag tag-{{ $p->badge_type }}">{{ $p->badge_text }}</span>
+                    @endif
                 </div>
             </div>
             @endforeach

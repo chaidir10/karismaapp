@@ -38,22 +38,52 @@ class PresensiController extends Controller
     public function riwayat(Request $request)
     {
         $bulan = $request->get('bulan', Carbon::now()->format('Y-m'));
+        $user = Auth::user();
 
-        $riwayat = Presensi::where('user_id', Auth::id())
+        $records = Presensi::where('user_id', $user->id)
             ->whereYear('tanggal', Carbon::parse($bulan)->year)
             ->whereMonth('tanggal', Carbon::parse($bulan)->month)
             ->orderBy('tanggal', 'desc')
             ->orderBy('jam', 'asc')
-            ->get()
-            ->groupBy(function ($item) {
-                return Carbon::parse($item->tanggal)->translatedFormat('d F Y');
-            });
+            ->get();
+
+        foreach ($records as $p) {
+            if ($p->is_lembur) {
+                $p->badge_text = null;
+                $p->badge_type = null;
+            } else {
+                $jadwal = $user->getJadwalKerja($p->tanggal);
+                if ($p->jenis === 'masuk') {
+                    $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
+                    if ($p->jam > $batas) {
+                        $p->badge_text = 'Terlambat';
+                        $p->badge_type = 'danger';
+                    } else {
+                        $p->badge_text = 'Tepat Waktu';
+                        $p->badge_type = 'success';
+                    }
+                } else {
+                    $jamPulang = $jadwal['jam_pulang'];
+                    if ($p->jam < $jamPulang) {
+                        $p->badge_text = 'Pulang Cepat';
+                        $p->badge_type = 'warning';
+                    } else {
+                        $p->badge_text = 'Tepat Waktu';
+                        $p->badge_type = 'success';
+                    }
+                }
+            }
+        }
+
+        $riwayat = $records->groupBy(function ($item) {
+            return Carbon::parse($item->tanggal)->translatedFormat('d F Y');
+        });
 
         return view('pegawai.riwayat', [
             'riwayat'       => $riwayat,
             'bulan'         => $bulan,
-            'wilayahAlamat' => Auth::user()->wilayahKerjaList->pluck('alamat')->filter()->first()
-                ?? Auth::user()->wilayahKerja->alamat ?? '',
+            'wilayahAlamat' => $user->wilayahKerjaList->pluck('alamat')->filter()->first()
+                ?? $user->wilayahKerja->alamat ?? '',
         ]);
     }
 
