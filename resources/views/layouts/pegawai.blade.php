@@ -1193,6 +1193,24 @@
 
             document.addEventListener('turbo:submit-start', function() { window.showLoading('Mengirim...'); });
             document.addEventListener('turbo:submit-end', hideOverlay);
+
+            // Cleanup before Turbo caches page — close modals, remove backdrops
+            document.addEventListener('turbo:before-cache', function() {
+                // Bootstrap modals
+                document.querySelectorAll('.modal.show').forEach(function(m) {
+                    var inst = bootstrap.Modal.getInstance(m);
+                    if(inst) inst.hide();
+                });
+                document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
+                // Custom overlays
+                document.querySelectorAll('.modal-overlay.visible').forEach(function(m) { m.classList.remove('visible'); });
+                document.querySelectorAll('.create-overlay.active').forEach(function(m) { m.classList.remove('active'); });
+                document.querySelectorAll('.photo-preview-overlay.visible').forEach(function(m) { m.classList.remove('visible'); });
+                document.querySelectorAll('.crop-modal.visible').forEach(function(m) { m.classList.remove('visible'); });
+                // Reset body
+                document.body.style.overflow = '';
+                document.body.classList.remove('modal-open');
+            });
         })();
 
         function updateGreeting() {

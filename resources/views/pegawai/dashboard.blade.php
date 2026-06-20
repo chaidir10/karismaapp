@@ -1037,86 +1037,58 @@
 <script>
     // Carousel with live drag
     var currentSlide = 0;
-    var track = document.getElementById('carouselTrack');
-    var totalSlides = track ? track.children.length : 0;
-    var autoSlideTimer = null;
-    var isDragging = false;
-    var dragStartX = 0;
-    var dragCurrentX = 0;
-    var dragBaseOffset = 0;
+    var track, totalSlides, autoSlideTimer, isDragging, dragStartX, dragCurrentX, dragBaseOffset;
 
     function getTrackWidth() { return track ? track.parentElement.offsetWidth : 1; }
-
     function setTrackPos(px, animate) {
         if (!track) return;
         track.style.transition = animate ? 'transform 0.3s ease' : 'none';
         track.style.transform = 'translateX(' + px + 'px)';
     }
-
     function goToSlide(i, animate) {
         currentSlide = Math.max(0, Math.min(i, totalSlides - 1));
         setTrackPos(-currentSlide * getTrackWidth(), animate !== false);
-        var dots = document.querySelectorAll('#carouselDots .dot');
-        dots.forEach(function(d, idx) { d.classList.toggle('active', idx === currentSlide); });
+        document.querySelectorAll('#carouselDots .dot').forEach(function(d, idx) { d.classList.toggle('active', idx === currentSlide); });
         resetAutoSlide();
     }
-
     function nextSlide() { goToSlide((currentSlide + 1) % totalSlides); }
-
     function resetAutoSlide() {
         if (autoSlideTimer) clearInterval(autoSlideTimer);
         if (totalSlides > 1) autoSlideTimer = setInterval(nextSlide, 5000);
     }
-
-    function onDragStart(x) {
-        isDragging = true;
-        dragStartX = x;
-        dragCurrentX = x;
-        dragBaseOffset = -currentSlide * getTrackWidth();
-        if (autoSlideTimer) clearInterval(autoSlideTimer);
-    }
-
-    function onDragMove(x) {
-        if (!isDragging) return;
-        dragCurrentX = x;
-        var diff = dragCurrentX - dragStartX;
-        setTrackPos(dragBaseOffset + diff, false);
-    }
-
+    function onDragStart(x) { isDragging=true; dragStartX=x; dragCurrentX=x; dragBaseOffset=-currentSlide*getTrackWidth(); if(autoSlideTimer) clearInterval(autoSlideTimer); }
+    function onDragMove(x) { if(!isDragging) return; dragCurrentX=x; setTrackPos(dragBaseOffset+(dragCurrentX-dragStartX), false); }
     function onDragEnd() {
-        if (!isDragging) return;
-        isDragging = false;
-        var diff = dragCurrentX - dragStartX;
-        var threshold = getTrackWidth() * 0.2;
-        if (diff < -threshold && currentSlide < totalSlides - 1) {
-            goToSlide(currentSlide + 1);
-        } else if (diff > threshold && currentSlide > 0) {
-            goToSlide(currentSlide - 1);
-        } else {
-            goToSlide(currentSlide);
-        }
+        if(!isDragging) return; isDragging=false;
+        var diff=dragCurrentX-dragStartX, threshold=getTrackWidth()*0.2;
+        if(diff<-threshold && currentSlide<totalSlides-1) goToSlide(currentSlide+1);
+        else if(diff>threshold && currentSlide>0) goToSlide(currentSlide-1);
+        else goToSlide(currentSlide);
     }
 
-    if (track && totalSlides > 1) {
+    function initCarousel() {
+        if(autoSlideTimer) clearInterval(autoSlideTimer);
+        currentSlide=0; isDragging=false;
+        track = document.getElementById('carouselTrack');
+        totalSlides = track ? track.children.length : 0;
+        if(!track || totalSlides <= 1) return;
+
+        setTrackPos(0, false);
         resetAutoSlide();
 
-        track.addEventListener('touchstart', function(e) { onDragStart(e.touches[0].clientX); }, { passive: true });
-        track.addEventListener('touchmove', function(e) { onDragMove(e.touches[0].clientX); }, { passive: true });
-        track.addEventListener('touchend', onDragEnd);
-        track.addEventListener('touchcancel', onDragEnd);
-
-        track.addEventListener('mousedown', function(e) { e.preventDefault(); onDragStart(e.clientX); });
-        document.addEventListener('mousemove', function(e) { if (isDragging) onDragMove(e.clientX); });
-        document.addEventListener('mouseup', onDragEnd);
-
+        track.ontouchstart = function(e) { onDragStart(e.touches[0].clientX); };
+        track.ontouchmove = function(e) { onDragMove(e.touches[0].clientX); };
+        track.ontouchend = onDragEnd;
+        track.ontouchcancel = onDragEnd;
+        track.onmousedown = function(e) { e.preventDefault(); onDragStart(e.clientX); track.style.cursor='grabbing'; };
+        document.onmousemove = function(e) { if(isDragging) onDragMove(e.clientX); };
+        document.onmouseup = function() { onDragEnd(); if(track) track.style.cursor='grab'; };
         track.style.cursor = 'grab';
-        track.addEventListener('mousedown', function() { track.style.cursor = 'grabbing'; });
-        document.addEventListener('mouseup', function() { if (track) track.style.cursor = 'grab'; });
-
-        track.addEventListener('click', function(e) {
-            if (Math.abs(dragCurrentX - dragStartX) > 10) e.stopPropagation();
-        }, true);
+        track.onclick = function(e) { if(Math.abs(dragCurrentX-dragStartX)>10) e.stopPropagation(); };
     }
+
+    document.addEventListener('turbo:load', initCarousel);
+    initCarousel();
 
     function openInfoModal(id) {
         if (window.bootstrap && window.bootstrap.Modal) {
