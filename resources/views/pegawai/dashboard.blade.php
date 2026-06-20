@@ -185,8 +185,7 @@
         ->where('tanggal', now()->format('Y-m-d'))
         ->where('jenis', 'masuk')->where('is_lembur', true)->first();
 @endphp
-<button class="lembur-fab lembur-active" data-bs-toggle="modal" data-bs-target="#presensiModal"
-    onclick="setJenis('pulang'); setLembur(true)">
+<button class="lembur-fab lembur-active" data-bs-toggle="modal" data-bs-target="#confirmLemburModal">
     <div class="lembur-fab-icon pulse"><i class="fas fa-bolt"></i></div>
     <div class="lembur-fab-text">
         <span class="lembur-fab-label">Selesai Lembur</span>
@@ -291,6 +290,26 @@
                     <button class="btn-secondary" style="flex:1;" data-bs-dismiss="modal">Batal</button>
                     <button style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;"
                         onclick="proceedPulang()">Ya, Pulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Konfirmasi Selesai Lembur --}}
+<div class="modal fade" id="confirmLemburModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:20px; border:none;">
+            <div class="modal-body p-4 text-center">
+                <div style="width:60px;height:60px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                    <i class="fas fa-bolt" style="font-size:24px;color:#10b981;"></i>
+                </div>
+                <h5 style="font-weight:700; font-size:16px; margin-bottom:8px;">Selesai Lembur</h5>
+                <p style="font-size:13px; color:var(--gray-dark); margin-bottom:16px;">Yakin ingin mengakhiri lembur?</p>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-secondary" style="flex:1;" data-bs-dismiss="modal">Batal</button>
+                    <button style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-weight:600; font-size:14px; cursor:pointer;"
+                        onclick="proceedSelesaiLembur()">Ya, Selesai</button>
                 </div>
             </div>
         </div>
@@ -956,6 +975,18 @@
         } else {
             new bootstrap.Modal(document.getElementById('presensiModal')).show();
         }
+    }
+
+    function proceedSelesaiLembur() {
+        setJenis('pulang');
+        setLembur(true);
+
+        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmLemburModal'));
+        if (confirmModal) confirmModal.hide();
+
+        setTimeout(function() {
+            new bootstrap.Modal(document.getElementById('presensiModal')).show();
+        }, 300);
     }
 
     function proceedPulang() {
