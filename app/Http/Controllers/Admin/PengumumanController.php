@@ -25,7 +25,7 @@ class PengumumanController extends Controller
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'waktu' => 'nullable|date_format:H:i',
-            'gambar' => 'nullable|image|max:2048',
+            'gambar' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,svg,bmp|max:5120',
         ]);
 
         $data = $request->only(['judul', 'jenis', 'isi', 'tanggal_mulai', 'tanggal_selesai', 'waktu']);
@@ -54,7 +54,7 @@ class PengumumanController extends Controller
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'waktu' => 'nullable|date_format:H:i',
-            'gambar' => 'nullable|image|max:2048',
+            'gambar' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,svg,bmp|max:5120',
         ]);
 
         $pengumuman = Pengumuman::findOrFail($id);
@@ -99,7 +99,7 @@ class PengumumanController extends Controller
 
     public function uploadImage(Request $request)
     {
-        $request->validate(['image' => 'required|image|max:2048']);
+        $request->validate(['image' => 'required|file|mimes:jpg,jpeg,png,gif,webp,svg,bmp|max:5120']);
         $path = $request->file('image')->store('pengumuman/content', 'public');
         return response()->json(['url' => asset('public/storage/' . $path)]);
     }

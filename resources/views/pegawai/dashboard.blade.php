@@ -138,22 +138,22 @@
     .history-empty p { font-size:13px; margin:0; }
 
     /* Carousel */
-    .info-carousel { margin:0 20px 20px; position:relative; overflow:hidden; border-radius:16px; }
+    .info-carousel { margin:0 0 20px; position:relative; overflow:hidden; }
     .carousel-track { display:flex; transition:transform 0.35s ease; }
-    .carousel-slide { min-width:100%; cursor:pointer; }
+    .carousel-slide { min-width:100%; cursor:pointer; padding:0 20px; box-sizing:border-box; }
 
     .slide-content {
-        background:var(--white); border-radius:16px; padding:16px; display:flex; gap:14px; align-items:flex-start;
-        box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid var(--gray-light);
+        border-radius:16px; padding:16px; display:flex; gap:14px; align-items:flex-start;
+        box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid rgba(255,255,255,0.15);
     }
     .slide-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
     .slide-body { flex:1; min-width:0; }
     .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
     .slide-tag { font-size:9px; font-weight:700; color:#fff; padding:2px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px; }
-    .slide-date { font-size:10px; color:var(--gray); }
-    .slide-title { font-size:14px; font-weight:700; color:var(--dark); margin-bottom:4px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .slide-desc { font-size:12px; color:var(--gray); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .slide-link { font-size:11px; font-weight:600; color:var(--primary); margin-top:6px; }
+    .slide-date { font-size:10px; opacity:0.7; }
+    .slide-title { font-size:14px; font-weight:700; margin-bottom:4px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-desc { font-size:12px; opacity:0.75; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-link { font-size:11px; font-weight:600; margin-top:6px; opacity:0.85; }
 
     .slide-image { width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; }
     .slide-image-overlay { position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,0.7) 0%,transparent 60%); display:flex; flex-direction:column; justify-content:flex-end; padding:14px 16px; }
@@ -164,6 +164,7 @@
     .dot.active { background:var(--primary); width:20px; border-radius:4px; }
 
     .ql-content img { max-width:100%; border-radius:8px; margin:10px 0; }
+    .ql-content { text-align:justify; }
 </style>
 
 @section('content')
@@ -265,20 +266,20 @@
                 </div>
             </div>
             @else
-            <div class="slide-content">
-                <div class="slide-icon" style="background:{{ $pmColor }}15; color:{{ $pmColor }}">
+            <div class="slide-content" style="background:linear-gradient(135deg, {{ $pmColor }}18, {{ $pmColor }}08); color:#1e293b;">
+                <div class="slide-icon" style="background:{{ $pmColor }}22; color:{{ $pmColor }}">
                     <i class="fas {{ $pmIcon }}"></i>
                 </div>
                 <div class="slide-body">
                     <div class="slide-tag-row">
                         <span class="slide-tag" style="background:{{ $pmColor }}">{{ $pmLabel }}</span>
                         @if($pm->tanggal_mulai)
-                        <span class="slide-date">{{ $pm->tanggal_mulai->format('d M Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->format('d M Y') }}@endif</span>
+                        <span class="slide-date" style="color:#64748b;">{{ $pm->tanggal_mulai->format('d M Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->format('d M Y') }}@endif</span>
                         @endif
                     </div>
-                    <div class="slide-title">{{ $pm->judul }}</div>
-                    <div class="slide-desc">{!! \Illuminate\Support\Str::limit(strip_tags($pm->isi), 80) !!}</div>
-                    <div class="slide-link">Baca selengkapnya <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+                    <div class="slide-title" style="color:#1e293b;">{{ $pm->judul }}</div>
+                    <div class="slide-desc" style="color:#475569;">{!! \Illuminate\Support\Str::limit(strip_tags($pm->isi), 80) !!}</div>
+                    <div class="slide-link" style="color:{{ $pmColor }};">Baca selengkapnya <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
                 </div>
             </div>
             @endif
@@ -317,7 +318,7 @@
                     <span><i class="far fa-clock" style="margin-right:4px;"></i>{{ \Carbon\Carbon::parse($pm->waktu)->format('H:i') }}</span>
                     @endif
                 </div>
-                <div style="font-size:14px; line-height:1.8; color:#334155;" class="ql-content">{!! $pm->isi !!}</div>
+                <div style="font-size:14px; line-height:1.8; color:#334155; text-align:justify;" class="ql-content">{!! $pm->isi !!}</div>
             </div>
             <div style="padding:12px 16px; border-top:1px solid var(--gray-light); flex-shrink:0;">
                 <button type="button" data-bs-dismiss="modal" style="width:100%; padding:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer;">
