@@ -5,15 +5,24 @@
 <style>
     .pengajuan-page { padding: 20px; padding-bottom: 100px; }
 
-    .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .page-header { margin-bottom:16px; }
     .page-title { font-size:17px; font-weight:700; color:var(--dark); margin:0; }
-    .btn-buat {
-        display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
-        background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff;
-        border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600;
+
+    .fab-buat {
+        position:fixed; bottom:90px; right:15px; z-index:50;
+        border:none; border-radius:14px; padding:10px 14px;
+        color:#fff; display:flex; align-items:center; gap:10px;
+        cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.15);
+        background:linear-gradient(135deg, var(--primary), var(--primary-dark));
         -webkit-tap-highlight-color:transparent;
     }
-    .btn-buat:active { opacity:0.85; }
+    .fab-buat:active { transform:scale(0.95); }
+    .fab-buat-icon {
+        width:36px; height:36px; border-radius:10px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:16px; flex-shrink:0; background:rgba(255,255,255,0.2);
+    }
+    .fab-buat-text { font-size:13px; font-weight:700; }
 
     .pengajuan-list { display:flex; flex-direction:column; gap:10px; }
 
@@ -93,7 +102,6 @@
 <div class="pengajuan-page">
     <div class="page-header">
         <h3 class="page-title">Pengajuan Presensi</h3>
-        <button class="btn-buat" onclick="openModal()"><i class="fas fa-plus"></i> Buat</button>
     </div>
 
     <div class="pengajuan-list">
@@ -130,6 +138,12 @@
         @endforelse
     </div>
 </div>
+
+<!-- Floating Button -->
+<button class="fab-buat" onclick="openModal()">
+    <div class="fab-buat-icon"><i class="fas fa-pen-to-square"></i></div>
+    <div class="fab-buat-text">Buat Pengajuan</div>
+</button>
 
 <!-- Detail Modal -->
 <div class="modal fade detail-modal" id="pengajuanDetailModal" tabindex="-1" aria-hidden="true">
