@@ -1051,12 +1051,6 @@
             </div>
             <div class="media-row">
                 <div class="media-col">
-                    <label>Foto</label>
-                    <div class="foto-wrapper" id="detailFotoPresensi">
-                        <span class="text-muted">Tidak ada foto</span>
-                    </div>
-                </div>
-                <div class="media-col">
                     <label>Peta Lokasi</label>
                     <div class="map-container">
                         <div id="presensiMap"></div>
@@ -1068,6 +1062,12 @@
                             <i class="fas fa-exclamation-triangle"></i>
                             <span>Koordinat tidak tersedia</span>
                         </div>
+                    </div>
+                </div>
+                <div class="media-col">
+                    <label>Foto</label>
+                    <div class="foto-wrapper" id="detailFotoPresensi">
+                        <span class="text-muted">Tidak ada foto</span>
                     </div>
                 </div>
             </div>
@@ -1198,12 +1198,6 @@
             </div>
             <div class="media-row">
                 <div class="media-col">
-                    <label>Foto</label>
-                    <div class="foto-wrapper" id="detailFotoHariIni">
-                        <span class="text-muted">Tidak ada foto</span>
-                    </div>
-                </div>
-                <div class="media-col">
                     <label>Peta Lokasi</label>
                     <div class="map-container">
                         <div id="hariIniMap"></div>
@@ -1215,6 +1209,12 @@
                             <i class="fas fa-exclamation-triangle"></i>
                             <span>Koordinat tidak tersedia</span>
                         </div>
+                    </div>
+                </div>
+                <div class="media-col">
+                    <label>Foto</label>
+                    <div class="foto-wrapper" id="detailFotoHariIni">
+                        <span class="text-muted">Tidak ada foto</span>
                     </div>
                 </div>
             </div>
@@ -1244,7 +1244,6 @@
                 <div class="detail-item full-width"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px">-</span></div>
             </div>
             <div class="media-row">
-                <div class="media-col"><label>Foto</label><div class="foto-wrapper" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div></div>
                 <div class="media-col">
                     <label>Peta Lokasi</label>
                     <div class="map-container">
@@ -1253,6 +1252,7 @@
                         <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                     </div>
                 </div>
+                <div class="media-col"><label>Foto</label><div class="foto-wrapper" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div></div>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')">Tutup</button>
@@ -1680,52 +1680,63 @@
 
         // Sorting
         var ths = table.querySelectorAll('th[data-sort]');
-        ths.forEach(function(th) {
+        var monthMap = {Jan:1,Feb:2,Mar:3,Apr:4,Mei:5,Jun:6,Jul:7,Agu:8,Sep:9,Okt:10,Nov:11,Des:12};
+
+        function applySort(colIndex, dir, sortType, save) {
+            ths.forEach(function(h) {
+                h.classList.remove('sort-asc', 'sort-desc');
+                var ic = h.querySelector('.sort-icon');
+                if (ic) ic.className = 'fas fa-sort sort-icon';
+            });
+            var th = ths[colIndex] || table.querySelectorAll('th')[colIndex];
+            if (!th) return;
+            th.classList.add('sort-' + dir);
+            var icon = th.querySelector('.sort-icon');
+            if (icon) icon.className = 'fas fa-sort-' + (dir === 'asc' ? 'up' : 'down') + ' sort-icon';
+
+            var actualColIndex = Array.from(th.parentElement.children).indexOf(th);
+
+            instance.rows.sort(function(a, b) {
+                var aCell = a.children[actualColIndex];
+                var bCell = b.children[actualColIndex];
+                if (!aCell || !bCell) return 0;
+                var aVal = aCell.textContent.trim();
+                var bVal = bCell.textContent.trim();
+                if (sortType === 'date') {
+                    var ap = aVal.split(' '), bp = bVal.split(' ');
+                    var aD = new Date(parseInt(ap[2]), (monthMap[ap[1]] || 1) - 1, parseInt(ap[0]));
+                    var bD = new Date(parseInt(bp[2]), (monthMap[bp[1]] || 1) - 1, parseInt(bp[0]));
+                    return dir === 'asc' ? aD - bD : bD - aD;
+                }
+                return dir === 'asc' ? aVal.localeCompare(bVal, 'id') : bVal.localeCompare(aVal, 'id');
+            });
+            instance.rows.forEach(function(row) { tbody.appendChild(row); });
+            instance.currentPage = 1;
+            render();
+
+            if (save) {
+                localStorage.setItem('sort_' + tbodyId, JSON.stringify({ col: colIndex, dir: dir, type: sortType }));
+            }
+        }
+
+        ths.forEach(function(th, thIdx) {
             th.addEventListener('click', function() {
-                var colIndex = Array.from(th.parentElement.children).indexOf(th);
                 var sortType = th.getAttribute('data-sort');
                 var dir = th.classList.contains('sort-asc') ? 'desc' : 'asc';
-
-                // Reset all headers in this table
-                ths.forEach(function(h) {
-                    h.classList.remove('sort-asc', 'sort-desc');
-                    var icon = h.querySelector('.sort-icon');
-                    if (icon) icon.className = 'fas fa-sort sort-icon';
-                });
-
-                th.classList.add('sort-' + dir);
-                var icon = th.querySelector('.sort-icon');
-                if (icon) icon.className = 'fas fa-sort-' + (dir === 'asc' ? 'up' : 'down') + ' sort-icon';
-
-                var monthMap = {Jan:1,Feb:2,Mar:3,Apr:4,Mei:5,Jun:6,Jul:7,Agu:8,Sep:9,Okt:10,Nov:11,Des:12};
-
-                instance.rows.sort(function(a, b) {
-                    var aCell = a.children[colIndex];
-                    var bCell = b.children[colIndex];
-                    if (!aCell || !bCell) return 0;
-
-                    var aVal = aCell.textContent.trim();
-                    var bVal = bCell.textContent.trim();
-
-                    if (sortType === 'date') {
-                        var aParts = aVal.split(' ');
-                        var bParts = bVal.split(' ');
-                        var aDate = new Date(parseInt(aParts[2]), (monthMap[aParts[1]] || 1) - 1, parseInt(aParts[0]));
-                        var bDate = new Date(parseInt(bParts[2]), (monthMap[bParts[1]] || 1) - 1, parseInt(bParts[0]));
-                        return dir === 'asc' ? aDate - bDate : bDate - aDate;
-                    }
-
-                    return dir === 'asc'
-                        ? aVal.localeCompare(bVal, 'id')
-                        : bVal.localeCompare(aVal, 'id');
-                });
-
-                instance.rows.forEach(function(row) { tbody.appendChild(row); });
-                render();
+                applySort(thIdx, dir, sortType, true);
             });
         });
 
-        render();
+        // Restore saved sort
+        var saved = localStorage.getItem('sort_' + tbodyId);
+        if (saved) {
+            try {
+                var s = JSON.parse(saved);
+                applySort(s.col, s.dir, s.type, false);
+            } catch(e) {}
+        } else {
+            render();
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
