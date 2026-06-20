@@ -43,9 +43,9 @@
         background: var(--white); border-radius: 14px; padding: 14px 16px;
         margin-bottom: 10px; display: flex; align-items: center; gap: 14px;
         box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid transparent;
-        cursor: pointer; transition: all 0.2s;
+        cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
-    .presensi-card:active { transform: scale(0.98); }
+    .presensi-card:active { opacity: 0.85; }
 
     .card-icon {
         width: 44px; height: 44px; border-radius: 12px;

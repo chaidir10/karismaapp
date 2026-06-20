@@ -114,7 +114,7 @@
         background:var(--white); border-radius:14px; padding:14px 16px; margin-bottom:10px;
         display:flex; align-items:center; gap:14px;
         box-shadow:0 1px 6px rgba(0,0,0,0.04); border:1px solid var(--gray-light);
-        cursor:pointer; transition:transform 0.15s;
+        cursor:pointer;
     }
     .history-card:active { transform:scale(0.98); }
     .hc-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
@@ -849,25 +849,8 @@
         border-bottom-right-radius: 16px;
     }
 
-    /* Auto Close Modal Animation */
     .modal.fade .modal-dialog {
         transition: transform 0.3s ease-out;
-    }
-
-    .auto-close-modal {
-        animation: slideDown 0.5s ease-in-out;
-    }
-
-    @keyframes slideDown {
-        0% {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
     }
 
     .success-modal-content {

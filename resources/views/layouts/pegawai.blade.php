@@ -419,7 +419,20 @@
         }
         .loading-text { color:var(--gray); font-size:13px; font-weight:500; }
 
-        .page-transition { animation:fadeIn 0.3s ease-in-out; }
+        .page-transition { animation: pageFade 0.4s ease-out; }
+        @keyframes pageFade {
+            from { opacity:0; transform:translateY(8px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+
+        /* Bootstrap modal override — slide up consistently */
+        .modal.fade .modal-dialog {
+            transform: translateY(20px);
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+        }
 
         /* Modal Styles - Full Screen Mobile */
         .modal-fullscreen-mobile {
@@ -443,7 +456,7 @@
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(-50px) scale(0.9);
+                transform: translateY(30px);
             }
 
             to {
@@ -782,20 +795,13 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .attendance-card,
         .attendance-history {
-            animation: fadeIn 0.5s ease-out forwards;
+            animation: fadeIn 0.4s ease-out forwards;
         }
 
         /* Modal Backdrop Fix */
