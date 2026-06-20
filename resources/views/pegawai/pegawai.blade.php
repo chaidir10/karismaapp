@@ -472,22 +472,18 @@
                 </div>
 
                 <div class="employee-status">
-                    @php
-                    $statusClass = 'bg-success-light';
-                    $statusText = 'Aktif';
-                    if(isset($p->status)) {
-                    if($p->status == 'Cuti') {
-                    $statusClass = 'bg-warning-light';
-                    $statusText = 'Cuti';
-                    } elseif($p->status == 'Tidak Aktif') {
-                    $statusClass = 'bg-danger-light';
-                    $statusText = 'Tidak Aktif';
-                    }
-                    }
-                    @endphp
-                    <span class="badge {{ $statusClass }}">
-                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> {{ $statusText }}
-                    </span>
+                    @if(!empty($kehadiranHariIni) && isset($kehadiranHariIni[$p->id]))
+                        @php $kh = $kehadiranHariIni[$p->id]; @endphp
+                        @if($kh['status'] === 'tepat')
+                        <span class="badge bg-success-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> {{ $kh['text'] }}</span>
+                        @elseif($kh['status'] === 'telat')
+                        <span class="badge bg-danger-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> {{ $kh['text'] }}</span>
+                        @else
+                        <span class="badge bg-secondary-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> {{ $kh['text'] }}</span>
+                        @endif
+                    @else
+                    <span class="badge bg-success-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> Aktif</span>
+                    @endif
                 </div>
             </div>
 

@@ -1073,6 +1073,74 @@
         }
     }
 
+    // Push Notification Reminders
+    (function() {
+        if (!('Notification' in window)) return;
+
+        var jadwalMasuk = @json($jadwalKerjaHariIni['jam_masuk'] ?? '07:30:00');
+        var jadwalPulang = @json($jadwalKerjaHariIni['jam_pulang'] ?? '16:00:00');
+        var sudahMasuk = @json($sudahPresensiMasuk);
+        var sudahPulang = @json($sudahPresensiPulang);
+        var jamMasukUser = @json($jamMasukHariIni ?? '');
+        var isLibur = @json($isLiburHariIni ?? false);
+
+        if (isLibur) return;
+
+        if (Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        function sendNotif(title, body, tag) {
+            if (Notification.permission !== 'granted') return;
+            if (sessionStorage.getItem('notif-' + tag)) return;
+            new Notification(title, { body: body, icon: '{{ asset("public/pwa/icons/icon-192x192.png") }}', tag: tag });
+            sessionStorage.setItem('notif-' + tag, '1');
+        }
+
+        function parseTime(str) {
+            var p = str.split(':');
+            var d = new Date();
+            d.setHours(parseInt(p[0]), parseInt(p[1]), parseInt(p[2] || 0), 0);
+            return d;
+        }
+
+        var now = new Date();
+        var masukTime = parseTime(jadwalMasuk);
+        var pulangTime = parseTime(jadwalPulang);
+        var reminderMasuk = new Date(masukTime.getTime() - 10 * 60000);
+        var reminderPulang = new Date(pulangTime.getTime() - 10 * 60000);
+
+        // Hitung jam pulang berdasarkan durasi kerja
+        var durasiKerja = pulangTime.getTime() - masukTime.getTime();
+        var jamPulangAktual = pulangTime;
+        if (sudahMasuk && jamMasukUser) {
+            var actualStart = parseTime(jamMasukUser);
+            if (actualStart > masukTime) {
+                jamPulangAktual = new Date(actualStart.getTime() + durasiKerja);
+            }
+        }
+
+        function checkReminders() {
+            var n = new Date();
+            var today = n.toISOString().split('T')[0];
+
+            if (!sudahMasuk && n >= reminderMasuk && n < masukTime) {
+                sendNotif('Reminder Presensi Masuk', 'Waktu masuk kerja 10 menit lagi (' + jadwalMasuk.substring(0,5) + ')', today + '-masuk-reminder');
+            }
+
+            if (sudahMasuk && !sudahPulang && n >= new Date(jamPulangAktual.getTime() - 10 * 60000) && n < jamPulangAktual) {
+                sendNotif('Reminder Presensi Pulang', 'Waktu pulang kerja 10 menit lagi', today + '-pulang-reminder');
+            }
+
+            if (sudahMasuk && !sudahPulang && n >= jamPulangAktual) {
+                sendNotif('Waktunya Pulang', 'Jam kerja Anda sudah terpenuhi. Jangan lupa presensi pulang!', today + '-pulang-now');
+            }
+        }
+
+        checkReminders();
+        setInterval(checkReminders, 30000);
+    })();
+
     let videoStream = null;
     let mapInstance = null;
     let currentPosition = null;
