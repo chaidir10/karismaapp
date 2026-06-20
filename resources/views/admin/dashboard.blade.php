@@ -971,14 +971,21 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th>Pegawai</th>
-                                <th>Jenis</th>
-                                <th>Jam</th>
+                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
                         <tbody id="lemburHariIniTable" data-paginate="5">
                             @forelse($lemburHariIni as $index => $l)
-                            <tr>
+                            <tr class="clickable-row"
+                                data-user-name="{{ $l->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="Lembur {{ ucfirst($l->jenis) }}"
+                                data-jam="{{ $l->jam ?? '-' }}"
+                                data-lokasi="{{ $l->lokasi ?? '' }}"
+                                data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}"
+                                data-status="{{ $l->status ?? '' }}">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $l->user->name ?? 'N/A' }}</td>
                                 <td><span class="badge" style="background:rgba(245,158,11,0.1);color:#d97706;border:1px solid rgba(245,158,11,0.2);">Lembur {{ ucfirst($l->jenis) }}</span></td>
@@ -1219,6 +1226,40 @@
     </div>
 </div>
 
+{{-- Modal Detail Lembur --}}
+<div id="modalDetailLembur" class="modal-overlay">
+    <div class="modal-container modal-large">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Lembur</h3>
+            <button class="modal-close" onclick="closeModal('modalDetailLembur')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
+                <div class="detail-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
+                <div class="detail-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
+                <div class="detail-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
+                <div class="detail-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
+                <div class="detail-item full-width"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px">-</span></div>
+            </div>
+            <div class="media-row">
+                <div class="media-col"><label>Foto</label><div class="foto-wrapper" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div></div>
+                <div class="media-col">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="lemburMap"></div>
+                        <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
+                        <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -1288,6 +1329,21 @@
                     foto_url     : this.dataset.fotoUrl,
                     status       : this.dataset.status,
                     status_label : this.dataset.statusLabel
+                });
+            });
+        });
+
+        // Klik baris lembur hari ini
+        document.querySelectorAll('#lemburHariIniTable .clickable-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                openLemburModal({
+                    user_name : this.dataset.userName,
+                    tanggal   : this.dataset.tanggal,
+                    jenis     : this.dataset.jenis,
+                    jam       : this.dataset.jam,
+                    lokasi    : this.dataset.lokasi,
+                    foto_url  : this.dataset.fotoUrl,
+                    status    : this.dataset.status
                 });
             });
         });
@@ -1410,6 +1466,34 @@
         openModal('modalDetailHariIni');
     }
 
+    // ─── Modal Detail Lembur ─────────────────────────────────────────────────
+    var lemburCoords = { lat: NaN, lng: NaN, lokasi: '' };
+
+    function openLemburModal(data) {
+        document.getElementById('detailNamaLembur').textContent    = data.user_name || 'N/A';
+        document.getElementById('detailTanggalLembur').textContent = data.tanggal   || '-';
+        document.getElementById('detailJenisLembur').textContent   = data.jenis     || '-';
+        document.getElementById('detailJamLembur').textContent     = data.jam       || '-';
+        document.getElementById('detailLokasiLembur').textContent  = data.lokasi    || 'Tidak ada lokasi';
+
+        var st = (data.status || '').toLowerCase();
+        var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
+        document.getElementById('detailVerifikasiLembur').innerHTML = '<span class="status-badge ' + verifCls + '">' + capitalize(st) + '</span>';
+
+        var fotoEl = document.getElementById('detailFotoLembur');
+        fotoEl.innerHTML = data.foto_url
+            ? '<img src="' + data.foto_url + '" alt="Foto" class="foto-image" onerror="this.style.display=\'none\'">'
+            : '<span class="text-muted">Tidak ada foto</span>';
+
+        var lat = NaN, lng = NaN;
+        if (data.lokasi) {
+            var parts = data.lokasi.trim().split(',');
+            if (parts.length === 2) { lat = parseFloat(parts[0].trim()); lng = parseFloat(parts[1].trim()); }
+        }
+        lemburCoords = { lat: lat, lng: lng, lokasi: data.lokasi || 'Lokasi tidak tersedia' };
+        openModal('modalDetailLembur');
+    }
+
     // ─── Modal Helpers ────────────────────────────────────────────────────────
     function openModal(id) {
         var modal = document.getElementById(id);
@@ -1420,6 +1504,7 @@
 
         if (id === 'modalPresensiPending') renderMap('presensiMap', 'mapLoading', 'mapError', pendingCoords, 'pending');
         if (id === 'modalDetailHariIni')   renderMap('hariIniMap', 'hariIniMapLoading', 'hariIniMapError', hariIniCoords, 'hariIni');
+        if (id === 'modalDetailLembur')    renderMap('lemburMap', 'lemburMapLoading', 'lemburMapError', lemburCoords, 'lembur');
     }
 
     function closeModal(id) {
@@ -1431,6 +1516,7 @@
 
         if (id === 'modalPresensiPending') destroyMap('pending');
         if (id === 'modalDetailHariIni')   destroyMap('hariIni');
+        if (id === 'modalDetailLembur')    destroyMap('lembur');
     }
 
     // ─── Map ──────────────────────────────────────────────────────────────────
@@ -1639,6 +1725,74 @@
         initTable('pengajuanPendingTable');
         initTable('presensiHariIniTable');
         initTable('lemburHariIniTable');
+
+        // AJAX approve/reject — no page reload
+        document.querySelectorAll('.inline-form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var btn = form.querySelector('button[type="submit"]');
+                var originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                })
+                .then(function(r) { return r.json().catch(function() { return {}; }); })
+                .then(function() {
+                    // Remove the row from table
+                    var row = form.closest('tr');
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s';
+                        row.style.opacity = '0';
+                        setTimeout(function() { row.remove(); }, 300);
+                    }
+                    // Close modal if open
+                    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+                        if (m.style.display === 'flex') closeModal(m.id);
+                    });
+                })
+                .catch(function() {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                    alert('Gagal memproses. Coba lagi.');
+                });
+            });
+        });
+
+        // Also handle modal approve/reject forms
+        ['formApprovePresensi','formRejectPresensi'].forEach(function(fid) {
+            var form = document.getElementById(fid);
+            if (!form) return;
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var btn = form.querySelector('button[type="submit"]');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                })
+                .then(function() {
+                    closeModal('modalPresensiPending');
+                    // Remove matching row from table
+                    document.querySelectorAll('#presensiPendingTable tr').forEach(function(row) {
+                        var approveUrl = row.dataset ? row.dataset.approveUrl : '';
+                        if (approveUrl === form.action || form.action.includes(approveUrl)) {
+                            row.style.transition = 'opacity 0.3s';
+                            row.style.opacity = '0';
+                            setTimeout(function() { row.remove(); }, 300);
+                        }
+                    });
+                })
+                .catch(function() {
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.disabled = false;
+                });
+            });
+        });
     });
 </script>
 
