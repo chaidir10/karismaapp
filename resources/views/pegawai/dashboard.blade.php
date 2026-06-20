@@ -634,11 +634,6 @@
 
                 <!-- Bottom Panel -->
                 <div style="background:var(--card-bg); flex-shrink:0; border-top-left-radius:20px; border-top-right-radius:20px; margin-top:-20px; position:relative; z-index:10; padding:16px 20px 24px;">
-                    <!-- Submit button (atas, mudah dijangkau) -->
-                    <button type="button" class="submit-btn-large" onclick="captureAndProcess()" style="width:100%; max-width:none; border-radius:14px; padding:16px; font-size:15px; box-shadow:0 4px 14px rgba(90,182,234,0.3); margin-bottom:14px;">
-                        <i class="fas fa-camera" style="margin-right:8px;"></i> Ambil Foto & Absen
-                    </button>
-
                     <!-- Location -->
                     <div style="border-radius:14px; overflow:hidden; border:1px solid var(--card-border);">
                         <div id="mini-map" style="width:100%; height:100px; background:var(--gray-light);"></div>
@@ -647,6 +642,12 @@
                             <div id="locationRadiusInfo" style="font-size:10px; margin-top:4px;"></div>
                         </div>
                     </div>
+                
+                    <!-- Submit button (atas, mudah dijangkau) -->
+                    <button type="button" class="submit-btn-large" onclick="captureAndProcess()" style="width:100%; max-width:none; border-radius:14px; padding:16px; font-size:15px; box-shadow:0 4px 14px rgba(90,182,234,0.3); margin-bottom:14px;">
+                        <i class="fas fa-camera" style="margin-right:8px;"></i> Ambil Foto & Absen
+                    </button>
+
                 </div>
             </form>
         </div>
