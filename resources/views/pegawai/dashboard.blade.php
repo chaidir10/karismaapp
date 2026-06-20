@@ -1034,7 +1034,6 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script>
     // Carousel with live drag
     var currentSlide = 0;
@@ -1189,7 +1188,6 @@
     let autoCloseTimer = null;
     let faceDetected = false;
     let mpFaceDetector = null;
-    let mpCamera = null;
 
     const sudahPresensiMasuk = @json($sudahPresensiMasuk);
     const sudahPresensiPulang = @json($sudahPresensiPulang);
@@ -1427,10 +1425,10 @@
             mapInstance = null;
         }
 
-        const submitBtn = document.querySelector('.submit-btn-large');
+        var submitBtn = document.querySelector('.submit-btn-large');
         if (submitBtn) {
             submitBtn.innerHTML = '<i class="fas fa-camera me-2"></i>Ambil Foto & Absen';
-            submitBtn.disabled = false;
+            submitBtn.disabled = true;
         }
 
         capturedPhotoData = null;
@@ -1453,10 +1451,19 @@
         if (infoEl) infoEl.textContent = '';
     }
 
+    var _faceDetectTimer = null;
+    var _faceDetecting = false;
+
     function initializeCamera() {
         var video = document.getElementById('video');
         if (!video) return;
         video.muted = true;
+
+        // Stop any existing stream first
+        if (videoStream) {
+            videoStream.getTracks().forEach(function(t) { t.stop(); });
+            videoStream = null;
+        }
 
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showError("Browser tidak mendukung akses kamera.");
@@ -1481,28 +1488,26 @@
         });
     }
 
-    // MediaPipe Face Detection
+    // MediaPipe Face Detection — NO Camera utility (avoids stream conflict)
     function initFaceDetection() {
         var video = document.getElementById('video');
         var submitBtn = document.querySelector('.submit-btn-large');
         var statusEl = document.getElementById('faceStatus');
 
-        // ALWAYS disable button until face is confirmed
         if (submitBtn) submitBtn.disabled = true;
         faceDetected = false;
         updateFaceStatus(false);
 
+        // Cleanup previous
+        if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
+        if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
+
         if (typeof FaceDetection === 'undefined') {
-            // No face detection available — keep button DISABLED (no celah)
             if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Face detection tidak tersedia'; }
             return;
         }
 
         if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
-
-        // Destroy previous instance if exists
-        if (mpCamera) { try { mpCamera.stop(); } catch(e) {} mpCamera = null; }
-        mpFaceDetector = null;
 
         mpFaceDetector = new FaceDetection({
             locateFile: function(file) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/' + file; }
@@ -1510,7 +1515,8 @@
         mpFaceDetector.setOptions({ model: 'short', minDetectionConfidence: 0.6 });
 
         mpFaceDetector.onResults(function(results) {
-            if (!videoStream) return; // modal closed, ignore
+            _faceDetecting = false;
+            if (!videoStream) return;
             var found = false;
             if (results.detections && results.detections.length > 0) {
                 found = isFaceInGuide(results.detections[0].boundingBox, video);
@@ -1521,18 +1527,13 @@
             }
         });
 
-        if (typeof Camera !== 'undefined') {
-            mpCamera = new Camera(video, {
-                onFrame: async function() {
-                    if (mpFaceDetector && videoStream) {
-                        try { await mpFaceDetector.send({ image: video }); } catch(e) {}
-                    }
-                },
-                width: 640,
-                height: 480
-            });
-            mpCamera.start();
-        }
+        // Send frames manually via setInterval — no Camera utility needed
+        _faceDetectTimer = setInterval(function() {
+            if (!videoStream || !mpFaceDetector || _faceDetecting) return;
+            if (video.readyState < 2 || video.paused) return;
+            _faceDetecting = true;
+            mpFaceDetector.send({ image: video }).catch(function() { _faceDetecting = false; });
+        }, 300);
     }
 
     function isFaceInGuide(bb, video) {
@@ -1565,7 +1566,8 @@
     }
 
     function stopFaceDetection() {
-        if (mpCamera) { try { mpCamera.stop(); } catch(e) {} mpCamera = null; }
+        if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
+        _faceDetecting = false;
         if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
         faceDetected = false;
         var ovalEl = document.getElementById('faceGuideOval');
