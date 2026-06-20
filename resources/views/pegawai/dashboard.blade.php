@@ -1,6 +1,10 @@
 @extends('layouts.pegawai')
 @section('title', 'Home')
 
+@push('head')
+<meta name="turbo-cache-control" content="no-cache">
+@endpush
+
 <style>
     .btn-secondary {
         background: var(--gray-light);
@@ -329,7 +333,7 @@
 
 {{-- Modal Info Detail --}}
 @foreach($pengumumans as $pm)
-<div class="modal fade" data-turbo-permanent id="infoModal{{ $pm->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="infoModal{{ $pm->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
         <div class="modal-content" style="border-radius:0; height:100vh; display:flex; flex-direction:column;">
             <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--gray-light); flex-shrink:0;">
@@ -437,7 +441,7 @@
     $dIconColor = $dIsMasuk ? 'var(--primary-dark)' : 'var(--accent)';
     $dIconName = $dIsLembur ? 'fa-bolt' : ($dIsMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
 @endphp
-<div class="modal fade" data-turbo-permanent id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
         <div class="modal-content" style="border-radius:0; border:none; height:100vh; background:var(--card-bg); display:flex; flex-direction:column;">
             <!-- Header -->
@@ -533,7 +537,7 @@
 @endforeach
 
 {{-- Modal Peringatan Jam Kerja Belum Terpenuhi --}}
-<div class="modal fade" data-turbo-permanent id="earlyPulangModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="earlyPulangModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4 text-center">
@@ -553,7 +557,7 @@
 </div>
 
 {{-- Modal Konfirmasi Selesai Lembur --}}
-<div class="modal fade" data-turbo-permanent id="confirmLemburModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="confirmLemburModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4 text-center">
@@ -574,7 +578,7 @@
 
 {{-- Modal Pilih Shift --}}
 @if($user->can_shift && $shifts->count() > 0)
-<div class="modal fade" data-turbo-permanent id="shiftPickerModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="shiftPickerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4">
@@ -600,7 +604,7 @@
 @endif
 
 <!-- Modal Presensi -->
-<div class="modal fade" data-turbo-permanent id="presensiModal" tabindex="-1" aria-hidden="true" data-turbo-permanent>
+<div class="modal fade"  id="presensiModal" tabindex="-1" aria-hidden="true" >
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
         <div class="modal-content">
             <div class="modal-header">
@@ -652,7 +656,7 @@
 </div>
 
 <!-- Modal Konfirmasi Presensi (Luar Radius) -->
-<div class="modal fade" data-turbo-permanent id="confirmationModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="confirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden; background:var(--card-bg);">
             <div style="padding:24px 24px 0; text-align:center;">
@@ -693,7 +697,7 @@
 </div>
 
 <!-- Modal Presensi Berhasil (Dalam Radius - Auto Close) -->
-<!-- <div class="modal fade" data-turbo-permanent id="successConfirmationModal" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade"  id="successConfirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-2xl auto-close-modal">
             <div class="modal-body p-0">
@@ -741,7 +745,7 @@
 </div> -->
 
 <!-- Modal Peringatan Belum Presensi Masuk -->
-<div class="modal fade" data-turbo-permanent id="warningModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade"  id="warningModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-2xl">
             <div class="modal-body p-0">
@@ -1373,16 +1377,13 @@
         return true;
     }
 
-    // Bind modal events once — not inside turbo:load to avoid stacking
-    (function() {
+    document.addEventListener('turbo:load', function() {
         var presensiModal = document.getElementById('presensiModal');
         if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
         }
-    })();
 
-    document.addEventListener('turbo:load', function() {
         // Detail map modals
         initializeDetailModals();
 
