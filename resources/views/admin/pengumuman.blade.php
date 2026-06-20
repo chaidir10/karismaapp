@@ -4,9 +4,13 @@
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <style>
-    .ql-editor { min-height: 200px; font-size: 14px; }
-    .ql-toolbar { border-radius: 12px 12px 0 0 !important; border-color: #e2e8f0 !important; }
-    .ql-container { border-radius: 0 0 12px 12px !important; border-color: #e2e8f0 !important; }
+    .ql-editor { min-height: 200px; font-size: 14px; color: var(--dark); }
+    .ql-toolbar { border-radius: 12px 12px 0 0 !important; border-color: var(--input-border) !important; background: var(--card-bg); }
+    .ql-container { border-radius: 0 0 12px 12px !important; border-color: var(--input-border) !important; background: var(--card-bg); }
+    .ql-toolbar .ql-stroke { stroke: var(--text-muted) !important; }
+    .ql-toolbar .ql-fill { fill: var(--text-muted) !important; }
+    .ql-toolbar .ql-picker-label { color: var(--text-muted) !important; }
+    .ql-editor.ql-blank::before { color: var(--gray) !important; }
 
     .p-card {
         background: #fff; border-radius: 16px; margin-bottom: 12px;

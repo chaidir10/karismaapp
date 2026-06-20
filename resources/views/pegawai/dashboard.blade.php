@@ -182,7 +182,8 @@
     }
 
     .ql-content img { max-width:100%; border-radius:8px; margin:10px 0; }
-    .ql-content { text-align:justify; }
+    .ql-content { text-align:justify; color:var(--dark); }
+    [data-theme="dark"] .ql-content, [data-theme="dark"] .ql-content * { color:var(--dark) !important; }
 </style>
 
 @section('content')
@@ -351,7 +352,7 @@
                     <span><i class="far fa-clock" style="margin-right:4px;"></i>{{ \Carbon\Carbon::parse($pm->waktu)->format('H:i') }}</span>
                     @endif
                 </div>
-                <div style="font-size:14px; line-height:1.8; color:#334155; text-align:justify;" class="ql-content">{!! $pm->isi !!}</div>
+                <div style="font-size:14px; line-height:1.8; color:var(--dark); text-align:justify;" class="ql-content">{!! $pm->isi !!}</div>
             </div>
             <div style="padding:12px 16px; border-top:1px solid var(--gray-light); flex-shrink:0;">
                 <button type="button" data-bs-dismiss="modal" style="width:100%; padding:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer;">
