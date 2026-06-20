@@ -1441,7 +1441,8 @@
         }
 
         const jenis = document.getElementById('jenisPresensi')?.value || '';
-        if (jenis === 'pulang' && !sudahPresensiMasuk) {
+        const lemburVal = document.getElementById('isLemburInput')?.value;
+        if (jenis === 'pulang' && !sudahPresensiMasuk && lemburVal !== '1') {
             showError("Anda belum melakukan presensi masuk hari ini.");
             return;
         }
