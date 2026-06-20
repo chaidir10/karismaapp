@@ -881,71 +881,41 @@
 
     /* Face Guide */
     .face-guide {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 2;
-        pointer-events: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        position:absolute; inset:0; z-index:2; pointer-events:none;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
     }
-
     .face-guide-oval {
-        width: 55%;
-        max-width: 220px;
-        aspect-ratio: 3 / 4;
-        border: 3px dashed rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        transition: border-color 0.3s, box-shadow 0.3s;
+        width:60%; max-width:240px; aspect-ratio:3/4;
+        border:2px solid rgba(255,255,255,0.35); border-radius:50%;
+        transition:border-color 0.4s, box-shadow 0.4s;
     }
-
     .face-guide-oval.detected {
-        border-color: #10b981;
-        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        border-color:var(--primary); border-width:3px;
+        box-shadow:0 0 0 4px rgba(90,182,234,0.2), 0 0 30px rgba(90,182,234,0.15);
     }
-
     .face-guide-text {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 11px;
-        margin-top: 8px;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        color:rgba(255,255,255,0.7); font-size:11px; margin-top:10px;
+        text-shadow:0 1px 4px rgba(0,0,0,0.5); font-weight:500;
     }
 
+    /* Face Status Badge */
     .face-status {
-        position: absolute;
-        top: 12px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 3;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-        transition: all 0.3s;
+        position:absolute; bottom:100px; left:50%; transform:translateX(-50%);
+        z-index:3; padding:8px 16px; border-radius:12px;
+        font-size:12px; font-weight:600; display:flex; align-items:center; gap:8px;
+        white-space:nowrap; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+        transition:all 0.3s;
     }
-
     .face-status.no-face {
-        background: rgba(239, 68, 68, 0.85);
-        color: #fff;
+        background:rgba(30,30,30,0.7); color:rgba(255,255,255,0.8);
     }
-
     .face-status.face-ok {
-        background: rgba(16, 185, 129, 0.85);
-        color: #fff;
+        background:rgba(16,185,129,0.2); color:#6ee7b7;
+        border:1px solid rgba(16,185,129,0.3);
     }
 
     .submit-btn-large:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        filter: grayscale(0.5);
+        opacity:0.4; cursor:not-allowed;
     }
 
     /* Floating Lembur FAB */
@@ -1460,13 +1430,15 @@
     function initializeCamera() {
         var video = document.getElementById('video');
         if (!video) return;
-        video.muted = true;
 
-        // Stop any existing stream first
+        // Full cleanup first — stop everything
+        stopFaceDetection();
         if (videoStream) {
             videoStream.getTracks().forEach(function(t) { t.stop(); });
             videoStream = null;
         }
+        video.srcObject = null;
+        video.muted = true;
 
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showError("Browser tidak mendukung akses kamera.");
