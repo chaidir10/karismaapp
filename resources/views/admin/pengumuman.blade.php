@@ -34,15 +34,15 @@
         font-size: 24px; color: #fff; background-size: cover; background-position: center;
     }
     .p-card .p-info { flex: 1; min-width: 0; }
-    .p-card .p-title { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-card .p-title { font-size: 15px; font-weight: 700; color: var(--dm-text, #1e293b); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .p-card .p-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
     .p-card .p-meta .p-tag { padding: 2px 10px; border-radius: 8px; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: #fff; }
-    .p-card .p-excerpt { font-size: 12px; color: #64748b; line-height: 1.4; max-height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .p-card .p-excerpt { font-size: 12px; color: var(--dm-muted, #64748b); line-height: 1.4; max-height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .p-card .p-badge-inactive { display: inline-block; background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
     .p-card .p-actions { flex-shrink: 0; display: flex; gap: 4px; }
     .p-card .p-actions button {
         width: 36px; height: 36px; border-radius: 10px; border: none;
-        background: #f8fafc; cursor: pointer; display: flex; align-items: center;
+        background: var(--dm-bg, #f8fafc); cursor: pointer; display: flex; align-items: center;
         justify-content: center; font-size: 14px; transition: all 0.15s;
     }
     .p-card .p-actions button:hover { background: #e2e8f0; }
@@ -150,11 +150,11 @@
         </div>
         @empty
         <div class="bg-white rounded-xl" style="text-align:center; padding:60px 20px;">
-            <div style="width:64px; height:64px; border-radius:16px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:#94a3b8;">
+            <div style="width:64px; height:64px; border-radius:16px; background:var(--dm-card, #f1f5f9); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:var(--dm-muted, #94a3b8);">
                 <i class="fas fa-bullhorn"></i>
             </div>
-            <p style="font-size:15px; font-weight:600; color:#64748b; margin:0 0 4px;">Belum ada pengumuman</p>
-            <p style="font-size:13px; color:#94a3b8; margin:0;">Klik tombol "Tambah Pengumuman" untuk membuat yang baru</p>
+            <p style="font-size:15px; font-weight:600; color:var(--dm-muted, #64748b); margin:0 0 4px;">Belum ada pengumuman</p>
+            <p style="font-size:13px; color:var(--dm-muted, #94a3b8); margin:0;">Klik tombol "Tambah Pengumuman" untuk membuat yang baru</p>
         </div>
         @endforelse
     </div>
@@ -162,12 +162,12 @@
 
 <!-- Modal Form -->
 <div id="formModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:20px; width:95%; max-width:700px; max-height:90vh; overflow-y:auto; padding:28px; position:relative;">
-        <button onclick="closeModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px;"
+    <div style="background:var(--dm-card, #fff); border-radius:20px; width:95%; max-width:700px; max-height:90vh; overflow-y:auto; padding:28px; position:relative;">
+        <button onclick="closeModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--dm-muted, #94a3b8); width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px;"
             onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
             <i class="fas fa-times"></i>
         </button>
-        <h3 id="modalTitle" style="font-size:18px; font-weight:700; margin-bottom:24px; color:#1e293b;">Tambah Pengumuman</h3>
+        <h3 id="modalTitle" style="font-size:18px; font-weight:700; margin-bottom:24px; color:var(--dm-text, #1e293b);">Tambah Pengumuman</h3>
 
         <form id="pengumumanForm" method="POST" enctype="multipart/form-data">
             @csrf
@@ -194,15 +194,15 @@
                 <label class="form-label">Tanggal & Waktu <span class="optional">(opsional, isi sesuai kebutuhan)</span></label>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <div style="flex:1; min-width:140px;">
-                        <div style="font-size:11px; color:#94a3b8; margin-bottom:4px;">Tanggal Mulai</div>
+                        <div style="font-size:11px; color:var(--dm-muted, #94a3b8); margin-bottom:4px;">Tanggal Mulai</div>
                         <input type="date" name="tanggal_mulai" id="inputTglMulai" class="form-input">
                     </div>
                     <div style="flex:1; min-width:140px;">
-                        <div style="font-size:11px; color:#94a3b8; margin-bottom:4px;">Tanggal Selesai</div>
+                        <div style="font-size:11px; color:var(--dm-muted, #94a3b8); margin-bottom:4px;">Tanggal Selesai</div>
                         <input type="date" name="tanggal_selesai" id="inputTglSelesai" class="form-input">
                     </div>
                     <div style="width:130px;">
-                        <div style="font-size:11px; color:#94a3b8; margin-bottom:4px;">Waktu</div>
+                        <div style="font-size:11px; color:var(--dm-muted, #94a3b8); margin-bottom:4px;">Waktu</div>
                         <input type="time" name="waktu" id="inputWaktu" class="form-input">
                     </div>
                 </div>
@@ -211,7 +211,7 @@
             <!-- Gambar Cover -->
             <div style="margin-bottom:16px;">
                 <label class="form-label">Gambar Cover <span class="optional">(opsional)</span></label>
-                <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+                <div style="font-size:11px; color:var(--dm-muted, #94a3b8); margin-bottom:8px;">
                     <i class="fas fa-info-circle" style="margin-right:4px;"></i>
                     Ukuran yang disarankan: <strong>800 x 300 px</strong> (rasio 2.7:1). Format: JPG, PNG, GIF, WebP. Maks 5MB.
                 </div>
@@ -227,10 +227,10 @@
 
             <!-- Opsi Tampilan -->
             <div style="margin-bottom:16px; background:#f8fafc; border-radius:12px; padding:14px 16px; border:1px solid #e2e8f0;">
-                <label style="font-size:13px; display:flex; align-items:center; gap:8px; cursor:pointer; color:#374151; font-weight:500;">
+                <label style="font-size:13px; display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--dm-text, #374151); font-weight:500;">
                     <input type="checkbox" name="sembunyikan_detail" id="inputSembunyikan" value="1" style="accent-color:#3b82f6; width:16px; height:16px;">
                     Sembunyikan judul & label di slider
-                    <span style="font-size:11px; color:#94a3b8; font-weight:400;">(hanya tampil gambar, detail tetap muncul saat diklik)</span>
+                    <span style="font-size:11px; color:var(--dm-muted, #94a3b8); font-weight:400;">(hanya tampil gambar, detail tetap muncul saat diklik)</span>
                 </label>
             </div>
 
@@ -243,7 +243,7 @@
 
             <!-- Actions -->
             <div style="display:flex; gap:10px; justify-content:flex-end;">
-                <button type="button" onclick="closeModal()" style="padding:10px 20px; border-radius:12px; border:1px solid #e2e8f0; background:#fff; font-size:14px; cursor:pointer; font-weight:500; color:#475569;">Batal</button>
+                <button type="button" onclick="closeModal()" style="padding:10px 20px; border-radius:12px; border:1px solid var(--dm-border, #e2e8f0); background:var(--dm-card, #fff); font-size:14px; cursor:pointer; font-weight:500; color:var(--dm-text, #475569);">Batal</button>
                 <button type="submit" style="padding:10px 28px; border-radius:12px; border:none; background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; font-size:14px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(59,130,246,0.3);">
                     <i class="fas fa-save" style="margin-right:6px;"></i> Simpan
                 </button>

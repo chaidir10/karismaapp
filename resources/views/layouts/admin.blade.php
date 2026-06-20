@@ -397,8 +397,53 @@
         [data-theme="dark"] .foto-wrapper { background: #0f1626 !important; border-color: var(--dm-border) !important; }
         [data-theme="dark"] .rounded-xl, [data-theme="dark"] .rounded-2xl { border-color: var(--dm-border) !important; }
         [data-theme="dark"] .border { border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .border-b { border-color: var(--dm-border) !important; }
         [data-theme="dark"] .hidden.fixed { background-color: rgba(0,0,0,0.7) !important; }
         [data-theme="dark"] .hidden.fixed > div { background-color: var(--dm-card) !important; }
+
+        /* Tom Select dark */
+        [data-theme="dark"] .ts-wrapper.single .ts-control { background: var(--dm-input) !important; border-color: var(--dm-input-border) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .ts-wrapper.single .ts-control .item { color: var(--dm-text) !important; }
+        [data-theme="dark"] .ts-wrapper.single .ts-control > input { color: var(--dm-text) !important; }
+        [data-theme="dark"] .ts-dropdown { background: var(--dm-card) !important; border-color: var(--dm-border) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .ts-dropdown .option { color: var(--dm-text) !important; }
+        [data-theme="dark"] .ts-dropdown .option.active { background: #1e293b !important; }
+
+        /* Pengumuman cards dark */
+        [data-theme="dark"] .p-card { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .p-card .p-title { color: var(--dm-text) !important; }
+        [data-theme="dark"] .p-card .p-meta { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .p-card .p-excerpt { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .p-card .p-actions button { background: #1e293b !important; }
+        [data-theme="dark"] .p-card .p-actions button:hover { background: #334155 !important; }
+
+        /* Form elements dark */
+        [data-theme="dark"] .form-input { background: var(--dm-input) !important; border-color: var(--dm-input-border) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .form-label { color: var(--dm-text) !important; }
+        [data-theme="dark"] .form-label .optional { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .cover-preview { border-color: var(--dm-border) !important; }
+
+        /* Quill dark */
+        [data-theme="dark"] .ql-toolbar { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .ql-container { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .ql-editor { color: var(--dm-text) !important; }
+        [data-theme="dark"] .ql-toolbar .ql-stroke { stroke: var(--dm-muted) !important; }
+        [data-theme="dark"] .ql-toolbar .ql-fill { fill: var(--dm-muted) !important; }
+        [data-theme="dark"] .ql-toolbar .ql-picker-label { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .ql-editor.ql-blank::before { color: var(--dm-muted) !important; }
+
+        /* Info/alert boxes dark */
+        [data-theme="dark"] .bg-blue-50 { background-color: #0d1f2d !important; }
+        [data-theme="dark"] .border-\[\#5AB6EA\] { border-color: #1e3a5f !important; }
+        [data-theme="dark"] .text-\[\#2E97D4\] { color: #5AB6EA !important; }
+
+        /* Buttons dark — gradient headers keep color, white buttons adapt */
+        [data-theme="dark"] .bg-white.text-blue-600, [data-theme="dark"] .bg-white.text-\[\#2E97D4\] { background: #1e293b !important; }
+        [data-theme="dark"] .hover\:bg-blue-50:hover { background: #1a2332 !important; }
+
+        /* Modal form dark */
+        [data-theme="dark"] #formModal > div { background: var(--dm-card) !important; }
+        [data-theme="dark"] .modal-box { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
 
         .admin-theme-btn {
             width: 34px; height: 34px; border-radius: 8px; border: 1px solid #e5e7eb;
