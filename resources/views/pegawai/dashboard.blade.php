@@ -601,7 +601,7 @@
 @endif
 
 <!-- Modal Presensi -->
-<div class="modal" id="presensiModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="presensiModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
         <div class="modal-content" style="border:none; border-radius:0; height:100vh; background:#000; display:flex; flex-direction:column; overflow:hidden;">
             <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" data-turbo="false" style="display:flex; flex-direction:column; height:100%;">
@@ -614,7 +614,7 @@
 
                 <!-- Camera Area -->
                 <div style="flex:1; position:relative; overflow:hidden; background:#000;">
-                    <video id="video" playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+                    <video id="video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
                     <canvas id="canvas" style="display:none;"></canvas>
 
                     <!-- Close button -->
@@ -1061,6 +1061,7 @@
         track.onclick = function(e) { if(Math.abs(dragCurrentX-dragStartX)>10) e.stopPropagation(); };
     }
 
+    document.addEventListener('turbo:load', initCarousel);
     initCarousel();
 
     function openInfoModal(id) {
@@ -1345,24 +1346,12 @@
         return true;
     }
 
-    // Bind modal events immediately + on pageshow (bfcache restore)
-    function bindModalEvents() {
-        var presensiModal = document.getElementById('presensiModal');
-        if (presensiModal && !presensiModal._bound) {
-            presensiModal._bound = true;
+    document.addEventListener('turbo:load', function() {
+        const presensiModal = document.getElementById('presensiModal');
+        if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
         }
-    }
-    bindModalEvents();
-    window.addEventListener('pageshow', function(e) {
-        bindModalEvents();
-        initializeDetailModals();
-        initCarousel();
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        bindModalEvents();
 
         // Detail map modals
         initializeDetailModals();
