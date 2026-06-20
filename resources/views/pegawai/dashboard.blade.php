@@ -329,7 +329,7 @@
 
 {{-- Modal Info Detail --}}
 @foreach($pengumumans as $pm)
-<div class="modal fade"  id="infoModal{{ $pm->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="infoModal{{ $pm->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
         <div class="modal-content" style="border-radius:0; height:100vh; display:flex; flex-direction:column;">
             <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--gray-light); flex-shrink:0;">
@@ -437,7 +437,7 @@
     $dIconColor = $dIsMasuk ? 'var(--primary-dark)' : 'var(--accent)';
     $dIconName = $dIsLembur ? 'fa-bolt' : ($dIsMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
 @endphp
-<div class="modal fade"  id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
         <div class="modal-content" style="border-radius:0; border:none; height:100vh; background:var(--card-bg); display:flex; flex-direction:column;">
             <!-- Header -->
@@ -533,7 +533,7 @@
 @endforeach
 
 {{-- Modal Peringatan Jam Kerja Belum Terpenuhi --}}
-<div class="modal fade"  id="earlyPulangModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="earlyPulangModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4 text-center">
@@ -553,7 +553,7 @@
 </div>
 
 {{-- Modal Konfirmasi Selesai Lembur --}}
-<div class="modal fade"  id="confirmLemburModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="confirmLemburModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4 text-center">
@@ -574,7 +574,7 @@
 
 {{-- Modal Pilih Shift --}}
 @if($user->can_shift && $shifts->count() > 0)
-<div class="modal fade"  id="shiftPickerModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="shiftPickerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4">
@@ -600,7 +600,7 @@
 @endif
 
 <!-- Modal Presensi -->
-<div class="modal fade"  id="presensiModal" tabindex="-1" aria-hidden="true" >
+<div class="modal fade" id="presensiModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
         <div class="modal-content">
             <div class="modal-header">
@@ -652,7 +652,7 @@
 </div>
 
 <!-- Modal Konfirmasi Presensi (Luar Radius) -->
-<div class="modal fade"  id="confirmationModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden; background:var(--card-bg);">
             <div style="padding:24px 24px 0; text-align:center;">
@@ -693,7 +693,7 @@
 </div>
 
 <!-- Modal Presensi Berhasil (Dalam Radius - Auto Close) -->
-<!-- <div class="modal fade"  id="successConfirmationModal" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade" id="successConfirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-2xl auto-close-modal">
             <div class="modal-body p-0">
@@ -741,7 +741,7 @@
 </div> -->
 
 <!-- Modal Peringatan Belum Presensi Masuk -->
-<div class="modal fade"  id="warningModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-2xl">
             <div class="modal-body p-0">
@@ -1087,6 +1087,7 @@
         track.onclick = function(e) { if(Math.abs(dragCurrentX-dragStartX)>10) e.stopPropagation(); };
     }
 
+    document.addEventListener('turbo:load', initCarousel);
     initCarousel();
 
     function openInfoModal(id) {
@@ -1372,8 +1373,8 @@
         return true;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var presensiModal = document.getElementById('presensiModal');
+    document.addEventListener('turbo:load', function() {
+        const presensiModal = document.getElementById('presensiModal');
         if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
@@ -1484,90 +1485,96 @@
         });
     }
 
-    // Face Detection — Native FaceDetector API (Chrome/Android, fast) + face-api.js fallback
-    var _useNative = ('FaceDetector' in window);
-    var _nativeDetector = null;
-
     async function initFaceDetection() {
-        var submitBtn = document.querySelector('.submit-btn-large');
-        var statusEl = document.getElementById('faceStatus');
+        const submitBtn = document.querySelector('.submit-btn-large');
+        const statusEl = document.getElementById('faceStatus');
+
+        if (typeof faceapi === 'undefined') {
+            console.warn('face-api.js tidak termuat, face detection dinonaktifkan');
+            if (statusEl) statusEl.style.display = 'none';
+            return;
+        }
+
         if (submitBtn) submitBtn.disabled = true;
         updateFaceStatus(false);
 
-        // Try native first (10x faster, no model download)
-        if (_useNative) {
-            try { _nativeDetector = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 }); startFaceDetectionLoop(); return; } catch(e) { _useNative = false; }
-        }
-
-        // Fallback: face-api.js
-        if (typeof faceapi === 'undefined') { if (statusEl) statusEl.style.display = 'none'; if (submitBtn) submitBtn.disabled = false; return; }
         if (!faceModelLoaded) {
             try {
-                if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/');
+                if (statusEl) {
+                    statusEl.className = 'face-status no-face';
+                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...';
+                }
+                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
                 faceModelLoaded = true;
-            } catch(e) { if (statusEl) statusEl.style.display = 'none'; if (submitBtn) submitBtn.disabled = false; return; }
+            } catch (e) {
+                console.error('Gagal memuat model:', e);
+                if (statusEl) statusEl.style.display = 'none';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
         }
+
         startFaceDetectionLoop();
     }
 
-    // Check if face bounding box is inside the guide oval
-    function isFaceInGuide(faceBox, video) {
-        var oval = document.getElementById('faceGuideOval');
-        if (!oval || !video.videoWidth) return true;
-        var gr = oval.getBoundingClientRect();
-        var vr = video.getBoundingClientRect();
-        var sx = vr.width / video.videoWidth, sy = vr.height / video.videoHeight;
-        // Mirror: front camera is mirrored, so flip X
-        var fl = vr.left + (vr.width - (faceBox.x + faceBox.width) * sx);
-        var ft = vr.top + faceBox.y * sy;
-        var fr = fl + faceBox.width * sx;
-        var fb = ft + faceBox.height * sy;
-        var m = 15; // margin tolerance
-        return fl >= (gr.left - m) && ft >= (gr.top - m) && fr <= (gr.right + m) && fb <= (gr.bottom + m);
-    }
-
     function startFaceDetectionLoop() {
-        var video = document.getElementById('video');
+        const video = document.getElementById('video');
         if (!video) return;
-        var detecting = false;
-        var speed = _useNative ? 250 : 500;
+
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.35 });
+        let detecting = false;
 
         async function detect() {
             if (!videoStream) return;
-            if (video.readyState < 2 || video.paused || detecting) { faceDetectionLoop = setTimeout(detect, speed); return; }
+            if (video.readyState < 2 || video.paused || detecting) {
+                faceDetectionLoop = setTimeout(detect, 500);
+                return;
+            }
+
             detecting = true;
             try {
-                var found = false;
-                if (_useNative && _nativeDetector) {
-                    var faces = await _nativeDetector.detect(video);
-                    found = faces.length > 0 && isFaceInGuide(faces[0].boundingBox, video);
-                } else {
-                    var dets = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 }));
-                    found = dets.length > 0 && isFaceInGuide(dets[0].box, video);
+                const detections = await faceapi.detectAllFaces(video, options);
+                const found = detections.length > 0;
+
+                if (found !== faceDetected) {
+                    faceDetected = found;
+                    updateFaceStatus(found);
                 }
-                if (found !== faceDetected) { faceDetected = found; updateFaceStatus(found); }
-            } catch(e) {}
+            } catch (e) {
+                console.error('Detect error:', e);
+            }
             detecting = false;
-            if (videoStream) faceDetectionLoop = setTimeout(detect, speed);
+
+            if (videoStream) faceDetectionLoop = setTimeout(detect, 500);
         }
-        faceDetectionLoop = setTimeout(detect, 400);
+
+        faceDetectionLoop = setTimeout(detect, 1000);
     }
 
     function updateFaceStatus(detected) {
-        var statusEl = document.getElementById('faceStatus');
-        var submitBtn = document.querySelector('.submit-btn-large');
-        var ovalEl = document.getElementById('faceGuideOval');
+        const statusEl = document.getElementById('faceStatus');
+        const submitBtn = document.querySelector('.submit-btn-large');
+        const ovalEl = document.getElementById('faceGuideOval');
+
         if (statusEl) {
             statusEl.className = detected ? 'face-status face-ok' : 'face-status no-face';
-            statusEl.innerHTML = detected ? '<i class="fas fa-user-check"></i> Wajah terdeteksi' : '<i class="fas fa-user-slash"></i> Posisikan wajah dalam lingkaran';
+            statusEl.innerHTML = detected
+                ? '<i class="fas fa-user-check"></i> Wajah terdeteksi'
+                : '<i class="fas fa-user-slash"></i> Wajah tidak terdeteksi';
         }
-        if (ovalEl) ovalEl.classList.toggle('detected', detected);
+
+        if (ovalEl) {
+            ovalEl.classList.toggle('detected', detected);
+        }
+
         if (submitBtn) submitBtn.disabled = !detected;
     }
 
     function stopFaceDetection() {
-        if (faceDetectionLoop) { clearTimeout(faceDetectionLoop); faceDetectionLoop = null; }
+        if (faceDetectionLoop) {
+            clearTimeout(faceDetectionLoop);
+            faceDetectionLoop = null;
         }
         faceDetected = false;
 

@@ -1115,7 +1115,7 @@
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <a href="{{ route('pegawai.dashboard') }}" class="nav-item {{ Route::is('pegawai.dashboard') ? 'active' : '' }}" data-turbo="false">
+            <a href="{{ route('pegawai.dashboard') }}" class="nav-item {{ Route::is('pegawai.dashboard') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="fas fa-house"></i></div>
                 <div>Home</div>
             </a>
