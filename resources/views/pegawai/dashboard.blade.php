@@ -601,52 +601,55 @@
 
 <!-- Modal Presensi -->
 <div class="modal fade" id="presensiModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title"> </h3>
-                <button type="button" class="close-btn" data-bs-dismiss="modal">×</button>
-            </div>
-            <div class="modal-body p-0 position-relative">
-                <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" data-turbo="false">
-                    @csrf
-                    <input type="hidden" name="jenis" id="jenisPresensi">
-                    <input type="hidden" name="foto" id="fotoInput">
-                    <input type="hidden" name="lokasi" id="lokasiInput">
-                    <input type="hidden" name="is_lembur" id="isLemburInput" value="0">
-                    <input type="hidden" name="jam_shift_id" id="jamShiftIdInput" value="">
+    <div class="modal-dialog modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
+        <div class="modal-content" style="border:none; border-radius:0; height:100vh; background:#000; display:flex; flex-direction:column; overflow:hidden;">
+            <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" data-turbo="false" style="display:flex; flex-direction:column; height:100%;">
+                @csrf
+                <input type="hidden" name="jenis" id="jenisPresensi">
+                <input type="hidden" name="foto" id="fotoInput">
+                <input type="hidden" name="lokasi" id="lokasiInput">
+                <input type="hidden" name="is_lembur" id="isLemburInput" value="0">
+                <input type="hidden" name="jam_shift_id" id="jamShiftIdInput" value="">
 
-                    <div class="camera-container-full">
-                        <video id="video" autoplay playsinline></video>
-                        <canvas id="canvas" class="d-none"></canvas>
-                        <div class="face-guide">
-                            <div class="face-guide-oval" id="faceGuideOval"></div>
-                            <div class="face-guide-text">Posisikan wajah di dalam lingkaran</div>
-                        </div>
-                        <div id="faceStatus" class="face-status no-face">
-                            <i class="fas fa-user-slash"></i> Wajah tidak terdeteksi
+                <!-- Camera Area -->
+                <div style="flex:1; position:relative; overflow:hidden; background:#000;">
+                    <video id="video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+
+                    <!-- Close button -->
+                    <button type="button" data-bs-dismiss="modal" style="position:absolute; top:12px; left:12px; z-index:20; width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,0.4); border:none; color:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+
+                    <!-- Face guide -->
+                    <div class="face-guide">
+                        <div class="face-guide-oval" id="faceGuideOval"></div>
+                        <div class="face-guide-text">Posisikan wajah di dalam lingkaran</div>
+                    </div>
+
+                    <!-- Face status -->
+                    <div id="faceStatus" class="face-status no-face">
+                        <i class="fas fa-user-slash"></i> Wajah tidak terdeteksi
+                    </div>
+                </div>
+
+                <!-- Bottom Panel -->
+                <div style="background:var(--card-bg); flex-shrink:0; border-top-left-radius:20px; border-top-right-radius:20px; margin-top:-20px; position:relative; z-index:10; padding:16px 20px 24px;">
+                    <!-- Location -->
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                        <div id="mini-map" style="width:50px; height:50px; border-radius:12px; flex-shrink:0; overflow:hidden; background:var(--gray-light);"></div>
+                        <div style="flex:1; min-width:0;">
+                            <div id="location-address-mini" style="font-size:12px; color:var(--dark); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Mendeteksi lokasi...</div>
+                            <div id="locationRadiusInfo" style="font-size:10px; margin-top:2px;"></div>
                         </div>
                     </div>
 
-                    <div class="mini-map-wrapper">
-                        <div class="mini-map-container">
-                            <div id="mini-map" class="mini-map"></div>
-
-                            <div class="location-info-mini">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span id="location-address-mini">Mendeteksi lokasi...</span>
-                                <div id="locationRadiusInfo" class="text-sm mt-1"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="submit-btn-container">
-                        <button type="button" class="submit-btn-large" onclick="captureAndProcess()">
-                            <i class="fas fa-camera me-2"></i>Ambil Foto & Absen
-                        </button>
-                    </div>
-                </form>
-            </div>
+                    <!-- Submit button -->
+                    <button type="button" class="submit-btn-large" onclick="captureAndProcess()" style="width:100%; max-width:none; border-radius:14px; padding:16px; font-size:15px; box-shadow:0 4px 14px rgba(90,182,234,0.3);">
+                        <i class="fas fa-camera" style="margin-right:8px;"></i> Ambil Foto & Absen
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -1752,7 +1755,7 @@
 
                     if (addrEl) {
                         if (status === 'approved' && detailWilayahAlamat) {
-                            addrEl.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + detailWilayahAlamat;
+                            addrEl.textContent = detailWilayahAlamat;
                         } else {
                             getAddressFromCoordinates(lat, lng, addrEl);
                         }
@@ -1771,22 +1774,15 @@
     }
 
     function getAddressFromCoordinates(lat, lng, el) {
-        el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
+        el.textContent = 'Mendeteksi alamat...';
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-            .then(r => {
-                if (!r.ok) throw new Error(r.status);
-                return r.json();
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
+            .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function(data) {
+                el.textContent = (data && data.display_name) ? data.display_name : lat.toFixed(6) + ', ' + lng.toFixed(6);
             })
-            .then(data => {
-                if (data && data.display_name) {
-                    el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + data.display_name;
-                } else {
-                    throw new Error('no data');
-                }
-            })
-            .catch(() => {
-                el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+            .catch(function() {
+                el.textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
             });
     }
 
