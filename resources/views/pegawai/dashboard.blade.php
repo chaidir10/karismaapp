@@ -102,15 +102,40 @@
         white-space: nowrap;
     }
 
-    /* History item clickable */
-    .history-item {
-        cursor: pointer;
-    }
+    /* History Section */
+    .history-section { margin: 0 20px 100px; }
+    .history-section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .history-section-title { font-size:16px; font-weight:700; color:var(--dark); margin:0; }
+    .history-section-link { font-size:12px; font-weight:600; color:var(--primary); text-decoration:none; }
 
-    .history-item:active {
-        background: var(--gray-light);
-        border-radius: 8px;
+    .history-card {
+        background:var(--white); border-radius:14px; padding:14px 16px; margin-bottom:10px;
+        display:flex; align-items:center; gap:14px;
+        box-shadow:0 1px 6px rgba(0,0,0,0.04); border:1px solid var(--gray-light);
+        cursor:pointer; transition:transform 0.15s;
     }
+    .history-card:active { transform:scale(0.98); }
+    .hc-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .hc-icon-masuk { background:#d1fae5; color:#059669; }
+    .hc-icon-pulang { background:#fef3c7; color:#d97706; }
+    .hc-icon-lembur-masuk { background:#ede9fe; color:#7c3aed; }
+    .hc-icon-lembur-pulang { background:#fce7f3; color:#db2777; }
+    .hc-body { flex:1; min-width:0; }
+    .hc-title-row { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
+    .hc-label { font-size:13px; font-weight:600; color:var(--dark); }
+    .hc-tag { font-size:9px; font-weight:700; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px; }
+    .hc-tag-reguler { background:#dbeafe; color:#2563eb; }
+    .hc-tag-lembur { background:#ede9fe; color:#7c3aed; }
+    .hc-time { font-size:20px; font-weight:800; color:var(--dark); font-variant-numeric:tabular-nums; line-height:1.2; }
+    .hc-right { flex-shrink:0; }
+    .hc-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .hc-dot-approved { background:#10b981; }
+    .hc-dot-pending { background:#f59e0b; }
+    .hc-dot-rejected { background:#ef4444; }
+    .hc-status { font-size:11px; color:var(--gray); font-weight:500; }
+    .history-empty { text-align:center; padding:40px 20px; color:var(--gray); background:var(--white); border-radius:14px; }
+    .history-empty i { font-size:32px; opacity:0.25; display:block; margin-bottom:10px; }
+    .history-empty p { font-size:13px; margin:0; }
 </style>
 
 @section('content')
@@ -200,23 +225,49 @@
 @endif
 
 <!-- Riwayat Hari Ini -->
-<div class="attendance-history">
-    <div class="history-header">
-        <h5 class="history-title">Riwayat Hari Ini</h5>
+<div class="history-section">
+    <div class="history-section-header">
+        <h5 class="history-section-title">Riwayat Hari Ini</h5>
+        <a href="{{ route('pegawai.riwayat') }}" class="history-section-link">Lihat Semua <i class="fas fa-chevron-right" style="font-size:10px"></i></a>
     </div>
-    <div>
-        @forelse($riwayatHariIni as $p)
-        <div class="history-item" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
-            <div>
-                <span class="history-time">{{ $p->jam }}</span>
-                <div class="history-type">{{ $p->is_lembur ? '⏰ Lembur ' : '' }}{{ ucfirst($p->jenis) }}</div>
+    @forelse($riwayatHariIni as $p)
+    @php
+        $isLembur = $p->is_lembur;
+        $isMasuk = $p->jenis === 'masuk';
+        if ($isLembur) {
+            $iconCls = $isMasuk ? 'hc-icon-lembur-masuk' : 'hc-icon-lembur-pulang';
+            $iconName = 'fa-bolt';
+            $labelText = $isMasuk ? 'Masuk Lembur' : 'Pulang Lembur';
+            $tagCls = 'hc-tag-lembur';
+            $tagText = 'Lembur';
+        } else {
+            $iconCls = $isMasuk ? 'hc-icon-masuk' : 'hc-icon-pulang';
+            $iconName = $isMasuk ? 'fa-sign-in-alt' : 'fa-sign-out-alt';
+            $labelText = $isMasuk ? 'Masuk' : 'Pulang';
+            $tagCls = 'hc-tag-reguler';
+            $tagText = 'Reguler';
+        }
+    @endphp
+    <div class="history-card" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
+        <div class="hc-icon {{ $iconCls }}"><i class="fas {{ $iconName }}"></i></div>
+        <div class="hc-body">
+            <div class="hc-title-row">
+                <span class="hc-label">{{ $labelText }}</span>
+                <span class="hc-tag {{ $tagCls }}">{{ $tagText }}</span>
             </div>
-            <i class="fas fa-chevron-right" style="color:var(--gray);font-size:12px;"></i>
+            <div class="hc-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
         </div>
-        @empty
-        <div class="empty-state">Belum ada riwayat absensi hari ini</div>
-        @endforelse
+        <div class="hc-right">
+            <span class="hc-dot hc-dot-{{ $p->status }}"></span>
+            <span class="hc-status">{{ ucfirst($p->status) }}</span>
+        </div>
     </div>
+    @empty
+    <div class="history-empty">
+        <i class="fas fa-clock"></i>
+        <p>Belum ada riwayat hari ini</p>
+    </div>
+    @endforelse
 </div>
 
 <!-- Modal Detail -->
@@ -248,7 +299,7 @@
 
             <div class="detail-info-section">
                 <div class="detail-datetime-info">
-                    <div class="detail-type-badge fw-bold">{{ $p->is_lembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }} - {{ $p->jam }}</div>
+                    <div class="detail-type-badge fw-bold">{{ $p->is_lembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }} - {{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
                     <div class="detail-day">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l') }}, {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('d F Y') }}</div>
                 </div>
 
@@ -371,15 +422,6 @@
                             <i class="fas fa-user-slash"></i> Wajah tidak terdeteksi
                         </div>
                     </div>
-
-                    <!-- <div class="mini-map-container">
-                        <div id="mini-map" class="mini-map"></div>
-                        <div class="location-info-mini mt-1">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span id="location-address-mini">Mendeteksi lokasi...</span>
-                            <div id="locationRadiusInfo" class="text-sm mt-1">Memeriksa radius wilayah kerja...</div>
-                        </div>
-                    </div> -->
 
                     <div class="mini-map-wrapper">
                         <div class="mini-map-container">
