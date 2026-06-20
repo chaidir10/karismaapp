@@ -27,20 +27,25 @@ class PegawaiController extends Controller
                 ->orderBy('jam', 'asc')
                 ->get();
 
-            $presensiMasuk = $semuaPresensi->where('jenis', 'masuk')->where('is_lembur', false)->keyBy('user_id');
+            $presensiByUser = $semuaPresensi->groupBy('user_id');
 
             foreach ($pegawai as $p) {
-                $masuk = $presensiMasuk->get($p->id);
-                if (!$masuk) {
-                    $kehadiranHariIni[$p->id] = ['status' => 'belum', 'text' => 'Belum Hadir'];
-                } else {
+                $userPresensi = $presensiByUser->get($p->id, collect());
+                $masukReguler = $userPresensi->where('jenis', 'masuk')->where('is_lembur', false)->first();
+                $masukLembur = $userPresensi->where('jenis', 'masuk')->where('is_lembur', true)->first();
+
+                if ($masukLembur && !$masukReguler) {
+                    $kehadiranHariIni[$p->id] = ['status' => 'lembur', 'text' => 'Lembur'];
+                } elseif ($masukReguler) {
                     $jadwal = $p->getJadwalKerja($today);
                     $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-                    if ($masuk->jam > $batas) {
+                    if ($masukReguler->jam > $batas) {
                         $kehadiranHariIni[$p->id] = ['status' => 'telat', 'text' => 'Terlambat'];
                     } else {
-                        $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Tepat Waktu'];
+                        $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Masuk'];
                     }
+                } else {
+                    $kehadiranHariIni[$p->id] = ['status' => 'belum', 'text' => 'Belum Masuk'];
                 }
 
                 $riwayatHariIni[$p->id] = $semuaPresensi->where('user_id', $p->id)->values();

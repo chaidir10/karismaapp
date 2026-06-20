@@ -55,6 +55,7 @@
     .s-dot-telat { background:#ef4444; }
     .s-dot-belum { background:var(--gray); }
     .s-dot-aktif { background:#10b981; }
+    .s-dot-lembur { background:var(--accent); }
     .s-text { font-size:11px; font-weight:500; color:var(--gray); }
 
     .empty-box { text-align:center; padding:60px 20px; color:var(--gray); background:var(--card-bg); border-radius:16px; }
