@@ -637,7 +637,7 @@
                     <!-- Location -->
                     <div style="border-radius:14px; overflow:hidden; border:1px solid var(--card-border);">
                         <div id="mini-map" style="width:100%; height:100px; background:var(--gray-light);"></div>
-                        <div style="padding:10px 14px; background:var(--light);">
+                        <div style="padding:10px 14px; background:var(--light); text-align:center;">
                             <div id="location-address-mini" style="font-size:12px; color:var(--dark); font-weight:500; line-height:1.4;">Mendeteksi lokasi...</div>
                             <div id="locationRadiusInfo" style="font-size:10px; margin-top:4px;"></div>
                         </div>
