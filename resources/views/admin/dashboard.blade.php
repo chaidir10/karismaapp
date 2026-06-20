@@ -45,6 +45,12 @@
         background: transparent;
     }
 
+    /* Scrollbar dark mode */
+    [data-theme="dark"] .card-content::-webkit-scrollbar { width: 6px; }
+    [data-theme="dark"] .card-content::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 3px; }
+    [data-theme="dark"] .card-content::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+    [data-theme="dark"] .card-content { scrollbar-color: var(--gray-300) var(--gray-100); }
+
     .dashboard-header {
         margin-bottom: 30px;
     }
@@ -721,15 +727,16 @@
             <div class="card-header">
                 <h2 class="card-title">Tren Kehadiran 7 Hari</h2>
             </div>
-            <div class="card-content" style="padding:15px;">
-                <div style="position:relative; height:250px;">
+            <div class="card-content" style="padding:10px 15px 5px;">
+                <div style="position:relative; height:260px;">
                     <canvas id="attendanceChart"></canvas>
                 </div>
             </div>
         </div>
         <div class="content-card" style="margin:0;">
             <div class="card-header">
-                <h2 class="card-title">Performa Bulan Ini</h2>
+                <h2 class="card-title">Top 10 Performa Bulan Ini</h2>
+                <a href="{{ route('admin.performa.index') }}" style="font-size:12px; font-weight:600; color:var(--primary); text-decoration:none;">Lihat Semua <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
             </div>
             <div class="card-content" style="padding:0; max-height:310px; overflow-y:auto;">
                 @foreach($performaList as $idx => $pf)

@@ -405,6 +405,7 @@
         [data-theme="dark"] .ts-wrapper.single .ts-control { background: var(--dm-input) !important; border-color: var(--dm-input-border) !important; color: var(--dm-text) !important; }
         [data-theme="dark"] .ts-wrapper.single .ts-control .item { color: var(--dm-text) !important; }
         [data-theme="dark"] .ts-wrapper.single .ts-control > input { color: var(--dm-text) !important; }
+        [data-theme="dark"] .ts-wrapper.single .ts-control > input::placeholder { color: var(--dm-muted) !important; opacity:1; }
         [data-theme="dark"] .ts-dropdown { background: var(--dm-card) !important; border-color: var(--dm-border) !important; color: var(--dm-text) !important; }
         [data-theme="dark"] .ts-dropdown .option { color: var(--dm-text) !important; }
         [data-theme="dark"] .ts-dropdown .option.active { background: #1e293b !important; }
