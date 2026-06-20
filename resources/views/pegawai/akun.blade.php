@@ -3,271 +3,640 @@
 @section('title', 'Akun Saya')
 
 @section('content')
-<div class="pt-6">
+<style>
+    .akun-page { padding: 20px; padding-bottom: 100px; }
+
+    /* Notifications */
+    .notif-success {
+        background: var(--success-light);
+        border: 1px solid var(--success);
+        color: var(--success);
+        padding: 12px 16px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .notif-error {
+        background: var(--danger-light);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: 12px 16px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    /* Profile Section */
+    .profile-section {
+        text-align: center;
+        padding: 24px 0 20px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 18px;
+        margin: 0 auto 14px;
+        overflow: hidden;
+        border: 3px solid var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-soft);
+    }
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .profile-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 26px;
+    }
+
+    .profile-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0 0 8px;
+    }
+
+    .profile-tag {
+        display: inline-block;
+        background: rgba(90, 182, 234, 0.1);
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 14px;
+        border-radius: 20px;
+    }
+
+    /* Info List */
+    .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: var(--card-bg);
+        border-radius: 14px;
+        border: 1px solid var(--card-border);
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+        background: rgba(90, 182, 234, 0.1);
+        color: var(--primary);
+    }
+
+    .info-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .info-label {
+        font-size: 12px;
+        color: var(--gray);
+        font-weight: 500;
+        margin: 0 0 2px;
+    }
+    .info-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--dark);
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Edit Profile Button */
+    .btn-edit-profile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: #fff;
+        border: none;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        margin-bottom: 16px;
+    }
+    .btn-edit-profile:active { opacity: 0.85; }
+
+    /* Action Cards */
+    .action-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: var(--card-bg);
+        border-radius: 14px;
+        border: 1px solid var(--card-border);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        width: 100%;
+        text-align: left;
+    }
+    .action-item:active { opacity: 0.85; }
+
+    .action-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+    .action-icon-theme {
+        background: rgba(90, 182, 234, 0.1);
+        color: var(--primary);
+    }
+    .action-icon-logout {
+        background: var(--danger-light);
+        color: var(--danger);
+    }
+
+    .action-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .action-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0 0 2px;
+    }
+    .action-subtitle {
+        font-size: 12px;
+        color: var(--gray);
+        margin: 0;
+    }
+
+    .action-arrow {
+        color: var(--gray);
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 50;
+        padding: 16px;
+        overflow-y: auto;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.visible {
+        display: flex;
+    }
+
+    .modal-box {
+        background: var(--card-bg);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 420px;
+        padding: 24px;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid var(--card-border);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: var(--gray);
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .modal-close:active { background: var(--gray-light); }
+
+    .modal-heading {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0 0 20px;
+    }
+
+    /* Logout modal */
+    .logout-icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        background: var(--danger-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 24px;
+        color: var(--danger);
+    }
+
+    .logout-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--dark);
+        text-align: center;
+        margin: 0 0 8px;
+    }
+
+    .logout-desc {
+        font-size: 14px;
+        color: var(--gray);
+        text-align: center;
+        margin: 0 0 24px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-modal-cancel {
+        flex: 1;
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--dark);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .btn-modal-cancel:active { opacity: 0.85; }
+
+    .btn-modal-danger {
+        flex: 1;
+        padding: 12px;
+        border-radius: 14px;
+        border: none;
+        background: var(--danger);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .btn-modal-danger:active { opacity: 0.85; }
+
+    .btn-modal-primary {
+        flex: 1;
+        padding: 12px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .btn-modal-primary:active { opacity: 0.85; }
+
+    /* Form fields */
+    .form-field {
+        margin-bottom: 16px;
+    }
+    .form-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 6px;
+    }
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        font-size: 14px;
+        background: var(--card-bg);
+        color: var(--dark);
+        outline: none;
+    }
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(90, 182, 234, 0.15);
+    }
+    .form-field input[type="file"] {
+        padding: 10px;
+        font-size: 13px;
+    }
+    .field-error {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 4px;
+    }
+    .field-hint {
+        font-size: 11px;
+        color: var(--gray);
+        margin-top: 4px;
+    }
+
+    @keyframes modalSlideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="akun-page">
     {{-- Notifikasi sukses --}}
     @if(session('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg m-4 flex items-center">
-        <i class="fas fa-check-circle mr-2"></i>
+    <div class="notif-success">
+        <i class="fas fa-check-circle"></i>
         {{ session('success') }}
     </div>
     @endif
 
     {{-- Notifikasi error --}}
     @if($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg m-4 flex items-center">
-        <i class="fas fa-exclamation-circle mr-2"></i>
+    <div class="notif-error">
+        <i class="fas fa-exclamation-circle"></i>
         Terjadi kesalahan. Silakan periksa form di bawah.
     </div>
     @endif
 
-    {{-- Modal Konfirmasi Logout --}}
-    <div id="logoutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 relative">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-sign-out-alt text-red-500 text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Konfirmasi Logout</h3>
-                <p class="text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari aplikasi?</p>
+    {{-- Profile Section --}}
+    <div class="profile-section">
+        <div class="profile-avatar">
+            @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
+            <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}"
+                alt="Foto Profil {{ $user->name }}"
+                onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\'profile-avatar-placeholder\'>{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}</div>'">
+            @else
+            <div class="profile-avatar-placeholder">{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}</div>
+            @endif
+        </div>
+        <h2 class="profile-name">{{ $user->name ?? 'Nama Pengguna' }}</h2>
+        <span class="profile-tag">{{ $user->jabatan ?? 'Pegawai' }}</span>
+    </div>
 
-                <div class="flex gap-3">
-                    <button type="button" id="logoutCancelBtn"
-                        class="flex-1 px-4 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 font-medium text-sm">
-                        Batal
-                    </button>
-                    <button type="button" id="logoutConfirmBtn"
-                        class="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-all duration-300 font-medium text-sm">
-                        Ya, Logout
-                    </button>
-                </div>
+    {{-- Info Items --}}
+    <div class="info-list">
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="info-content">
+                <p class="info-label">No HP</p>
+                <p class="info-value">{{ $user->no_hp ?? '-' }}</p>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-content">
+                <p class="info-label">Email</p>
+                <p class="info-value">{{ $user->email ?? '-' }}</p>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="info-content">
+                <p class="info-label">Alamat</p>
+                <p class="info-value">{{ $user->alamat ?? '-' }}</p>
             </div>
         </div>
     </div>
 
-    {{-- Profile Card --}}
-    <div class="bg-white mx-4 mt-4 rounded-2xl shadow-xl p-6 border border-gray-100">
-        {{-- Foto Profil --}}
-        <div class="flex justify-center mb-4">
-            <div class="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden flex items-center justify-center bg-blue-100 text-white text-2xl font-bold">
-                @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
-                <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}"
-                    alt="Foto Profil {{ $user->name }}"
-                    class="w-full h-full object-cover"
-                    onerror="this.style.display='none'; this.parentNode.innerHTML='{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}'">
-                @else
-                {{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}
+    {{-- Edit Button --}}
+    <button onclick="openModal('editModal')" class="btn-edit-profile">
+        <i class="fas fa-edit"></i>
+        Edit Profil
+    </button>
+
+    {{-- Action Cards --}}
+    <div class="action-list">
+        {{-- Dark/Light Mode --}}
+        <button type="button" onclick="toggleTheme()" class="action-item">
+            <div class="action-icon action-icon-theme">
+                <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </div>
+            <div class="action-content">
+                <p class="action-title">Tampilan</p>
+                <p class="action-subtitle">Ubah ke mode gelap / terang</p>
+            </div>
+            <div class="action-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </button>
+
+        {{-- Logout --}}
+        <form action="{{ route('pegawai.akun.logout') }}" method="POST" id="logoutForm">
+            @csrf
+            <button type="button" onclick="openLogoutModal()" class="action-item">
+                <div class="action-icon action-icon-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="action-content">
+                    <p class="action-title">Keluar</p>
+                    <p class="action-subtitle">Logout dari aplikasi</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </button>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Konfirmasi Logout --}}
+<div id="logoutModal" class="modal-overlay">
+    <div class="modal-box" style="text-align:center;">
+        <div class="logout-icon-box">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <h3 class="logout-title">Konfirmasi Logout</h3>
+        <p class="logout-desc">Apakah Anda yakin ingin keluar dari aplikasi?</p>
+
+        <div class="modal-actions">
+            <button type="button" id="logoutCancelBtn" class="btn-modal-cancel">
+                Batal
+            </button>
+            <button type="button" id="logoutConfirmBtn" class="btn-modal-danger">
+                Ya, Logout
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Edit Akun --}}
+<div id="editModal" class="modal-overlay">
+    <div class="modal-box">
+        <button type="button" class="modal-close" onclick="closeModal('editModal')">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h3 class="modal-heading">Edit Profil</h3>
+
+        <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            {{-- Nama --}}
+            <div class="form-field">
+                <label for="name">Nama</label>
+                <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}">
+                @error('name')
+                <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Email --}}
+            <div class="form-field">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}">
+                @error('email')
+                <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- No HP --}}
+            <div class="form-field">
+                <label for="no_hp">No HP</label>
+                <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', $user->no_hp) }}">
+                @error('no_hp')
+                <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Alamat --}}
+            <div class="form-field">
+                <label for="alamat">Alamat</label>
+                <textarea name="alamat" id="alamat" rows="3">{{ old('alamat', $user->alamat) }}</textarea>
+                @error('alamat')
+                <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Password --}}
+            <div class="form-field">
+                <label for="password">Password Baru</label>
+                <input type="password" name="password" id="password" placeholder="Kosongkan jika tidak ingin diubah">
+                @error('password')
+                <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Konfirmasi Password --}}
+            <div class="form-field">
+                <label for="password_confirmation">Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" id="password_confirmation">
+            </div>
+
+            {{-- Foto Profil --}}
+            <div class="form-field">
+                <label for="foto_profil">Foto Profil</label>
+                <input type="file" name="foto_profil" id="foto_profil" accept="image/*">
+                @error('foto_profil')
+                <div class="field-error">{{ $message }}</div>
+                @enderror
+                @if($user->foto_profil)
+                <div class="field-hint">Foto profil saat ini: {{ $user->foto_profil }}</div>
                 @endif
             </div>
-        </div>
 
-
-
-        {{-- Nama dan Jabatan --}}
-        <h3 class="text-xl font-bold text-center text-gray-800 mb-2">{{ $user->name ?? 'Nama Pengguna' }}</h3>
-        <div class="text-center mb-6">
-            <span class="bg-blue-50 text-blue-600 text-xs font-medium px-4 py-1 rounded-full">
-                {{ $user->jabatan ?? 'Pegawai' }}
-            </span>
-        </div>
-
-        {{-- Informasi Profil --}}
-        <div class="space-y-4 mb-6">
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 text-blue-600">
-                    <i class="fas fa-phone text-sm"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-700">No HP</p>
-                    <p class="text-sm text-gray-600">{{ $user->no_hp ?? '-' }}</p>
-                </div>
-            </div>
-
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 text-blue-600">
-                    <i class="fas fa-envelope text-sm"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-700">Email</p>
-                    <p class="text-sm text-gray-600">{{ $user->email ?? '-' }}</p>
-                </div>
-            </div>
-
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 text-blue-600">
-                    <i class="fas fa-map-marker-alt text-sm"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-700">Alamat</p>
-                    <p class="text-sm text-gray-600">{{ $user->alamat ?? '-' }}</p>
-                </div>
-            </div>
-        </div>
-
-        {{-- Tombol Edit --}}
-        <button onclick="openModal('editModal')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg">
-            <i class="fas fa-edit"></i>
-            Edit Profil
-        </button>
-    </div>
-
-    {{-- Menu Section --}}
-    <div class="mx-4 mb-20 mt-4">
-        <div class="space-y-3">
-            {{-- Dark/Light Mode --}}
-            <button type="button" onclick="toggleTheme()" class="w-full flex items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md text-left">
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mr-3 text-blue-600">
-                    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"/>
-                        <line x1="12" y1="1" x2="12" y2="3"/>
-                        <line x1="12" y1="21" x2="12" y2="23"/>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                        <line x1="1" y1="12" x2="3" y2="12"/>
-                        <line x1="21" y1="12" x2="23" y2="12"/>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                    </svg>
-                    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <div class="font-semibold text-sm">Tampilan</div>
-                    <div class="text-xs text-gray-500">Ubah ke mode gelap / terang</div>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
-                    <polyline points="9 18 15 12 9 6"/>
-                </svg>
-            </button>
-
-            {{-- Logout --}}
-            <form action="{{ route('pegawai.akun.logout') }}" method="POST" id="logoutForm">
-                @csrf
-                <button type="button" onclick="openLogoutModal()" class="w-full flex items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md text-left">
-                    <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center mr-3 text-red-500">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="font-semibold text-sm">Keluar</div>
-                        <div class="text-xs text-gray-500">Logout dari aplikasi</div>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-400"></i>
+            {{-- Tombol Aksi --}}
+            <div class="modal-actions" style="margin-top:20px;">
+                <button type="button" class="btn-modal-cancel" onclick="closeModal('editModal')">
+                    Batal
                 </button>
-            </form>
-        </div>
-    </div>
-
-    {{-- Modal Edit Akun --}}
-    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
-            <button type="button"
-                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                onclick="closeModal('editModal')">
-                <i class="fas fa-times text-lg"></i>
-            </button>
-
-            <h3 class="text-xl font-bold text-gray-800 mb-6">
-                Edit Profil
-            </h3>
-
-            {{-- Sesuaikan dengan route yang ada --}}
-            <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                @csrf
-
-                {{-- Nama --}}
-                <div>
-                    <label for="name" class="block text-gray-700 text-sm font-medium mb-2">Nama</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    @error('name')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Email --}}
-                <div>
-                    <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    @error('email')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- No HP --}}
-                <div>
-                    <label for="no_hp" class="block text-gray-700 text-sm font-medium mb-2">No HP</label>
-                    <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', $user->no_hp) }}"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    @error('no_hp')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Alamat --}}
-                <div>
-                    <label for="alamat" class="block text-gray-700 text-sm font-medium mb-2">Alamat</label>
-                    <textarea name="alamat" id="alamat" rows="3"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('alamat', $user->alamat) }}</textarea>
-                    @error('alamat')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Password --}}
-                <div>
-                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password Baru</label>
-                    <input type="password" name="password" id="password" placeholder="Kosongkan jika tidak ingin diubah"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    @error('password')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Konfirmasi Password --}}
-                <div>
-                    <label for="password_confirmation" class="block text-gray-700 text-sm font-medium mb-2">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-
-                {{-- Foto Profil --}}
-                <div>
-                    <label for="foto_profil" class="block text-gray-700 text-sm font-medium mb-2">Foto Profil</label>
-                    <input type="file" name="foto_profil" id="foto_profil" accept="image/*"
-                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    @error('foto_profil')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                    @if($user->foto_profil)
-                    <p class="text-xs text-gray-500 mt-1">Foto profil saat ini: {{ $user->foto_profil }}</p>
-                    @endif
-                </div>
-
-                {{-- Tombol Aksi --}}
-                <div class="flex gap-3 pt-4">
-                    <button type="button"
-                        class="flex-1 px-4 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 font-medium text-sm"
-                        onclick="closeModal('editModal')">
-                        Batal
-                    </button>
-                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 font-medium text-sm">
-                        Simpan
-                    </button>
-                </div>
-            </form>
-        </div>
+                <button type="submit" class="btn-modal-primary">
+                    Simpan
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     function openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
+        document.getElementById(modalId).classList.add('visible');
         document.body.style.overflow = 'hidden';
     }
 
     function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
+        document.getElementById(modalId).classList.remove('visible');
         document.body.style.overflow = 'auto';
     }
 
@@ -304,10 +673,10 @@
         // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (!logoutModal.classList.contains('hidden')) {
+                if (logoutModal.classList.contains('visible')) {
                     closeLogoutModal();
                 }
-                if (!document.getElementById('editModal').classList.contains('hidden')) {
+                if (document.getElementById('editModal').classList.contains('visible')) {
                     closeModal('editModal');
                 }
             }
