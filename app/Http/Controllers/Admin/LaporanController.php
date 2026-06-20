@@ -91,18 +91,22 @@ class LaporanController extends Controller
                     'status_masuk'   => $isLibur ? $statusLibur : 'Tidak Hadir',
                 ];
 
+                $hasExplicitLembur = $lemburMasuk && $lemburPulang;
+
                 if ($masuk && $pulang) {
                     $jamMasukObj  = Carbon::parse($masuk->jam);
                     $jamPulangObj = Carbon::parse($pulang->jam);
                     $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
                     if ($isLibur) {
-                        $row['lembur']       = $jamKerja;
-                        $row['lembur_waktu'] = $jamMasukObj->format('H:i') . '-' . $jamPulangObj->format('H:i');
-                        $row['jam_kerja']    = '-';
-                        $row['status_masuk'] = 'Lembur';
-                        $totalLembur += $jamKerja;
-                        $totalHariLembur++;
+                        if (!$hasExplicitLembur) {
+                            $row['lembur']       = $jamKerja;
+                            $row['lembur_waktu'] = $jamMasukObj->format('H:i') . '-' . $jamPulangObj->format('H:i');
+                            $row['status_masuk'] = 'Lembur';
+                            $totalLembur += $jamKerja;
+                            $totalHariLembur++;
+                        }
+                        $row['jam_kerja'] = '-';
                     } else {
                         $row['masuk']  = $jamMasukObj->format('H:i');
                         $row['pulang'] = $jamPulangObj->format('H:i');
