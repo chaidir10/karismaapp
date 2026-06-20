@@ -112,9 +112,9 @@
         background:var(--white); border-radius:14px; padding:14px 16px; margin-bottom:10px;
         display:flex; align-items:center; gap:14px;
         box-shadow:0 1px 6px rgba(0,0,0,0.04); border:1px solid var(--gray-light);
-        cursor:pointer; -webkit-tap-highlight-color:transparent;
+        cursor:pointer; transition:transform 0.15s;
     }
-    .history-card:active { opacity:0.85; }
+    .history-card:active { transform:scale(0.98); }
     .hc-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
     .hc-icon-masuk { background:#d1fae5; color:#059669; }
     .hc-icon-pulang { background:#fef3c7; color:#d97706; }
@@ -140,7 +140,7 @@
     /* Carousel */
     .info-carousel { margin:0 0 20px; position:relative; overflow:hidden; }
     .carousel-track { display:flex; will-change:transform; user-select:none; -webkit-user-select:none; }
-    .carousel-slide { min-width:100%; cursor:pointer; padding:0 20px; box-sizing:border-box; contain:content; }
+    .carousel-slide { min-width:100%; cursor:pointer; padding:0 20px; box-sizing:border-box; }
 
     .slide-content {
         border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center;
@@ -990,13 +990,14 @@
     }
 
     @keyframes fabPulse {
-        0%, 100% { opacity:1; }
-        50% { opacity:0.7; }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+        50% { box-shadow: 0 0 0 6px rgba(255,255,255,0); }
     }
 </style>
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
 <script>
     // Carousel with live drag
     var currentSlide = 0;
@@ -1315,16 +1316,7 @@
         @endif
     });
 
-    function loadFaceApi() {
-        if (typeof faceapi !== 'undefined' || document.getElementById('faceApiScript')) return;
-        var s = document.createElement('script');
-        s.id = 'faceApiScript';
-        s.src = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js';
-        document.head.appendChild(s);
-    }
-
     function initializePresensiModal() {
-        loadFaceApi();
         initializeCamera();
         initializeLocation();
     }
@@ -1438,13 +1430,13 @@
         const video = document.getElementById('video');
         if (!video) return;
 
-        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.3 });
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.35 });
         let detecting = false;
 
         async function detect() {
             if (!videoStream) return;
             if (video.readyState < 2 || video.paused || detecting) {
-                faceDetectionLoop = setTimeout(detect, 800);
+                faceDetectionLoop = setTimeout(detect, 500);
                 return;
             }
 
@@ -1462,10 +1454,10 @@
             }
             detecting = false;
 
-            if (videoStream) faceDetectionLoop = setTimeout(detect, 800);
+            if (videoStream) faceDetectionLoop = setTimeout(detect, 500);
         }
 
-        faceDetectionLoop = setTimeout(detect, 1200);
+        faceDetectionLoop = setTimeout(detect, 1000);
     }
 
     function updateFaceStatus(detected) {
