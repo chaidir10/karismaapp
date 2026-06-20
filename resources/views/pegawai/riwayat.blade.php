@@ -20,7 +20,7 @@
     .filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); }
     .btn-download {
         width: 42px; height: 42px; border-radius: 10px; border: none; cursor: pointer;
-        background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff;
         display: flex; align-items: center; justify-content: center; font-size: 16px;
         flex-shrink: 0; transition: transform 0.2s;
     }

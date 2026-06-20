@@ -52,25 +52,25 @@
 
     /* Icon pengganti avatar */
     .pengajuan-icon {
-        width: 50px;
-        height: 50px;
+        width: 44px;
+        height: 44px;
         margin-right: 15px;
         flex-shrink: 0;
-        border-radius: 50%;
+        border-radius: 12px;
         overflow: hidden;
-        border: 2px solid var(--gray-light);
+        border: none;
         display: flex;
         align-items: center;
         justify-content: center;
         background-color: var(--primary-soft);
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .pengajuan-icon-container {
-        width: 80px;
-        height: 80px;
+        width: 64px;
+        height: 64px;
         margin: 0 auto;
-        border-radius: 50%;
+        border-radius: 16px;
         overflow: hidden;
         border: 3px solid var(--primary);
         display: flex;
@@ -191,7 +191,7 @@
     .modal-content {
         border-radius: 20px;
         border: none;
-        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         overflow-y: auto;
     }
 
@@ -399,10 +399,10 @@
         }
 
         .pengajuan-icon {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             margin-right: 12px;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .pengajuan-icon-container {
@@ -449,11 +449,11 @@
 
                 <div class="pengajuan-icon">
                     @if($p->jenis == 'masuk')
-                    <i class="fas fa-sign-in-alt text-primary"></i>
+                    <i class="fas fa-sign-in-alt" style="color:var(--primary-dark)"></i>
                     @elseif($p->jenis == 'pulang')
-                    <i class="fas fa-sign-out-alt text-warning"></i>
+                    <i class="fas fa-sign-out-alt" style="color:var(--primary-dark)"></i>
                     @else
-                    <i class="fas fa-exchange-alt text-info"></i>
+                    <i class="fas fa-exchange-alt" style="color:var(--primary-dark)"></i>
                     @endif
                 </div>
 

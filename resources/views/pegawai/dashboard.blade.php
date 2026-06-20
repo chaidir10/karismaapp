@@ -147,8 +147,8 @@
         color:#fff;
     }
     .slide-icon {
-        width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center;
-        font-size:20px; flex-shrink:0; background:rgba(255,255,255,0.2); color:#fff;
+        width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+        font-size:18px; flex-shrink:0; background:rgba(255,255,255,0.2); color:#fff;
     }
     .slide-body { flex:1; min-width:0; }
     .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
@@ -179,7 +179,7 @@
     <!-- Info bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--white);">
         <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">
+            <div style="width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">
                 <i class="far fa-calendar-alt"></i>
             </div>
             <div>
@@ -471,7 +471,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4 text-center">
-                <div style="width:60px;height:60px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                <div style="width:56px;height:56px;background:#fef3c7;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
                     <i class="fas fa-exclamation-triangle" style="font-size:24px;color:#f59e0b;"></i>
                 </div>
                 <h5 style="font-weight:700; font-size:16px; margin-bottom:8px;">Jam Kerja Belum Terpenuhi</h5>
@@ -491,7 +491,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none;">
             <div class="modal-body p-4 text-center">
-                <div style="width:60px;height:60px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                <div style="width:56px;height:56px;background:#d1fae5;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
                     <i class="fas fa-bolt" style="font-size:24px;color:#10b981;"></i>
                 </div>
                 <h5 style="font-weight:700; font-size:16px; margin-bottom:8px;">Selesai Lembur</h5>
@@ -590,7 +590,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden; background:var(--card-bg);">
             <div style="padding:24px 24px 0; text-align:center;">
-                <div style="width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                <div style="width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
                     <i class="fas fa-map-marker-alt" style="font-size:22px; color:#fff;"></i>
                 </div>
                 <h5 style="font-weight:700; font-size:17px; color:var(--dark); margin-bottom:6px;">Di Luar Wilayah Kerja</h5>

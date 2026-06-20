@@ -112,7 +112,7 @@
     .employee-avatar-placeholder {
         width: 100%;
         height: 100%;
-        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -201,7 +201,7 @@
     .search-box .input-group {
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
     }
 
     .search-box .input-group-text {
@@ -255,7 +255,7 @@
     .modal-content {
         border-radius: 20px;
         border: none;
-        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         overflow-y: auto;
     }
 
@@ -410,7 +410,7 @@
     .avatar-placeholder {
         width: 100%;
         height: 100%;
-        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
         display: flex;
         align-items: center;
         justify-content: center;

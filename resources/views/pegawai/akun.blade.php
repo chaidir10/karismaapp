@@ -43,7 +43,7 @@
     .profile-avatar {
         width: 80px;
         height: 80px;
-        border-radius: 18px;
+        border-radius: 50%;
         margin: 0 auto 14px;
         overflow: hidden;
         border: 3px solid var(--primary);
@@ -106,16 +106,16 @@
     }
 
     .info-icon {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
+        font-size: 18px;
         flex-shrink: 0;
-        background: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
+        background: var(--primary-soft);
+        color: var(--primary-dark);
     }
 
     .info-content {
@@ -181,18 +181,18 @@
     .action-item:active { opacity: 0.85; }
 
     .action-icon {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
+        font-size: 18px;
         flex-shrink: 0;
     }
     .action-icon-theme {
-        background: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
+        background: var(--primary-soft);
+        color: var(--primary-dark);
     }
     .action-icon-logout {
         background: var(--danger-light);
@@ -278,9 +278,9 @@
 
     /* Logout modal */
     .logout-icon-box {
-        width: 60px;
-        height: 60px;
-        border-radius: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
         background: var(--danger-light);
         display: flex;
         align-items: center;

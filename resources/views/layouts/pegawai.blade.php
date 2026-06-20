@@ -180,7 +180,7 @@
         .user-avatar {
             width: 44px;
             height: 44px;
-            border-radius: 14px;
+            border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.4);
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -203,8 +203,8 @@
             margin: -20px 20px 25px;
             padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(90, 182, 234, 0.1);
-            border: 1px solid rgba(90, 182, 234, 0.1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--card-border);
             position: relative;
             z-index: 2;
         }
@@ -283,8 +283,8 @@
             margin: 0 20px 25px;
             padding: 20px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(90, 182, 234, 0.1);
-            border: 1px solid rgba(90, 182, 234, 0.1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--card-border);
         }
 
         .history-header {
@@ -1058,7 +1058,7 @@
                         <h1 class="user-name" id="user-name">{{ Auth::user()->name ?? 'User' }}</h1>
                     </div>
                 </div>
-                <div style="width:36px; height:36px; border-radius:12px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff;">
+                <div style="width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff;">
                     <i class="far fa-bell"></i>
                 </div>
             </div>
