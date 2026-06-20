@@ -635,19 +635,19 @@
 
                 <!-- Bottom Panel -->
                 <div style="background:var(--card-bg); flex-shrink:0; border-top-left-radius:20px; border-top-right-radius:20px; margin-top:-20px; position:relative; z-index:10; padding:16px 20px 24px;">
+                    <!-- Submit button (atas, mudah dijangkau) -->
+                    <button type="button" class="submit-btn-large" onclick="captureAndProcess()" style="width:100%; max-width:none; border-radius:14px; padding:16px; font-size:15px; box-shadow:0 4px 14px rgba(90,182,234,0.3); margin-bottom:14px;">
+                        <i class="fas fa-camera" style="margin-right:8px;"></i> Ambil Foto & Absen
+                    </button>
+
                     <!-- Location -->
-                    <div style="margin-bottom:14px; border-radius:14px; overflow:hidden; border:1px solid var(--card-border);">
-                        <div id="mini-map" style="width:100%; height:120px; background:var(--gray-light);"></div>
+                    <div style="border-radius:14px; overflow:hidden; border:1px solid var(--card-border);">
+                        <div id="mini-map" style="width:100%; height:100px; background:var(--gray-light);"></div>
                         <div style="padding:10px 14px; background:var(--light);">
                             <div id="location-address-mini" style="font-size:12px; color:var(--dark); font-weight:500; line-height:1.4;">Mendeteksi lokasi...</div>
                             <div id="locationRadiusInfo" style="font-size:10px; margin-top:4px;"></div>
                         </div>
                     </div>
-
-                    <!-- Submit button -->
-                    <button type="button" class="submit-btn-large" onclick="captureAndProcess()" style="width:100%; max-width:none; border-radius:14px; padding:16px; font-size:15px; box-shadow:0 4px 14px rgba(90,182,234,0.3);">
-                        <i class="fas fa-camera" style="margin-right:8px;"></i> Ambil Foto & Absen
-                    </button>
                 </div>
             </form>
         </div>
@@ -1588,37 +1588,22 @@
         const submitBtn = document.querySelector('.submit-btn-large');
         const addrEl = document.getElementById('location-address-mini');
 
-        if (infoEl) infoEl.style.fontSize = "10px";
-
-        let matched = null;
-        for (const w of wilayahList) {
-            const distance = haversineDistance(lat, lng, w.lat, w.lng);
-            if (distance <= w.radius) {
-                matched = w;
+        var matched = null;
+        for (var i = 0; i < wilayahList.length; i++) {
+            if (haversineDistance(lat, lng, wilayahList[i].lat, wilayahList[i].lng) <= wilayahList[i].radius) {
+                matched = wilayahList[i];
                 break;
             }
         }
 
         if (matched) {
-            if (infoEl) {
-                infoEl.innerHTML = '<span class="badge bg-success">✔ Anda berada di dalam wilayah kerja</span>';
-                infoEl.classList.remove('text-danger', 'text-warning');
-                infoEl.classList.add('text-success');
-            }
-            if (submitBtn) submitBtn.disabled = false;
-            if (addrEl) addrEl.textContent = matched.alamat || 'Di dalam wilayah kerja';
+            if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);"><i class="fas fa-check-circle" style="color:#10b981;font-size:11px;"></i><span style="font-size:11px;font-weight:600;color:#10b981;">Di dalam wilayah kerja</span></div>';
+            if (addrEl) addrEl.textContent = matched.alamat || 'Lokasi terverifikasi';
             isOutsideRadius = false;
         } else {
-            if (infoEl) {
-                infoEl.innerHTML = '<span class="badge bg-warning">⚠ Anda berada di luar radius wilayah kerja</span>';
-                infoEl.classList.remove('text-success');
-                infoEl.classList.add('text-warning');
-            }
-            if (submitBtn) submitBtn.disabled = false;
+            if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:11px;"></i><span style="font-size:11px;font-weight:600;color:#f59e0b;">Di luar radius wilayah kerja</span></div>';
             isOutsideRadius = true;
-
-            const miniEl = document.getElementById('location-address-mini');
-            if (miniEl) getAddressFromCoordinates(lat, lng, miniEl);
+            if (addrEl) getAddressFromCoordinates(lat, lng, addrEl);
         }
     }
 
@@ -1751,10 +1736,20 @@
         fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
             .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
             .then(function(data) {
-                el.textContent = (data && data.display_name) ? data.display_name : lat.toFixed(6) + ', ' + lng.toFixed(6);
+                if (data && data.display_name) {
+                    el.textContent = data.display_name;
+                } else if (data && data.address) {
+                    var parts = [];
+                    if (data.address.road) parts.push(data.address.road);
+                    if (data.address.suburb) parts.push(data.address.suburb);
+                    if (data.address.city || data.address.town) parts.push(data.address.city || data.address.town);
+                    el.textContent = parts.length > 0 ? parts.join(', ') : 'Alamat tidak ditemukan';
+                } else {
+                    el.textContent = 'Alamat tidak ditemukan';
+                }
             })
             .catch(function() {
-                el.textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
+                el.textContent = 'Alamat tidak dapat dideteksi';
             });
     }
 
