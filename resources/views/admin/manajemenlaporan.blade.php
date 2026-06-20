@@ -240,7 +240,7 @@
     ${row.waktu_kurang && row.waktu_kurang != '-' && row.waktu_kurang != 0 ? row.waktu_kurang + ' menit' : '-'}
 </td>
                                 <td class="px-4 py-3 text-xs ${row.lembur && row.lembur != '-' && row.lembur > 0 ? 'text-orange-600 font-medium' : 'text-gray-600'}">
-    ${row.lembur && row.lembur != '-' && row.lembur > 0 ? Math.floor(row.lembur/60) + ' jam ' + (row.lembur%60) + ' menit' : '-'}
+    ${row.lembur && row.lembur != '-' && row.lembur > 0 ? Math.floor(row.lembur/60) + 'j ' + (row.lembur%60) + 'm' + (row.lembur_waktu ? ' (' + row.lembur_waktu + ')' : '') : '-'}
 </td>
 
                             </tr>

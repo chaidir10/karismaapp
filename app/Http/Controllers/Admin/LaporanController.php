@@ -77,13 +77,14 @@ class LaporanController extends Controller
 
                 $row = [
                     'tanggal'        => $date->format('d/m/Y'),
-                    'masuk'          => $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-',
-                    'pulang'         => $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-',
+                    'masuk'          => '-',
+                    'pulang'         => '-',
                     'keterlambatan'  => '-',
                     'pulang_cepat'   => '-',
                     'jam_kerja'      => '-',
                     'waktu_kurang'   => '-',
                     'lembur'         => '-',
+                    'lembur_waktu'   => null,
                     'is_weekend'     => $isLibur,
                     'is_holiday'     => $isHoliday,
                     'holiday_name'   => $isHoliday ? $holidays[$tanggal] : null,
@@ -97,12 +98,15 @@ class LaporanController extends Controller
 
                     if ($isLibur) {
                         $row['lembur']       = $jamKerja;
+                        $row['lembur_waktu'] = $jamMasukObj->format('H:i') . '-' . $jamPulangObj->format('H:i');
                         $row['jam_kerja']    = '-';
                         $row['status_masuk'] = 'Lembur';
                         $totalLembur += $jamKerja;
                         $totalHariLembur++;
                     } else {
-                        // Hari kerja normal
+                        $row['masuk']  = $jamMasukObj->format('H:i');
+                        $row['pulang'] = $jamPulangObj->format('H:i');
+
                         $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
                         $keterlambatan = $jamMasukObj->gte($jamToleransi)
@@ -132,26 +136,29 @@ class LaporanController extends Controller
                         $totalHariKerja++;
                     }
                 } elseif ($masuk || $pulang) {
-                    if (!$isLibur) $totalHariKerja++;
+                    if (!$isLibur) {
+                        $totalHariKerja++;
+                        $row['masuk']  = $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-';
+                        $row['pulang'] = $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-';
+                    }
                     $row['status_masuk'] = 'Data Tidak Lengkap';
                 }
 
                 // Lembur eksplisit (dari tombol lembur) — berlaku semua hari
                 if ($lemburMasuk && $lemburPulang) {
-                    $lemburMenit = $this->calculateMinutesWithoutSeconds(
-                        Carbon::parse($lemburMasuk->jam),
-                        Carbon::parse($lemburPulang->jam)
-                    );
+                    $lemburMasukObj  = Carbon::parse($lemburMasuk->jam);
+                    $lemburPulangObj = Carbon::parse($lemburPulang->jam);
+                    $lemburMenit = $this->calculateMinutesWithoutSeconds($lemburMasukObj, $lemburPulangObj);
+                    $waktuRange = $lemburMasukObj->format('H:i') . '-' . $lemburPulangObj->format('H:i');
+
                     $currentLembur = is_numeric($row['lembur']) ? $row['lembur'] : 0;
                     $row['lembur'] = $currentLembur + $lemburMenit;
+                    $row['lembur_waktu'] = $row['lembur_waktu'] ? $row['lembur_waktu'] . ', ' . $waktuRange : $waktuRange;
                     $totalLembur += $lemburMenit;
                     if ($currentLembur == 0) {
                         $totalHariLembur++;
                     }
                     if (!$masuk && !$pulang) {
-                        $row['masuk']  = Carbon::parse($lemburMasuk->jam)->format('H:i');
-                        $row['pulang'] = Carbon::parse($lemburPulang->jam)->format('H:i');
-                        $row['jam_kerja']    = '-';
                         $row['status_masuk'] = 'Lembur';
                     }
                 }

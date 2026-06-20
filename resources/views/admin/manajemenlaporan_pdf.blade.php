@@ -70,7 +70,7 @@
                     <td>{{ fmtM($row['pulang_cepat']) }}</td>
                     <td>{{ is_numeric($row['jam_kerja']) ? fmtJM($row['jam_kerja']) : $row['jam_kerja'] }}</td>
                     <td>{{ fmtM($row['waktu_kurang']) }}</td>
-                    <td>{{ is_numeric($row['lembur']) && $row['lembur'] > 0 ? fmtJM($row['lembur']) : '-' }}</td>
+                    <td>{{ is_numeric($row['lembur']) && $row['lembur'] > 0 ? fmtJM($row['lembur']) . ' (' . ($row['lembur_waktu'] ?? '') . ')' : '-' }}</td>
                     <td>{{ $row['status_masuk'] }}</td>
                 </tr>
                 @endforeach

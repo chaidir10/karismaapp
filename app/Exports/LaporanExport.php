@@ -68,7 +68,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
                 $row['pulang_cepat'] !== '-' ? $row['pulang_cepat'] . ' mnt' : '-',
                 $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
                 $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
-                is_numeric($row['lembur']) && $row['lembur'] > 0 ? $this->formatMenit($row['lembur']) : '-',
+                is_numeric($row['lembur']) && $row['lembur'] > 0
+                    ? $this->formatMenit($row['lembur']) . (!empty($row['lembur_waktu']) ? ' (' . $row['lembur_waktu'] . ')' : '')
+                    : '-',
                 $row['status_masuk'],
             ];
         }
