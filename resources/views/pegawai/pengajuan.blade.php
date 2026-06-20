@@ -449,9 +449,9 @@
 
                 <div class="pengajuan-icon">
                     @if($p->jenis == 'masuk')
-                    <i class="fas fa-sign-in-alt" style="color:var(--primary-dark)"></i>
+                    <i class="fas fa-arrow-right-to-bracket" style="color:var(--primary-dark)"></i>
                     @elseif($p->jenis == 'pulang')
-                    <i class="fas fa-sign-out-alt" style="color:var(--primary-dark)"></i>
+                    <i class="fas fa-arrow-right-from-bracket" style="color:var(--primary-dark)"></i>
                     @else
                     <i class="fas fa-exchange-alt" style="color:var(--primary-dark)"></i>
                     @endif
@@ -583,11 +583,11 @@
             
             switch(jenis) {
                 case 'masuk':
-                    iconClass = 'fas fa-sign-in-alt';
+                    iconClass = 'fas fa-arrow-right-to-bracket';
                     iconColor = 'var(--primary)';
                     break;
                 case 'pulang':
-                    iconClass = 'fas fa-sign-out-alt';
+                    iconClass = 'fas fa-arrow-right-from-bracket';
                     iconColor = 'var(--accent)';
                     break;
                 case 'keduanya':

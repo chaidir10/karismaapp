@@ -148,7 +148,7 @@
                     $tagText = 'Lembur';
                 } else {
                     $iconClass = $isMasuk ? 'icon-masuk' : 'icon-pulang';
-                    $iconName = $isMasuk ? 'fa-sign-in-alt' : 'fa-sign-out-alt';
+                    $iconName = $isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket';
                     $label = $isMasuk ? 'Masuk' : 'Pulang';
                     $tag = 'tag-reguler';
                     $tagText = 'Reguler';

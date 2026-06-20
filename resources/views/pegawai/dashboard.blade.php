@@ -218,7 +218,7 @@
             @endif
             onclick="setJenis('masuk'); setLembur(false)"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
-            <i class="fas {{ $sudahPresensiMasuk ? 'fa-check-circle' : 'fa-sign-in-alt' }}" style="font-size:20px;"></i>
+            <i class="fas {{ $sudahPresensiMasuk ? 'fa-check-circle' : 'fa-arrow-right-to-bracket' }}" style="font-size:20px;"></i>
             {{ $sudahPresensiMasuk ? 'Sudah Masuk' : 'Masuk' }}
         </button>
         <button class="{{ (!$sudahPresensiMasuk || $sudahPresensiPulang) ? '' : 'absen-btn-active' }}"
@@ -227,7 +227,7 @@
             {{ (!$sudahPresensiMasuk || $sudahPresensiPulang) ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 4px 14px rgba(245,158,11,0.3);' }}"
             onclick="handlePulangWithCheck()"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
-            <i class="fas {{ $sudahPresensiPulang ? 'fa-check-circle' : 'fa-sign-out-alt' }}" style="font-size:20px;"></i>
+            <i class="fas {{ $sudahPresensiPulang ? 'fa-check-circle' : 'fa-arrow-right-from-bracket' }}" style="font-size:20px;"></i>
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
@@ -381,7 +381,7 @@
             $tagText = 'Lembur';
         } else {
             $iconCls = $isMasuk ? 'hc-icon-masuk' : 'hc-icon-pulang';
-            $iconName = $isMasuk ? 'fa-sign-in-alt' : 'fa-sign-out-alt';
+            $iconName = $isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket';
             $labelText = $isMasuk ? 'Masuk' : 'Pulang';
             $tagCls = 'hc-tag-reguler';
             $tagText = 'Reguler';
