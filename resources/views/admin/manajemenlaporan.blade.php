@@ -6,10 +6,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
-    .ts-wrapper.single .ts-control { border-radius: 12px; border-color: #d1d5db; padding: 6px 12px; font-size: 14px; min-height: 38px; }
-    .ts-wrapper.single .ts-control:focus, .ts-wrapper.single.focus .ts-control { border-color: #6366f1; box-shadow: none; }
-    .ts-dropdown { border-radius: 12px; font-size: 14px; }
-    .ts-dropdown .option { padding: 8px 12px; }
+    .ts-wrapper.single .ts-control {
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 7px 16px;
+        font-size: 14px;
+        min-height: 42px;
+        background: #fff;
+        box-shadow: none;
+        cursor: text;
+    }
+    .ts-wrapper.single.focus .ts-control {
+        border-color: #6366f1;
+        box-shadow: none;
+        outline: none;
+    }
+    .ts-wrapper.single .ts-control input { font-size: 14px; }
+    .ts-wrapper.single .ts-control .item { color: #374151; }
+    .ts-wrapper { border: none !important; box-shadow: none !important; }
+    .ts-dropdown { border: 1px solid #d1d5db; border-radius: 12px; font-size: 14px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .ts-dropdown .option { padding: 9px 16px; }
+    .ts-dropdown .option.active { background: #eef2ff; color: #4338ca; }
+    .ts-wrapper .clear-button { margin-right: 4px; font-size: 16px; color: #94a3b8; }
+    .ts-wrapper .clear-button:hover { color: #ef4444; }
 
     body {
         font-family: 'Poppins', sans-serif;
@@ -154,6 +173,7 @@
     new TomSelect('#user_id', {
         placeholder: 'Ketik nama atau NIP...',
         allowEmptyOption: true,
+        plugins: { clear_button: { title: 'Hapus pilihan' } },
     });
 
     // Fungsi untuk menampilkan notifikasi
