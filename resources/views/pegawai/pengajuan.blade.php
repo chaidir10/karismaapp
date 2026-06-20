@@ -6,21 +6,15 @@
 <style>
     /* Pengajuan Section - Mirip dengan employee-section */
     .pengajuan-section {
-        background-color: var(--white);
+        background-color: var(--card-bg);
         margin: 20px;
         position: relative;
         z-index: 2;
-        padding: 25px;
+        padding: 20px;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.1);
-        border: 1px solid rgba(109, 40, 217, 0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid var(--card-border);
         margin-bottom: 100px;
-    }
-
-    .pengajuan-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(109, 40, 217, 0.2);
     }
 
     .section-header {
@@ -47,18 +41,14 @@
     .pengajuan-item {
         display: flex;
         align-items: center;
-        padding: 15px;
+        padding: 14px;
         background-color: var(--light);
-        border-radius: 16px;
-        transition: all 0.2s ease;
-        border: 1px solid var(--gray-light);
+        border-radius: 14px;
+        border: 1px solid var(--card-border);
         cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
     }
-
-    .pengajuan-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(109, 40, 217, 0.1);
-    }
+    .pengajuan-item:active { opacity: 0.85; }
 
     /* Icon pengganti avatar */
     .pengajuan-icon {

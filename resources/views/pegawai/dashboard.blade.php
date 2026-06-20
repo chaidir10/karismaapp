@@ -588,49 +588,39 @@
 <!-- Modal Konfirmasi Presensi (Luar Radius) -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-2xl">
-            <div class="modal-body p-0">
-                <div class="text-center p-0">
-                    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Konfirmasi Presensi</h3>
-                    <p class="text-gray-600 mb-4">Anda berada di luar radius wilayah kerja. Yakin ingin melanjutkan presensi?</p>
+        <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden; background:var(--card-bg);">
+            <div style="padding:24px 24px 0; text-align:center;">
+                <div style="width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                    <i class="fas fa-map-marker-alt" style="font-size:22px; color:#fff;"></i>
+                </div>
+                <h5 style="font-weight:700; font-size:17px; color:var(--dark); margin-bottom:6px;">Di Luar Wilayah Kerja</h5>
+                <p style="font-size:13px; color:var(--gray); margin-bottom:16px; line-height:1.5;">Presensi di luar radius memerlukan persetujuan admin</p>
 
-                    <div class="confirmation-details bg-gray-50 rounded-xl p-0 mb-4">
-                        <div class="grid grid-cols-2 gap-4 text-left">
-                            <div>
-                                <div class="text-xs text-gray-500 mb-1">Jenis Presensi</div>
-                                <div id="confirmationJenis" class="font-semibold text-gray-800"></div>
-                            </div>
-                            <div>
-                                <div class="text-xs text-gray-500 mb-1">Waktu</div>
-                                <div id="confirmationWaktu" class="font-semibold text-gray-800"></div>
-                            </div>
+                <div style="background:var(--light); border-radius:14px; padding:14px; text-align:left; margin-bottom:16px; border:1px solid var(--card-border);">
+                    <div style="display:flex; gap:16px; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Jenis</div>
+                            <div id="confirmationJenis" style="font-size:14px; font-weight:700; color:var(--dark);"></div>
                         </div>
-                        <div class="mt-3">
-                            <div class="text-xs text-gray-500 mb-1">Lokasi Saat Ini</div>
-                            <div id="confirmationLokasi" class="font-semibold text-gray-800 text-sm"></div>
-                        </div>
-                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
-                            <div class="flex items-start">
-                                <i class="fas fa-exclamation-circle text-yellow-500 mt-0.5 mr-2"></i>
-                                <div class="text-xs text-yellow-700">
-                                    <strong>Perhatian:</strong> Presensi di luar radius memerlukan persetujuan admin dan dapat mempengaruhi status kehadiran Anda.
-                                </div>
-                            </div>
+                        <div style="flex:1;">
+                            <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Waktu</div>
+                            <div id="confirmationWaktu" style="font-size:14px; font-weight:700; color:var(--dark);"></div>
                         </div>
                     </div>
+                    <div>
+                        <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Lokasi</div>
+                        <div id="confirmationLokasi" style="font-size:12px; color:var(--gray-dark); line-height:1.4;"></div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="flex border-t border-gray-200">
-                    <button type="button" class="flex-1 py-4 text-gray-600 font-medium hover:bg-gray-50 rounded-bl-2xl transition-colors" data-bs-dismiss="modal">
-                        <i class="fas fa-times mr-2"></i>Batal
-                    </button>
-                    <button type="button" class="flex-1 py-4 bg-red-500 text-white font-medium hover:bg-red-600 rounded-br-2xl transition-colors" onclick="prosesPresensi()" id="confirmPresensiBtn">
-                        <i class="fas fa-check mr-2"></i>Ya, Presensi
-                    </button>
-                </div>
+            <div style="display:flex; gap:10px; padding:0 24px 24px;">
+                <button type="button" data-bs-dismiss="modal" style="flex:1; padding:14px; border-radius:14px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">
+                    Batal
+                </button>
+                <button type="button" onclick="prosesPresensi()" id="confirmPresensiBtn" style="flex:1; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">
+                    Ya, Presensi
+                </button>
             </div>
         </div>
     </div>
@@ -777,9 +767,6 @@
         }
     }
 
-    .confirmation-details {
-        border-left: 4px solid #ffc107;
-    }
 
     /* Toast Styles */
     .toast {
@@ -912,7 +899,7 @@
     /* Floating Lembur FAB */
     .lembur-fab {
         position: fixed;
-        bottom: 80px;
+        bottom: 90px;
         right: 15px;
         z-index: 50;
         border: none;

@@ -151,11 +151,11 @@
 
         /* Header */
         .app-header {
-            padding: 25px;
+            padding: 20px 20px 30px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            border-bottom-right-radius: 30px;
-            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 24px;
+            border-bottom-left-radius: 24px;
         }
 
         .header-content {
@@ -166,21 +166,24 @@
 
         .greeting {
             font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 3px;
+            opacity: 0.8;
+            margin-bottom: 2px;
+            font-weight: 400;
         }
 
         .user-name {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
+            letter-spacing: -0.3px;
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .user-avatar img {
@@ -191,7 +194,7 @@
 
         /* Main Content */
         .main-content {
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
 
         /* Attendance Card */
@@ -364,13 +367,11 @@
             max-width: 500px;
             display: flex;
             justify-content: space-around;
-            background-color: var(--white);
-            padding: 15px 0;
-            box-shadow: 0 -10px 30px rgba(90, 182, 234, 0.1);
+            background-color: var(--card-bg);
+            padding: 10px 0 14px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
             z-index: 10;
-            border-top: 1px solid var(--gray-light);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            border-top: 1px solid var(--card-border);
         }
 
         @media (min-width: 768px) {
@@ -960,6 +961,75 @@
 
         [data-theme="dark"] .loading-overlay { background: var(--body-bg); }
         [data-theme="dark"] .loading-text { color: var(--gray); }
+
+        /* Dark mode comprehensive */
+        [data-theme="dark"] .bg-white,
+        [data-theme="dark"] .bg-gray-50 { background-color: var(--card-bg) !important; }
+        [data-theme="dark"] .bg-green-50 { background-color: #064e3b !important; }
+        [data-theme="dark"] .bg-red-50, [data-theme="dark"] .bg-yellow-50 { background-color: #78350f !important; }
+        [data-theme="dark"] .text-gray-800, [data-theme="dark"] .text-gray-900 { color: var(--text-primary) !important; }
+        [data-theme="dark"] .text-gray-600, [data-theme="dark"] .text-gray-500, [data-theme="dark"] .text-gray-400 { color: var(--text-muted) !important; }
+        [data-theme="dark"] .text-gray-700 { color: var(--text-secondary) !important; }
+        [data-theme="dark"] .border-gray-200, [data-theme="dark"] .border-gray-100, [data-theme="dark"] .border-gray-300 { border-color: var(--card-border) !important; }
+        [data-theme="dark"] .border-green-200, [data-theme="dark"] .border-green-400 { border-color: #065f46 !important; }
+        [data-theme="dark"] .border-yellow-200 { border-color: #78350f !important; }
+        [data-theme="dark"] .border-red-200, [data-theme="dark"] .border-red-400 { border-color: #7f1d1d !important; }
+        [data-theme="dark"] .text-green-700, [data-theme="dark"] .text-green-600 { color: #6ee7b7 !important; }
+        [data-theme="dark"] .text-red-500, [data-theme="dark"] .text-red-600, [data-theme="dark"] .text-red-700 { color: #fca5a5 !important; }
+        [data-theme="dark"] .text-yellow-500, [data-theme="dark"] .text-yellow-700 { color: #fcd34d !important; }
+        [data-theme="dark"] .text-blue-600 { color: #93c5fd !important; }
+        [data-theme="dark"] .shadow-xl, [data-theme="dark"] .shadow-lg, [data-theme="dark"] .shadow-sm, [data-theme="dark"] .shadow-md { box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; }
+        [data-theme="dark"] .rounded-2xl, [data-theme="dark"] .rounded-xl { border-color: var(--card-border); }
+        [data-theme="dark"] .divide-gray-200 > * + * { border-color: var(--card-border) !important; }
+        [data-theme="dark"] .hover\:bg-gray-50:hover { background-color: var(--gray-light) !important; }
+
+        [data-theme="dark"] .attendance-card { background-color: var(--card-bg) !important; border-color: var(--card-border) !important; box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important; }
+        [data-theme="dark"] .history-card, [data-theme="dark"] .presensi-card { background-color: var(--card-bg) !important; border-color: var(--card-border) !important; }
+        [data-theme="dark"] .slide-content { border-color: rgba(255,255,255,0.08) !important; }
+        [data-theme="dark"] .slide-image { border-color: rgba(255,255,255,0.1) !important; }
+        [data-theme="dark"] .filter-bar { background: var(--card-bg) !important; }
+        [data-theme="dark"] .filter-bar select, [data-theme="dark"] .filter-bar input { background: var(--input-bg) !important; border-color: var(--input-border) !important; color: var(--text-primary) !important; }
+
+        [data-theme="dark"] .modal-content { background-color: var(--card-bg) !important; color: var(--text-primary) !important; }
+        [data-theme="dark"] .modal-content .border-t { border-color: var(--card-border) !important; }
+        [data-theme="dark"] .detail-info-section, [data-theme="dark"] .detail-datetime-info { background-color: var(--card-bg) !important; }
+        [data-theme="dark"] .confirmation-details { background-color: var(--gray-light) !important; }
+
+        [data-theme="dark"] .bottom-nav { background-color: var(--card-bg) !important; border-color: var(--card-border) !important; box-shadow: 0 -4px 20px rgba(0,0,0,0.3) !important; }
+
+        [data-theme="dark"] .pengajuan-section, [data-theme="dark"] .employee-section {
+            background-color: var(--card-bg) !important; border-color: var(--card-border) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+        }
+        [data-theme="dark"] .pengajuan-item, [data-theme="dark"] .employee-item {
+            background-color: var(--gray-light) !important; border-color: var(--card-border) !important;
+        }
+        [data-theme="dark"] .pengajuan-item:hover, [data-theme="dark"] .employee-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+        }
+
+        [data-theme="dark"] .empty-state, [data-theme="dark"] .empty-box, [data-theme="dark"] .history-empty {
+            background-color: var(--card-bg) !important; color: var(--gray) !important;
+        }
+
+        [data-theme="dark"] .bg-blue-50, [data-theme="dark"] .bg-blue-100 { background-color: #1e3a5f !important; }
+        [data-theme="dark"] .bg-red-50, [data-theme="dark"] .bg-red-100 { background-color: #4a1c1c !important; }
+        [data-theme="dark"] .text-blue-600, [data-theme="dark"] .text-blue-700 { color: #93c5fd !important; }
+        [data-theme="dark"] .file\:bg-blue-50::file-selector-button { background-color: #1e3a5f !important; color: #93c5fd !important; }
+
+        [data-theme="dark"] .riwayat-page { color: var(--text-primary); }
+        [data-theme="dark"] .riwayat-page .filter-bar { background: var(--card-bg) !important; box-shadow: 0 2px 12px rgba(0,0,0,0.2) !important; }
+        [data-theme="dark"] .riwayat-page .presensi-card { background: var(--card-bg) !important; border-color: var(--card-border) !important; }
+        [data-theme="dark"] .riwayat-page .date-label { color: var(--gray) !important; }
+        [data-theme="dark"] .riwayat-page .date-label::after { background: var(--card-border) !important; }
+        [data-theme="dark"] .riwayat-page .card-title, [data-theme="dark"] .riwayat-page .card-time { color: var(--text-primary) !important; }
+        [data-theme="dark"] .riwayat-page .card-meta { color: var(--text-muted) !important; }
+        [data-theme="dark"] .riwayat-page .btn-download { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
+
+        [data-theme="dark"] .hc-label, [data-theme="dark"] .hc-time { color: var(--text-primary) !important; }
+        [data-theme="dark"] .hc-status { color: var(--text-muted) !important; }
+
+        [data-theme="dark"] .history-section-title { color: var(--text-primary) !important; }
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -972,22 +1042,24 @@
         @if(!request()->is('pegawai/akun*') && !request()->is('akun*'))
         <div class="app-header">
             <div class="header-content">
-                <div>
-                    <div class="greeting" id="greeting">Selamat pagi</div>
-                    <h1 class="user-name" id="user-name">{{ Auth::user()->name ?? 'User' }}</h1>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="user-avatar">
+                        @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
+                        <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}"
+                            alt="Foto Profil"
+                            onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=128'">
+                        @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=128"
+                            alt="Avatar">
+                        @endif
+                    </div>
+                    <div>
+                        <div class="greeting" id="greeting">Selamat pagi</div>
+                        <h1 class="user-name" id="user-name">{{ Auth::user()->name ?? 'User' }}</h1>
+                    </div>
                 </div>
-
-                <div class="user-avatar">
-                    @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
-                    <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}"
-                        alt="Foto Profil {{ Auth::user()->name }}"
-                        class="w-full h-full object-cover"
-                        onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=128'">
-                    @else
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&size=128"
-                        alt="Avatar {{ Auth::user()->name }}"
-                        class="w-full h-full object-cover">
-                    @endif
+                <div style="width:36px; height:36px; border-radius:12px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff;">
+                    <i class="far fa-bell"></i>
                 </div>
             </div>
         </div>
