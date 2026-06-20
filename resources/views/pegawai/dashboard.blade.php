@@ -636,11 +636,11 @@
                 <!-- Bottom Panel -->
                 <div style="background:var(--card-bg); flex-shrink:0; border-top-left-radius:20px; border-top-right-radius:20px; margin-top:-20px; position:relative; z-index:10; padding:16px 20px 24px;">
                     <!-- Location -->
-                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
-                        <div id="mini-map" style="width:50px; height:50px; border-radius:12px; flex-shrink:0; overflow:hidden; background:var(--gray-light);"></div>
-                        <div style="flex:1; min-width:0;">
-                            <div id="location-address-mini" style="font-size:12px; color:var(--dark); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Mendeteksi lokasi...</div>
-                            <div id="locationRadiusInfo" style="font-size:10px; margin-top:2px;"></div>
+                    <div style="margin-bottom:14px; border-radius:14px; overflow:hidden; border:1px solid var(--card-border);">
+                        <div id="mini-map" style="width:100%; height:120px; background:var(--gray-light);"></div>
+                        <div style="padding:10px 14px; background:var(--light);">
+                            <div id="location-address-mini" style="font-size:12px; color:var(--dark); font-weight:500; line-height:1.4;">Mendeteksi lokasi...</div>
+                            <div id="locationRadiusInfo" style="font-size:10px; margin-top:4px;"></div>
                         </div>
                     </div>
 
