@@ -99,7 +99,7 @@
             <option value="{{ $y }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('Y') === $y ? 'selected' : '' }}>{{ $y }}</option>
         @endfor
     </select>
-    <a id="btnDownloadPdf" class="btn-download" title="Download PDF" style="width:52px; min-width:52px;">
+    <a id="btnDownloadPdf" class="btn-download" title="Download PDF" style="width:64px; min-width:64px;">
         <i class="fas fa-file-pdf"></i>
     </a>
 </div>
