@@ -2,542 +2,176 @@
 @section('title', 'Pengajuan')
 
 @section('content')
-
 <style>
-    /* Pengajuan Section - Mirip dengan employee-section */
-    .pengajuan-section {
-        background-color: var(--card-bg);
-        margin: 20px;
-        position: relative;
-        z-index: 2;
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        border: 1px solid var(--card-border);
-        margin-bottom: 100px;
-    }
+    .pengajuan-page { padding: 20px; padding-bottom: 100px; }
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
+    .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .page-title { font-size:17px; font-weight:700; color:var(--dark); margin:0; }
+    .btn-buat {
+        display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
+        background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff;
+        border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600;
+        -webkit-tap-highlight-color:transparent;
     }
+    .btn-buat:active { opacity:0.85; }
 
-    .section-title {
-        font-weight: 700;
-        font-size: 17px;
-        color: var(--dark);
-        margin: 0;
-    }
+    .pengajuan-list { display:flex; flex-direction:column; gap:10px; }
 
-    .pengajuan-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+    .p-card {
+        background:var(--card-bg); border-radius:14px; padding:14px 16px;
+        display:flex; align-items:center; gap:14px;
+        box-shadow:0 1px 6px rgba(0,0,0,0.04); border:1px solid var(--card-border);
+        cursor:pointer; -webkit-tap-highlight-color:transparent;
     }
+    .p-card:active { opacity:0.85; }
 
-    /* Pengajuan Item - Mirip dengan employee-item */
-    .pengajuan-item {
-        display: flex;
-        align-items: center;
-        padding: 14px;
-        background-color: var(--light);
-        border-radius: 14px;
-        border: 1px solid var(--card-border);
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
+    .p-icon {
+        width:44px; height:44px; border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:18px; flex-shrink:0;
     }
-    .pengajuan-item:active { opacity: 0.85; }
+    .p-icon-masuk { background:var(--primary-soft); color:var(--primary-dark); }
+    .p-icon-pulang { background:var(--accent-light); color:var(--accent); }
+    .p-icon-keduanya { background:var(--primary-soft); color:var(--primary-dark); }
 
-    /* Icon pengganti avatar */
-    .pengajuan-icon {
-        width: 44px;
-        height: 44px;
-        margin-right: 15px;
-        flex-shrink: 0;
-        border-radius: 12px;
-        overflow: hidden;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-        font-size: 18px;
-    }
+    .p-body { flex:1; min-width:0; }
+    .p-title { font-size:14px; font-weight:600; color:var(--dark); margin-bottom:2px; }
+    .p-date { font-size:12px; color:var(--gray); margin-bottom:3px; }
+    .p-alasan { font-size:11px; color:var(--gray-dark); display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
 
-    .pengajuan-icon-container {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 3px solid var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-        font-size: 32px;
-    }
+    .p-status { flex-shrink:0; text-align:right; }
+    .s-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .s-dot-pending { background:#f59e0b; }
+    .s-dot-approved { background:#10b981; }
+    .s-dot-rejected { background:#ef4444; }
+    .s-text { font-size:11px; font-weight:500; color:var(--gray); }
 
-    .pengajuan-info {
-        flex-grow: 1;
-        min-width: 0;
-    }
+    .empty-box { text-align:center; padding:60px 20px; color:var(--gray); background:var(--card-bg); border-radius:16px; }
+    .empty-box i { font-size:40px; margin-bottom:12px; opacity:0.3; display:block; }
+    .empty-box p { font-size:14px; margin:0; }
 
-    .pengajuan-jenis {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 2px;
-        color: var(--dark);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    /* Detail Modal */
+    .detail-modal .modal-content { background:var(--card-bg); border-radius:20px; border:none; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+    .detail-modal .modal-body { padding:24px; }
+    .detail-icon-box { width:56px; height:56px; border-radius:14px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 12px; }
+    .detail-title { font-size:16px; font-weight:700; color:var(--dark); text-align:center; margin-bottom:4px; }
+    .detail-status-row { text-align:center; margin-bottom:16px; }
+    .detail-status-badge { display:inline-block; padding:4px 12px; border-radius:8px; font-size:11px; font-weight:600; }
+    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .detail-grid .full { grid-column:1/-1; }
+    .detail-label { font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px; }
+    .detail-value { font-size:14px; font-weight:500; color:var(--dark); padding:6px 0; border-bottom:1px solid var(--card-border); }
+    .detail-close-btn { width:100%; margin-top:16px; padding:12px; background:var(--gray-light); color:var(--dark); border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer; }
 
-    .pengajuan-date {
-        font-size: 12px;
-        color: var(--gray);
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    /* Create Modal */
+    .create-overlay {
+        display:none; position:fixed; z-index:100; inset:0;
+        background:rgba(0,0,0,0.4); align-items:center; justify-content:center; padding:20px;
     }
-
-    .pengajuan-alasan .badge {
-        font-size: 10px;
-        font-weight: 500;
-        padding: 4px 8px;
-        border-radius: 6px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 150px;
+    .create-overlay.active { display:flex; }
+    .create-box {
+        background:var(--card-bg); border-radius:20px; width:100%; max-width:450px;
+        max-height:90vh; overflow-y:auto; padding:24px; position:relative;
     }
-
-    .pengajuan-status .badge {
-        font-size: 11px;
-        padding: 5px 10px;
-        font-weight: 500;
-        border-radius: 6px;
-        white-space: nowrap;
+    .create-box h3 { font-size:17px; font-weight:700; color:var(--dark); text-align:center; margin-bottom:20px; }
+    .create-close { position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--gray); }
+    .form-group { margin-bottom:16px; }
+    .form-group label { font-size:13px; font-weight:600; color:var(--dark); display:block; margin-bottom:6px; }
+    .form-group input, .form-group select, .form-group textarea {
+        width:100%; border:1px solid var(--card-border); border-radius:12px;
+        padding:12px 14px; font-size:14px; background:var(--card-bg); color:var(--dark); outline:none;
     }
-
-    /* Status Colors */
-    .status-pending { 
-        background-color: var(--warning-light); 
-        color: var(--warning);
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--primary); }
+    .form-actions { display:flex; gap:10px; margin-top:20px; }
+    .form-actions button {
+        flex:1; padding:14px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; border:none;
     }
-    .status-approved { 
-        background-color: var(--success-light); 
-        color: var(--success);
-    }
-    .status-rejected { 
-        background-color: var(--danger-light); 
-        color: var(--danger);
-    }
-
-    /* Badge Color Variants */
-    .bg-primary-light {
-        background-color: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
-    }
-
-    .bg-secondary-light {
-        background-color: rgba(100, 116, 139, 0.1);
-        color: var(--gray-dark);
-    }
-
-    /* Button Styles */
-    .btn-scale {
-        transition: transform 0.2s ease;
-    }
-
-    .btn-scale:active {
-        transform: scale(0.96);
-    }
-
-    .btn-sm {
-        padding: 0.35rem 0.75rem;
-        font-size: 0.8rem;
-        border-radius: 10px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border: none;
-        padding: 0.35rem 0.75rem;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 8px rgba(90, 182, 234, 0.3);
-    }
-
-    .btn-primary:hover {
-        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(90, 182, 234, 0.4);
-    }
-
-    /* Modal Styles */
-    .modal-dialog.modal-md {
-        max-width: 100%;
-        margin: 1rem auto;
-    }
-
-    .modal-content {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        overflow-y: auto;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid var(--gray-light);
-        padding: 15px 20px;
-    }
-
-    .modal-footer {
-        border-top: 1px solid var(--gray-light);
-        padding: 15px 20px;
-    }
-
-    .modal-title {
-        font-weight: 600;
-        color: var(--dark);
-        font-size: 18px;
-    }
-
-    .btn-close {
-        font-size: 12px;
-    }
-
-    /* Detail Grid Layout */
-    .detail-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .detail-item.full-width {
-        grid-column: 1 / -1;
-    }
-
-    .detail-label {
-        font-size: 12px;
-        color: var(--gray);
-        font-weight: 500;
-        margin-bottom: 4px;
-    }
-
-    .detail-value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--dark);
-        padding: 6px 0;
-        border-bottom: 1px solid var(--gray-light);
-        word-break: break-word;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .pengajuan-section {
-        animation: fadeIn 0.2s 0.1s ease-out forwards;
-        opacity: 0;
-    }
-
-    .pengajuan-item {
-        animation: fadeIn 0.2s ease-out forwards;
-        opacity: 0;
-    }
-
-    .pengajuan-item:nth-child(1) { animation-delay: 0.15s; }
-    .pengajuan-item:nth-child(2) { animation-delay: 0.2s; }
-    .pengajuan-item:nth-child(3) { animation-delay: 0.25s; }
-    .pengajuan-item:nth-child(4) { animation-delay: 0.3s; }
-    .pengajuan-item:nth-child(5) { animation-delay: 0.35s; }
-
-    /* MODAL BUAT PENGAJUAN (Existing Modal) */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 100;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.4);
-        overflow: auto;
-        padding-top: 50px;
-        animation: fadeIn 0.3s ease-out;
-    }
-    .modal-content {
-        background: var(--white);
-        margin: auto;
-        padding: 25px;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 450px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        border: none;
-        animation: slideIn 0.3s ease-out;
-    }
-    .close {
-        float: right;
-        font-size: 24px;
-        cursor: pointer;
-        color: var(--gray);
-        transition: color 0.2s ease;
-    }
-    .close:hover {
-        color: var(--dark);
-    }
-    .modal-content h3 {
-        font-weight: 700;
-        color: var(--dark);
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    .form-group label {
-        font-weight: 600;
-        display: block;
-        margin-bottom: 8px;
-        color: var(--dark);
-        font-size: 14px;
-    }
-    .form-group input, 
-    .form-group select, 
-    .form-group textarea {
-        width: 100%;
-        border: 1px solid var(--gray-light);
-        border-radius: 10px;
-        padding: 12px 15px;
-        font-size: 14px;
-        transition: all 0.2s ease;
-        background-color: var(--white);
-    }
-    .form-group input:focus, 
-    .form-group select:focus, 
-    .form-group textarea:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 0.25rem rgba(90, 182, 234, 0.15);
-        outline: none;
-    }
-    .form-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 25px;
-    }
-    .btn-secondary {
-        background: var(--gray-light);
-        color: var(--dark);
-        border: none;
-        border-radius: 10px;
-        padding: 12px 15px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        flex: 1;
-        transition: all 0.2s ease;
-    }
-    .btn-secondary:hover {
-        background: var(--gray);
-        color: var(--white);
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Responsive adjustments */
-    @media (min-width: 576px) {
-        .detail-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .modal-dialog.modal-md {
-            max-width: 500px;
-        }
-
-        .pengajuan-icon-container {
-            width: 100px;
-            height: 100px;
-            font-size: 40px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        .pengajuan-item {
-            padding: 12px;
-        }
-
-        .pengajuan-icon {
-            width: 40px;
-            height: 40px;
-            margin-right: 12px;
-            font-size: 16px;
-        }
-
-        .pengajuan-icon-container {
-            width: 70px;
-            height: 70px;
-            font-size: 28px;
-        }
-
-        .pengajuan-jenis {
-            font-size: 13px;
-        }
-
-        .pengajuan-date {
-            font-size: 11px;
-        }
-
-        .pengajuan-status .badge {
-            font-size: 10px;
-            padding: 4px 8px;
-        }
-    }
+    .btn-submit { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; }
+    .btn-cancel { background:var(--gray-light); color:var(--dark); }
 </style>
 
-<div class="container">
-    <!-- Pengajuan Section -->
-    <div class="pengajuan-section">
-        <div class="section-header">
-            <h3 class="section-title">Pengajuan Presensi</h3>
-            <button class="btn btn-sm btn-primary btn-scale" onclick="openModal()">
-                <i class="fas fa-plus"></i> Buat 
-            </button>
-        </div>
+<div class="pengajuan-page">
+    <div class="page-header">
+        <h3 class="page-title">Pengajuan Presensi</h3>
+        <button class="btn-buat" onclick="openModal()"><i class="fas fa-plus"></i> Buat</button>
+    </div>
 
-        {{-- Riwayat Pengajuan --}}
-        <div class="pengajuan-list">
-            @forelse($pengajuan as $p)
-            <div class="pengajuan-item"
-                 data-pengajuan-id="{{ $p->id }}"
-                 data-pengajuan-jenis="{{ $p->jenis }}"
-                 data-pengajuan-tanggal="{{ $p->tanggal }}"
-                 data-pengajuan-alasan="{{ $p->alasan }}"
-                 data-pengajuan-bukti="{{ $p->bukti ? asset('public/storage/' . str_replace('public/', '', $p->bukti)) : '' }}"
-                 data-pengajuan-status="{{ $p->status }}">
-
-                <div class="pengajuan-icon">
-                    @if($p->jenis == 'masuk')
-                    <i class="fas fa-arrow-right-to-bracket" style="color:var(--primary-dark)"></i>
-                    @elseif($p->jenis == 'pulang')
-                    <i class="fas fa-arrow-right-from-bracket" style="color:var(--primary-dark)"></i>
-                    @else
-                    <i class="fas fa-exchange-alt" style="color:var(--primary-dark)"></i>
-                    @endif
-                </div>
-
-                <div class="pengajuan-info">
-                    <h5 class="pengajuan-jenis">{{ ucfirst($p->jenis) }}</h5>
-                    <p class="pengajuan-date">{{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d F Y') }}</p>
-                    <div class="pengajuan-alasan">
-                        <span class="badge bg-secondary-light">{{ Str::limit($p->alasan, 30) }}</span>
-                    </div>
-                </div>
-
-                <div class="pengajuan-status">
-                    <span class="badge status-{{ $p->status }}">
-                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> 
-                        {{ ucfirst($p->status) }}
-                    </span>
-                </div>
+    <div class="pengajuan-list">
+        @forelse($pengajuan as $p)
+        @php
+            $isMasuk = $p->jenis == 'masuk';
+            $isPulang = $p->jenis == 'pulang';
+            $iconCls = $isPulang ? 'p-icon-pulang' : ($isMasuk ? 'p-icon-masuk' : 'p-icon-keduanya');
+            $iconName = $isPulang ? 'fa-arrow-right-from-bracket' : ($isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-arrow-left');
+        @endphp
+        <div class="p-card"
+             data-pengajuan-id="{{ $p->id }}"
+             data-pengajuan-jenis="{{ $p->jenis }}"
+             data-pengajuan-tanggal="{{ $p->tanggal }}"
+             data-pengajuan-alasan="{{ $p->alasan }}"
+             data-pengajuan-bukti="{{ $p->bukti ? asset('public/storage/' . str_replace('public/', '', $p->bukti)) : '' }}"
+             data-pengajuan-status="{{ $p->status }}">
+            <div class="p-icon {{ $iconCls }}"><i class="fas {{ $iconName }}"></i></div>
+            <div class="p-body">
+                <div class="p-title">Pengajuan {{ ucfirst($p->jenis) }}</div>
+                <div class="p-date">{{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d F Y') }}</div>
+                <div class="p-alasan">{{ $p->alasan }}</div>
             </div>
-
-            @empty
-            <div class="text-center py-4">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada pengajuan.</p>
+            <div class="p-status">
+                <span class="s-dot s-dot-{{ $p->status }}"></span>
+                <span class="s-text">{{ ucfirst($p->status) }}</span>
             </div>
-            @endforelse
         </div>
+        @empty
+        <div class="empty-box">
+            <i class="fas fa-paper-plane"></i>
+            <p>Belum ada pengajuan</p>
+        </div>
+        @endforelse
     </div>
 </div>
 
-<!-- Modal Detail Pengajuan -->
-<div class="modal fade" id="pengajuanDetailModal" tabindex="-1" aria-labelledby="pengajuanDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
+<!-- Detail Modal -->
+<div class="modal fade detail-modal" id="pengajuanDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-body p-0 pt-2">
-                <div class="text-center mb-3">
-                    <div id="modalPengajuanIconContainer" class="pengajuan-icon-container">
-                        <!-- Icon akan dimuat di sini melalui JavaScript -->
+            <div class="modal-body">
+                <div class="detail-icon-box" id="modalPengajuanIconBox"></div>
+                <div class="detail-title" id="modalPengajuanJenis">-</div>
+                <div class="detail-status-row">
+                    <span class="detail-status-badge" id="modalPengajuanStatus" style="background:var(--primary-soft); color:var(--primary-dark);">-</span>
+                </div>
+                <div class="detail-grid">
+                    <div>
+                        <div class="detail-label">Tanggal</div>
+                        <div class="detail-value" id="modalPengajuanTanggal">-</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Jenis</div>
+                        <div class="detail-value" id="modalPengajuanJenisDetail">-</div>
+                    </div>
+                    <div class="full">
+                        <div class="detail-label">Alasan</div>
+                        <div class="detail-value" id="modalPengajuanAlasan">-</div>
+                    </div>
+                    <div class="full">
+                        <div class="detail-label">Bukti</div>
+                        <div class="detail-value" id="modalPengajuanBukti"><span style="color:var(--gray)">Tidak ada bukti</span></div>
                     </div>
                 </div>
-
-                <div class="pengajuan-detail-section">
-                    <h5 class="text-center" id="modalPengajuanJenis">Jenis Pengajuan</h5>
-                    <div class="text-center mb-4">
-                        <span class="badge bg-primary-light" id="modalPengajuanStatus">-</span>
-                    </div>
-
-                    <div class="detail-grid full-width">
-                        <div class="detail-item">
-                            <div class="detail-label">Tanggal</div>
-                            <div class="detail-value" id="modalPengajuanTanggal">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Jenis</div>
-                            <div class="detail-value" id="modalPengajuanJenisDetail">-</div>
-                        </div>
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Alasan</div>
-                            <div class="detail-value" id="modalPengajuanAlasan">-</div>
-                        </div>
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Bukti</div>
-                            <div class="detail-value" id="modalPengajuanBukti">
-                                <span class="text-muted">Tidak ada bukti</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer pb-0 pt-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="detail-close-btn" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
 </div>
 
-{{-- Modal Buat Pengajuan --}}
-<div id="pengajuanModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+<!-- Create Modal -->
+<div id="pengajuanModal" class="create-overlay">
+    <div class="create-box">
+        <button class="create-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
         <h3>Buat Pengajuan Presensi</h3>
-
         <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-
             <div class="form-group">
                 <label for="jenis">Jenis Pengajuan</label>
                 <select name="jenis" id="jenis" required>
@@ -547,25 +181,21 @@
                     <option value="keduanya">Keduanya</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label for="tanggal">Tanggal</label>
                 <input type="date" name="tanggal" id="tanggal" required>
             </div>
-
             <div class="form-group">
                 <label for="alasan">Alasan</label>
                 <textarea name="alasan" id="alasan" rows="3" required></textarea>
             </div>
-
             <div class="form-group">
                 <label for="bukti">Upload Bukti (jpg/png/pdf, max 2MB)</label>
                 <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf,.heic,.heif">
             </div>
-
             <div class="form-actions">
-                <button type="submit" class="btn-primary">Kirim Pengajuan</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+                <button type="submit" class="btn-submit">Kirim Pengajuan</button>
+                <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
             </div>
         </form>
     </div>
@@ -573,97 +203,57 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const pengajuanItems = document.querySelectorAll('.pengajuan-item');
-        const pengajuanModal = new bootstrap.Modal(document.getElementById('pengajuanDetailModal'));
-        const modalIconContainer = document.getElementById('modalPengajuanIconContainer');
+        var items = document.querySelectorAll('.p-card');
+        var detailModal = new bootstrap.Modal(document.getElementById('pengajuanDetailModal'));
+        var iconBox = document.getElementById('modalPengajuanIconBox');
+        var statusBadge = document.getElementById('modalPengajuanStatus');
 
-        // Fungsi untuk membuat icon berdasarkan jenis pengajuan
-        function createPengajuanIcon(jenis) {
-            let iconClass, iconColor;
-            
-            switch(jenis) {
-                case 'masuk':
-                    iconClass = 'fas fa-arrow-right-to-bracket';
-                    iconColor = 'var(--primary)';
-                    break;
-                case 'pulang':
-                    iconClass = 'fas fa-arrow-right-from-bracket';
-                    iconColor = 'var(--accent)';
-                    break;
-                case 'keduanya':
-                    iconClass = 'fas fa-exchange-alt';
-                    iconColor = 'var(--info)';
-                    break;
-                default:
-                    iconClass = 'fas fa-clock';
-                    iconColor = 'var(--gray)';
-            }
-            
-            return `<i class="${iconClass}" style="color: ${iconColor}"></i>`;
+        function getIcon(jenis) {
+            if (jenis === 'masuk') return { cls: 'fa-arrow-right-to-bracket', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
+            if (jenis === 'pulang') return { cls: 'fa-arrow-right-from-bracket', color: 'var(--accent)', bg: 'var(--accent-light)' };
+            return { cls: 'fa-arrow-right-arrow-left', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
         }
 
-        // Fungsi untuk mengisi data modal
-        function fillModalData(pengajuanItem) {
-            const pengajuanJenis = pengajuanItem.getAttribute('data-pengajuan-jenis');
-            const pengajuanTanggal = pengajuanItem.getAttribute('data-pengajuan-tanggal');
-            const pengajuanAlasan = pengajuanItem.getAttribute('data-pengajuan-alasan');
-            const pengajuanBukti = pengajuanItem.getAttribute('data-pengajuan-bukti');
-            const pengajuanStatus = pengajuanItem.getAttribute('data-pengajuan-status');
-
-            // Set icon di modal
-            modalIconContainer.innerHTML = createPengajuanIcon(pengajuanJenis);
-
-            // Set data lainnya
-            document.getElementById('modalPengajuanJenis').textContent = `Pengajuan ${pengajuanJenis}`;
-            document.getElementById('modalPengajuanStatus').textContent = pengajuanStatus;
-            document.getElementById('modalPengajuanTanggal').textContent = new Date(pengajuanTanggal).toLocaleDateString('id-ID', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('modalPengajuanJenisDetail').textContent = pengajuanJenis;
-            document.getElementById('modalPengajuanAlasan').textContent = pengajuanAlasan;
-
-            // Set bukti
-            const buktiElement = document.getElementById('modalPengajuanBukti');
-            if (pengajuanBukti && pengajuanBukti.trim() !== '') {
-                buktiElement.innerHTML = `<a href="${pengajuanBukti}" target="_blank" class="text-primary">Lihat Bukti</a>`;
-            } else {
-                buktiElement.innerHTML = '<span class="text-muted">Tidak ada bukti</span>';
-            }
+        function getStatusStyle(status) {
+            if (status === 'approved') return { bg: 'var(--success-light)', color: 'var(--success)' };
+            if (status === 'rejected') return { bg: 'var(--danger-light)', color: 'var(--danger)' };
+            return { bg: 'var(--warning-light)', color: 'var(--warning)' };
         }
 
-        // Tambahkan event listener untuk setiap item pengajuan
-        pengajuanItems.forEach((item) => {
+        items.forEach(function(item) {
             item.addEventListener('click', function() {
-                fillModalData(this);
-                pengajuanModal.show();
-            });
-        });
+                var jenis = this.dataset.pengajuanJenis;
+                var status = this.dataset.pengajuanStatus;
+                var icon = getIcon(jenis);
+                var ss = getStatusStyle(status);
 
-        // Reset modal ketika ditutup
-        document.getElementById('pengajuanDetailModal').addEventListener('hidden.bs.modal', function () {
-            modalIconContainer.innerHTML = '';
+                iconBox.style.background = icon.bg;
+                iconBox.innerHTML = '<i class="fas ' + icon.cls + '" style="color:' + icon.color + '"></i>';
+                statusBadge.style.background = ss.bg;
+                statusBadge.style.color = ss.color;
+                statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+                document.getElementById('modalPengajuanJenis').textContent = 'Pengajuan ' + jenis.charAt(0).toUpperCase() + jenis.slice(1);
+                document.getElementById('modalPengajuanTanggal').textContent = new Date(this.dataset.pengajuanTanggal).toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+                document.getElementById('modalPengajuanJenisDetail').textContent = jenis.charAt(0).toUpperCase() + jenis.slice(1);
+                document.getElementById('modalPengajuanAlasan').textContent = this.dataset.pengajuanAlasan;
+
+                var bukti = this.dataset.pengajuanBukti;
+                var buktiEl = document.getElementById('modalPengajuanBukti');
+                buktiEl.innerHTML = bukti && bukti.trim() ? '<a href="' + bukti + '" target="_blank" style="color:var(--primary); font-weight:600;">Lihat Bukti</a>' : '<span style="color:var(--gray)">Tidak ada bukti</span>';
+
+                detailModal.show();
+            });
         });
     });
 
-    // Fungsi untuk modal buat pengajuan (existing)
     function openModal() {
-        document.getElementById("pengajuanModal").style.display = "block";
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('tanggal').value = today;
+        document.getElementById('pengajuanModal').classList.add('active');
+        document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
     }
-
     function closeModal() {
-        document.getElementById("pengajuanModal").style.display = "none";
+        document.getElementById('pengajuanModal').classList.remove('active');
     }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById("pengajuanModal");
-        if (event.target == modal) {
-            closeModal();
-        }
-    }
+    document.getElementById('pengajuanModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 </script>
 @endsection

@@ -3,692 +3,259 @@
 
 @section('content')
 <style>
-    /* Employee Section */
-    .employee-section {
-        background-color: var(--card-bg);
-        margin: 20px;
-        position: relative;
-        z-index: 2;
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        border: 1px solid var(--card-border);
-        margin-bottom: 100px;
+    .pegawai-page { padding: 20px; padding-bottom: 100px; }
+
+    .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .page-title { font-size:17px; font-weight:700; color:var(--dark); margin:0; }
+
+    /* Search */
+    .search-bar {
+        position:relative; margin-bottom:16px;
+    }
+    .search-bar input {
+        width:100%; padding:12px 14px 12px 42px; border:1px solid var(--card-border);
+        border-radius:14px; font-size:14px; background:var(--card-bg); color:var(--dark); outline:none;
+    }
+    .search-bar input:focus { border-color:var(--primary); }
+    .search-bar i {
+        position:absolute; left:14px; top:50%; transform:translateY(-50%);
+        color:var(--gray); font-size:14px;
     }
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
+    .employee-list { display:flex; flex-direction:column; gap:10px; }
+
+    .e-card {
+        background:var(--card-bg); border-radius:14px; padding:14px 16px;
+        display:flex; align-items:center; gap:14px;
+        box-shadow:0 1px 6px rgba(0,0,0,0.04); border:1px solid var(--card-border);
+        cursor:pointer; -webkit-tap-highlight-color:transparent;
+    }
+    .e-card:active { opacity:0.85; }
+
+    .e-avatar {
+        width:44px; height:44px; border-radius:50%; flex-shrink:0; overflow:hidden;
+        background:var(--primary-soft); display:flex; align-items:center; justify-content:center;
+        border:2px solid var(--card-border);
+    }
+    .e-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .e-avatar-placeholder {
+        width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+        background:linear-gradient(135deg,var(--primary),var(--primary-light));
+        color:#fff; font-weight:700; font-size:14px;
     }
 
-    .section-title {
-        font-weight: 700;
-        font-size: 17px;
-        color: var(--dark);
-        margin: 0;
+    .e-body { flex:1; min-width:0; }
+    .e-name { font-size:14px; font-weight:600; color:var(--dark); margin-bottom:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .e-position { font-size:12px; color:var(--gray); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .e-dept { font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; background:var(--primary-soft); color:var(--primary-dark); display:inline-block; }
+
+    .e-status { flex-shrink:0; text-align:right; }
+    .s-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .s-dot-tepat { background:#10b981; }
+    .s-dot-telat { background:#ef4444; }
+    .s-dot-belum { background:var(--gray); }
+    .s-dot-aktif { background:#10b981; }
+    .s-text { font-size:11px; font-weight:500; color:var(--gray); }
+
+    .empty-box { text-align:center; padding:60px 20px; color:var(--gray); background:var(--card-bg); border-radius:16px; }
+    .empty-box i { font-size:40px; margin-bottom:12px; opacity:0.3; display:block; }
+    .empty-box p { font-size:14px; margin:0; }
+
+    /* Detail Modal */
+    .detail-modal .modal-content { background:var(--card-bg); border-radius:20px; border:none; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+    .detail-modal .modal-body { padding:24px; }
+    .modal-avatar {
+        width:72px; height:72px; border-radius:50%; margin:0 auto 12px; overflow:hidden;
+        border:3px solid var(--primary); background:var(--primary-soft);
+        display:flex; align-items:center; justify-content:center;
     }
-
-    .employee-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+    .modal-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .modal-avatar-placeholder {
+        width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+        background:linear-gradient(135deg,var(--primary),var(--primary-light));
+        color:#fff; font-weight:700; font-size:22px;
     }
-
-    .employee-item {
-        display: flex;
-        align-items: center;
-        padding: 14px;
-        background-color: var(--light);
-        border-radius: 14px;
-        border: 1px solid var(--card-border);
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .employee-item:active { opacity: 0.85; }
-
-    /* PERBAIKAN UTAMA: Styling untuk avatar */
-    .employee-avatar {
-        width: 50px;
-        height: 50px;
-        margin-right: 15px;
-        flex-shrink: 0;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid var(--gray-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-    }
-
-    .employee-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .btn-secondary {
-        background: var(--gray-light);
-        color: var(--dark);
-        border: none;
-        border-radius: 10px;
-        padding: 12px 15px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        flex: 1;
-        transition: all 0.2s ease;
-    }
-    .btn-secondary:hover {
-        background: var(--gray);
-        color: var(--white);
-    }
-
-    /* Container untuk avatar modal - PERBAIKAN PENTING */
-    .employee-avatar-container {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-    }
-
-    /* Avatar besar untuk modal */
-    .employee-avatar-large {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .employee-avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 24px;
-        border-radius: 50%;
-    }
-
-    .employee-info {
-        flex-grow: 1;
-        min-width: 0;
-    }
-
-    .employee-name {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 2px;
-        color: var(--dark);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .employee-position {
-        font-size: 12px;
-        color: var(--gray);
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .employee-department .badge {
-        font-size: 10px;
-        font-weight: 500;
-        padding: 4px 8px;
-        border-radius: 6px;
-        white-space: nowrap;
-    }
-
-    .employee-status .badge {
-        font-size: 11px;
-        padding: 5px 10px;
-        font-weight: 500;
-        border-radius: 6px;
-        white-space: nowrap;
-    }
-
-    /* Badge Color Variants */
-    .bg-primary-light {
-        background-color: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
-    }
-
-    .bg-warning-light {
-        background-color: rgba(254, 170, 43, 0.1);
-        color: var(--accent);
-    }
-
-    .bg-danger-light {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-
-    .bg-info-light {
-        background-color: rgba(6, 182, 212, 0.1);
-        color: #06b6d4;
-    }
-
-    .bg-success-light {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .bg-secondary-light {
-        background-color: rgba(100, 116, 139, 0.1);
-        color: var(--gray-dark);
-    }
-
-    /* Search Box */
-    .search-box {
-        margin-bottom: 20px;
-    }
-
-    .search-box .input-group {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
-    }
-
-    .search-box .input-group-text {
-        border: none;
-        background-color: var(--white);
-        padding-left: 15px;
-    }
-
-    .search-box .form-control {
-        border: none;
-        font-size: 14px;
-        padding: 12px 15px;
-        background-color: var(--white);
-    }
-
-    .search-box .form-control:focus {
-        box-shadow: none;
-    }
-
-    /* Button Styles */
-    .btn-scale {
-        transition: transform 0.2s ease;
-    }
-
-    .btn-scale:active {
-        transform: scale(0.96);
-    }
-
-    .btn-sm {
-        padding: 0.35rem 0.75rem;
-        font-size: 0.8rem;
-        border-radius: 10px;
-    }
-
-    .btn-outline-primary {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-
-    .btn-outline-primary:hover {
-        background-color: var(--primary);
-        color: white;
-    }
-
-    /* Modal Styles - Improved for Mobile */
-    .modal-dialog.modal-md {
-        max-width: 100%;
-        margin: 1rem auto;
-    }
-
-    .modal-content {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        overflow-y: auto;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid var(--gray-light);
-        padding: 15px 20px;
-    }
-
-    .modal-footer {
-        border-top: 1px solid var(--gray-light);
-        padding: 15px 20px;
-    }
-
-    .modal-title {
-        font-weight: 600;
-        color: var(--dark);
-        font-size: 18px;
-    }
-
-    .btn-close {
-        font-size: 12px;
-    }
-
-    /* Detail Grid Layout */
-    .detail-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .detail-item.full-width {
-        grid-column: 1 / -1;
-    }
-
-    .detail-label {
-        font-size: 12px;
-        color: var(--gray);
-        font-weight: 500;
-        margin-bottom: 4px;
-    }
-
-    .detail-value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--dark);
-        padding: 6px 0;
-        border-bottom: 1px solid var(--gray-light);
-        word-break: break-word;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .employee-section {
-        animation: fadeIn 0.2s 0.1s ease-out forwards;
-        opacity: 0;
-    }
-
-    .employee-item {
-        animation: fadeIn 0.2s ease-out forwards;
-        opacity: 0;
-    }
-
-    .employee-item:nth-child(1) {
-        animation-delay: 0.15s;
-    }
-
-    .employee-item:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .employee-item:nth-child(3) {
-        animation-delay: 0.25s;
-    }
-
-    .employee-item:nth-child(4) {
-        animation-delay: 0.3s;
-    }
-
-    .employee-item:nth-child(5) {
-        animation-delay: 0.35s;
-    }
-
-    .search-box {
-        animation: fadeIn 0.2s 0.05s ease-out forwards;
-        opacity: 0;
-    }
-
-    /* Responsive adjustments */
-    @media (min-width: 576px) {
-        .detail-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .modal-dialog.modal-md {
-            max-width: 500px;
-        }
-
-        .employee-avatar-container {
-            width: 120px;
-            height: 120px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        .employee-item {
-            padding: 12px;
-        }
-
-        .employee-avatar {
-            width: 45px;
-            height: 45px;
-            margin-right: 12px;
-        }
-
-        .employee-avatar-container {
-            width: 80px;
-            height: 80px;
-        }
-
-        .employee-name {
-            font-size: 13px;
-        }
-
-        .employee-position {
-            font-size: 11px;
-        }
-
-        .employee-status .badge {
-            font-size: 10px;
-            padding: 4px 8px;
-        }
-    }
-
-    /* Fix untuk gambar yang loading atau error */
-    .avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 18px;
-        border-radius: 50%;
-    }
+    .modal-name { font-size:16px; font-weight:700; color:var(--dark); text-align:center; margin-bottom:4px; }
+    .modal-position { text-align:center; margin-bottom:16px; }
+    .modal-position span { display:inline-block; padding:4px 12px; border-radius:8px; font-size:11px; font-weight:600; background:var(--primary-soft); color:var(--primary-dark); }
+    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .detail-grid .full { grid-column:1/-1; }
+    .detail-label { font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px; }
+    .detail-value { font-size:14px; font-weight:500; color:var(--dark); padding:6px 0; border-bottom:1px solid var(--card-border); display:flex; align-items:center; justify-content:space-between; }
+    .detail-close-btn { width:100%; margin-top:16px; padding:12px; background:var(--gray-light); color:var(--dark); border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer; }
 </style>
 
-<div class="container">
-    <!-- Employee List Section -->
-    <div class="employee-section">
-        <div class="section-header">
-            <h3 class="section-title">Daftar Pegawai</h3>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-primary btn-scale">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
+<div class="pegawai-page">
+    <div class="page-header">
+        <h3 class="page-title">Daftar Pegawai</h3>
+    </div>
+
+    <div class="search-bar">
+        <i class="fas fa-magnifying-glass"></i>
+        <input type="text" placeholder="Cari nama, jabatan..." id="searchInput">
+    </div>
+
+    <div class="employee-list">
+        @forelse($pegawai as $p)
+        <div class="e-card"
+            data-employee-id="{{ $p->id }}"
+            data-employee-nip="{{ $p->nip }}"
+            data-employee-email="{{ $p->email }}"
+            data-employee-phone="{{ $p->no_hp ?? '-' }}"
+            data-employee-address="{{ $p->alamat ?? '-' }}"
+            data-employee-status="{{ $p->status ?? 'Aktif' }}"
+            data-employee-dept="{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}"
+            data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
+
+            <div class="e-avatar">
+                @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
+                <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}" onerror="handleAvatarError(this, '{{ $p->name }}')">
+                @else
+                <div class="e-avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->take(2)->join('') }}</div>
+                @endif
+            </div>
+
+            <div class="e-body">
+                <div class="e-name">{{ $p->name }}</div>
+                <div class="e-position">{{ $p->jabatan ?? '-' }}</div>
+                <span class="e-dept">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
+            </div>
+
+            <div class="e-status">
+                @if(!empty($kehadiranHariIni) && isset($kehadiranHariIni[$p->id]))
+                    @php $kh = $kehadiranHariIni[$p->id]; @endphp
+                    <span class="s-dot s-dot-{{ $kh['status'] }}"></span>
+                    <span class="s-text">{{ $kh['text'] }}</span>
+                @else
+                    <span class="s-dot s-dot-aktif"></span>
+                    <span class="s-text">Aktif</span>
+                @endif
             </div>
         </div>
-
-        <div class="search-box">
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search text-muted"></i>
-                </span>
-                <input type="text" class="form-control" placeholder="Cari pegawai..." id="searchInput">
-            </div>
+        @empty
+        <div class="empty-box">
+            <i class="fas fa-user-group"></i>
+            <p>Belum ada data pegawai</p>
         </div>
-
-        <div class="employee-list">
-            @forelse($pegawai as $p)
-            <!-- Bagian employee-item -->
-            <div class="employee-item"
-                data-employee-id="{{ $p->id }}"
-                data-employee-nip="{{ $p->nip }}"
-                data-employee-email="{{ $p->email }}"
-                data-employee-phone="{{ $p->no_hp ?? '-' }}"
-                data-employee-address="{{ $p->alamat ?? '-' }}"
-                data-employee-status="{{ $p->status ?? 'Aktif' }}"
-                data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
-
-                <div class="employee-avatar">
-                    @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
-                    <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
-                        onerror="handleAvatarError(this, '{{ $p->name }}')">
-                    @else
-                    <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
-                    @endif
-                </div>
-
-                <div class="employee-info">
-                    <h5 class="employee-name">{{ $p->name }}</h5>
-                    <p class="employee-position">{{ $p->jabatan ?? '-' }}</p>
-                    <div class="employee-department">
-                        <span class="badge bg-primary-light">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
-                    </div>
-                </div>
-
-                <div class="employee-status">
-                    @if(!empty($kehadiranHariIni) && isset($kehadiranHariIni[$p->id]))
-                        @php $kh = $kehadiranHariIni[$p->id]; @endphp
-                        @if($kh['status'] === 'tepat')
-                        <span class="badge bg-success-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> {{ $kh['text'] }}</span>
-                        @elseif($kh['status'] === 'telat')
-                        <span class="badge bg-danger-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> {{ $kh['text'] }}</span>
-                        @else
-                        <span class="badge bg-secondary-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> {{ $kh['text'] }}</span>
-                        @endif
-                    @else
-                    <span class="badge bg-success-light"><i class="fas fa-circle small me-1" style="font-size:6px;"></i> Aktif</span>
-                    @endif
-                </div>
-            </div>
-
-            @empty
-            <div class="text-center py-4">
-                <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada data pegawai.</p>
-            </div>
-            @endforelse
-        </div>
+        @endforelse
     </div>
 </div>
 
-<!-- Modal Detail Pegawai -->
-<div class="modal fade" id="employeeDetailModal" tabindex="-1" aria-labelledby="employeeDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
+<!-- Detail Modal -->
+<div class="modal fade detail-modal" id="employeeDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-body p-0 pt-2">
-                <div class="text-center mb-2">
-                    <div id="modalEmployeeAvatarContainer" class="employee-avatar-container">
-                        <!-- Avatar akan dimuat di sini melalui JavaScript -->
+            <div class="modal-body">
+                <div class="modal-avatar" id="modalEmployeeAvatarContainer"></div>
+                <div class="modal-name" id="modalEmployeeName">-</div>
+                <div class="modal-position"><span id="modalEmployeePosition">-</span></div>
+
+                <div class="detail-grid">
+                    <div>
+                        <div class="detail-label">Unit Kerja</div>
+                        <div class="detail-value" id="modalEmployeeDepartment">-</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value" id="modalEmployeeStatus">-</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">NIP</div>
+                        <div class="detail-value" id="modalEmployeeNip">-</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">No. Telepon</div>
+                        <div class="detail-value">
+                            <span id="modalEmployeePhone">-</span>
+                            <a href="#" id="whatsappLink" target="_blank" style="text-decoration:none;">
+                                <i class="fab fa-whatsapp" style="color:#25D366; font-size:18px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="full">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value" id="modalEmployeeEmail">-</div>
+                    </div>
+                    <div class="full">
+                        <div class="detail-label">Alamat</div>
+                        <div class="detail-value" id="modalEmployeeAddress">-</div>
                     </div>
                 </div>
-
-                <div class="employee-detail-section">
-                    <h5 class="text-center" id="modalEmployeeName">Nama Pegawai</h5>
-                    <div class="text-center mb-4">
-                        <span class="badge bg-primary-light" id="modalEmployeePosition">-</span>
-                    </div>
-
-                    <div class="detail-grid full-width">
-                        <div class="detail-item">
-                            <div class="detail-label">Unit Kerja</div>
-                            <div class="detail-value" id="modalEmployeeDepartment">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Status</div>
-                            <div class="detail-value" id="modalEmployeeStatus">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">NIP</div>
-                            <div class="detail-value" id="modalEmployeeNip">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">No. Telepon</div>
-                            <div class="detail-value d-flex align-items-center justify-content-between">
-                                <span id="modalEmployeePhone">-</span>
-                                <a href="#" id="whatsappLink" target="_blank" style="text-decoration: none;">
-                                    <i class="fab fa-whatsapp" style="color: #25D366; font-size: 18px;"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Email</div>
-                            <div class="detail-value" id="modalEmployeeEmail">-</div>
-                        </div>
-
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Alamat</div>
-                            <div class="detail-value" id="modalEmployeeAddress">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer pb-0 pt-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="detail-close-btn" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
 </div>
-
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const employeeItems = document.querySelectorAll('.employee-item');
-        const employeeModal = new bootstrap.Modal(document.getElementById('employeeDetailModal'));
-        const searchInput = document.getElementById('searchInput');
-        const modalAvatarContainer = document.getElementById('modalEmployeeAvatarContainer');
+        var items = document.querySelectorAll('.e-card');
+        var modal = new bootstrap.Modal(document.getElementById('employeeDetailModal'));
+        var avatarBox = document.getElementById('modalEmployeeAvatarContainer');
+        var searchInput = document.getElementById('searchInput');
 
-        // Fungsi untuk membuat placeholder avatar berdasarkan nama
-        function createAvatarPlaceholder(name) {
-            const initials = name.split(' ').map(word => word[0]).join('').toUpperCase();
-            return `<div class="employee-avatar-placeholder">${initials}</div>`;
+        function initials(name) {
+            return name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase();
         }
 
-        // Fungsi untuk membuat avatar dengan gambar
-        function createAvatarImage(avatarUrl, name) {
-            return `<img src="${avatarUrl}" class="employee-avatar-large" alt="${name}" onerror="handleModalAvatarError(this, '${name}')">`;
-        }
-
-        // Fungsi untuk menangani error gambar di list
-        function handleAvatarError(imgElement, name) {
-            imgElement.style.display = 'none';
-            imgElement.parentElement.innerHTML = `<div class="avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
-        }
-
-        // Fungsi untuk menangani error gambar di modal
-        function handleModalAvatarError(imgElement, name) {
-            imgElement.style.display = 'none';
-            modalAvatarContainer.innerHTML = createAvatarPlaceholder(name);
-        }
-
-        // Fungsi untuk mengisi data modal
-        function fillModalData(employeeItem) {
-            const employeeName = employeeItem.querySelector('.employee-name').textContent;
-            const employeePosition = employeeItem.querySelector('.employee-position').textContent;
-            const employeeDepartment = employeeItem.querySelector('.employee-department .badge').textContent;
-            const employeeAvatar = employeeItem.getAttribute('data-employee-avatar');
-            const employeeNip = employeeItem.getAttribute('data-employee-nip');
-            const employeeEmail = employeeItem.getAttribute('data-employee-email');
-            const employeePhone = employeeItem.getAttribute('data-employee-phone');
-            const employeeAddress = employeeItem.getAttribute('data-employee-address');
-            const employeeStatus = employeeItem.getAttribute('data-employee-status');
-
-            // Set avatar di modal
-            if (employeeAvatar && employeeAvatar.trim() !== '') {
-                modalAvatarContainer.innerHTML = createAvatarImage(employeeAvatar, employeeName);
-            } else {
-                modalAvatarContainer.innerHTML = createAvatarPlaceholder(employeeName);
-            }
-
-            // Set data lainnya
-            document.getElementById('modalEmployeeName').textContent = employeeName;
-            document.getElementById('modalEmployeePosition').textContent = employeePosition;
-            document.getElementById('modalEmployeeDepartment').textContent = employeeDepartment;
-            document.getElementById('modalEmployeeStatus').textContent = employeeStatus;
-            document.getElementById('modalEmployeeNip').textContent = employeeNip || '-';
-            document.getElementById('modalEmployeeEmail').textContent = employeeEmail || '-';
-            document.getElementById('modalEmployeePhone').textContent = employeePhone || '-';
-            document.getElementById('modalEmployeeAddress').textContent = employeeAddress || '-';
-
-            // Set WhatsApp link
-            const whatsappLink = document.getElementById('whatsappLink');
-            if (employeePhone && employeePhone !== '-') {
-                let phoneNumber = employeePhone.replace(/[^0-9]/g, '');
-                if (phoneNumber.startsWith('0')) {
-                    phoneNumber = '62' + phoneNumber.substring(1);
-                }
-                whatsappLink.href = `https://wa.me/${phoneNumber}`;
-                whatsappLink.style.pointerEvents = 'auto';
-                whatsappLink.style.opacity = '1';
-            } else {
-                whatsappLink.href = '#';
-                whatsappLink.style.pointerEvents = 'none';
-                whatsappLink.style.opacity = '0.5';
-            }
-        }
-
-        // Tambahkan event listener untuk setiap item pegawai
-        employeeItems.forEach((item) => {
-            // Setup error handling untuk avatar di list
-            const avatarImg = item.querySelector('.employee-avatar img');
-            const employeeName = item.querySelector('.employee-name').textContent;
-
-            if (avatarImg) {
-                avatarImg.addEventListener('error', function() {
-                    handleAvatarError(this, employeeName);
-                });
-            }
-
-            // Click handler untuk modal - PERBAIKAN: Gunakan event delegation yang lebih baik
+        items.forEach(function(item) {
             item.addEventListener('click', function() {
-                fillModalData(this);
-                employeeModal.show();
+                var name = this.querySelector('.e-name').textContent;
+                var position = this.querySelector('.e-position').textContent;
+                var avatar = this.dataset.employeeAvatar;
+
+                if (avatar && avatar.trim()) {
+                    avatarBox.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<div class=modal-avatar-placeholder>' + initials(name) + '</div>\'">';
+                } else {
+                    avatarBox.innerHTML = '<div class="modal-avatar-placeholder">' + initials(name) + '</div>';
+                }
+
+                document.getElementById('modalEmployeeName').textContent = name;
+                document.getElementById('modalEmployeePosition').textContent = position;
+                document.getElementById('modalEmployeeDepartment').textContent = this.dataset.employeeDept;
+                document.getElementById('modalEmployeeStatus').textContent = this.dataset.employeeStatus;
+                document.getElementById('modalEmployeeNip').textContent = this.dataset.employeeNip || '-';
+                document.getElementById('modalEmployeeEmail').textContent = this.dataset.employeeEmail || '-';
+                document.getElementById('modalEmployeePhone').textContent = this.dataset.employeePhone || '-';
+                document.getElementById('modalEmployeeAddress').textContent = this.dataset.employeeAddress || '-';
+
+                var phone = this.dataset.employeePhone;
+                var waLink = document.getElementById('whatsappLink');
+                if (phone && phone !== '-') {
+                    var num = phone.replace(/[^0-9]/g, '');
+                    if (num.startsWith('0')) num = '62' + num.substring(1);
+                    waLink.href = 'https://wa.me/' + num;
+                    waLink.style.pointerEvents = 'auto';
+                    waLink.style.opacity = '1';
+                } else {
+                    waLink.href = '#';
+                    waLink.style.pointerEvents = 'none';
+                    waLink.style.opacity = '0.5';
+                }
+
+                modal.show();
             });
         });
 
-        // Search functionality
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                const employees = document.querySelectorAll('.employee-item');
-
-                employees.forEach(employee => {
-                    const name = employee.querySelector('.employee-name').textContent.toLowerCase();
-                    const position = employee.querySelector('.employee-position').textContent.toLowerCase();
-                    const department = employee.querySelector('.employee-department .badge').textContent.toLowerCase();
-
-                    if (name.includes(searchTerm) || position.includes(searchTerm) || department.includes(searchTerm)) {
-                        employee.style.display = 'flex';
-                    } else {
-                        employee.style.display = 'none';
-                    }
+                var term = this.value.toLowerCase().trim();
+                items.forEach(function(el) {
+                    var name = el.querySelector('.e-name').textContent.toLowerCase();
+                    var pos = el.querySelector('.e-position').textContent.toLowerCase();
+                    el.style.display = (name.includes(term) || pos.includes(term)) ? 'flex' : 'none';
                 });
             });
         }
 
-        // PERBAIKAN PENTING: Reset modal ketika ditutup
-        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function () {
-            // Kosongkan container avatar untuk memastikan tidak ada konflik
-            modalAvatarContainer.innerHTML = '';
+        document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function() {
+            avatarBox.innerHTML = '';
         });
     });
 
-    // Export fungsi ke global scope untuk digunakan di inline event handlers
-    window.handleAvatarError = function(imgElement, name) {
-        imgElement.style.display = 'none';
-        imgElement.parentElement.innerHTML = `<div class="avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
-    };
-
-    window.handleModalAvatarError = function(imgElement, name) {
-        imgElement.style.display = 'none';
-        document.getElementById('modalEmployeeAvatarContainer').innerHTML = `<div class="employee-avatar-placeholder">${name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>`;
+    window.handleAvatarError = function(img, name) {
+        img.style.display = 'none';
+        img.parentElement.innerHTML = '<div class="e-avatar-placeholder">' + name.split(' ').map(function(w){return w[0]}).join('').toUpperCase() + '</div>';
     };
 </script>
 @endsection
