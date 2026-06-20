@@ -373,114 +373,52 @@
             border-top-right-radius: 20px;
         }
 
-        /* Desktop: posisikan bottom-nav di dalam container */
         @media (min-width: 768px) {
-            .bottom-nav {
-                left: 50%;
-                transform: translateX(-50%);
-                border-radius: 20px;
-            }
+            .bottom-nav { left:50%; transform:translateX(-50%); border-radius:20px; }
         }
-
-        /* Mobile: full width bottom-nav */
         @media (max-width: 767px) {
-            .bottom-nav {
-                max-width: 100%;
-                border-radius: 0;
-            }
+            .bottom-nav { max-width:100%; border-radius:0; }
         }
 
         .nav-item {
-            text-align: center;
-            color: var(--gray-dark);
-            font-size: 10px;
-            width: 20%;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            text-align:center; color:var(--gray); font-size:10px; font-weight:500;
+            width:20%; cursor:pointer; text-decoration:none;
+            display:flex; flex-direction:column; align-items:center; gap:2px;
+            position:relative; -webkit-tap-highlight-color:transparent;
         }
-
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 0px;
-            transition: all 0.3s;
+        .nav-icon { font-size:18px; height:28px; display:flex; align-items:center; justify-content:center; position:relative; }
+        .nav-item.active { color:var(--primary-dark); font-weight:600; }
+        .nav-item.active .nav-icon::before {
+            content:''; position:absolute; width:32px; height:32px; border-radius:10px;
+            background:var(--primary); opacity:0.12; top:50%; left:50%;
+            transform:translate(-50%,-50%);
         }
+        .nav-item.active { pointer-events:none; }
 
-        .nav-item.active {
-            color: var(--primary);
-        }
-
-        .nav-item.active .nav-icon {
-            transform: scale(1.1);
-        }
-
-        .nav-item:hover {
-            color: var(--primary);
-        }
-
-        /* Loading Spinner Styles */
+        /* Loader */
         .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            position:fixed; inset:0; z-index:9999;
+            background:var(--white);
+            display:flex; justify-content:center; align-items:center;
+            opacity:0; visibility:hidden; transition:opacity 0.2s, visibility 0.2s;
         }
+        .loading-overlay.active { opacity:1; visibility:visible; }
+        .loading-content { display:flex; flex-direction:column; align-items:center; gap:16px; }
+        .loader-dots { display:flex; gap:8px; }
+        .loader-dots span {
+            width:10px; height:10px; border-radius:50%;
+            background:var(--primary); opacity:0.3;
+            animation:dotPulse 1.2s ease-in-out infinite;
+        }
+        .loader-dots span:nth-child(2) { animation-delay:0.15s; }
+        .loader-dots span:nth-child(3) { animation-delay:0.3s; }
+        @keyframes dotPulse {
+            0%, 80%, 100% { opacity:0.3; transform:scale(0.8); }
+            40% { opacity:1; transform:scale(1.1); }
+        }
+        .loading-text { color:var(--gray); font-size:13px; font-weight:500; }
 
-        .loading-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .loading-spinner-full {
-            width: 60px;
-            height: 60px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            margin-top: 15px;
-            color: var(--primary-dark);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .loading-content {
-            text-align: center;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(90, 182, 234, 0.2);
-        }
-
-        /* Page transition */
-        .page-transition {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        /* Prevent loading on active nav items */
-        .nav-item.active {
-            pointer-events: none;
-        }
-
-        /* Smooth transitions for all interactive elements */
-        a, button, .nav-item {
-            transition: all 0.3s ease;
-        }
+        .page-transition { animation:fadeIn 0.3s ease-in-out; }
 
         /* Modal Styles - Full Screen Mobile */
         .modal-fullscreen-mobile {
@@ -1020,9 +958,8 @@
             background-color: var(--card-bg) !important;
         }
 
-        [data-theme="dark"] .loading-overlay {
-            background: rgba(0, 0, 0, 0.8);
-        }
+        [data-theme="dark"] .loading-overlay { background: var(--body-bg); }
+        [data-theme="dark"] .loading-text { color: var(--gray); }
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -1064,29 +1001,23 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <a href="{{ route('pegawai.dashboard') }}" class="nav-item {{ Route::is('pegawai.dashboard') ? 'active' : '' }}">
-                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <div class="nav-icon"><i class="fas fa-house"></i></div>
                 <div>Home</div>
             </a>
-
             <a href="{{ route('pegawai.riwayat') }}" class="nav-item {{ Route::is('pegawai.riwayat') ? 'active' : '' }}">
-                <div class="nav-icon"><i class="fas fa-history"></i></div>
+                <div class="nav-icon"><i class="fas fa-clock-rotate-left"></i></div>
                 <div>Riwayat</div>
             </a>
-
             <a href="{{ route('pegawai.pengajuan.index') }}" class="nav-item {{ Route::is('pegawai.pengajuan.index') ? 'active' : '' }}">
-                <div class="nav-icon"><i class="fas fa-file-upload"></i></div>
+                <div class="nav-icon"><i class="fas fa-paper-plane"></i></div>
                 <div>Pengajuan</div>
             </a>
-
             <a href="{{ route('pegawai.daftar') }}" class="nav-item {{ Route::is('pegawai.daftar') ? 'active' : '' }}">
-                <div class="nav-icon">
-                    <div class="nav-icon"><i class="fas fa-users"></i></div>
-                </div>
+                <div class="nav-icon"><i class="fas fa-user-group"></i></div>
                 <div>Pegawai</div>
             </a>
-
             <a href="{{ route('pegawai.akun.index') }}" class="nav-item {{ Route::is('pegawai.akun.index') ? 'active' : '' }}">
-                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <div class="nav-icon"><i class="fas fa-circle-user"></i></div>
                 <div>Akun</div>
             </a>
         </div>
@@ -1095,7 +1026,7 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
-            <div class="loading-spinner-full"></div>
+            <div class="loader-dots"><span></span><span></span><span></span></div>
             <div class="loading-text">Memuat...</div>
         </div>
     </div>
