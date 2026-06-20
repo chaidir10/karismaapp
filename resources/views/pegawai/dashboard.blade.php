@@ -179,8 +179,8 @@
     <!-- Info bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--white);">
         <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">
-                <i class="far fa-calendar-alt"></i>
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; color:var(--primary-dark); font-size:18px;">
+                <i class="fas fa-calendar-day"></i>
             </div>
             <div>
                 <div style="font-size:11px; color:var(--gray); font-weight:500;">{{ now()->translatedFormat('l') }}</div>
