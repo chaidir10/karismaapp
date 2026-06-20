@@ -209,7 +209,7 @@
     <div style="display:flex; gap:10px; padding:16px 20px;">
         <button class="{{ $sudahPresensiMasuk ? '' : 'absen-btn-active' }}"
             id="clock-in-btn"
-            style="flex:1; height:52px; border-radius:14px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px; font-weight:700; transition:all 0.2s;
+            style="flex:1; height:60px; border-radius:16px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:15px; font-weight:700;
             {{ $sudahPresensiMasuk ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 14px rgba(90,182,234,0.3);' }}"
             @if($user->can_shift && $shifts->count() > 0 && !$sudahPresensiMasuk)
                 data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
@@ -218,16 +218,16 @@
             @endif
             onclick="setJenis('masuk'); setLembur(false)"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
-            <i class="fas {{ $sudahPresensiMasuk ? 'fa-check-circle' : 'fa-sign-in-alt' }}" style="font-size:18px;"></i>
+            <i class="fas {{ $sudahPresensiMasuk ? 'fa-check-circle' : 'fa-sign-in-alt' }}" style="font-size:20px;"></i>
             {{ $sudahPresensiMasuk ? 'Sudah Masuk' : 'Masuk' }}
         </button>
         <button class="{{ (!$sudahPresensiMasuk || $sudahPresensiPulang) ? '' : 'absen-btn-active' }}"
             id="clock-out-btn"
-            style="flex:1; height:52px; border-radius:14px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px; font-weight:700; transition:all 0.2s;
+            style="flex:1; height:60px; border-radius:16px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:15px; font-weight:700;
             {{ (!$sudahPresensiMasuk || $sudahPresensiPulang) ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 4px 14px rgba(245,158,11,0.3);' }}"
             onclick="handlePulangWithCheck()"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
-            <i class="fas {{ $sudahPresensiPulang ? 'fa-check-circle' : 'fa-sign-out-alt' }}" style="font-size:18px;"></i>
+            <i class="fas {{ $sudahPresensiPulang ? 'fa-check-circle' : 'fa-sign-out-alt' }}" style="font-size:20px;"></i>
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
