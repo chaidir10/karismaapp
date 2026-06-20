@@ -9,8 +9,8 @@
         h3 { text-align: center; margin: 0 0 4px; font-size: 12px; }
         h4 { text-align: center; margin: 0 0 6px; font-size: 9px; font-weight: normal; color: #555; }
         table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-        th, td { border: 1px solid #333; padding: 2px 3px; text-align: center; font-size: 8px; line-height: 1.3; }
-        th { background-color: #e0e0e0; font-weight: bold; font-size: 8px; }
+        th, td { border: 1px solid #333; padding: 2px 2px; text-align: center; font-size: 12px; line-height: 1.3; }
+        th { background-color: #e0e0e0; font-weight: bold; font-size: 12px; }
         .weekend { background-color: #f2f2f2; }
         .summary-table { margin-top: 6px; border: none; }
         .summary-table td { border: none; text-align: left; font-size: 9px; padding: 1px 4px; }
