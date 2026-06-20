@@ -1122,6 +1122,22 @@
         }
     }
 
+    // Profile photo map marker
+    var _profilePhoto = @json(
+        (Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
+            ? asset('public/storage/foto_profil/' . Auth::user()->foto_profil)
+            : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=5AB6EA&color=fff&size=80'
+    );
+
+    function profileMarkerIcon() {
+        return L.divIcon({
+            className: '',
+            html: '<div style="width:40px;height:40px;border-radius:50%;border:3px solid var(--primary);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.2);"><img src="' + _profilePhoto + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.src=\'https://ui-avatars.com/api/?name=U&background=5AB6EA&color=fff&size=80\'"></div>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+        });
+    }
+
     // Push Notification Reminders
     (function() {
         if (!('Notification' in window)) return;
@@ -1697,7 +1713,7 @@
                 maxZoom: 19
             }).addTo(mapInstance);
 
-            L.marker([lat, lng]).addTo(mapInstance);
+            L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
 
             ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
                 .forEach(f => mapInstance[f] && mapInstance[f].disable());
@@ -1759,7 +1775,7 @@
                     try {
                         const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-                        L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
+                        L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(map);
                         this._map = map;
                         setTimeout(() => { try { map.invalidateSize(); } catch(e){} }, 300);
                     } catch (e) {
