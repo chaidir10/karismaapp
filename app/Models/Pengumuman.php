@@ -20,12 +20,14 @@ class Pengumuman extends Model
         'isi',
         'gambar',
         'is_active',
+        'sembunyikan_detail',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'sembunyikan_detail' => 'boolean',
             'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
         ];
@@ -34,12 +36,13 @@ class Pengumuman extends Model
     public static function jenisOptions(): array
     {
         return [
-            'pengumuman' => ['label' => 'Pengumuman', 'icon' => 'fa-bullhorn', 'color' => '#3b82f6'],
-            'rapat' => ['label' => 'Rapat', 'icon' => 'fa-users', 'color' => '#8b5cf6'],
-            'info' => ['label' => 'Informasi', 'icon' => 'fa-info-circle', 'color' => '#06b6d4'],
-            'tugas' => ['label' => 'Tugas', 'icon' => 'fa-clipboard-list', 'color' => '#f59e0b'],
-            'kegiatan' => ['label' => 'Kegiatan', 'icon' => 'fa-calendar-check', 'color' => '#10b981'],
-            'lainnya' => ['label' => 'Lainnya', 'icon' => 'fa-bell', 'color' => '#64748b'],
+            'pengumuman' => ['label' => 'Pengumuman', 'icon' => 'fa-newspaper', 'color' => '#3b82f6'],
+            'rapat' => ['label' => 'Rapat', 'icon' => 'fa-handshake', 'color' => '#8b5cf6'],
+            'info' => ['label' => 'Informasi', 'icon' => 'fa-lightbulb', 'color' => '#06b6d4'],
+            'tugas' => ['label' => 'Tugas', 'icon' => 'fa-list-check', 'color' => '#f59e0b'],
+            'kegiatan' => ['label' => 'Kegiatan', 'icon' => 'fa-calendar-day', 'color' => '#10b981'],
+            'pengingat' => ['label' => 'Pengingat', 'icon' => 'fa-bell-concierge', 'color' => '#ec4899'],
+            'lainnya' => ['label' => 'Lainnya', 'icon' => 'fa-circle-info', 'color' => '#64748b'],
         ];
     }
 

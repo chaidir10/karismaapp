@@ -208,6 +208,15 @@
                 </label>
             </div>
 
+            <!-- Opsi Tampilan -->
+            <div style="margin-bottom:16px; background:#f8fafc; border-radius:12px; padding:14px 16px; border:1px solid #e2e8f0;">
+                <label style="font-size:13px; display:flex; align-items:center; gap:8px; cursor:pointer; color:#374151; font-weight:500;">
+                    <input type="checkbox" name="sembunyikan_detail" id="inputSembunyikan" value="1" style="accent-color:#3b82f6; width:16px; height:16px;">
+                    Sembunyikan judul & label di slider
+                    <span style="font-size:11px; color:#94a3b8; font-weight:400;">(hanya tampil gambar, detail tetap muncul saat diklik)</span>
+                </label>
+            </div>
+
             <!-- Isi -->
             <div style="margin-bottom:20px;">
                 <label class="form-label">Isi Pengumuman</label>
@@ -303,6 +312,7 @@
         document.getElementById('inputWaktu').value = '';
         document.getElementById('inputGambar').value = '';
         document.getElementById('inputHapusGambar').checked = false;
+        document.getElementById('inputSembunyikan').checked = false;
         document.getElementById('coverPreview').style.display = 'none';
         quill.root.innerHTML = '';
     }
@@ -325,6 +335,7 @@
                 document.getElementById('inputWaktu').value = data.waktu ? data.waktu.substring(0, 5) : '';
                 document.getElementById('inputGambar').value = '';
                 document.getElementById('inputHapusGambar').checked = false;
+                document.getElementById('inputSembunyikan').checked = !!data.sembunyikan_detail;
                 quill.root.innerHTML = data.isi;
 
                 var preview = document.getElementById('coverPreview');

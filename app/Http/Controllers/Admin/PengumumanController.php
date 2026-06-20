@@ -30,6 +30,7 @@ class PengumumanController extends Controller
 
         $data = $request->only(['judul', 'jenis', 'isi', 'tanggal_mulai', 'tanggal_selesai', 'waktu']);
         $data['is_active'] = true;
+        $data['sembunyikan_detail'] = $request->boolean('sembunyikan_detail');
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('pengumuman', 'public');
@@ -59,6 +60,7 @@ class PengumumanController extends Controller
 
         $pengumuman = Pengumuman::findOrFail($id);
         $data = $request->only(['judul', 'jenis', 'isi', 'tanggal_mulai', 'tanggal_selesai', 'waktu']);
+        $data['sembunyikan_detail'] = $request->boolean('sembunyikan_detail');
 
         if ($request->hasFile('gambar')) {
             if ($pengumuman->gambar && Storage::disk('public')->exists($pengumuman->gambar)) {

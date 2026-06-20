@@ -139,7 +139,7 @@
 
     /* Carousel */
     .info-carousel { margin:0 0 20px; position:relative; overflow:hidden; }
-    .carousel-track { display:flex; transition:transform 0.35s ease; }
+    .carousel-track { display:flex; will-change:transform; user-select:none; -webkit-user-select:none; }
     .carousel-slide { min-width:100%; cursor:pointer; padding:0 20px; box-sizing:border-box; }
 
     .slide-content {
@@ -156,8 +156,6 @@
     .slide-link { font-size:11px; font-weight:600; margin-top:6px; opacity:0.85; }
 
     .slide-image { width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; }
-    .slide-image-overlay { position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,0.7) 0%,transparent 60%); display:flex; flex-direction:column; justify-content:flex-end; padding:14px 16px; }
-    .slide-image-title { font-size:14px; font-weight:700; color:#fff; line-height:1.3; }
 
     .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
@@ -258,16 +256,20 @@
             $pmLabel = \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? $pm->jenis;
         @endphp
         <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})">
-            @if($pm->gambar)
+            @if($pm->gambar && ($pm->sembunyikan_detail ?? false))
+            {{-- Gambar only, no overlay --}}
+            <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}')"></div>
+            @elseif($pm->gambar)
+            {{-- Gambar with subtle tag overlay --}}
             <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}')">
-                <div class="slide-image-overlay">
-                    <span class="slide-tag" style="background:{{ $pmColor }}">{{ $pmLabel }}</span>
-                    <div class="slide-image-title">{{ $pm->judul }}</div>
+                <div style="position:absolute; top:12px; left:12px;">
+                    <span class="slide-tag" style="background:{{ $pmColor }}; opacity:0.75;">{{ $pmLabel }}</span>
                 </div>
             </div>
             @else
-            <div class="slide-content" style="background:linear-gradient(135deg, {{ $pmColor }}18, {{ $pmColor }}08); color:#1e293b;">
-                <div class="slide-icon" style="background:{{ $pmColor }}22; color:{{ $pmColor }}">
+            {{-- No image, gradient card --}}
+            <div class="slide-content" style="background:linear-gradient(135deg, {{ $pmColor }}28, {{ $pmColor }}10);">
+                <div class="slide-icon" style="background:{{ $pmColor }}30; color:{{ $pmColor }}">
                     <i class="fas {{ $pmIcon }}"></i>
                 </div>
                 <div class="slide-body">
@@ -994,17 +996,29 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
 <script>
-    // Carousel
+    // Carousel with live drag
     var currentSlide = 0;
     var track = document.getElementById('carouselTrack');
     var totalSlides = track ? track.children.length : 0;
     var autoSlideTimer = null;
+    var isDragging = false;
+    var dragStartX = 0;
+    var dragCurrentX = 0;
+    var dragBaseOffset = 0;
 
-    function goToSlide(i) {
-        currentSlide = i;
-        if (track) track.style.transform = 'translateX(-' + (i * 100) + '%)';
+    function getTrackWidth() { return track ? track.parentElement.offsetWidth : 1; }
+
+    function setTrackPos(px, animate) {
+        if (!track) return;
+        track.style.transition = animate ? 'transform 0.3s ease' : 'none';
+        track.style.transform = 'translateX(' + px + 'px)';
+    }
+
+    function goToSlide(i, animate) {
+        currentSlide = Math.max(0, Math.min(i, totalSlides - 1));
+        setTrackPos(-currentSlide * getTrackWidth(), animate !== false);
         var dots = document.querySelectorAll('#carouselDots .dot');
-        dots.forEach(function(d, idx) { d.classList.toggle('active', idx === i); });
+        dots.forEach(function(d, idx) { d.classList.toggle('active', idx === currentSlide); });
         resetAutoSlide();
     }
 
@@ -1015,16 +1029,54 @@
         if (totalSlides > 1) autoSlideTimer = setInterval(nextSlide, 5000);
     }
 
-    if (totalSlides > 1) {
-        resetAutoSlide();
-        var startX = 0;
-        if (track) {
-            track.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
-            track.addEventListener('touchend', function(e) {
-                var diff = startX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 50) { diff > 0 ? goToSlide(Math.min(currentSlide + 1, totalSlides - 1)) : goToSlide(Math.max(currentSlide - 1, 0)); }
-            });
+    function onDragStart(x) {
+        isDragging = true;
+        dragStartX = x;
+        dragCurrentX = x;
+        dragBaseOffset = -currentSlide * getTrackWidth();
+        if (autoSlideTimer) clearInterval(autoSlideTimer);
+    }
+
+    function onDragMove(x) {
+        if (!isDragging) return;
+        dragCurrentX = x;
+        var diff = dragCurrentX - dragStartX;
+        setTrackPos(dragBaseOffset + diff, false);
+    }
+
+    function onDragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        var diff = dragCurrentX - dragStartX;
+        var threshold = getTrackWidth() * 0.2;
+        if (diff < -threshold && currentSlide < totalSlides - 1) {
+            goToSlide(currentSlide + 1);
+        } else if (diff > threshold && currentSlide > 0) {
+            goToSlide(currentSlide - 1);
+        } else {
+            goToSlide(currentSlide);
         }
+    }
+
+    if (track && totalSlides > 1) {
+        resetAutoSlide();
+
+        track.addEventListener('touchstart', function(e) { onDragStart(e.touches[0].clientX); }, { passive: true });
+        track.addEventListener('touchmove', function(e) { onDragMove(e.touches[0].clientX); }, { passive: true });
+        track.addEventListener('touchend', onDragEnd);
+        track.addEventListener('touchcancel', onDragEnd);
+
+        track.addEventListener('mousedown', function(e) { e.preventDefault(); onDragStart(e.clientX); });
+        document.addEventListener('mousemove', function(e) { if (isDragging) onDragMove(e.clientX); });
+        document.addEventListener('mouseup', onDragEnd);
+
+        track.style.cursor = 'grab';
+        track.addEventListener('mousedown', function() { track.style.cursor = 'grabbing'; });
+        document.addEventListener('mouseup', function() { if (track) track.style.cursor = 'grab'; });
+
+        track.addEventListener('click', function(e) {
+            if (Math.abs(dragCurrentX - dragStartX) > 10) e.stopPropagation();
+        }, true);
     }
 
     function openInfoModal(id) {
