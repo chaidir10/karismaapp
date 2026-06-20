@@ -1481,35 +1481,39 @@
         });
     }
 
-    // MediaPipe Face Detection — fast, accurate, runs on GPU
+    // MediaPipe Face Detection
     function initFaceDetection() {
         var video = document.getElementById('video');
         var submitBtn = document.querySelector('.submit-btn-large');
         var statusEl = document.getElementById('faceStatus');
 
+        // ALWAYS disable button until face is confirmed
         if (submitBtn) submitBtn.disabled = true;
+        faceDetected = false;
         updateFaceStatus(false);
 
         if (typeof FaceDetection === 'undefined') {
-            if (statusEl) statusEl.style.display = 'none';
-            if (submitBtn) submitBtn.disabled = false;
+            // No face detection available — keep button DISABLED (no celah)
+            if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Face detection tidak tersedia'; }
             return;
         }
 
         if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
 
+        // Destroy previous instance if exists
+        if (mpCamera) { try { mpCamera.stop(); } catch(e) {} mpCamera = null; }
+        mpFaceDetector = null;
+
         mpFaceDetector = new FaceDetection({
             locateFile: function(file) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/' + file; }
         });
-
         mpFaceDetector.setOptions({ model: 'short', minDetectionConfidence: 0.6 });
 
         mpFaceDetector.onResults(function(results) {
+            if (!videoStream) return; // modal closed, ignore
             var found = false;
             if (results.detections && results.detections.length > 0) {
-                var det = results.detections[0];
-                var bb = det.boundingBox;
-                found = isFaceInGuide(bb, video);
+                found = isFaceInGuide(results.detections[0].boundingBox, video);
             }
             if (found !== faceDetected) {
                 faceDetected = found;
@@ -1521,7 +1525,7 @@
             mpCamera = new Camera(video, {
                 onFrame: async function() {
                     if (mpFaceDetector && videoStream) {
-                        await mpFaceDetector.send({ image: video });
+                        try { await mpFaceDetector.send({ image: video }); } catch(e) {}
                     }
                 },
                 width: 640,
@@ -1562,9 +1566,12 @@
 
     function stopFaceDetection() {
         if (mpCamera) { try { mpCamera.stop(); } catch(e) {} mpCamera = null; }
+        if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
         faceDetected = false;
         var ovalEl = document.getElementById('faceGuideOval');
         if (ovalEl) ovalEl.classList.remove('detected');
+        var submitBtn = document.querySelector('.submit-btn-large');
+        if (submitBtn) submitBtn.disabled = true;
     }
 
     function initializeLocation() {
@@ -1784,6 +1791,11 @@
     function captureAndProcess() {
         if (!videoStream || !currentPosition) {
             showError("Kamera atau lokasi belum siap. Pastikan izin kamera & lokasi diizinkan.");
+            return;
+        }
+
+        if (!faceDetected) {
+            showError("Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.");
             return;
         }
 
