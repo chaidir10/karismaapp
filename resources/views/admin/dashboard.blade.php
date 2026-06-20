@@ -607,7 +607,8 @@
     }
 
     #presensiMap,
-    #hariIniMap {
+    #hariIniMap,
+    #lemburMap {
         width: 100%;
         height: 100%;
     }
