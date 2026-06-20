@@ -116,16 +116,16 @@
     }
     .history-card:active { transform:scale(0.98); }
     .hc-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-    .hc-icon-masuk { background:#d1fae5; color:#059669; }
-    .hc-icon-pulang { background:#fef3c7; color:#d97706; }
-    .hc-icon-lembur-masuk { background:#ede9fe; color:#7c3aed; }
-    .hc-icon-lembur-pulang { background:#fce7f3; color:#db2777; }
+    .hc-icon-masuk { background:var(--primary-soft); color:var(--primary-dark); }
+    .hc-icon-pulang { background:var(--accent-light); color:var(--accent); }
+    .hc-icon-lembur-masuk { background:var(--primary-soft); color:var(--primary-dark); }
+    .hc-icon-lembur-pulang { background:var(--accent-light); color:var(--accent); }
     .hc-body { flex:1; min-width:0; }
     .hc-title-row { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
     .hc-label { font-size:13px; font-weight:600; color:var(--dark); }
     .hc-tag { font-size:9px; font-weight:700; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px; }
-    .hc-tag-reguler { background:#dbeafe; color:#2563eb; }
-    .hc-tag-lembur { background:#ede9fe; color:#7c3aed; }
+    .hc-tag-reguler { background:var(--primary-soft); color:var(--primary-dark); }
+    .hc-tag-lembur { background:var(--accent-light); color:var(--accent); }
     .hc-time { font-size:20px; font-weight:800; color:var(--dark); font-variant-numeric:tabular-nums; line-height:1.2; }
     .hc-right { flex-shrink:0; }
     .hc-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
@@ -210,7 +210,7 @@
         <button class="{{ $sudahPresensiMasuk ? '' : 'absen-btn-active' }}"
             id="clock-in-btn"
             style="flex:1; height:52px; border-radius:14px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px; font-weight:700; transition:all 0.2s;
-            {{ $sudahPresensiMasuk ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,#10b981,#059669); color:#fff; box-shadow:0 4px 14px rgba(16,185,129,0.3);' }}"
+            {{ $sudahPresensiMasuk ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 14px rgba(90,182,234,0.3);' }}"
             @if($user->can_shift && $shifts->count() > 0 && !$sudahPresensiMasuk)
                 data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
             @else

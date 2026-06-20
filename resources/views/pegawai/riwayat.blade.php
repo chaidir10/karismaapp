@@ -50,10 +50,10 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 18px; flex-shrink: 0;
     }
-    .icon-masuk { background: #d1fae5; color: #059669; }
-    .icon-pulang { background: #fef3c7; color: #d97706; }
-    .icon-lembur-masuk { background: #ede9fe; color: #7c3aed; }
-    .icon-lembur-pulang { background: #fce7f3; color: #db2777; }
+    .icon-masuk { background: var(--primary-soft); color: var(--primary-dark); }
+    .icon-pulang { background: var(--accent-light); color: var(--accent); }
+    .icon-lembur-masuk { background: var(--primary-soft); color: var(--primary-dark); }
+    .icon-lembur-pulang { background: var(--accent-light); color: var(--accent); }
 
     .card-body { flex: 1; min-width: 0; }
     .card-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
@@ -62,8 +62,8 @@
         font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
         text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .tag-reguler { background: #dbeafe; color: #2563eb; }
-    .tag-lembur { background: #ede9fe; color: #7c3aed; }
+    .tag-reguler { background: var(--primary-soft); color: var(--primary-dark); }
+    .tag-lembur { background: var(--accent-light); color: var(--accent); }
     .card-time { font-size: 22px; font-weight: 800; color: var(--dark); font-variant-numeric: tabular-nums; line-height: 1.2; }
     .card-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
 
@@ -82,33 +82,33 @@
     .empty-box i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; display: block; }
     .empty-box p { font-size: 14px; margin: 0; }
 
-    /* Modal (keep existing) */
-    .detail-modal .modal-content { background:var(--white); border-radius:0; height:100vh; margin:0; display:flex; flex-direction:column; width:100vw; max-width:none; overflow:hidden; }
+    /* Modal */
+    .detail-modal .modal-content { background:var(--card-bg); border-radius:0; height:100vh; margin:0; display:flex; flex-direction:column; width:100vw; max-width:none; overflow:hidden; }
     .detail-modal .modal-dialog { margin:0; max-width:none; width:100%; height:100%; }
-    .detail-modal .modal-header { position:sticky; top:0; z-index:10; background:var(--white); border-bottom:1px solid var(--gray-light); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; min-height:44px; }
+    .detail-modal .modal-header { position:sticky; top:0; z-index:10; background:var(--card-bg); border-bottom:1px solid var(--card-border); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; min-height:44px; }
     .detail-modal .modal-title { font-weight:700; color:var(--dark); font-size:18px; margin:0; }
     .detail-modal .close-btn { background:none; border:none; font-size:24px; cursor:pointer; color:var(--gray); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
-    .detail-content-container { display:flex; flex:1; width:100%; overflow:hidden; }
-    .detail-image-container { flex:3; height:100%; position:relative; border-right:1px solid var(--gray-light); }
-    .detail-map-container { flex:2; height:100%; position:relative; }
+    .detail-content-container { display:flex; flex:1; width:100%; overflow:hidden; min-height:0; }
+    .detail-image-container { flex:3; min-height:0; position:relative; border-right:1px solid var(--card-border); }
+    .detail-map-container { flex:2; min-height:0; position:relative; }
     .detail-image { width:100%; height:100%; object-fit:cover; display:block; }
     .detail-map { width:100%; height:100%; }
     .no-photo-placeholder, .no-location-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--gray); gap:12px; background:var(--gray-light); }
-    .detail-info-section { padding:12px 16px; background:var(--white); flex-shrink:0; border-top:1px solid var(--gray-light); }
+    .detail-info-section { padding:12px 16px; background:var(--card-bg); flex-shrink:0; border-top:1px solid var(--card-border); }
     .detail-datetime-info { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; padding:12px 16px; border-radius:12px; margin-bottom:10px; text-align:center; }
     .detail-type-badge { display:inline-block; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:700; margin-bottom:6px; background:rgba(255,255,255,0.2); }
-    .badge-masuk { background:rgba(16,185,129,0.3); }
-    .badge-pulang { background:rgba(239,68,68,0.3); }
-    .badge-lembur { background:rgba(124,58,237,0.3); }
+    .badge-masuk { background:rgba(90,182,234,0.4); }
+    .badge-pulang { background:rgba(254,170,43,0.4); }
+    .badge-lembur { background:rgba(90,182,234,0.4); }
     .detail-date { font-size:13px; opacity:0.9; margin-bottom:4px; font-weight:500; }
     .detail-location-address { margin-top:6px; font-size:12px; line-height:1.4; color:rgba(255,255,255,0.9); word-break:break-word; }
     .loading-address { display:flex; align-items:center; justify-content:center; gap:8px; color:rgba(255,255,255,0.9); font-size:12px; }
-    .detail-back-btn { width:100%; padding:10px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; border:none; border-radius:10px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; min-height:40px; box-shadow:0 4px 8px rgba(90,182,234,0.3); }
+    .detail-back-btn { width:100%; padding:10px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; min-height:44px; }
 
     @media (max-width:576px) {
         .detail-content-container { flex-direction:column; }
-        .detail-image-container { flex:3; border-right:none; border-bottom:1px solid var(--gray-light); }
-        .detail-map-container { flex:2; }
+        .detail-image-container { flex:none; height:45vh; border-right:none; border-bottom:1px solid var(--card-border); }
+        .detail-map-container { flex:none; height:30vh; }
     }
 </style>
 
