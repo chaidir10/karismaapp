@@ -104,7 +104,9 @@
                 <label class="text-sm font-medium block mb-2 text-gray-700">Bulan</label>
                 <input type="month" name="bulan" id="bulan" class="w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="height:42px;" value="{{ now()->format('Y-m') }}">
             </div>
-            <div class="md:col-span-5 flex gap-2" style="margin-top:auto;">
+            <div class="md:col-span-5">
+                <label class="text-sm font-medium block mb-2 text-gray-700 invisible">_</label>
+                <div class="flex gap-2">
                 <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm" style="height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -123,6 +125,7 @@
                     </svg>
                     Excel
                 </a>
+                </div>
             </div>
         </form>
     </div>
