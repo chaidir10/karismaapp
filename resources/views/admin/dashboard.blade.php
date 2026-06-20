@@ -4,6 +4,26 @@
 
 @section('content')
 <style>
+    :root {
+        --primary: #3b82f6;
+        --primary-light: #60a5fa;
+        --primary-dark: #2563eb;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --light: #f8fafc;
+        --dark: #1e293b;
+        --white: #ffffff;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+    }
+
     .admin-dashboard {
         padding: 20px;
         background: var(--light);
@@ -43,6 +63,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-left: 4px solid var(--primary);
     }
 
     .stat-content {
@@ -67,11 +88,11 @@
         width: 50px;
         height: 50px;
         border-radius: 10px;
-        background: var(--primary-soft);
+        background: var(--primary);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary-dark);
+        color: var(--white);
         font-size: 20px;
     }
 
@@ -255,9 +276,9 @@
     }
 
     .jenis-badge {
-        background: var(--primary-soft);
-        color: var(--primary-dark);
-        border: 1px solid rgba(46, 151, 212, 0.2);
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
     .status-badge {
@@ -663,7 +684,7 @@
                 <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
                 <p class="stat-label">Total Pegawai</p>
             </div>
-            <div class="stat-icon" style="background:var(--primary-soft);color:var(--primary-dark);">
+            <div class="stat-icon">
                 <i class="fas fa-users"></i>
             </div>
         </div>
@@ -1217,7 +1238,7 @@
     let hariIniCoords  = null;
 
     // ─── DOM Ready ───────────────────────────────────────────────────────────
-    function initDashboardListeners() {
+    document.addEventListener('DOMContentLoaded', function () {
 
         // Klik baris presensi pending
         document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(function (row) {
@@ -1286,9 +1307,7 @@
                 });
             }
         });
-    }
-    document.addEventListener('DOMContentLoaded', initDashboardListeners);
-    document.addEventListener('turbo:load', initDashboardListeners);
+    });
 
     // ─── Modal Presensi ───────────────────────────────────────────────────────
     function openPresensiModal(data) {
@@ -1615,30 +1634,21 @@
         render();
     }
 
-    function initAllTables() {
+    document.addEventListener('DOMContentLoaded', function() {
         initTable('presensiPendingTable');
         initTable('pengajuanPendingTable');
         initTable('presensiHariIniTable');
         initTable('lemburHariIniTable');
-    }
-    document.addEventListener('DOMContentLoaded', initAllTables);
-    document.addEventListener('turbo:load', initAllTables);
+    });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <script>
-    var attendanceChartInstance = null;
-
-    function initAttendanceChart() {
+    document.addEventListener('DOMContentLoaded', function() {
         var ctx = document.getElementById('attendanceChart');
         if (!ctx) return;
 
-        if (attendanceChartInstance) {
-            attendanceChartInstance.destroy();
-            attendanceChartInstance = null;
-        }
-
-        attendanceChartInstance = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'line',
             data: {
                 labels: @json($chartLabels),
@@ -1721,15 +1731,6 @@
                 }
             }
         });
-    }
-
-    document.addEventListener('DOMContentLoaded', initAttendanceChart);
-    document.addEventListener('turbo:load', initAttendanceChart);
-    document.addEventListener('turbo:before-cache', function() {
-        if (attendanceChartInstance) {
-            attendanceChartInstance.destroy();
-            attendanceChartInstance = null;
-        }
     });
 </script>
 

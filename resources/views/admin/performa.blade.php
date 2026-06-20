@@ -32,7 +32,7 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="rounded-xl p-6 mb-8 shadow-lg" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark))">
+    <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-6 mb-8 shadow-lg">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-white">Performa Pegawai</h1>
@@ -47,7 +47,7 @@
         <form id="formFilter" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div class="md:col-span-3">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Bulan</label>
-                <select id="filterBulan" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm">
+                <select id="filterBulan" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
                     @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
                     @foreach($namaBulan as $i => $nb)
                         <option value="{{ $i+1 }}" {{ (int)now()->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
@@ -56,14 +56,14 @@
             </div>
             <div class="md:col-span-2">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Tahun</label>
-                <select id="filterTahun" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm">
+                <select id="filterTahun" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
                     @for($y = now()->year; $y >= 2024; $y--)
                         <option value="{{ $y }}">{{ $y }}</option>
                     @endfor
                 </select>
             </div>
             <div class="md:col-span-7 flex gap-2">
-                <button type="submit" class="flex-1 bg-[#2E97D4] text-white px-4 py-2 rounded-xl hover:bg-[#2680b8] transition-colors flex items-center justify-center text-sm">
+                <button type="submit" class="flex-1 bg-amber-600 text-white px-4 py-2 rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center text-sm">
                     <i class="fas fa-search mr-2"></i>
                     Tampilkan Performa
                 </button>
@@ -76,7 +76,7 @@
     </div>
 
     <!-- Info Metodologi -->
-    <div class="bg-blue-50 border border-[#5AB6EA] rounded-xl p-4 mb-6 text-sm text-[#2E97D4]">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm text-amber-800">
         <div class="flex items-start gap-2">
             <i class="fas fa-info-circle mt-0.5"></i>
             <div>
@@ -181,7 +181,7 @@
         return 'background:#e5e7eb;color:#6b7280';
     }
 
-    function initPerforma() {
+    document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('formFilter').addEventListener('submit', function(e) {
             e.preventDefault();
             loadPerforma();
@@ -196,9 +196,7 @@
         });
 
         loadPerforma();
-    }
-    document.addEventListener('DOMContentLoaded', initPerforma);
-    document.addEventListener('turbo:load', initPerforma);
+    });
 
     function loadPerforma() {
         var bulan = document.getElementById('filterBulan').value;
