@@ -1,24 +1,49 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
     <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <title>Admin | @yield('title')</title>
-    <!-- Google Fonts + Tailwind + Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
+    <script>(function(){ var t=localStorage.getItem('karisma-admin-theme')||'light'; document.documentElement.setAttribute('data-theme',t); })();</script>
+
     @stack('head')
     @stack('styles')
     <style>
+        :root, [data-theme="light"] {
+            --dm-bg: #f9fafb;
+            --dm-card: #ffffff;
+            --dm-sidebar: #ffffff;
+            --dm-topbar: #ffffff;
+            --dm-border: #e5e7eb;
+            --dm-text: #1e293b;
+            --dm-text2: #4b5563;
+            --dm-muted: #6b7280;
+            --dm-input: #ffffff;
+            --dm-input-border: #d1d5db;
+        }
+        [data-theme="dark"] {
+            --dm-bg: #0f172a;
+            --dm-card: #1e293b;
+            --dm-sidebar: #0f172a;
+            --dm-topbar: #1e293b;
+            --dm-border: #334155;
+            --dm-text: #f1f5f9;
+            --dm-text2: #cbd5e1;
+            --dm-muted: #94a3b8;
+            --dm-input: #1e293b;
+            --dm-input-border: #475569;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             -webkit-text-size-adjust: 100%;
@@ -307,6 +332,80 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 40;
         }
+        /* ─── Dark Mode ─── */
+        [data-theme="dark"] body { background-color: var(--dm-bg) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .sidebar { background: var(--dm-sidebar) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .sidebar-item { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .sidebar-item:hover, [data-theme="dark"] .sidebar-item.active { background-color: rgba(90,182,234,0.1) !important; color: #5AB6EA !important; }
+        [data-theme="dark"] .sidebar-title { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .topbar { background: var(--dm-topbar) !important; box-shadow: none !important; border-bottom: 1px solid var(--dm-border) !important; }
+        [data-theme="dark"] .main-content { background: var(--dm-bg) !important; }
+        [data-theme="dark"] .mobile-sidebar-content { background: var(--dm-sidebar) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .logout-modal-content { background: var(--dm-card) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .logout-modal h3 { color: var(--dm-text) !important; }
+        [data-theme="dark"] .logout-modal p { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .logout-btn-cancel { background: var(--dm-border) !important; color: var(--dm-text) !important; }
+
+        [data-theme="dark"] .bg-white { background-color: var(--dm-card) !important; }
+        [data-theme="dark"] .bg-gray-50, [data-theme="dark"] .bg-gray-100 { background-color: #1e293b !important; }
+        [data-theme="dark"] .bg-green-50 { background-color: #064e3b !important; }
+        [data-theme="dark"] .bg-red-50, [data-theme="dark"] .bg-red-100 { background-color: #4a1c1c !important; }
+        [data-theme="dark"] .bg-yellow-50 { background-color: #78350f !important; }
+        [data-theme="dark"] .bg-blue-50, [data-theme="dark"] .bg-blue-100 { background-color: #1e3a5f !important; }
+
+        [data-theme="dark"] .text-gray-800, [data-theme="dark"] .text-gray-900 { color: var(--dm-text) !important; }
+        [data-theme="dark"] .text-gray-700 { color: var(--dm-text2) !important; }
+        [data-theme="dark"] .text-gray-600, [data-theme="dark"] .text-gray-500, [data-theme="dark"] .text-gray-400 { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .text-green-700 { color: #6ee7b7 !important; }
+        [data-theme="dark"] .text-red-500, [data-theme="dark"] .text-red-700 { color: #fca5a5 !important; }
+        [data-theme="dark"] .text-blue-600 { color: #93c5fd !important; }
+
+        [data-theme="dark"] .border-gray-100, [data-theme="dark"] .border-gray-200, [data-theme="dark"] .border-gray-300 { border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .border-green-200 { border-color: #065f46 !important; }
+        [data-theme="dark"] .border-red-200 { border-color: #7f1d1d !important; }
+        [data-theme="dark"] .divide-gray-200 > * + * { border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .shadow-xl, [data-theme="dark"] .shadow-lg, [data-theme="dark"] .shadow-md, [data-theme="dark"] .shadow-sm { box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; }
+        [data-theme="dark"] .hover\:bg-gray-50:hover { background-color: #334155 !important; }
+
+        [data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select {
+            background-color: var(--dm-input) !important; border-color: var(--dm-input-border) !important; color: var(--dm-text) !important;
+        }
+        [data-theme="dark"] .modal-content { background-color: var(--dm-card) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .modal-overlay .modal-container { background-color: var(--dm-card) !important; }
+
+        [data-theme="dark"] .data-table th { color: var(--dm-muted) !important; background: #1e293b !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .data-table td { color: var(--dm-text) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .data-table tbody tr:hover { background: #334155 !important; }
+        [data-theme="dark"] .user-name { color: var(--dm-text) !important; }
+        [data-theme="dark"] .time-cell { color: var(--dm-text) !important; }
+        [data-theme="dark"] .date-cell { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .card-title { color: var(--dm-text) !important; }
+        [data-theme="dark"] .card-badge { background: #334155 !important; color: var(--dm-muted) !important; }
+        [data-theme="dark"] .stat-card { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .stat-value { color: var(--dm-text) !important; }
+        [data-theme="dark"] .stat-label { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .content-card { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .card-header { border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .table-pagination { border-color: var(--dm-border) !important; color: var(--dm-muted) !important; }
+        [data-theme="dark"] .pagination-buttons button { background: var(--dm-card) !important; border-color: var(--dm-border) !important; color: var(--dm-muted) !important; }
+        [data-theme="dark"] .pagination-buttons button:hover:not(:disabled) { background: #334155 !important; }
+        [data-theme="dark"] .detail-grid label { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .detail-grid span { color: var(--dm-text) !important; }
+        [data-theme="dark"] .text-muted { color: var(--dm-muted) !important; }
+        [data-theme="dark"] .modal-title { color: var(--dm-text) !important; }
+        [data-theme="dark"] .map-container { border-color: var(--dm-border) !important; background: #1e293b !important; }
+        [data-theme="dark"] .foto-wrapper { background: #1e293b !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .rounded-xl, [data-theme="dark"] .rounded-2xl { border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .border { border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .hidden.fixed { background-color: rgba(0,0,0,0.7) !important; }
+        [data-theme="dark"] .hidden.fixed > div { background-color: var(--dm-card) !important; }
+
+        .admin-theme-btn {
+            width: 34px; height: 34px; border-radius: 8px; border: 1px solid #e5e7eb;
+            background: transparent; color: #6b7280; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        [data-theme="dark"] .admin-theme-btn { border-color: var(--dm-border); color: var(--dm-muted); }
     </style>
 </head>
 
@@ -395,7 +494,11 @@
                 <div class="flex items-center">
                     <span class="font-semibold">@yield('title')</span>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
+                    <button type="button" class="admin-theme-btn" onclick="toggleAdminTheme()" title="Ubah tema">
+                        <i class="fas fa-sun" id="admin-sun"></i>
+                        <i class="fas fa-moon" id="admin-moon" style="display:none;"></i>
+                    </button>
                     <div class="text-sm text-gray-600">{{ Auth::user()->name }}</div>
                     @if(Auth::user()->foto_profil)
                     <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
@@ -473,7 +576,22 @@
     </div>
 
     <script>
+        function toggleAdminTheme() {
+            var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('karisma-admin-theme', next);
+            syncAdminThemeIcons();
+        }
+        function syncAdminThemeIcons() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            var s = document.getElementById('admin-sun'), m = document.getElementById('admin-moon');
+            if (s) s.style.display = isDark ? 'none' : 'inline';
+            if (m) m.style.display = isDark ? 'inline' : 'none';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            syncAdminThemeIcons();
+
             // Mobile sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mobileSidebar = document.getElementById('mobileSidebar');
