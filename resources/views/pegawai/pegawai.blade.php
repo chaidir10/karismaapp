@@ -3,13 +3,24 @@
 
 @section('content')
 <style>
-    .pegawai-page { padding: 20px; padding-bottom: 100px; }
+    /* Employee Section */
+    .employee-section {
+        background-color: var(--card-bg);
+        margin: 20px;
+        position: relative;
+        z-index: 2;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid var(--card-border);
+        margin-bottom: 100px;
+    }
 
     .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 15px;
     }
 
     .section-title {
@@ -19,47 +30,17 @@
         margin: 0;
     }
 
-    /* Search bar standalone */
-    .search-bar {
-        position: relative;
-        margin-bottom: 16px;
-    }
-    .search-bar .search-icon {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--gray);
-        font-size: 14px;
-        pointer-events: none;
-    }
-    .search-bar input {
-        width: 100%;
-        padding: 12px 14px 12px 40px;
-        border: 1px solid var(--card-border);
-        border-radius: 12px;
-        font-size: 14px;
-        background: var(--card-bg);
-        color: var(--dark);
-        outline: none;
-    }
-    .search-bar input:focus {
-        border-color: var(--primary);
-    }
-
     .employee-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
 
-    /* Card Items */
     .employee-item {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 14px 16px;
-        background: var(--card-bg);
+        padding: 14px;
+        background-color: var(--light);
         border-radius: 14px;
         border: 1px solid var(--card-border);
         cursor: pointer;
@@ -67,46 +48,90 @@
     }
     .employee-item:active { opacity: 0.85; }
 
-    /* Avatar rounded-square */
+    /* PERBAIKAN UTAMA: Styling untuk avatar */
     .employee-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        overflow: hidden;
+        width: 50px;
+        height: 50px;
+        margin-right: 15px;
         flex-shrink: 0;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid var(--gray-light);
         display: flex;
         align-items: center;
         justify-content: center;
         background-color: var(--primary-soft);
     }
+
     .employee-avatar img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
     }
-    .avatar-placeholder {
+
+    .btn-secondary {
+        background: var(--gray-light);
+        color: var(--dark);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 15px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+        transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+        background: var(--gray);
+        color: var(--white);
+    }
+
+    /* Container untuk avatar modal - PERBAIKAN PENTING */
+    .employee-avatar-container {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--primary-soft);
+    }
+
+    /* Avatar besar untuk modal */
+    .employee-avatar-large {
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        object-fit: cover;
+        display: block;
+    }
+
+    .employee-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-weight: 700;
-        font-size: 15px;
+        font-weight: bold;
+        font-size: 24px;
+        border-radius: 50%;
     }
 
     .employee-info {
-        flex: 1;
+        flex-grow: 1;
         min-width: 0;
     }
 
     .employee-name {
         font-size: 14px;
         font-weight: 600;
+        margin-bottom: 2px;
         color: var(--dark);
-        margin: 0 0 2px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -115,7 +140,7 @@
     .employee-position {
         font-size: 12px;
         color: var(--gray);
-        margin: 0 0 4px;
+        margin-bottom: 5px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -124,249 +149,362 @@
     .employee-department .badge {
         font-size: 10px;
         font-weight: 500;
-        padding: 3px 8px;
+        padding: 4px 8px;
         border-radius: 6px;
         white-space: nowrap;
+    }
+
+    .employee-status .badge {
+        font-size: 11px;
+        padding: 5px 10px;
+        font-weight: 500;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+
+    /* Badge Color Variants */
+    .bg-primary-light {
         background-color: rgba(90, 182, 234, 0.1);
         color: var(--primary);
     }
 
-    /* Status dot on right */
-    .employee-status {
-        flex-shrink: 0;
-        text-align: right;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 4px;
-    }
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-    .dot-aktif { background: #10b981; }
-    .dot-cuti { background: #f59e0b; }
-    .dot-tidak-aktif { background: #ef4444; }
-    .status-text {
-        font-size: 11px;
-        font-weight: 500;
-        color: var(--gray);
+    .bg-warning-light {
+        background-color: rgba(254, 170, 43, 0.1);
+        color: var(--accent);
     }
 
-    /* Modal avatar container */
-    .employee-avatar-container {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto;
-        border-radius: 18px;
+    .bg-danger-light {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .bg-info-light {
+        background-color: rgba(6, 182, 212, 0.1);
+        color: #06b6d4;
+    }
+
+    .bg-success-light {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .bg-secondary-light {
+        background-color: rgba(100, 116, 139, 0.1);
+        color: var(--gray-dark);
+    }
+
+    /* Search Box */
+    .search-box {
+        margin-bottom: 20px;
+    }
+
+    .search-box .input-group {
+        border-radius: 12px;
         overflow: hidden;
-        border: 3px solid var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-    }
-    .employee-avatar-large {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-    .employee-avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
-    /* Detail Grid */
+    .search-box .input-group-text {
+        border: none;
+        background-color: var(--white);
+        padding-left: 15px;
+    }
+
+    .search-box .form-control {
+        border: none;
+        font-size: 14px;
+        padding: 12px 15px;
+        background-color: var(--white);
+    }
+
+    .search-box .form-control:focus {
+        box-shadow: none;
+    }
+
+    /* Button Styles */
+    .btn-scale {
+        transition: transform 0.2s ease;
+    }
+
+    .btn-scale:active {
+        transform: scale(0.96);
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    .btn-outline-primary {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    /* Modal Styles - Improved for Mobile */
+    .modal-dialog.modal-md {
+        max-width: 100%;
+        margin: 1rem auto;
+    }
+
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.2);
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--gray-light);
+        padding: 15px 20px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--gray-light);
+        padding: 15px 20px;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 18px;
+    }
+
+    .btn-close {
+        font-size: 12px;
+    }
+
+    /* Detail Grid Layout */
     .detail-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 12px;
     }
+
     .detail-item {
         display: flex;
         flex-direction: column;
     }
+
     .detail-item.full-width {
         grid-column: 1 / -1;
     }
+
     .detail-label {
         font-size: 12px;
         color: var(--gray);
         font-weight: 500;
         margin-bottom: 4px;
     }
+
     .detail-value {
         font-size: 14px;
         font-weight: 500;
         color: var(--dark);
         padding: 6px 0;
-        border-bottom: 1px solid var(--card-border);
+        border-bottom: 1px solid var(--gray-light);
         word-break: break-word;
     }
 
-    /* Badge */
-    .bg-primary-light {
-        background-color: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    /* Bootstrap modal overrides */
-    .modal-dialog.modal-md {
-        max-width: 100%;
-        margin: 1rem auto;
-    }
-    .modal-content-detail {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        overflow-y: auto;
-        background: var(--card-bg);
-    }
-    .modal-header {
-        border-bottom: 1px solid var(--card-border);
-        padding: 15px 20px;
-    }
-    .modal-footer {
-        border-top: 1px solid var(--card-border);
-        padding: 15px 20px;
-    }
-    .modal-title {
-        font-weight: 600;
-        color: var(--dark);
-        font-size: 18px;
-    }
-    .btn-close {
-        font-size: 12px;
-    }
-    .btn-secondary {
-        background: var(--gray-light);
-        color: var(--dark);
-        border: none;
-        border-radius: 10px;
-        padding: 8px 15px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        -webkit-tap-highlight-color: transparent;
+    .employee-section {
+        animation: fadeIn 0.2s 0.1s ease-out forwards;
+        opacity: 0;
     }
 
-    /* Empty state */
-    .empty-box {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--gray);
-        background: var(--card-bg);
-        border-radius: 16px;
-        border: 1px solid var(--card-border);
+    .employee-item {
+        animation: fadeIn 0.2s ease-out forwards;
+        opacity: 0;
     }
-    .empty-box i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; display: block; }
-    .empty-box p { font-size: 14px; margin: 0; }
 
+    .employee-item:nth-child(1) {
+        animation-delay: 0.15s;
+    }
+
+    .employee-item:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .employee-item:nth-child(3) {
+        animation-delay: 0.25s;
+    }
+
+    .employee-item:nth-child(4) {
+        animation-delay: 0.3s;
+    }
+
+    .employee-item:nth-child(5) {
+        animation-delay: 0.35s;
+    }
+
+    .search-box {
+        animation: fadeIn 0.2s 0.05s ease-out forwards;
+        opacity: 0;
+    }
+
+    /* Responsive adjustments */
     @media (min-width: 576px) {
         .detail-grid {
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
+
         .modal-dialog.modal-md {
             max-width: 500px;
         }
+
         .employee-avatar-container {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
         }
     }
 
     @media (max-width: 400px) {
-        .employee-item { padding: 12px; gap: 10px; }
-        .employee-avatar { width: 40px; height: 40px; border-radius: 12px; }
-        .employee-name { font-size: 13px; }
-        .employee-position { font-size: 11px; }
+        .employee-item {
+            padding: 12px;
+        }
+
+        .employee-avatar {
+            width: 45px;
+            height: 45px;
+            margin-right: 12px;
+        }
+
+        .employee-avatar-container {
+            width: 80px;
+            height: 80px;
+        }
+
+        .employee-name {
+            font-size: 13px;
+        }
+
+        .employee-position {
+            font-size: 11px;
+        }
+
+        .employee-status .badge {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+    }
+
+    /* Fix untuk gambar yang loading atau error */
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        border-radius: 50%;
     }
 </style>
 
-<div class="pegawai-page">
-    <!-- Section Header -->
-    <div class="section-header">
-        <h3 class="section-title">Daftar Pegawai</h3>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="search-bar">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Cari pegawai..." id="searchInput">
-    </div>
-
-    <!-- Employee List -->
-    <div class="employee-list">
-        @forelse($pegawai as $p)
-        <div class="employee-item"
-            data-employee-id="{{ $p->id }}"
-            data-employee-nip="{{ $p->nip }}"
-            data-employee-email="{{ $p->email }}"
-            data-employee-phone="{{ $p->no_hp ?? '-' }}"
-            data-employee-address="{{ $p->alamat ?? '-' }}"
-            data-employee-status="{{ $p->status ?? 'Aktif' }}"
-            data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
-
-            <div class="employee-avatar">
-                @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
-                <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
-                    onerror="handleAvatarError(this, '{{ $p->name }}')">
-                @else
-                <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
-                @endif
+<div class="container">
+    <!-- Employee List Section -->
+    <div class="employee-section">
+        <div class="section-header">
+            <h3 class="section-title">Daftar Pegawai</h3>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary btn-scale">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
             </div>
+        </div>
 
-            <div class="employee-info">
-                <h5 class="employee-name">{{ $p->name }}</h5>
-                <p class="employee-position">{{ $p->jabatan ?? '-' }}</p>
-                <div class="employee-department">
-                    <span class="badge">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
+        <div class="search-box">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control" placeholder="Cari pegawai..." id="searchInput">
+            </div>
+        </div>
+
+        <div class="employee-list">
+            @forelse($pegawai as $p)
+            <!-- Bagian employee-item -->
+            <div class="employee-item"
+                data-employee-id="{{ $p->id }}"
+                data-employee-nip="{{ $p->nip }}"
+                data-employee-email="{{ $p->email }}"
+                data-employee-phone="{{ $p->no_hp ?? '-' }}"
+                data-employee-address="{{ $p->alamat ?? '-' }}"
+                data-employee-status="{{ $p->status ?? 'Aktif' }}"
+                data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
+
+                <div class="employee-avatar">
+                    @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
+                    <img src="{{ asset('public/storage/foto_profil/' . $p->foto_profil) }}" alt="{{ $p->name }}"
+                        onerror="handleAvatarError(this, '{{ $p->name }}')">
+                    @else
+                    <div class="avatar-placeholder">{{ collect(explode(' ', $p->name))->map(fn($n)=>substr($n,0,1))->join('') }}</div>
+                    @endif
+                </div>
+
+                <div class="employee-info">
+                    <h5 class="employee-name">{{ $p->name }}</h5>
+                    <p class="employee-position">{{ $p->jabatan ?? '-' }}</p>
+                    <div class="employee-department">
+                        <span class="badge bg-primary-light">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
+                    </div>
+                </div>
+
+                <div class="employee-status">
+                    @php
+                    $statusClass = 'bg-success-light';
+                    $statusText = 'Aktif';
+                    if(isset($p->status)) {
+                    if($p->status == 'Cuti') {
+                    $statusClass = 'bg-warning-light';
+                    $statusText = 'Cuti';
+                    } elseif($p->status == 'Tidak Aktif') {
+                    $statusClass = 'bg-danger-light';
+                    $statusText = 'Tidak Aktif';
+                    }
+                    }
+                    @endphp
+                    <span class="badge {{ $statusClass }}">
+                        <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> {{ $statusText }}
+                    </span>
                 </div>
             </div>
 
-            <div class="employee-status">
-                @php
-                $statusText = 'Aktif';
-                $dotClass = 'dot-aktif';
-                if(isset($p->status)) {
-                    if($p->status == 'Cuti') {
-                        $dotClass = 'dot-cuti';
-                        $statusText = 'Cuti';
-                    } elseif($p->status == 'Tidak Aktif') {
-                        $dotClass = 'dot-tidak-aktif';
-                        $statusText = 'Tidak Aktif';
-                    }
-                }
-                @endphp
-                <span class="status-dot {{ $dotClass }}"></span>
-                <span class="status-text">{{ $statusText }}</span>
+            @empty
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Belum ada data pegawai.</p>
             </div>
+            @endforelse
         </div>
-
-        @empty
-        <div class="empty-box">
-            <i class="fas fa-users"></i>
-            <p>Belum ada data pegawai.</p>
-        </div>
-        @endforelse
     </div>
 </div>
 
 <!-- Modal Detail Pegawai -->
 <div class="modal fade" id="employeeDetailModal" tabindex="-1" aria-labelledby="employeeDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content modal-content-detail">
+        <div class="modal-content">
             <div class="modal-body p-0 pt-2">
                 <div class="text-center mb-2">
                     <div id="modalEmployeeAvatarContainer" class="employee-avatar-container">
@@ -375,12 +513,12 @@
                 </div>
 
                 <div class="employee-detail-section">
-                    <h5 class="text-center" id="modalEmployeeName" style="color:var(--dark);font-weight:600;">Nama Pegawai</h5>
+                    <h5 class="text-center" id="modalEmployeeName">Nama Pegawai</h5>
                     <div class="text-center mb-4">
                         <span class="badge bg-primary-light" id="modalEmployeePosition">-</span>
                     </div>
 
-                    <div class="detail-grid full-width" style="padding:0 20px;">
+                    <div class="detail-grid full-width">
                         <div class="detail-item">
                             <div class="detail-label">Unit Kerja</div>
                             <div class="detail-value" id="modalEmployeeDepartment">-</div>
@@ -512,7 +650,7 @@
                 });
             }
 
-            // Click handler untuk modal
+            // Click handler untuk modal - PERBAIKAN: Gunakan event delegation yang lebih baik
             item.addEventListener('click', function() {
                 fillModalData(this);
                 employeeModal.show();
@@ -539,8 +677,9 @@
             });
         }
 
-        // Reset modal ketika ditutup
+        // PERBAIKAN PENTING: Reset modal ketika ditutup
         document.getElementById('employeeDetailModal').addEventListener('hidden.bs.modal', function () {
+            // Kosongkan container avatar untuk memastikan tidak ada konflik
             modalAvatarContainer.innerHTML = '';
         });
     });
