@@ -101,6 +101,13 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        input, textarea, [contenteditable] {
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         body {
