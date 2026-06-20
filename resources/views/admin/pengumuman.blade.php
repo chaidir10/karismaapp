@@ -11,10 +11,19 @@
     .p-card {
         background: #fff; border-radius: 16px; margin-bottom: 12px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;
-        overflow: hidden; transition: box-shadow 0.2s;
+        overflow: hidden; transition: box-shadow 0.2s, transform 0.15s;
+        cursor: default;
     }
     .p-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-    .p-card-inner { display: flex; gap: 16px; padding: 18px 20px; align-items: center; }
+    .p-card.dragging { opacity:0.5; transform:scale(0.98); }
+    .p-card.drag-over { border-top:2px solid #3b82f6; }
+    .p-card-inner { display: flex; gap: 12px; padding: 16px 20px; align-items: center; }
+    .drag-handle {
+        cursor: grab; color: #cbd5e1; font-size: 16px; flex-shrink: 0;
+        display: flex; align-items: center; padding: 4px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .drag-handle:active { cursor: grabbing; color: #94a3b8; }
     .p-card .p-thumb {
         width: 70px; height: 70px; border-radius: 14px; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
@@ -85,13 +94,17 @@
     @endif
 
     <!-- List -->
-    <div>
+    <div id="pengumumanSortable">
         @forelse($pengumumans as $p)
         @php
             $opt = $jenisOptions[$p->jenis] ?? ['icon' => 'fa-bell', 'color' => '#64748b', 'label' => $p->jenis];
         @endphp
-        <div class="p-card">
+        <div class="p-card" data-id="{{ $p->id }}" draggable="true">
             <div class="p-card-inner">
+                <div class="drag-handle" title="Geser untuk ubah urutan">
+                    <i class="fas fa-grip-vertical"></i>
+                </div>
+
                 @if($p->gambar)
                 <div class="p-thumb" style="background-image:url('{{ asset('public/storage/'.$p->gambar) }}');"></div>
                 @else
@@ -365,5 +378,53 @@
         .then(function(r) { return r.json(); })
         .then(function(data) { location.reload(); });
     }
+
+    // Drag & Drop Reorder
+    (function() {
+        var container = document.getElementById('pengumumanSortable');
+        if (!container) return;
+        var dragItem = null;
+
+        container.addEventListener('dragstart', function(e) {
+            var card = e.target.closest('.p-card');
+            if (!card) return;
+            dragItem = card;
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        container.addEventListener('dragend', function(e) {
+            var card = e.target.closest('.p-card');
+            if (card) card.classList.remove('dragging');
+            container.querySelectorAll('.p-card').forEach(function(c) { c.classList.remove('drag-over'); });
+            dragItem = null;
+            saveOrder();
+        });
+
+        container.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            var card = e.target.closest('.p-card');
+            if (!card || card === dragItem) return;
+            container.querySelectorAll('.p-card').forEach(function(c) { c.classList.remove('drag-over'); });
+            var rect = card.getBoundingClientRect();
+            var mid = rect.top + rect.height / 2;
+            if (e.clientY < mid) {
+                card.classList.add('drag-over');
+                container.insertBefore(dragItem, card);
+            } else {
+                container.insertBefore(dragItem, card.nextSibling);
+            }
+        });
+
+        function saveOrder() {
+            var ids = [];
+            container.querySelectorAll('.p-card[data-id]').forEach(function(c) { ids.push(c.dataset.id); });
+            fetch("{{ route('admin.pengumuman.reorder') }}", {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ ids: ids })
+            });
+        }
+    })();
 </script>
 @endpush

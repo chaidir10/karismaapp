@@ -140,6 +140,7 @@ class DashboardController extends Controller
         }
 
         $pengumumans = Pengumuman::where('is_active', true)
+            ->orderBy('urutan')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();

@@ -11,7 +11,7 @@ class PengumumanController extends Controller
 {
     public function index()
     {
-        $pengumumans = Pengumuman::orderBy('created_at', 'desc')->get();
+        $pengumumans = Pengumuman::orderBy('urutan')->orderBy('created_at', 'desc')->get();
         $jenisOptions = Pengumuman::jenisOptions();
         return view('admin.pengumuman', compact('pengumumans', 'jenisOptions'));
     }
@@ -31,6 +31,7 @@ class PengumumanController extends Controller
         $data = $request->only(['judul', 'jenis', 'isi', 'tanggal_mulai', 'tanggal_selesai', 'waktu']);
         $data['is_active'] = true;
         $data['sembunyikan_detail'] = $request->boolean('sembunyikan_detail');
+        $data['urutan'] = Pengumuman::max('urutan') + 1;
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('pengumuman', 'public');
@@ -104,5 +105,14 @@ class PengumumanController extends Controller
         $request->validate(['image' => 'required|file|mimes:jpg,jpeg,png,gif,webp,svg,bmp|max:5120']);
         $path = $request->file('image')->store('pengumuman/content', 'public');
         return response()->json(['url' => asset('public/storage/' . $path)]);
+    }
+
+    public function reorder(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        foreach ($ids as $i => $id) {
+            Pengumuman::where('id', $id)->update(['urutan' => $i]);
+        }
+        return response()->json(['success' => true]);
     }
 }

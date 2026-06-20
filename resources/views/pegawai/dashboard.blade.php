@@ -171,6 +171,17 @@
     .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
     .dot.active { background:var(--primary); width:20px; border-radius:4px; }
 
+    .badge-baru {
+        position:absolute; top:8px; right:8px; z-index:2;
+        background:var(--danger); color:#fff; font-size:9px; font-weight:700;
+        padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px;
+        animation:baruPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes baruPulse {
+        0%, 100% { opacity:1; }
+        50% { opacity:0.4; }
+    }
+
     .ql-content img { max-width:100%; border-radius:8px; margin:10px 0; }
     .ql-content { text-align:justify; }
 </style>
@@ -262,7 +273,10 @@
             $pmOpt = \App\Models\Pengumuman::jenisOptions()[$pm->jenis] ?? ['icon'=>'fa-circle-info','color'=>'#64748b','label'=>$pm->jenis,'gradient'=>['#64748b','#475569']];
             $g1 = $pmOpt['gradient'][0]; $g2 = $pmOpt['gradient'][1];
         @endphp
-        <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})">
+        <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})" style="position:relative;">
+            @if($pm->created_at->diffInHours(now()) < 42)
+            <span class="badge-baru">Baru</span>
+            @endif
             @if($pm->gambar && ($pm->sembunyikan_detail ?? false))
             <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}');"></div>
             @elseif($pm->gambar)

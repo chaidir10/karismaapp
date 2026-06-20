@@ -174,6 +174,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/toggle', [PengumumanController::class, 'toggle'])->name('toggle');
             Route::post('/upload-image', [PengumumanController::class, 'uploadImage'])->name('upload-image');
+            Route::post('/reorder', [PengumumanController::class, 'reorder'])->name('reorder');
         });
     });
 

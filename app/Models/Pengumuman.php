@@ -21,6 +21,7 @@ class Pengumuman extends Model
         'gambar',
         'is_active',
         'sembunyikan_detail',
+        'urutan',
     ];
 
     protected function casts(): array
