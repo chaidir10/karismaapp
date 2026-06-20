@@ -1041,6 +1041,8 @@
         <!-- App Header -->
         @if(!request()->is('pegawai/akun*') && !request()->is('akun*'))
         <div class="app-header">
+            @if(request()->routeIs('pegawai.dashboard'))
+            {{-- Dashboard: avatar + greeting --}}
             <div class="header-content">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div class="user-avatar">
@@ -1062,6 +1064,24 @@
                     <i class="far fa-bell"></i>
                 </div>
             </div>
+            @else
+            {{-- Sub pages: icon + title --}}
+            @php
+                $pageIcon = 'fa-circle-info';
+                $pageTitle = 'Halaman';
+                if(request()->routeIs('pegawai.riwayat*')) { $pageIcon = 'fa-clock-rotate-left'; $pageTitle = 'Riwayat Presensi'; }
+                elseif(request()->routeIs('pegawai.pengajuan*')) { $pageIcon = 'fa-paper-plane'; $pageTitle = 'Pengajuan Presensi'; }
+                elseif(request()->routeIs('pegawai.daftar')) { $pageIcon = 'fa-user-group'; $pageTitle = 'Daftar Pegawai'; }
+            @endphp
+            <div class="header-content" style="justify-content:center;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff;">
+                        <i class="fas {{ $pageIcon }}"></i>
+                    </div>
+                    <h1 class="user-name" style="font-size:15px;">{{ $pageTitle }}</h1>
+                </div>
+            </div>
+            @endif
         </div>
         @endif
 

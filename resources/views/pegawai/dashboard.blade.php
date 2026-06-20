@@ -128,7 +128,7 @@
     .hc-tag { font-size:9px; font-weight:700; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px; }
     .hc-tag-reguler { background:var(--primary-soft); color:var(--primary-dark); }
     .hc-tag-lembur { background:var(--accent-light); color:var(--accent); }
-    .hc-time { font-size:20px; font-weight:800; color:var(--dark); font-variant-numeric:tabular-nums; line-height:1.2; }
+    .hc-time { font-size:18px; font-weight:800; color:var(--dark); font-variant-numeric:tabular-nums; line-height:1.2; }
     .hc-right { flex-shrink:0; }
     .hc-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
     .hc-dot-approved { background:#10b981; }

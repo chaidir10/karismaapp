@@ -100,10 +100,6 @@
 </style>
 
 <div class="pengajuan-page">
-    <div class="page-header">
-        <h3 class="page-title">Pengajuan Presensi</h3>
-    </div>
-
     <div class="pengajuan-list">
         @forelse($pengajuan as $p)
         @php

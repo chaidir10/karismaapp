@@ -86,10 +86,6 @@
 </style>
 
 <div class="pegawai-page">
-    <div class="page-header">
-        <h3 class="page-title">Daftar Pegawai</h3>
-    </div>
-
     <div class="search-bar">
         <i class="fas fa-magnifying-glass"></i>
         <input type="text" placeholder="Cari nama, jabatan..." id="searchInput">

@@ -4,27 +4,29 @@
 
 @section('content')
 <style>
-    .riwayat-page { padding: 20px; padding-bottom: 100px; }
+    .riwayat-page { padding: 20px; padding-bottom: 160px; }
 
-    /* Filter */
+    /* Floating Filter */
     .filter-bar {
-        display: flex; align-items: center; gap: 12px;
-        background: var(--white); border-radius: 16px; padding: 12px 16px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;
+        position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+        width: calc(100% - 40px); max-width: 460px; z-index: 9;
+        display: flex; align-items: center; gap: 8px;
+        background: var(--card-bg); border-radius: 16px; padding: 10px 12px;
+        box-shadow: 0 -2px 20px rgba(0,0,0,0.1); border: 1px solid var(--card-border);
     }
-    .filter-bar select, .filter-bar input {
-        border: 1px solid var(--gray-light); border-radius: 10px;
-        padding: 10px 14px; font-size: 14px; background: var(--white);
+    .filter-bar select {
+        border: 1px solid var(--card-border); border-radius: 10px;
+        padding: 10px 12px; font-size: 13px; background: var(--card-bg); color: var(--dark);
         outline: none; flex: 1; min-width: 0;
     }
-    .filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); }
+    .filter-bar select:focus { border-color: var(--primary); }
     .btn-download {
         width: 42px; height: 42px; border-radius: 10px; border: none; cursor: pointer;
         background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff;
         display: flex; align-items: center; justify-content: center; font-size: 16px;
-        flex-shrink: 0; transition: transform 0.2s;
+        flex-shrink: 0;
     }
-    .btn-download:active { transform: scale(0.93); }
+    .btn-download:active { opacity: 0.85; }
 
     /* Date group */
     .date-group { margin-bottom: 20px; }
@@ -64,7 +66,7 @@
     }
     .tag-reguler { background: var(--primary-soft); color: var(--primary-dark); }
     .tag-lembur { background: var(--accent-light); color: var(--accent); }
-    .card-time { font-size: 22px; font-weight: 800; color: var(--dark); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .card-time { font-size: 18px; font-weight: 800; color: var(--dark); font-variant-numeric: tabular-nums; line-height: 1.2; }
     .card-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
 
     .card-status { flex-shrink: 0; text-align: right; }
@@ -84,25 +86,25 @@
 
 </style>
 
-<div class="riwayat-page">
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-        <select id="filterBulan">
-            @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
-            @foreach($namaBulan as $i => $nb)
-                <option value="{{ $i+1 }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
-            @endforeach
-        </select>
-        <select id="filterTahun">
-            @for($y = now()->year; $y >= 2024; $y--)
-                <option value="{{ $y }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('Y') === $y ? 'selected' : '' }}>{{ $y }}</option>
-            @endfor
-        </select>
-        <a id="btnDownloadPdf" class="btn-download" title="Download PDF">
-            <i class="fas fa-file-pdf"></i>
-        </a>
-    </div>
+<!-- Floating Filter Bar -->
+<div class="filter-bar">
+    <select id="filterBulan">
+        @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
+        @foreach($namaBulan as $i => $nb)
+            <option value="{{ $i+1 }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
+        @endforeach
+    </select>
+    <select id="filterTahun">
+        @for($y = now()->year; $y >= 2024; $y--)
+            <option value="{{ $y }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('Y') === $y ? 'selected' : '' }}>{{ $y }}</option>
+        @endfor
+    </select>
+    <a id="btnDownloadPdf" class="btn-download" title="Download PDF">
+        <i class="fas fa-file-pdf"></i>
+    </a>
+</div>
 
+<div class="riwayat-page">
     <!-- Content -->
     <div class="riwayat-content">
         @forelse($riwayat as $tanggal => $items)
