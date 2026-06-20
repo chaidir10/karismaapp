@@ -411,54 +411,101 @@
 
 <!-- Modal Detail -->
 @foreach($riwayatHariIni as $p)
-<div class="modal fade detail-modal" id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
-        <div class="modal-content">
-            <div class="detail-content-container">
-                <div class="detail-image-container">
+@php
+    $dIsMasuk = $p->jenis === 'masuk';
+    $dIsLembur = $p->is_lembur;
+    $dIconBg = $dIsMasuk ? 'var(--primary-soft)' : 'var(--accent-light)';
+    $dIconColor = $dIsMasuk ? 'var(--primary-dark)' : 'var(--accent)';
+    $dIconName = $dIsLembur ? 'fa-bolt' : ($dIsMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
+@endphp
+<div class="modal fade" id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
+        <div class="modal-content" style="border-radius:0; border:none; height:100vh; background:var(--card-bg); display:flex; flex-direction:column;">
+            <!-- Header -->
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:{{ $dIconBg }}; display:flex; align-items:center; justify-content:center; color:{{ $dIconColor }}; font-size:16px;">
+                        <i class="fas {{ $dIconName }}"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:14px; font-weight:700; color:var(--dark);">{{ $dIsLembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }}</div>
+                        <div style="font-size:11px; color:var(--gray);">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }} &middot; {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('d M Y') }}</div>
+                    </div>
+                </div>
+                <button type="button" data-bs-dismiss="modal" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div style="flex:1; overflow-y:auto; padding:16px;">
+                <!-- Foto -->
+                <div style="border-radius:16px; overflow:hidden; margin-bottom:12px; aspect-ratio:4/3; background:var(--gray-light);">
                     @if($p->foto)
-                    <img src="{{ asset('public/storage/'.$p->foto) }}" class="detail-image" alt="Foto presensi">
+                    <img src="{{ asset('public/storage/'.$p->foto) }}" style="width:100%; height:100%; object-fit:cover; display:block;" alt="Foto">
                     @else
-                    <div class="d-flex align-items-center justify-content-center h-100 bg-light">
-                        <i class="fas fa-camera fa-3x text-muted"></i>
+                    <div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--gray); gap:8px;">
+                        <i class="fas fa-camera" style="font-size:28px; opacity:0.3;"></i>
+                        <span style="font-size:12px;">Tidak ada foto</span>
                     </div>
                     @endif
                 </div>
 
-                <div class="detail-map-container">
+                <!-- Maps -->
+                <div style="border-radius:16px; overflow:hidden; margin-bottom:12px; height:180px; background:var(--gray-light);">
                     @if($p->lokasi)
-                    <div id="mapDetail{{ $p->id }}" class="detail-map"></div>
+                    <div id="mapDetail{{ $p->id }}" style="width:100%; height:100%;"></div>
                     @else
-                    <div class="d-flex align-items-center justify-content-center h-100 bg-light">
-                        <i class="fas fa-map-marker-alt fa-3x text-muted"></i>
+                    <div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--gray); gap:8px;">
+                        <i class="fas fa-location-dot" style="font-size:28px; opacity:0.3;"></i>
+                        <span style="font-size:12px;">Lokasi tidak tersedia</span>
                     </div>
                     @endif
+                </div>
+
+                <!-- Info Card -->
+                <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                        <div style="width:44px; height:44px; border-radius:12px; background:{{ $dIconBg }}; display:flex; align-items:center; justify-content:center; color:{{ $dIconColor }}; font-size:18px; flex-shrink:0;">
+                            <i class="fas {{ $dIconName }}"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:15px; font-weight:700; color:var(--dark);">{{ $dIsLembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }} - {{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
+                            <div style="font-size:12px; color:var(--gray);">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l, d F Y') }}</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div style="flex:1; background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                            <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Status</div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span style="width:8px; height:8px; border-radius:50%; background:{{ $p->status == 'approved' ? '#10b981' : ($p->status == 'pending' ? '#f59e0b' : '#ef4444') }};"></span>
+                                <span style="font-size:13px; font-weight:600; color:var(--dark);">{{ ucfirst($p->status) }}</span>
+                            </div>
+                        </div>
+                        <div style="flex:1; background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                            <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Jenis</div>
+                            <div style="font-size:13px; font-weight:600; color:var(--dark);">{{ $dIsLembur ? 'Lembur' : 'Reguler' }}</div>
+                        </div>
+                    </div>
+
+                    <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                        <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Lokasi</div>
+                        <div style="font-size:12px; color:var(--dark); line-height:1.4;" id="locationAddress{{ $p->id }}">
+                            @if($p->lokasi)
+                            <div style="display:flex; align-items:center; gap:6px; color:var(--gray);"><i class="fas fa-spinner fa-spin" style="font-size:11px;"></i> <span>Mendeteksi alamat...</span></div>
+                            @else
+                            <span style="color:var(--gray);">Tidak tersedia</span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="detail-info-section">
-                <div class="detail-datetime-info">
-                    <div class="detail-type-badge fw-bold">{{ $p->is_lembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }} - {{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
-                    <div class="detail-day">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l') }}, {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('d F Y') }}</div>
-                </div>
-
-                <div class="detail-location-info">
-                    <div class="detail-location-address" id="locationAddress{{ $p->id }}">
-                        <div class="loading-address">
-                            <i class="fas fa-spinner fa-spin me-2"></i>Mendeteksi alamat...
-                        </div>
-                    </div>
-                    @if($p->status == 'approved')
-                    <div class="text-success mt-1">Presensi berhasil</div>
-                    @elseif($p->status == 'pending')
-                    <div class="text-warning mt-1">Menunggu persetujuan</div>
-                    @else
-                    <div class="text-danger mt-1">Presensi ditolak</div>
-                    @endif
-                </div>
-
-                <button type="button" class="detail-back-btn" data-bs-dismiss="modal">
-                    <i class="fas fa-arrow-left me-2"></i>Kembali
+            <!-- Bottom Button -->
+            <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
+                <button type="button" data-bs-dismiss="modal" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
                 </button>
             </div>
         </div>
