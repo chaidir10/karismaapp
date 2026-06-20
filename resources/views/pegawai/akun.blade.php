@@ -63,7 +63,7 @@
     }
     .info-content { flex:1; min-width:0; }
     .info-label { font-size:11px; color:var(--gray); font-weight:500; margin:0 0 2px; }
-    .info-value { font-size:14px; font-weight:600; color:var(--dark); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .info-value { font-size:14px; font-weight:600; color:var(--dark); margin:0; word-break:break-word; }
 
     /* Actions */
     .action-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
@@ -165,6 +165,9 @@
 
     <!-- Profile Hero -->
     <div class="profile-hero">
+        <button type="button" onclick="openModal('editModal')" style="position:absolute; top:14px; right:14px; z-index:2; width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;">
+            <i class="fas fa-pen-to-square"></i>
+        </button>
         <div class="profile-avatar" onclick="openPhotoPreview()">
             @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
             <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}" alt="Foto" id="mainAvatar">
@@ -211,15 +214,6 @@
 
     <!-- Actions -->
     <div class="action-list">
-        <button type="button" onclick="openModal('editModal')" class="action-item">
-            <div class="action-icon action-icon-edit"><i class="fas fa-pen-to-square"></i></div>
-            <div class="action-content">
-                <p class="action-title">Edit Profil</p>
-                <p class="action-subtitle">Ubah foto, nama, kontak</p>
-            </div>
-            <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
-        </button>
-
         <button type="button" onclick="toggleTheme()" class="action-item">
             <div class="action-icon action-icon-theme">
                 <i class="fas fa-sun" id="theme-icon-sun"></i>
@@ -271,66 +265,93 @@
     </div>
 </div>
 
-<!-- Edit Modal -->
+<!-- Edit Modal (Fullscreen) -->
 <div id="editModal" class="modal-overlay">
-    <div class="modal-box">
-        <button type="button" class="modal-close" onclick="closeModal('editModal')"><i class="fas fa-xmark"></i></button>
-        <h3 class="modal-heading">Edit Profil</h3>
+    <div style="background:var(--card-bg); width:100%; max-width:500px; height:100vh; display:flex; flex-direction:column; animation:modalSlideIn 0.3s ease-out;">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <button type="button" onclick="closeModal('editModal')" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
+                <i class="fas fa-chevron-left"></i> Batal
+            </button>
+            <span style="font-size:15px; font-weight:700; color:var(--dark);">Edit Profil</span>
+            <button type="submit" form="editForm" style="background:none; border:none; color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent;">
+                Simpan
+            </button>
+        </div>
 
-        <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="form-field">
-                <label>Nama</label>
-                <input type="text" name="name" value="{{ old('name', $user->name) }}">
-                @error('name')<div class="field-error">{{ $message }}</div>@enderror
-            </div>
-            <div class="form-field">
-                <label>Email</label>
-                <input type="email" name="email" value="{{ old('email', $user->email) }}">
-                @error('email')<div class="field-error">{{ $message }}</div>@enderror
-            </div>
-            <div class="form-field">
-                <label>No HP</label>
-                <input type="text" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}">
-                @error('no_hp')<div class="field-error">{{ $message }}</div>@enderror
-            </div>
-            <div class="form-field">
-                <label>Alamat</label>
-                <textarea name="alamat" rows="3">{{ old('alamat', $user->alamat) }}</textarea>
-                @error('alamat')<div class="field-error">{{ $message }}</div>@enderror
-            </div>
-            <div class="form-field">
-                <label>Password Baru</label>
-                <input type="password" name="password" placeholder="Kosongkan jika tidak diubah">
-                @error('password')<div class="field-error">{{ $message }}</div>@enderror
-            </div>
-            <div class="form-field">
-                <label>Konfirmasi Password</label>
-                <input type="password" name="password_confirmation">
-            </div>
-            <div class="form-field">
-                <label>Foto Profil</label>
-                <input type="file" name="foto_profil" id="fotoInput" accept="image/*" onchange="onPhotoSelected(this)">
-                @error('foto_profil')<div class="field-error">{{ $message }}</div>@enderror
+        <!-- Scrollable Content -->
+        <div style="flex:1; overflow-y:auto; padding:20px;">
+            <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data" id="editForm">
+                @csrf
 
-                <div class="photo-edit-area" id="photoEditArea">
-                    <div class="photo-edit-preview" id="cropPreview">
-                        <img id="cropImg" src="" alt="Preview" draggable="false">
+                <!-- Foto Section -->
+                <div style="text-align:center; margin-bottom:24px;">
+                    <div style="position:relative; display:inline-block;">
+                        <div id="editAvatarPreview" style="width:96px; height:96px; border-radius:50%; overflow:hidden; border:3px solid var(--primary); margin:0 auto; background:var(--primary-soft); display:flex; align-items:center; justify-content:center;">
+                            @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
+                            <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}" style="width:100%; height:100%; object-fit:cover; display:block;" id="editAvatarImg">
+                            @else
+                            <div style="color:var(--primary); font-size:32px; font-weight:700;">{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->take(2)->join('') }}</div>
+                            @endif
+                        </div>
+                        <label for="fotoInput" style="position:absolute; bottom:0; right:0; width:32px; height:32px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer; border:2px solid var(--card-bg);">
+                            <i class="fas fa-camera"></i>
+                        </label>
                     </div>
-                    <div class="photo-edit-hint">Geser foto untuk mengatur posisi</div>
-                    <div class="photo-edit-zoom">
-                        <span><i class="fas fa-magnifying-glass-minus"></i></span>
-                        <input type="range" id="zoomSlider" min="100" max="300" value="150" oninput="onZoomChange(this.value)">
-                        <span><i class="fas fa-magnifying-glass-plus"></i></span>
+                    <input type="file" name="foto_profil" id="fotoInput" accept="image/*" onchange="onPhotoSelected(this)" style="display:none;">
+                    @error('foto_profil')<div class="field-error" style="margin-top:8px;">{{ $message }}</div>@enderror
+
+                    <div class="photo-edit-area" id="photoEditArea">
+                        <div class="photo-edit-preview" id="cropPreview">
+                            <img id="cropImg" src="" alt="Preview" draggable="false">
+                        </div>
+                        <div class="photo-edit-hint">Geser foto untuk mengatur posisi</div>
+                        <div class="photo-edit-zoom">
+                            <span><i class="fas fa-magnifying-glass-minus"></i></span>
+                            <input type="range" id="zoomSlider" min="100" max="300" value="150" oninput="onZoomChange(this.value)">
+                            <span><i class="fas fa-magnifying-glass-plus"></i></span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="modal-actions" style="margin-top:20px;">
-                <button type="button" class="btn-modal-cancel" onclick="closeModal('editModal')">Batal</button>
-                <button type="submit" class="btn-modal-primary">Simpan</button>
-            </div>
-        </form>
+                <!-- Form Fields -->
+                <div style="background:var(--light); border-radius:14px; padding:4px 0; margin-bottom:16px; border:1px solid var(--card-border);">
+                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Nama</div>
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}" style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
+                        @error('name')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Email</div>
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
+                        @error('email')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">No HP</div>
+                        <input type="text" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}" style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
+                        @error('no_hp')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div style="padding:12px 16px;">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Alamat</div>
+                        <textarea name="alamat" rows="2" style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0; resize:none;">{{ old('alamat', $user->alamat) }}</textarea>
+                        @error('alamat')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                </div>
+
+                <!-- Password Section -->
+                <div style="background:var(--light); border-radius:14px; padding:4px 0; border:1px solid var(--card-border);">
+                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Password Baru</div>
+                        <input type="password" name="password" placeholder="Kosongkan jika tidak diubah" style="width:100%; border:none; background:transparent; font-size:15px; color:var(--dark); outline:none; padding:0;">
+                        @error('password')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div style="padding:12px 16px;">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Konfirmasi Password</div>
+                        <input type="password" name="password_confirmation" style="width:100%; border:none; background:transparent; font-size:15px; color:var(--dark); outline:none; padding:0;">
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
