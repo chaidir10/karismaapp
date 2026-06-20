@@ -88,9 +88,8 @@ class LaporanController extends Controller
                     $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
                     if ($isLibur) {
-                        // Weekend / libur nasional → kerja reguler otomatis jadi lembur
                         $row['lembur']       = $jamKerja;
-                        $row['jam_kerja']    = $jamKerja;
+                        $row['jam_kerja']    = '-';
                         $row['status_masuk'] = 'Lembur';
                         $totalLembur += $jamKerja;
                         $totalHariLembur++;
@@ -140,6 +139,9 @@ class LaporanController extends Controller
                     $totalLembur += $lemburMenit;
                     $totalHariLembur++;
                     if (!$masuk && !$pulang) {
+                        $row['masuk']  = Carbon::parse($lemburMasuk->jam)->format('H:i');
+                        $row['pulang'] = Carbon::parse($lemburPulang->jam)->format('H:i');
+                        $row['jam_kerja']    = '-';
                         $row['status_masuk'] = 'Lembur';
                     }
                 }

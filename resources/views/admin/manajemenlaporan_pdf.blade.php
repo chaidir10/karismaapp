@@ -5,15 +5,15 @@
     <title>Laporan Kehadiran</title>
     <style>
         @page { size: A4 landscape; margin: 10mm 8mm; }
-        body { font-family: DejaVu Sans, sans-serif; font-size: 8px; margin: 0; }
-        h3 { text-align: center; margin: 0 0 4px; font-size: 10px; }
-        h4 { text-align: center; margin: 0 0 6px; font-size: 8px; font-weight: normal; color: #555; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 9px; margin: 0; }
+        h3 { text-align: center; margin: 0 0 4px; font-size: 12px; }
+        h4 { text-align: center; margin: 0 0 6px; font-size: 9px; font-weight: normal; color: #555; }
         table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-        th, td { border: 1px solid #333; padding: 2px 3px; text-align: center; font-size: 7px; line-height: 1.3; }
-        th { background-color: #e0e0e0; font-weight: bold; font-size: 7px; }
+        th, td { border: 1px solid #333; padding: 2px 3px; text-align: center; font-size: 8px; line-height: 1.3; }
+        th { background-color: #e0e0e0; font-weight: bold; font-size: 8px; }
         .weekend { background-color: #f2f2f2; }
         .summary-table { margin-top: 6px; border: none; }
-        .summary-table td { border: none; text-align: left; font-size: 8px; padding: 1px 4px; }
+        .summary-table td { border: none; text-align: left; font-size: 9px; padding: 1px 4px; }
         .summary-table .label { font-weight: bold; }
         .page-break { page-break-after: always; }
         .cover { text-align: center; padding-top: 30vh; }
