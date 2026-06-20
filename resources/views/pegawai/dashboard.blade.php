@@ -1033,7 +1033,8 @@
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script>
     // Carousel with live drag
     var currentSlide = 0;
@@ -1186,9 +1187,9 @@
     let isOutsideRadius = false;
     let capturedPhotoData = null;
     let autoCloseTimer = null;
-    let faceDetectionLoop = null;
     let faceDetected = false;
-    let faceModelLoaded = false;
+    let mpFaceDetector = null;
+    let mpCamera = null;
 
     const sudahPresensiMasuk = @json($sudahPresensiMasuk);
     const sudahPresensiPulang = @json($sudahPresensiPulang);
@@ -1453,132 +1454,116 @@
     }
 
     function initializeCamera() {
-        const video = document.getElementById('video');
+        var video = document.getElementById('video');
         if (!video) return;
-
         video.muted = true;
 
-        if (!navigator.mediaDevices?.getUserMedia) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showError("Browser tidak mendukung akses kamera.");
             return;
         }
 
         navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            },
+            video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
             audio: false
         })
-        .then(stream => {
+        .then(function(stream) {
             videoStream = stream;
             video.srcObject = stream;
-            return video.play().catch(() => {});
+            return video.play().catch(function(){});
         })
-        .then(() => {
+        .then(function() {
             initFaceDetection();
         })
-        .catch(err => {
+        .catch(function(err) {
             console.error(err);
             showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
         });
     }
 
-    async function initFaceDetection() {
-        const submitBtn = document.querySelector('.submit-btn-large');
-        const statusEl = document.getElementById('faceStatus');
-
-        if (typeof faceapi === 'undefined') {
-            console.warn('face-api.js tidak termuat, face detection dinonaktifkan');
-            if (statusEl) statusEl.style.display = 'none';
-            return;
-        }
+    // MediaPipe Face Detection — fast, accurate, runs on GPU
+    function initFaceDetection() {
+        var video = document.getElementById('video');
+        var submitBtn = document.querySelector('.submit-btn-large');
+        var statusEl = document.getElementById('faceStatus');
 
         if (submitBtn) submitBtn.disabled = true;
         updateFaceStatus(false);
 
-        if (!faceModelLoaded) {
-            try {
-                if (statusEl) {
-                    statusEl.className = 'face-status no-face';
-                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...';
-                }
-                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/';
-                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-                faceModelLoaded = true;
-            } catch (e) {
-                console.error('Gagal memuat model:', e);
-                if (statusEl) statusEl.style.display = 'none';
-                if (submitBtn) submitBtn.disabled = false;
-                return;
-            }
+        if (typeof FaceDetection === 'undefined') {
+            if (statusEl) statusEl.style.display = 'none';
+            if (submitBtn) submitBtn.disabled = false;
+            return;
         }
 
-        startFaceDetectionLoop();
+        if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
+
+        mpFaceDetector = new FaceDetection({
+            locateFile: function(file) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/' + file; }
+        });
+
+        mpFaceDetector.setOptions({ model: 'short', minDetectionConfidence: 0.6 });
+
+        mpFaceDetector.onResults(function(results) {
+            var found = false;
+            if (results.detections && results.detections.length > 0) {
+                var det = results.detections[0];
+                var bb = det.boundingBox;
+                found = isFaceInGuide(bb, video);
+            }
+            if (found !== faceDetected) {
+                faceDetected = found;
+                updateFaceStatus(found);
+            }
+        });
+
+        if (typeof Camera !== 'undefined') {
+            mpCamera = new Camera(video, {
+                onFrame: async function() {
+                    if (mpFaceDetector && videoStream) {
+                        await mpFaceDetector.send({ image: video });
+                    }
+                },
+                width: 640,
+                height: 480
+            });
+            mpCamera.start();
+        }
     }
 
-    function startFaceDetectionLoop() {
-        const video = document.getElementById('video');
-        if (!video) return;
+    function isFaceInGuide(bb, video) {
+        var oval = document.getElementById('faceGuideOval');
+        if (!oval || !video.videoWidth) return true;
+        var gr = oval.getBoundingClientRect();
+        var vr = video.getBoundingClientRect();
 
-        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.35 });
-        let detecting = false;
+        // bb from MediaPipe is relative (0-1)
+        var faceW = bb.width * vr.width;
+        var faceH = bb.height * vr.height;
+        var faceX = vr.left + bb.xCenter * vr.width - faceW / 2;
+        var faceY = vr.top + bb.yCenter * vr.height - faceH / 2;
 
-        async function detect() {
-            if (!videoStream) return;
-            if (video.readyState < 2 || video.paused || detecting) {
-                faceDetectionLoop = setTimeout(detect, 500);
-                return;
-            }
-
-            detecting = true;
-            try {
-                const detections = await faceapi.detectAllFaces(video, options);
-                const found = detections.length > 0;
-
-                if (found !== faceDetected) {
-                    faceDetected = found;
-                    updateFaceStatus(found);
-                }
-            } catch (e) {
-                console.error('Detect error:', e);
-            }
-            detecting = false;
-
-            if (videoStream) faceDetectionLoop = setTimeout(detect, 500);
-        }
-
-        faceDetectionLoop = setTimeout(detect, 1000);
+        var m = 20;
+        return faceX >= (gr.left - m) && faceY >= (gr.top - m) &&
+               (faceX + faceW) <= (gr.right + m) && (faceY + faceH) <= (gr.bottom + m);
     }
 
     function updateFaceStatus(detected) {
-        const statusEl = document.getElementById('faceStatus');
-        const submitBtn = document.querySelector('.submit-btn-large');
-        const ovalEl = document.getElementById('faceGuideOval');
-
+        var statusEl = document.getElementById('faceStatus');
+        var submitBtn = document.querySelector('.submit-btn-large');
+        var ovalEl = document.getElementById('faceGuideOval');
         if (statusEl) {
             statusEl.className = detected ? 'face-status face-ok' : 'face-status no-face';
-            statusEl.innerHTML = detected
-                ? '<i class="fas fa-user-check"></i> Wajah terdeteksi'
-                : '<i class="fas fa-user-slash"></i> Wajah tidak terdeteksi';
+            statusEl.innerHTML = detected ? '<i class="fas fa-user-check"></i> Wajah terdeteksi' : '<i class="fas fa-user-slash"></i> Posisikan wajah dalam lingkaran';
         }
-
-        if (ovalEl) {
-            ovalEl.classList.toggle('detected', detected);
-        }
-
+        if (ovalEl) ovalEl.classList.toggle('detected', detected);
         if (submitBtn) submitBtn.disabled = !detected;
     }
 
     function stopFaceDetection() {
-        if (faceDetectionLoop) {
-            clearTimeout(faceDetectionLoop);
-            faceDetectionLoop = null;
-        }
+        if (mpCamera) { try { mpCamera.stop(); } catch(e) {} mpCamera = null; }
         faceDetected = false;
-
-        const ovalEl = document.getElementById('faceGuideOval');
+        var ovalEl = document.getElementById('faceGuideOval');
         if (ovalEl) ovalEl.classList.remove('detected');
     }
 
