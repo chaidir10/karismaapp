@@ -97,8 +97,8 @@
     <!-- Filter Section -->
     <div class="bg-white rounded-xl p-6 shadow-md mb-6">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">Filter Laporan</h2>
-        <form id="formFilter" id="filter-row" style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
-            <div style="flex:1; min-width:200px; max-width:400px;">
+        <form id="formFilter" style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
+            <div style="flex:3; min-width:200px;">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Pilih Pegawai</label>
                 <select name="user_id" id="user_id">
                     <option value="">Semua Pegawai</option>
@@ -107,20 +107,20 @@
                     @endforeach
                 </select>
             </div>
-            <div style="width:200px;">
+            <div style="flex:2; min-width:160px;">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Bulan</label>
                 <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid #d1d5db; border-radius:12px; padding:0 16px; font-size:14px; outline:none;">
             </div>
-            <div style="display:flex; gap:8px;">
-                <button type="submit" class="bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm" style="height:42px; padding:0 20px; border:none; cursor:pointer;">
+            <div style="flex:3; min-width:200px; display:flex; gap:8px;">
+                <button type="submit" class="bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm" style="flex:2; height:42px; border:none; cursor:pointer;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                     Tampilkan
                 </button>
-                <a href="#" id="btnPdf" class="bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center text-sm" style="height:42px; padding:0 16px;">
+                <a href="#" id="btnPdf" class="bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center text-sm" style="flex:1; height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     PDF
                 </a>
-                <a href="#" id="btnExcel" class="bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center text-sm" style="height:42px; padding:0 16px;">
+                <a href="#" id="btnExcel" class="bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center text-sm" style="flex:1; height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     Excel
                 </a>
