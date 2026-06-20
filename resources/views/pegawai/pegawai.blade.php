@@ -188,6 +188,17 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Riwayat Presensi Hari Ini -->
+            @if(!empty($riwayatHariIni))
+            <div id="modalRiwayatSection" style="margin-top:16px; display:none;">
+                <div style="font-size:12px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Presensi Hari Ini</div>
+                <div id="modalRiwayatList"></div>
+                <div id="modalRiwayatEmpty" style="text-align:center; padding:20px; color:var(--gray); font-size:12px; display:none;">
+                    Belum ada presensi hari ini
+                </div>
+            </div>
+            @endif
         </div>
         <!-- Footer -->
         <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
@@ -199,10 +210,46 @@
 </div>
 
 <script>
+    var _riwayatData = @json($riwayatHariIni ?? []);
+
     function initials(name) {
         return name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase();
     }
     function closeEmployeeModal() { document.getElementById('employeeDetailModal').style.display = 'none'; }
+
+    function renderRiwayat(employeeId) {
+        var section = document.getElementById('modalRiwayatSection');
+        var list = document.getElementById('modalRiwayatList');
+        var empty = document.getElementById('modalRiwayatEmpty');
+        if (!section || !list) return;
+
+        var records = _riwayatData[employeeId] || [];
+        list.innerHTML = '';
+
+        if (records.length === 0) {
+            section.style.display = 'block';
+            empty.style.display = 'block';
+            return;
+        }
+
+        section.style.display = 'block';
+        empty.style.display = 'none';
+
+        records.forEach(function(r) {
+            var isMasuk = r.jenis === 'masuk';
+            var isLembur = r.is_lembur;
+            var iconBg = isMasuk ? 'var(--primary-soft)' : 'var(--accent-light)';
+            var iconColor = isMasuk ? 'var(--primary-dark)' : 'var(--accent)';
+            var iconName = isLembur ? 'fa-bolt' : (isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
+            var label = (isLembur ? 'Lembur ' : '') + (isMasuk ? 'Masuk' : 'Pulang');
+            var jam = r.jam ? r.jam.substring(0, 5) : '-';
+
+            list.innerHTML += '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--card-bg); border-radius:12px; border:1px solid var(--card-border); margin-bottom:8px;">' +
+                '<div style="width:36px; height:36px; border-radius:10px; background:' + iconBg + '; color:' + iconColor + '; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;"><i class="fas ' + iconName + '"></i></div>' +
+                '<div style="flex:1;"><div style="font-size:13px; font-weight:600; color:var(--dark);">' + label + '</div><div style="font-size:11px; color:var(--gray);">' + jam + '</div></div>' +
+                '</div>';
+        });
+    }
 
     function initPegawai() {
         var items = document.querySelectorAll('.e-card');
@@ -244,6 +291,7 @@
                     waLink.style.opacity = '0.5';
                 }
 
+                renderRiwayat(this.dataset.employeeId);
                 document.getElementById('employeeDetailModal').style.display = 'block';
             };
         });

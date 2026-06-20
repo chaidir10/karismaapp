@@ -19,16 +19,18 @@ class PegawaiController extends Controller
         $userRole = Auth::user()->role ?? 'pegawai';
         $kehadiranHariIni = [];
 
+        $riwayatHariIni = [];
+
         if (in_array(strtolower($userRole), ['admin', 'superadmin'])) {
-            $presensiHariIni = Presensi::where('tanggal', $today)
-                ->where('jenis', 'masuk')
-                ->where('is_lembur', false)
+            $semuaPresensi = Presensi::where('tanggal', $today)
                 ->where('status', 'approved')
-                ->get()
-                ->keyBy('user_id');
+                ->orderBy('jam', 'asc')
+                ->get();
+
+            $presensiMasuk = $semuaPresensi->where('jenis', 'masuk')->where('is_lembur', false)->keyBy('user_id');
 
             foreach ($pegawai as $p) {
-                $masuk = $presensiHariIni->get($p->id);
+                $masuk = $presensiMasuk->get($p->id);
                 if (!$masuk) {
                     $kehadiranHariIni[$p->id] = ['status' => 'belum', 'text' => 'Belum Hadir'];
                 } else {
@@ -40,9 +42,11 @@ class PegawaiController extends Controller
                         $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Tepat Waktu'];
                     }
                 }
+
+                $riwayatHariIni[$p->id] = $semuaPresensi->where('user_id', $p->id)->values();
             }
         }
 
-        return view('pegawai.pegawai', compact('pegawai', 'kehadiranHariIni', 'userRole'));
+        return view('pegawai.pegawai', compact('pegawai', 'kehadiranHariIni', 'riwayatHariIni', 'userRole'));
     }
 }

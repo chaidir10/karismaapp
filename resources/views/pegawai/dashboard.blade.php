@@ -171,13 +171,15 @@
 
     .badge-baru {
         position:absolute; top:8px; right:8px; z-index:2;
-        background:var(--danger); color:#fff; font-size:9px; font-weight:700;
-        padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px;
-        animation:baruPulse 1.5s ease-in-out infinite;
+        background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color:#fff; font-size:9px; font-weight:700;
+        padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;
+        box-shadow:0 2px 10px rgba(90,182,234,0.5);
+        animation:baruGlow 2s ease-in-out infinite;
     }
-    @keyframes baruPulse {
-        0%, 100% { opacity:1; }
-        50% { opacity:0.4; }
+    @keyframes baruGlow {
+        0%, 100% { box-shadow:0 2px 10px rgba(90,182,234,0.5); }
+        50% { box-shadow:0 2px 20px rgba(90,182,234,0.8), 0 0 6px rgba(90,182,234,0.4); }
     }
 
     .ql-content img { max-width:100%; border-radius:8px; margin:10px 0; }
