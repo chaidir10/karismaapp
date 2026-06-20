@@ -136,8 +136,8 @@ class LaporanController extends Controller
                     $row['status_masuk'] = 'Data Tidak Lengkap';
                 }
 
-                // Lembur eksplisit (dari tombol lembur) — di hari kerja biasa
-                if ($lemburMasuk && $lemburPulang && !$isLibur) {
+                // Lembur eksplisit (dari tombol lembur) — berlaku semua hari
+                if ($lemburMasuk && $lemburPulang) {
                     $lemburMenit = $this->calculateMinutesWithoutSeconds(
                         Carbon::parse($lemburMasuk->jam),
                         Carbon::parse($lemburPulang->jam)
@@ -145,7 +145,9 @@ class LaporanController extends Controller
                     $currentLembur = is_numeric($row['lembur']) ? $row['lembur'] : 0;
                     $row['lembur'] = $currentLembur + $lemburMenit;
                     $totalLembur += $lemburMenit;
-                    $totalHariLembur++;
+                    if ($currentLembur == 0) {
+                        $totalHariLembur++;
+                    }
                     if (!$masuk && !$pulang) {
                         $row['masuk']  = Carbon::parse($lemburMasuk->jam)->format('H:i');
                         $row['pulang'] = Carbon::parse($lemburPulang->jam)->format('H:i');

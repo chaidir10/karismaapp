@@ -89,6 +89,8 @@ class PerformaController extends Controller
             $pulangTepat = 0;
             $pulangCepat = 0;
             $jamKerjaCukup = 0;
+            $totalMenitKerja = 0;
+            $totalMenitStandar = 0;
 
             for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
                 $tanggal = $d->format('Y-m-d');
@@ -129,6 +131,8 @@ class PerformaController extends Controller
 
                 $durasiStandar = $jamMasukDefault->diffInMinutes($jamPulangDefault);
                 $durasiAktual = $jamMasukObj->copy()->setSeconds(0)->diffInMinutes($jamPulangObj->copy()->setSeconds(0));
+                $totalMenitKerja += $durasiAktual;
+                $totalMenitStandar += $durasiStandar;
                 if ($durasiAktual >= $durasiStandar) {
                     $jamKerjaCukup++;
                 }
@@ -152,6 +156,8 @@ class PerformaController extends Controller
                 'pulang_tepat' => $pulangTepat,
                 'pulang_cepat' => $pulangCepat,
                 'jam_kerja_cukup' => $jamKerjaCukup,
+                'total_menit_kerja' => $totalMenitKerja,
+                'total_menit_standar' => $totalMenitStandar,
                 'skor_kehadiran' => $skorKehadiran,
                 'skor_masuk' => $skorMasuk,
                 'skor_pulang' => $skorPulang,
@@ -162,6 +168,7 @@ class PerformaController extends Controller
 
         usort($performa, function ($a, $b) {
             if ($b['performa'] !== $a['performa']) return $b['performa'] <=> $a['performa'];
+            if ($b['total_menit_kerja'] !== $a['total_menit_kerja']) return $b['total_menit_kerja'] <=> $a['total_menit_kerja'];
             if ($b['jam_kerja_cukup'] !== $a['jam_kerja_cukup']) return $b['jam_kerja_cukup'] <=> $a['jam_kerja_cukup'];
             if ($b['hadir'] !== $a['hadir']) return $b['hadir'] <=> $a['hadir'];
             return $a['telat'] <=> $b['telat'];

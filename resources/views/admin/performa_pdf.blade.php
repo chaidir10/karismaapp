@@ -10,14 +10,21 @@
         h3 { text-align: center; margin: 0 0 2px; font-size: 11px; font-weight: normal; }
         h4 { text-align: center; margin: 0 0 8px; font-size: 10px; font-weight: normal; color: #333; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-        th, td { border: 1px solid #000; padding: 3px 4px; text-align: center; font-size: 9px; }
-        th { font-weight: bold; }
+        th, td { border: 1px solid #000; padding: 3px 4px; text-align: center; font-size: 8px; }
+        th { font-weight: bold; font-size: 8px; }
         .left { text-align: left; }
         .notes { margin-top: 10px; font-size: 8px; line-height: 1.6; }
         .notes strong { font-size: 8px; }
     </style>
 </head>
 <body>
+    @php
+    function fmtDurasi($m) {
+        if (!$m) return '0j 0m';
+        return floor($m/60).'j '.$m%60 .'m';
+    }
+    @endphp
+
     <h2>LAPORAN PERFORMA PEGAWAI</h2>
     <h3>Balai Kekarantinaan Kesehatan Kelas I Tarakan</h3>
     <h4>Periode: {{ $bulanNama }} &mdash; Hari Kerja Efektif: {{ $hariKerja }} hari</h4>
@@ -26,20 +33,21 @@
         <thead>
             <tr>
                 <th style="width:3%">No</th>
-                <th style="width:18%" class="left">Nama Pegawai</th>
-                <th style="width:10%">NIP</th>
-                <th style="width:5%">Hadir</th>
-                <th style="width:5%">Tidak Hadir</th>
-                <th style="width:6%">Tepat Masuk</th>
-                <th style="width:5%">Telat</th>
-                <th style="width:6%">Pulang Tepat</th>
-                <th style="width:6%">Pulang Cepat</th>
-                <th style="width:6%">Jam Kerja Cukup</th>
-                <th style="width:7%">Kehadiran (25%)</th>
-                <th style="width:7%">Masuk (30%)</th>
-                <th style="width:7%">Pulang (20%)</th>
-                <th style="width:7%">Jam Kerja (25%)</th>
-                <th style="width:7%">Performa</th>
+                <th style="width:15%" class="left">Nama Pegawai</th>
+                <th style="width:9%">NIP</th>
+                <th style="width:4%">Hadir</th>
+                <th style="width:4%">Tidak Hadir</th>
+                <th style="width:5%">Tepat Masuk</th>
+                <th style="width:4%">Telat</th>
+                <th style="width:5%">Plg Tepat</th>
+                <th style="width:5%">Plg Cepat</th>
+                <th style="width:5%">JK Cukup</th>
+                <th style="width:7%">Total Durasi</th>
+                <th style="width:6%">Kehadiran (25%)</th>
+                <th style="width:6%">Masuk (30%)</th>
+                <th style="width:6%">Pulang (20%)</th>
+                <th style="width:6%">JK (25%)</th>
+                <th style="width:6%">Performa</th>
             </tr>
         </thead>
         <tbody>
@@ -55,6 +63,7 @@
                 <td>{{ $item['pulang_tepat'] }}</td>
                 <td>{{ $item['pulang_cepat'] }}</td>
                 <td>{{ $item['jam_kerja_cukup'] }}</td>
+                <td>{{ fmtDurasi($item['total_menit_kerja']) }}</td>
                 <td>{{ number_format($item['skor_kehadiran'], 1) }}</td>
                 <td>{{ number_format($item['skor_masuk'], 1) }}</td>
                 <td>{{ number_format($item['skor_pulang'], 1) }}</td>
@@ -71,7 +80,8 @@
         2. Kedisiplinan Masuk (30%) = (Hari Tepat Masuk / Hari Kerja) x 30<br>
         3. Kedisiplinan Pulang (20%) = (Hari Pulang Tepat / Hari Kerja) x 20<br>
         4. Jam Kerja Terpenuhi (25%) = (Hari dgn Durasi Kerja >= Standar / Hari Kerja) x 25<br>
-        Total Performa = Kehadiran + Masuk + Pulang + Jam Kerja (maks. 100%). Lembur tidak termasuk penilaian.
+        Total Performa = Kehadiran + Masuk + Pulang + Jam Kerja (maks. 100%). Lembur tidak termasuk penilaian.<br>
+        Jika performa sama, peringkat ditentukan oleh: Total Durasi Kerja terbanyak > Jam Kerja Cukup > Kehadiran > Telat paling sedikit.
     </div>
 </body>
 </html>
