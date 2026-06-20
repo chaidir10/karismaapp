@@ -43,7 +43,7 @@
         box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid transparent;
         cursor: pointer; transition: all 0.2s;
     }
-    .presensi-card:active { transform: scale(0.98); }
+    .presensi-card:active { opacity: 0.85; }
 
     .card-icon {
         width: 44px; height: 44px; border-radius: 12px;
@@ -229,9 +229,6 @@
     </div>
     @endforeach
 @endforeach
-
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
 <script>
     const wilayahAlamat = @json($wilayahAlamat);
