@@ -154,8 +154,8 @@
             padding: 20px 20px 24px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            border-bottom-right-radius: 24px;
-            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 100px;
+            border-bottom-left-radius: 100px;
         }
 
         .header-content {
