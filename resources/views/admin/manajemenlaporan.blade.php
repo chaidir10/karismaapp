@@ -28,12 +28,12 @@
         align-items: center;
         overflow: hidden;
     }
-    .ts-wrapper.single.focus .ts-control { border-color: #6366f1 !important; }
+    .ts-wrapper.single.focus .ts-control { border-color: #5AB6EA !important; }
     .ts-wrapper.single .ts-control > input { font-size: 14px; line-height: 40px; padding: 0 !important; margin: 0 !important; }
     .ts-wrapper.single .ts-control .item { color: #374151; line-height: 40px; }
     .ts-dropdown { border: 1px solid #d1d5db; border-radius: 12px; font-size: 14px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .ts-dropdown .option { padding: 9px 16px; }
-    .ts-dropdown .option.active { background: #eef2ff; color: #4338ca; }
+    .ts-dropdown .option.active { background: #E6F4F9; color: #2E97D4; }
 
     body {
         font-family: 'Poppins', sans-serif;
@@ -85,7 +85,7 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="rounded-xl p-6 mb-8 shadow-lg" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark))">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Laporan Kehadiran</h1>
@@ -112,7 +112,7 @@
                 <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid #d1d5db; border-radius:12px; padding:0 16px; font-size:14px; outline:none;">
             </div>
             <div style="flex:3; min-width:200px; display:flex; gap:8px;">
-                <button type="submit" class="bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm" style="flex:2; height:42px; border:none; cursor:pointer;">
+                <button type="submit" class="bg-[#2E97D4] text-white rounded-xl hover:bg-[#2680b8] transition-colors flex items-center justify-center text-sm" style="flex:2; height:42px; border:none; cursor:pointer;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                     Tampilkan
                 </button>
@@ -188,7 +188,7 @@
         }, 3000);
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    function initLaporan() {
         // Event listener untuk form filter
         document.getElementById('formFilter').addEventListener('submit', function(e){
             e.preventDefault();
@@ -332,7 +332,9 @@
             window.location.href = `{{ route('admin.laporan.excel') }}?user_id=${userId}&bulan=${bulan}`;
             showNotification('Membuat laporan Excel...', 'success');
         });
-    });
+    }
+    document.addEventListener('DOMContentLoaded', initLaporan);
+    document.addEventListener('turbo:load', initLaporan);
 
     // CSS untuk loading spinner
     const style = document.createElement('style');

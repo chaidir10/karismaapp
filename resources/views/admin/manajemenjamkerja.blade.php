@@ -5,7 +5,7 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg">
+    <div class="rounded-xl p-6 mb-5 shadow-lg" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark))">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-white">Manajemen Jam Kerja & Shift</h1>
@@ -124,7 +124,7 @@
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Hari</label>
-                <select name="hari" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                <select name="hari" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                     <option value="Senin">Senin</option>
                     <option value="Selasa">Selasa</option>
                     <option value="Rabu">Rabu</option>
@@ -135,16 +135,16 @@
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Masuk</label>
-                    <input type="time" name="jam_masuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_masuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Pulang</label>
-                    <input type="time" name="jam_pulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_pulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
                 <button type="button" onclick="closeModal('modalAddJam')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm flex items-center">
+                <button type="submit" class="px-6 py-2.5 bg-[#2E97D4] hover:bg-[#2680b8] text-white rounded-xl shadow-sm flex items-center">
                     <i class="fas fa-plus mr-2"></i> Simpan
                 </button>
             </div>
@@ -167,7 +167,7 @@
             <input type="hidden" name="id" id="editJamId">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Hari</label>
-                <select name="hari" id="editHari" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                <select name="hari" id="editHari" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                     <option value="Senin">Senin</option>
                     <option value="Selasa">Selasa</option>
                     <option value="Rabu">Rabu</option>
@@ -178,16 +178,16 @@
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Masuk</label>
-                    <input type="time" name="jam_masuk" id="editJamMasuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_masuk" id="editJamMasuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Pulang</label>
-                    <input type="time" name="jam_pulang" id="editJamPulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_pulang" id="editJamPulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
                 <button type="button" onclick="closeModal('modalEditJam')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm flex items-center">
+                <button type="submit" class="px-6 py-2.5 bg-[#2E97D4] hover:bg-[#2680b8] text-white rounded-xl shadow-sm flex items-center">
                     <i class="fas fa-sync-alt mr-2"></i> Perbarui
                 </button>
             </div>
@@ -209,16 +209,16 @@
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Nama Shift</label>
-                <input type="text" name="nama" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                <input type="text" name="nama" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
             </div>
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Masuk</label>
-                    <input type="time" name="jam_masuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_masuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Pulang</label>
-                    <input type="time" name="jam_pulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_pulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
@@ -246,16 +246,16 @@
             <input type="hidden" name="id" id="editShiftId">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Nama Shift</label>
-                <input type="text" name="nama" id="editShiftNama" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                <input type="text" name="nama" id="editShiftNama" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
             </div>
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Masuk</label>
-                    <input type="time" name="jam_masuk" id="editShiftJamMasuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_masuk" id="editShiftJamMasuk" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jam Pulang</label>
-                    <input type="time" name="jam_pulang" id="editShiftJamPulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                    <input type="time" name="jam_pulang" id="editShiftJamPulang" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] outline-none" required>
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
@@ -368,13 +368,13 @@ function closeModal(id) {
 }
 
 // ===================== JAM KERJA =====================
-// Tambah Jam Kerja
-document.getElementById('formAddJam').addEventListener('submit', function(e){
+
+function handleAddJam(e){
     e.preventDefault();
     const formData = new FormData(this);
     const errorsDiv = document.getElementById('addJamErrors');
     errorsDiv.classList.add('hidden');
-    
+
     fetch(`{{ route('admin.jamkerja.store') }}`, {
         method: 'POST',
         headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
@@ -385,7 +385,7 @@ document.getElementById('formAddJam').addEventListener('submit', function(e){
         const err = await res.json();
         throw err;
     })
-    .then(data => { 
+    .then(data => {
         if(data.success) {
             closeModal('modalAddJam');
             location.reload();
@@ -395,7 +395,7 @@ document.getElementById('formAddJam').addEventListener('submit', function(e){
         errorsDiv.innerHTML = Object.values(err.errors || {}).flat().join('<br>');
         errorsDiv.classList.remove('hidden');
     });
-});
+}
 
 // Edit Jam Kerja
 function openEditModal(id){
@@ -414,7 +414,7 @@ function openEditModal(id){
     .catch(()=> alert('Gagal mengambil data jam kerja.'));
 }
 
-document.getElementById('formEditJam').addEventListener('submit', function(e){
+function handleEditJam(e){
     e.preventDefault();
     const id = document.getElementById('editJamId').value;
     const hari = document.getElementById('editHari').value.trim();
@@ -436,7 +436,7 @@ document.getElementById('formEditJam').addEventListener('submit', function(e){
         const err = await res.json();
         throw err;
     })
-    .then(data => { 
+    .then(data => {
         if(data.success) {
             closeModal('modalEditJam');
             location.reload();
@@ -446,7 +446,7 @@ document.getElementById('formEditJam').addEventListener('submit', function(e){
         errorsDiv.innerHTML = Object.values(err.errors || {}).flat().join('<br>');
         errorsDiv.classList.remove('hidden');
     });
-});
+}
 
 // Hapus Jam Kerja
 function deleteJam(id){
@@ -468,13 +468,13 @@ function deleteJam(id){
 }
 
 // ===================== JAM SHIFT =====================
-// Tambah Shift
-document.getElementById('formAddShift').addEventListener('submit', function(e){
+
+function handleAddShift(e){
     e.preventDefault();
     const formData = new FormData(this);
     const errorsDiv = document.getElementById('addShiftErrors');
     errorsDiv.classList.add('hidden');
-    
+
     fetch(`{{ route('admin.jamkerja.shift.store') }}`, {
         method: 'POST',
         headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
@@ -485,7 +485,7 @@ document.getElementById('formAddShift').addEventListener('submit', function(e){
         const err = await res.json();
         throw err;
     })
-    .then(data => { 
+    .then(data => {
         if(data.success) {
             closeModal('modalAddShift');
             location.reload();
@@ -495,7 +495,7 @@ document.getElementById('formAddShift').addEventListener('submit', function(e){
         errorsDiv.innerHTML = Object.values(err.errors || {}).flat().join('<br>');
         errorsDiv.classList.remove('hidden');
     });
-});
+}
 
 // Edit Shift
 function openEditShiftModal(id){
@@ -514,7 +514,7 @@ function openEditShiftModal(id){
     .catch(()=> alert('Gagal mengambil data shift.'));
 }
 
-document.getElementById('formEditShift').addEventListener('submit', function(e){
+function handleEditShift(e){
     e.preventDefault();
     const id = document.getElementById('editShiftId').value;
     const nama = document.getElementById('editShiftNama').value.trim();
@@ -536,7 +536,7 @@ document.getElementById('formEditShift').addEventListener('submit', function(e){
         const err = await res.json();
         throw err;
     })
-    .then(data => { 
+    .then(data => {
         if(data.success) {
             closeModal('modalEditShift');
             location.reload();
@@ -546,7 +546,7 @@ document.getElementById('formEditShift').addEventListener('submit', function(e){
         errorsDiv.innerHTML = Object.values(err.errors || {}).flat().join('<br>');
         errorsDiv.classList.remove('hidden');
     });
-});
+}
 
 // Hapus Shift
 function deleteShift(id){
@@ -566,5 +566,14 @@ function deleteShift(id){
     })
     .catch(()=> alert('Terjadi kesalahan.'));
 }
+
+function initJamKerja() {
+    document.getElementById('formAddJam').addEventListener('submit', handleAddJam);
+    document.getElementById('formEditJam').addEventListener('submit', handleEditJam);
+    document.getElementById('formAddShift').addEventListener('submit', handleAddShift);
+    document.getElementById('formEditShift').addEventListener('submit', handleEditShift);
+}
+document.addEventListener('DOMContentLoaded', initJamKerja);
+document.addEventListener('turbo:load', initJamKerja);
 </script>
 @endpush

@@ -126,12 +126,12 @@
     }
 
     .btn-edit {
-        background: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
+        background: rgba(46, 151, 212, 0.1);
+        color: var(--primary-dark);
     }
 
     .btn-edit:hover {
-        background: #3b82f6;
+        background: var(--primary-dark);
         color: white;
     }
 
@@ -148,7 +148,7 @@
     /* Button Styles untuk Header */
     .btn-primary {
         background: white;
-        color: #3b82f6;
+        color: var(--primary-dark);
         padding: 12px 20px;
         border-radius: 12px;
         border: none;
@@ -177,7 +177,7 @@
         width: 100%;
         height: 6px;
         border-radius: 5px;
-        background: linear-gradient(to right, #6366f1, #a855f7);
+        background: linear-gradient(to right, var(--primary), var(--primary-dark));
         outline: none;
         cursor: pointer;
     }
@@ -188,7 +188,7 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        background: #4f46e5;
+        background: var(--primary-dark);
         border: 2px solid white;
         box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
         cursor: grab;
@@ -198,7 +198,7 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        background: #4f46e5;
+        background: var(--primary-dark);
         border: 2px solid white;
         box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
         cursor: grab;
@@ -269,11 +269,11 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="rounded-xl p-6 mb-8 shadow-lg" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark))">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Titik Presensi</h1>
-                <p class="text-indigo-100 mt-1">Kelola titik lokasi presensi dengan mudah</p>
+                <p class="text-blue-100 mt-1">Kelola titik lokasi presensi dengan mudah</p>
             </div>
             <button id="btnTambah"
                 class="btn-primary">
@@ -341,12 +341,12 @@
                                         <button onclick="editLokasi({{ $item->id }})" 
                                                 class="btn-edit" 
                                                 title="Edit">
-                                            <i class="fas fa-edit"></i>
+                                            <i class="fas fa-pen-to-square"></i>
                                         </button>
                                         <button onclick="deleteLokasi({{ $item->id }}, '{{ $item->nama }}')" 
                                                 class="btn-delete" 
                                                 title="Hapus">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-trash-can"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -397,26 +397,26 @@
             <div class="col-span-12 md:col-span-5 space-y-4">
                 <div>
                     <label class="text-sm font-medium block mb-1">Nama Titik <span class="text-red-500">*</span></label>
-                    <input type="text" id="nama" name="nama" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm required">
+                    <input type="text" id="nama" name="nama" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm required">
                     <div id="namaError" class="text-red-500 text-xs mt-1 hidden">Nama titik harus diisi</div>
                 </div>
                 <div>
                     <label class="text-sm font-medium block mb-1">Alamat</label>
                     <textarea id="alamat" name="alamat"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm"
                         rows="3"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-sm font-medium mb-1">Latitude <span class="text-red-500">*</span></label>
                         <input type="text" id="latitude" name="latitude"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm"
                             required>
                     </div>
                     <div>
                         <label class="text-sm font-medium mb-1">Longitude <span class="text-red-500">*</span></label>
                         <input type="text" id="longitude" name="longitude"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm"
                             required>
                     </div>
                 </div>
@@ -425,7 +425,7 @@
                     <div class="radius-slider-container">
                         <input type="range" id="radiusSlider" min="0" max="500" value="0" class="radius-slider">
                         <input type="number" id="radius" name="radius" min="0" max="500" value="0"
-                            class="radius-input px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm">
+                            class="radius-input px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-[#5AB6EA] text-sm">
                     </div>
                     <div id="radiusError" class="text-red-500 text-xs mt-1 hidden">Radius minimal 10 meter</div>
                     <div class="text-xs text-gray-500 mt-1">Jarak maksimal untuk dapat melakukan presensi</div>
@@ -441,7 +441,7 @@
 
                     <!-- Tombol Simpan -->
                     <button type="submit"
-                        class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center text-sm">
+                        class="px-5 py-2 bg-[#2E97D4] text-white rounded-xl hover:bg-[#2680b8] transition-colors flex items-center text-sm">
                         <i class="fas fa-check mr-2"></i>
                         Simpan
                     </button>
@@ -564,7 +564,7 @@
             <button
                 class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                 onclick="closeModal('modalConfirmCancel')">
-                <i class="fas fa-edit mr-2"></i>
+                <i class="fas fa-pen-to-square mr-2"></i>
                 Lanjutkan Edit
             </button>
             <button
@@ -594,7 +594,7 @@
         <p class="text-gray-600">Data titik presensi berhasil disimpan</p>
         <div class="flex justify-center mt-6">
             <button
-                class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center text-sm"
+                class="px-5 py-2 bg-[#2E97D4] text-white rounded-xl hover:bg-[#2680b8] transition-colors flex items-center text-sm"
                 onclick="closeModal('modalConfirmSave'); closeModal('modalForm'); location.reload();">
                 <i class="fas fa-check mr-2"></i>
                 Oke
@@ -836,7 +836,9 @@
     }
 
     // Event listener saat dokumen dimuat
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', initLokasiPage);
+    document.addEventListener('turbo:load', initLokasiPage);
+    function initLokasiPage() {
         // Inisialisasi peta utama
         initMap();
 

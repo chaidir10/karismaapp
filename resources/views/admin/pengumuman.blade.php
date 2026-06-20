@@ -5,8 +5,8 @@
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <style>
     .ql-editor { min-height: 200px; font-size: 14px; }
-    .ql-toolbar { border-radius: 12px 12px 0 0 !important; border-color: #e2e8f0 !important; }
-    .ql-container { border-radius: 0 0 12px 12px !important; border-color: #e2e8f0 !important; }
+    .ql-toolbar { border-radius: 12px 12px 0 0 !important; border-color: var(--input-border) !important; }
+    .ql-container { border-radius: 0 0 12px 12px !important; border-color: var(--input-border) !important; }
 
     .p-card {
         background: #fff; border-radius: 16px; margin-bottom: 12px;
@@ -16,7 +16,7 @@
     }
     .p-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
     .p-card.dragging { opacity:0.5; transform:scale(0.98); }
-    .p-card.drag-over { border-top:2px solid #3b82f6; }
+    .p-card.drag-over { border-top:2px solid var(--primary); }
     .p-card-inner { display: flex; gap: 12px; padding: 16px 20px; align-items: center; }
     .drag-handle {
         cursor: grab; color: #cbd5e1; font-size: 16px; flex-shrink: 0;
@@ -30,8 +30,8 @@
         font-size: 24px; color: #fff; background-size: cover; background-position: center;
     }
     .p-card .p-info { flex: 1; min-width: 0; }
-    .p-card .p-title { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .p-card .p-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
+    .p-card .p-title { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-card .p-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11px; color: var(--gray); margin-bottom: 6px; }
     .p-card .p-meta .p-tag { padding: 2px 10px; border-radius: 8px; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: #fff; }
     .p-card .p-excerpt { font-size: 12px; color: #64748b; line-height: 1.4; max-height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .p-card .p-badge-inactive { display: inline-block; background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
@@ -44,7 +44,7 @@
     .p-card .p-actions button:hover { background: #e2e8f0; }
     .btn-toggle-on { color: #10b981; }
     .btn-toggle-off { color: #ef4444; }
-    .btn-edit { color: #3b82f6; }
+    .btn-edit { color: var(--primary-dark); }
     .btn-delete { color: #ef4444; }
 
     /* Form field */
@@ -54,7 +54,7 @@
         width: 100%; border: 1px solid #e2e8f0; border-radius: 12px;
         padding: 10px 14px; font-size: 14px; outline: none; transition: border-color 0.2s;
     }
-    .form-input:focus { border-color: #3b82f6; }
+    .form-input:focus { border-color: var(--primary); }
 
     /* Preview gambar */
     .cover-preview {
@@ -75,13 +75,13 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="rounded-xl p-6 mb-8 shadow-lg" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark))">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-white">Pengumuman</h1>
                 <p class="text-blue-100 mt-1">Kelola pengumuman dan informasi untuk pegawai</p>
             </div>
-            <button onclick="openModal()" class="bg-white text-blue-600 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-sm">
+            <button onclick="openModal()" class="bg-white text-[#2E97D4] px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-sm">
                 <i class="fas fa-plus"></i> Tambah Pengumuman
             </button>
         </div>
@@ -224,7 +224,7 @@
             <!-- Opsi Tampilan -->
             <div style="margin-bottom:16px; background:#f8fafc; border-radius:12px; padding:14px 16px; border:1px solid #e2e8f0;">
                 <label style="font-size:13px; display:flex; align-items:center; gap:8px; cursor:pointer; color:#374151; font-weight:500;">
-                    <input type="checkbox" name="sembunyikan_detail" id="inputSembunyikan" value="1" style="accent-color:#3b82f6; width:16px; height:16px;">
+                    <input type="checkbox" name="sembunyikan_detail" id="inputSembunyikan" value="1" style="accent-color:var(--primary); width:16px; height:16px;">
                     Sembunyikan judul & label di slider
                     <span style="font-size:11px; color:#94a3b8; font-weight:400;">(hanya tampil gambar, detail tetap muncul saat diklik)</span>
                 </label>
@@ -240,7 +240,7 @@
             <!-- Actions -->
             <div style="display:flex; gap:10px; justify-content:flex-end;">
                 <button type="button" onclick="closeModal()" style="padding:10px 20px; border-radius:12px; border:1px solid #e2e8f0; background:#fff; font-size:14px; cursor:pointer; font-weight:500; color:#475569;">Batal</button>
-                <button type="submit" style="padding:10px 28px; border-radius:12px; border:none; background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; font-size:14px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                <button type="submit" style="padding:10px 28px; border-radius:12px; border:none; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; font-size:14px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(46,151,212,0.3);">
                     <i class="fas fa-save" style="margin-right:6px;"></i> Simpan
                 </button>
             </div>

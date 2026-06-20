@@ -5,13 +5,13 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header Section with Gradient -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg">
+    <div class="rounded-xl p-6 mb-5 shadow-lg" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark))">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Pegawai</h1>
                 <p class="text-blue-100 mt-1">Kelola data seluruh pegawai</p>
             </div>
-            <button onclick="openModal('modalAdd')" class="w-full sm:w-auto bg-white hover:bg-gray-100 text-blue-600 px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md">
+            <button onclick="openModal('modalAdd')" class="w-full sm:w-auto bg-white hover:bg-gray-100 text-[#2E97D4] px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md">
                 <i class="fas fa-user-plus mr-2"></i>
                 <span class="font-medium">Tambah Pegawai</span>
             </button>
@@ -25,7 +25,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari Pegawai</label>
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="Cari nama atau NIP..."
-                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
@@ -33,7 +33,7 @@
             </div>
             <div class="md:col-span-3">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Filter Unit</label>
-                <select id="filterUnit" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                <select id="filterUnit" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                     <option value="">Semua Unit</option>
                     @foreach($units as $unit)
                     <option value="{{ $unit->id }}">{{ $unit->nama }}</option>
@@ -42,7 +42,7 @@
             </div>
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Filter Jenis Pegawai</label>
-                <select id="filterJenis" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                <select id="filterJenis" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                     <option value="">Semua Jenis</option>
                     <option value="asn">ASN</option>
                     <option value="non_asn">Non ASN</option>
@@ -114,7 +114,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm">
                             @if($user->can_shift)
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                 Shift
                             </span>
                             @else
@@ -125,7 +125,7 @@
                         <td class="px-6 py-4 text-right text-sm font-medium">
                             <div class="flex justify-end space-x-2">
                                 <!-- All Action Buttons Visible -->
-                                <button onclick="openDetailModal({{ $user->id }})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Detail">
+                                <button onclick="openDetailModal({{ $user->id }})" class="p-2 text-[#2E97D4] hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Detail">
                                     <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
                             </div>
@@ -153,22 +153,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">NIP</label>
-                    <input type="number" name="nip" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <input type="number" name="nip" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                    <input type="text" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <input type="text" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none" required>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jabatan</label>
-                    <input type="text" name="jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="text" name="jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit Utama</label>
-                    <select name="unit_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <select name="unit_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
@@ -182,7 +182,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 border border-gray-300 rounded-xl max-h-40 overflow-y-auto">
                     @foreach($units as $u)
                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
-                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-[#2E97D4] focus:ring-[#5AB6EA]">
                         <span class="text-sm text-gray-700">{{ $u->nama }}</span>
                     </label>
                     @endforeach
@@ -192,7 +192,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Pegawai</label>
-                    <select name="jenis_pegawai" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <select name="jenis_pegawai" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                         <option value="asn">ASN</option>
                         <option value="non_asn">Non ASN</option>
                         <option value="outsourcing">Outsourcing</option>
@@ -200,24 +200,24 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
-                    <input type="text" name="no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="text" name="no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                    <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
-                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
                     </select>
@@ -226,7 +226,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
-                <textarea name="alamat" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" rows="3"></textarea>
+                <textarea name="alamat" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none" rows="3"></textarea>
             </div>
 
 
@@ -234,7 +234,7 @@
                 <button type="button" onclick="closeModal('modalAdd')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                     Batal
                 </button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-colors duration-200 flex items-center">
+                <button type="submit" class="px-6 py-2.5 bg-[#2E97D4] hover:bg-[#2680b8] text-white rounded-xl shadow-sm transition-colors duration-200 flex items-center">
                     <i class="fas fa-save mr-2"></i> Simpan
                 </button>
             </div>
@@ -269,13 +269,13 @@
                 <!-- Action Buttons -->
                 <div class="mt-4 space-y-3">
                     <button onclick="openEditModalFromDetail()" class="w-full px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl transition-colors duration-200 flex items-center justify-center">
-                        <i class="fas fa-edit mr-2"></i> Edit Data
+                        <i class="fas fa-pen-to-square mr-2"></i> Edit Data
                     </button>
                     <button onclick="showResetPasswordConfirmation()" class="w-full px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors duration-200 flex items-center justify-center">
                         <i class="fas fa-key mr-2"></i> Reset Password
                     </button>
                     <button onclick="showDeleteConfirmation()" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors duration-200 flex items-center justify-center">
-                        <i class="fas fa-trash-alt mr-2"></i> Hapus Pegawai
+                        <i class="fas fa-trash-can mr-2"></i> Hapus Pegawai
                     </button>
                 </div>
             </div>
@@ -326,7 +326,7 @@
 
                     <div class="mt-4">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Jadwal Kerja</label>
-                        <div id="detailShift" class="bg-indigo-50 rounded-lg p-3 text-indigo-800 border border-indigo-200 text-sm">Jam Kerja Normal</div>
+                        <div id="detailShift" class="bg-blue-50 rounded-lg p-3 text-blue-800 border border-blue-200 text-sm">Jam Kerja Normal</div>
                     </div>
 
                     <div class="mt-4">
@@ -362,22 +362,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">NIP</label>
-                    <input type="number" name="nip" id="edit_nip" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <input type="number" name="nip" id="edit_nip" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                    <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none" required>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jabatan</label>
-                    <input type="text" name="jabatan" id="edit_jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="text" name="jabatan" id="edit_jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit Utama</label>
-                    <select name="unit_id" id="edit_unit" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <select name="unit_id" id="edit_unit" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
@@ -391,7 +391,7 @@
                 <div id="editWilayahCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 border border-gray-300 rounded-xl max-h-40 overflow-y-auto">
                     @foreach($units as $u)
                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
-                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 edit-wilayah-cb">
+                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-[#2E97D4] focus:ring-[#5AB6EA] edit-wilayah-cb">
                         <span class="text-sm text-gray-700">{{ $u->nama }}</span>
                     </label>
                     @endforeach
@@ -401,7 +401,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Pegawai</label>
-                    <select name="jenis_pegawai" id="edit_jenis_pegawai" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <select name="jenis_pegawai" id="edit_jenis_pegawai" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                         <option value="asn">ASN</option>
                         <option value="non_asn">Non ASN</option>
                         <option value="outsourcing">Outsourcing</option>
@@ -409,19 +409,19 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" name="email" id="edit_email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="email" name="email" id="edit_email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
-                    <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
                     <select name="can_shift" id="edit_can_shift"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
                     </select>
@@ -430,14 +430,14 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
-                <textarea name="alamat" id="edit_alamat" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" rows="3"></textarea>
+                <textarea name="alamat" id="edit_alamat" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#5AB6EA] focus:border-[#5AB6EA] transition-all duration-200 outline-none" rows="3"></textarea>
             </div>
 
             <div class="flex justify-end space-x-4 pt-4">
                 <button type="button" onclick="closeModal('modalEdit')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                     Batal
                 </button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-colors duration-200 flex items-center">
+                <button type="submit" class="px-6 py-2.5 bg-[#2E97D4] hover:bg-[#2680b8] text-white rounded-xl shadow-sm transition-colors duration-200 flex items-center">
                     <i class="fas fa-sync-alt mr-2"></i> Perbarui
                 </button>
             </div>
@@ -462,7 +462,7 @@
                 </button>
                 <button type="button" onclick="confirmDelete()"
                     class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm transition-colors duration-200 font-medium flex items-center">
-                    <i class="fas fa-trash-alt mr-2"></i> Hapus
+                    <i class="fas fa-trash-can mr-2"></i> Hapus
                 </button>
             </div>
         </div>
@@ -532,7 +532,7 @@
 <!-- Loading Overlay -->
 <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white rounded-2xl p-6 flex items-center space-x-3">
-        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-[#2E97D4]"></div>
         <span class="text-gray-700 font-medium">Memproses...</span>
     </div>
 </div>
