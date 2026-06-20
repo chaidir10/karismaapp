@@ -724,10 +724,10 @@
                     </div>
                     <div style="flex:1; min-width:0;">
                         <div style="font-size:12px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $pf['user']->name }}</div>
-                        <div style="font-size:10px; color:var(--gray-500);">{{ $pf['hadir'] }} hadir · {{ $pf['telat'] }} telat · {{ $pf['lembur'] }} lembur</div>
+                        <div style="font-size:10px; color:var(--gray-500);">{{ $pf['hadir'] }} hadir · {{ $pf['telat'] }} telat</div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
-                        <div style="font-size:14px; font-weight:700; color:{{ $pf['persen'] >= 80 ? '#10b981' : ($pf['persen'] >= 50 ? '#f59e0b' : '#ef4444') }};">{{ $pf['persen'] }}%</div>
+                        <div style="font-size:14px; font-weight:700; color:{{ $pf['persen'] >= 90 ? '#10b981' : ($pf['persen'] >= 75 ? '#2563eb' : ($pf['persen'] >= 50 ? '#f59e0b' : '#ef4444')) }};">{{ $pf['persen'] }}%</div>
                     </div>
                 </div>
                 @endforeach

@@ -4,7 +4,13 @@
 
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
+    .ts-wrapper.single .ts-control { border-radius: 12px; border-color: #d1d5db; padding: 6px 12px; font-size: 14px; min-height: 38px; }
+    .ts-wrapper.single .ts-control:focus, .ts-wrapper.single.focus .ts-control { border-color: #6366f1; box-shadow: none; }
+    .ts-dropdown { border-radius: 12px; font-size: 14px; }
+    .ts-dropdown .option { padding: 8px 12px; }
+
     body {
         font-family: 'Poppins', sans-serif;
     }
@@ -143,7 +149,13 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
+    new TomSelect('#user_id', {
+        placeholder: 'Ketik nama atau NIP...',
+        allowEmptyOption: true,
+    });
+
     // Fungsi untuk menampilkan notifikasi
     function showNotification(message, type) {
         const notification = document.getElementById('notification');
