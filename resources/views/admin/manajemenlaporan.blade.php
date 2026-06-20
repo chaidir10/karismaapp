@@ -6,28 +6,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
+    .ts-wrapper { border: none !important; box-shadow: none !important; margin: 0; }
     .ts-wrapper.single .ts-control {
         border: 1px solid #d1d5db;
         border-radius: 12px;
-        padding: 7px 16px;
+        padding: 8px 32px 8px 16px;
         font-size: 14px;
-        min-height: 42px;
+        height: 42px;
+        line-height: 24px;
         background: #fff;
         box-shadow: none;
-        cursor: text;
+        display: flex;
+        align-items: center;
     }
-    .ts-wrapper.single.focus .ts-control {
-        border-color: #6366f1;
-        box-shadow: none;
-        outline: none;
-    }
+    .ts-wrapper.single.focus .ts-control { border-color: #6366f1; box-shadow: none; }
     .ts-wrapper.single .ts-control input { font-size: 14px; }
-    .ts-wrapper.single .ts-control .item { color: #374151; }
-    .ts-wrapper { border: none !important; box-shadow: none !important; }
+    .ts-wrapper.single .ts-control .item { color: #374151; line-height: 24px; }
     .ts-dropdown { border: 1px solid #d1d5db; border-radius: 12px; font-size: 14px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .ts-dropdown .option { padding: 9px 16px; }
     .ts-dropdown .option.active { background: #eef2ff; color: #4338ca; }
-    .ts-wrapper .clear-button { margin-right: 4px; font-size: 16px; color: #94a3b8; }
+    .ts-wrapper .clear-button { position: absolute !important; right: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; line-height: 1; padding: 0; }
     .ts-wrapper .clear-button:hover { color: #ef4444; }
 
     body {
@@ -104,22 +102,22 @@
             </div>
             <div class="md:col-span-3">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Bulan</label>
-                <input type="month" name="bulan" id="bulan" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" value="{{ now()->format('Y-m') }}">
+                <input type="month" name="bulan" id="bulan" class="w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="height:42px;" value="{{ now()->format('Y-m') }}">
             </div>
-            <div class="md:col-span-5 flex gap-2">
-                <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm">
+            <div class="md:col-span-5 flex gap-2" style="margin-top:auto;">
+                <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm" style="height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     </svg>
                     Tampilkan Laporan
                 </button>
-                <a href="#" id="btnPdf" class="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center text-sm">
+                <a href="#" id="btnPdf" class="bg-red-600 text-white px-4 rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center text-sm" style="height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                     PDF
                 </a>
-                <a href="#" id="btnExcel" class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center text-sm">
+                <a href="#" id="btnExcel" class="bg-green-600 text-white px-4 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center text-sm" style="height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
