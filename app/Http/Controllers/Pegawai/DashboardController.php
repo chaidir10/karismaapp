@@ -9,6 +9,7 @@ use App\Models\Presensi;
 use App\Models\JamKerja;
 use App\Models\JamShift;
 use App\Models\Pengumuman;
+use App\Models\AppSetting;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -145,6 +146,8 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        $disablePresensiLibur = ($isLiburHariIni && AppSetting::getBool('disable_presensi_hari_libur', true));
+
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
             'user',
@@ -163,7 +166,8 @@ class DashboardController extends Controller
             'pengumumans',
             'jadwalKerjaHariIni',
             'isLiburHariIni',
-            'namaLibur'
+            'namaLibur',
+            'disablePresensiLibur'
         ));
     }
 }

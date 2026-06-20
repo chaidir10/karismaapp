@@ -372,9 +372,9 @@
                         </a>
 
                         <div class="sidebar-title mt-6">Pengaturan</div>
-                        <a href="" class="sidebar-item">
+                        <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengaturan.*')) active @endif">
                             <i class="fas fa-cog"></i>
-                            Settings
+                            Pengaturan
                         </a>
                         <a href="#" class="sidebar-item logout-trigger">
                             <i class="fas fa-sign-out-alt"></i> Logout

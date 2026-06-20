@@ -176,6 +176,20 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::post('/upload-image', [PengumumanController::class, 'uploadImage'])->name('upload-image');
             Route::post('/reorder', [PengumumanController::class, 'reorder'])->name('reorder');
         });
+
+        // --------------------
+        // Pengaturan
+        // --------------------
+        Route::get('/pengaturan', function () {
+            return view('admin.pengaturan', [
+                'settings' => \App\Models\AppSetting::all()->pluck('value', 'key'),
+            ]);
+        })->name('pengaturan.index');
+
+        Route::post('/pengaturan', function (\Illuminate\Http\Request $request) {
+            \App\Models\AppSetting::setValue('disable_presensi_hari_libur', $request->boolean('disable_presensi_hari_libur') ? '1' : '0');
+            return redirect()->route('admin.pengaturan.index')->with('success', 'Pengaturan berhasil disimpan');
+        })->name('pengaturan.update');
     });
 
     // --------------------
