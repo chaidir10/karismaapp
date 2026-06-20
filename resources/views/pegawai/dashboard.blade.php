@@ -624,7 +624,6 @@
                     <!-- Face guide -->
                     <div class="face-guide">
                         <div class="face-guide-oval" id="faceGuideOval"></div>
-                        <div class="face-guide-text">Posisikan wajah di dalam lingkaran</div>
                     </div>
 
                     <!-- Face status -->
