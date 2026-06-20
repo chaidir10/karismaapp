@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    :root {
+    :root, [data-theme="light"] {
         --primary: #3b82f6;
         --primary-light: #60a5fa;
         --primary-dark: #2563eb;
@@ -22,6 +22,22 @@
         --gray-500: #64748b;
         --gray-600: #475569;
         --gray-700: #334155;
+    }
+    [data-theme="dark"] {
+        --primary: #60a5fa;
+        --primary-light: #93c5fd;
+        --primary-dark: #3b82f6;
+        --light: #0f1626;
+        --dark: #e2e8f0;
+        --white: #141b2d;
+        --gray-50: #0f1626;
+        --gray-100: #141b2d;
+        --gray-200: #1e293b;
+        --gray-300: #334155;
+        --gray-400: #64748b;
+        --gray-500: #94a3b8;
+        --gray-600: #94a3b8;
+        --gray-700: #cbd5e1;
     }
 
     .admin-dashboard {

@@ -32,16 +32,16 @@
             --dm-input-border: #d1d5db;
         }
         [data-theme="dark"] {
-            --dm-bg: #0f172a;
-            --dm-card: #1e293b;
-            --dm-sidebar: #0f172a;
-            --dm-topbar: #1e293b;
-            --dm-border: #334155;
-            --dm-text: #f1f5f9;
-            --dm-text2: #cbd5e1;
-            --dm-muted: #94a3b8;
-            --dm-input: #1e293b;
-            --dm-input-border: #475569;
+            --dm-bg: #0b0f19;
+            --dm-card: #141b2d;
+            --dm-sidebar: #0b0f19;
+            --dm-topbar: #141b2d;
+            --dm-border: #1e293b;
+            --dm-text: #e2e8f0;
+            --dm-text2: #94a3b8;
+            --dm-muted: #64748b;
+            --dm-input: #141b2d;
+            --dm-input-border: #1e293b;
         }
 
         body {
@@ -344,10 +344,10 @@
         [data-theme="dark"] .logout-modal-content { background: var(--dm-card) !important; color: var(--dm-text) !important; }
         [data-theme="dark"] .logout-modal h3 { color: var(--dm-text) !important; }
         [data-theme="dark"] .logout-modal p { color: var(--dm-muted) !important; }
-        [data-theme="dark"] .logout-btn-cancel { background: var(--dm-border) !important; color: var(--dm-text) !important; }
+        [data-theme="dark"] .logout-btn-cancel { background: #1e293b !important; color: var(--dm-text) !important; }
 
         [data-theme="dark"] .bg-white { background-color: var(--dm-card) !important; }
-        [data-theme="dark"] .bg-gray-50, [data-theme="dark"] .bg-gray-100 { background-color: #1e293b !important; }
+        [data-theme="dark"] .bg-gray-50, [data-theme="dark"] .bg-gray-100 { background-color: #0f1626 !important; }
         [data-theme="dark"] .bg-green-50 { background-color: #064e3b !important; }
         [data-theme="dark"] .bg-red-50, [data-theme="dark"] .bg-red-100 { background-color: #4a1c1c !important; }
         [data-theme="dark"] .bg-yellow-50 { background-color: #78350f !important; }
@@ -365,7 +365,7 @@
         [data-theme="dark"] .border-red-200 { border-color: #7f1d1d !important; }
         [data-theme="dark"] .divide-gray-200 > * + * { border-color: var(--dm-border) !important; }
         [data-theme="dark"] .shadow-xl, [data-theme="dark"] .shadow-lg, [data-theme="dark"] .shadow-md, [data-theme="dark"] .shadow-sm { box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; }
-        [data-theme="dark"] .hover\:bg-gray-50:hover { background-color: #334155 !important; }
+        [data-theme="dark"] .hover\:bg-gray-50:hover { background-color: #1a2332 !important; }
 
         [data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select {
             background-color: var(--dm-input) !important; border-color: var(--dm-input-border) !important; color: var(--dm-text) !important;
@@ -373,14 +373,14 @@
         [data-theme="dark"] .modal-content { background-color: var(--dm-card) !important; color: var(--dm-text) !important; }
         [data-theme="dark"] .modal-overlay .modal-container { background-color: var(--dm-card) !important; }
 
-        [data-theme="dark"] .data-table th { color: var(--dm-muted) !important; background: #1e293b !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .data-table th { color: var(--dm-muted) !important; background: #0f1626 !important; border-color: var(--dm-border) !important; }
         [data-theme="dark"] .data-table td { color: var(--dm-text) !important; border-color: var(--dm-border) !important; }
-        [data-theme="dark"] .data-table tbody tr:hover { background: #334155 !important; }
+        [data-theme="dark"] .data-table tbody tr:hover { background: #1a2332 !important; }
         [data-theme="dark"] .user-name { color: var(--dm-text) !important; }
         [data-theme="dark"] .time-cell { color: var(--dm-text) !important; }
         [data-theme="dark"] .date-cell { color: var(--dm-muted) !important; }
         [data-theme="dark"] .card-title { color: var(--dm-text) !important; }
-        [data-theme="dark"] .card-badge { background: #334155 !important; color: var(--dm-muted) !important; }
+        [data-theme="dark"] .card-badge { background: #1e293b !important; color: var(--dm-muted) !important; }
         [data-theme="dark"] .stat-card { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
         [data-theme="dark"] .stat-value { color: var(--dm-text) !important; }
         [data-theme="dark"] .stat-label { color: var(--dm-muted) !important; }
@@ -388,13 +388,13 @@
         [data-theme="dark"] .card-header { border-color: var(--dm-border) !important; }
         [data-theme="dark"] .table-pagination { border-color: var(--dm-border) !important; color: var(--dm-muted) !important; }
         [data-theme="dark"] .pagination-buttons button { background: var(--dm-card) !important; border-color: var(--dm-border) !important; color: var(--dm-muted) !important; }
-        [data-theme="dark"] .pagination-buttons button:hover:not(:disabled) { background: #334155 !important; }
+        [data-theme="dark"] .pagination-buttons button:hover:not(:disabled) { background: #1a2332 !important; }
         [data-theme="dark"] .detail-grid label { color: var(--dm-muted) !important; }
         [data-theme="dark"] .detail-grid span { color: var(--dm-text) !important; }
         [data-theme="dark"] .text-muted { color: var(--dm-muted) !important; }
         [data-theme="dark"] .modal-title { color: var(--dm-text) !important; }
-        [data-theme="dark"] .map-container { border-color: var(--dm-border) !important; background: #1e293b !important; }
-        [data-theme="dark"] .foto-wrapper { background: #1e293b !important; border-color: var(--dm-border) !important; }
+        [data-theme="dark"] .map-container { border-color: var(--dm-border) !important; background: #0f1626 !important; }
+        [data-theme="dark"] .foto-wrapper { background: #0f1626 !important; border-color: var(--dm-border) !important; }
         [data-theme="dark"] .rounded-xl, [data-theme="dark"] .rounded-2xl { border-color: var(--dm-border) !important; }
         [data-theme="dark"] .border { border-color: var(--dm-border) !important; }
         [data-theme="dark"] .hidden.fixed { background-color: rgba(0,0,0,0.7) !important; }
