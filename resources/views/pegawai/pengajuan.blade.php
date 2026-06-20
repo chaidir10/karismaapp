@@ -59,25 +59,15 @@
     .empty-box i { font-size:40px; margin-bottom:12px; opacity:0.3; display:block; }
     .empty-box p { font-size:14px; margin:0; }
 
-    /* Detail Modal */
-    .detail-modal .modal-content { background:var(--card-bg); border-radius:20px; border:none; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
-    .detail-modal .modal-body { padding:24px; }
-    .detail-icon-box { width:56px; height:56px; border-radius:14px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 12px; }
-    .detail-title { font-size:16px; font-weight:700; color:var(--dark); text-align:center; margin-bottom:4px; }
-    .detail-status-row { text-align:center; margin-bottom:16px; }
+    /* Detail & Create Modal — fullscreen */
+    .detail-icon-box { width:44px; height:44px; border-radius:12px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .detail-title { font-size:15px; font-weight:700; color:var(--dark); }
+    .detail-subtitle { font-size:11px; color:var(--gray); }
     .detail-status-badge { display:inline-block; padding:4px 12px; border-radius:8px; font-size:11px; font-weight:600; }
     .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .detail-grid .full { grid-column:1/-1; }
     .detail-label { font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px; }
-    .detail-value { font-size:14px; font-weight:500; color:var(--dark); padding:6px 0; border-bottom:1px solid var(--card-border); }
-    .detail-close-btn { width:100%; margin-top:16px; padding:12px; background:var(--gray-light); color:var(--dark); border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer; }
-
-    /* Create Modal */
-    .create-overlay {
-        display:none; position:fixed; z-index:100; inset:0;
-        background:rgba(0,0,0,0.4); align-items:center; justify-content:center; padding:20px;
-    }
-    .create-overlay.active { display:flex; }
+    .detail-value { font-size:14px; font-weight:500; color:var(--dark); padding:6px 0; border-bottom:1px solid var(--card-border); word-break:break-word; }
     .create-box {
         background:var(--card-bg); border-radius:20px; width:100%; max-width:450px;
         max-height:90vh; overflow-y:auto; padding:24px; position:relative;
@@ -141,16 +131,23 @@
     <div class="fab-buat-text">Buat Pengajuan</div>
 </button>
 
-<!-- Detail Modal -->
-<div class="modal fade detail-modal" id="pengajuanDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body">
+<!-- Detail Modal — Fullscreen -->
+<div id="pengajuanDetailModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
+    <div style="display:flex; flex-direction:column; height:100%;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
                 <div class="detail-icon-box" id="modalPengajuanIconBox"></div>
-                <div class="detail-title" id="modalPengajuanJenis">-</div>
-                <div class="detail-status-row">
-                    <span class="detail-status-badge" id="modalPengajuanStatus" style="background:var(--primary-soft); color:var(--primary-dark);">-</span>
+                <div>
+                    <div class="detail-title" id="modalPengajuanJenis">-</div>
+                    <div class="detail-subtitle"><span class="detail-status-badge" id="modalPengajuanStatus" style="background:var(--primary-soft); color:var(--primary-dark);">-</span></div>
                 </div>
+            </div>
+            <button onclick="closeDetailModal()" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:16px;">
+            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
                 <div class="detail-grid">
                     <div>
                         <div class="detail-label">Tanggal</div>
@@ -169,73 +166,80 @@
                         <div class="detail-value" id="modalPengajuanBukti"><span style="color:var(--gray)">Tidak ada bukti</span></div>
                     </div>
                 </div>
-                <button type="button" class="detail-close-btn" data-bs-dismiss="modal">Tutup</button>
             </div>
+        </div>
+        <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeDetailModal()" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
+            </button>
         </div>
     </div>
 </div>
 
-<!-- Create Modal -->
-<div id="pengajuanModal" class="create-overlay">
-    <div class="create-box">
-        <button class="create-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3>Buat Pengajuan Presensi</h3>
-        <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false">
-            @csrf
-            <div class="form-group">
-                <label for="jenis">Jenis Pengajuan</label>
-                <select name="jenis" id="jenis" required>
-                    <option value="">-- Pilih --</option>
-                    <option value="masuk">Masuk</option>
-                    <option value="pulang">Pulang</option>
-                    <option value="keduanya">Keduanya</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tanggal">Tanggal</label>
-                <input type="date" name="tanggal" id="tanggal" required>
-            </div>
-            <div class="form-group">
-                <label for="alasan">Alasan</label>
-                <textarea name="alasan" id="alasan" rows="3" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="bukti">Upload Bukti (jpg/png/pdf, max 2MB)</label>
-                <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf,.heic,.heif">
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">Kirim Pengajuan</button>
-                <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
-            </div>
-        </form>
+<!-- Create Modal — Fullscreen -->
+<div id="pengajuanModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
+    <div style="display:flex; flex-direction:column; height:100%;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500;">
+                <i class="fas fa-chevron-left"></i> Batal
+            </button>
+            <span style="font-size:15px; font-weight:700; color:var(--dark);">Buat Pengajuan</span>
+            <button type="submit" form="createForm" style="background:none; border:none; color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer;">
+                Kirim
+            </button>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:20px;">
+            <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false" id="createForm">
+                @csrf
+                <div style="background:var(--light); border-radius:14px; padding:4px 0; border:1px solid var(--card-border); margin-bottom:16px;">
+                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Jenis Pengajuan</div>
+                        <select name="jenis" id="jenis" required style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
+                            <option value="">-- Pilih --</option>
+                            <option value="masuk">Masuk</option>
+                            <option value="pulang">Pulang</option>
+                            <option value="keduanya">Keduanya</option>
+                        </select>
+                    </div>
+                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Tanggal</div>
+                        <input type="date" name="tanggal" id="tanggal" required style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
+                    </div>
+                    <div style="padding:12px 16px;">
+                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Alasan</div>
+                        <textarea name="alasan" id="alasan" rows="3" required style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0; resize:none;"></textarea>
+                    </div>
+                </div>
+                <div style="background:var(--light); border-radius:14px; padding:12px 16px; border:1px solid var(--card-border);">
+                    <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Upload Bukti (opsional)</div>
+                    <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf,.heic,.heif" style="font-size:13px; color:var(--dark);">
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('turbo:load', function() {
-        var items = document.querySelectorAll('.p-card');
-        var detailModal = new bootstrap.Modal(document.getElementById('pengajuanDetailModal'));
-        var iconBox = document.getElementById('modalPengajuanIconBox');
-        var statusBadge = document.getElementById('modalPengajuanStatus');
+    function getIcon(jenis) {
+        if (jenis === 'masuk') return { cls: 'fa-arrow-right-to-bracket', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
+        if (jenis === 'pulang') return { cls: 'fa-arrow-right-from-bracket', color: 'var(--accent)', bg: 'var(--accent-light)' };
+        return { cls: 'fa-arrow-right-arrow-left', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
+    }
+    function getStatusStyle(status) {
+        if (status === 'approved') return { bg: 'var(--success-light)', color: 'var(--success)' };
+        if (status === 'rejected') return { bg: 'var(--danger-light)', color: 'var(--danger)' };
+        return { bg: 'var(--warning-light)', color: 'var(--warning)' };
+    }
 
-        function getIcon(jenis) {
-            if (jenis === 'masuk') return { cls: 'fa-arrow-right-to-bracket', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
-            if (jenis === 'pulang') return { cls: 'fa-arrow-right-from-bracket', color: 'var(--accent)', bg: 'var(--accent-light)' };
-            return { cls: 'fa-arrow-right-arrow-left', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
-        }
-
-        function getStatusStyle(status) {
-            if (status === 'approved') return { bg: 'var(--success-light)', color: 'var(--success)' };
-            if (status === 'rejected') return { bg: 'var(--danger-light)', color: 'var(--danger)' };
-            return { bg: 'var(--warning-light)', color: 'var(--warning)' };
-        }
-
-        items.forEach(function(item) {
-            item.addEventListener('click', function() {
+    function initPengajuan() {
+        document.querySelectorAll('.p-card').forEach(function(item) {
+            item.onclick = function() {
                 var jenis = this.dataset.pengajuanJenis;
                 var status = this.dataset.pengajuanStatus;
                 var icon = getIcon(jenis);
                 var ss = getStatusStyle(status);
+                var iconBox = document.getElementById('modalPengajuanIconBox');
+                var statusBadge = document.getElementById('modalPengajuanStatus');
 
                 iconBox.style.background = icon.bg;
                 iconBox.innerHTML = '<i class="fas ' + icon.cls + '" style="color:' + icon.color + '"></i>';
@@ -252,18 +256,16 @@
                 var buktiEl = document.getElementById('modalPengajuanBukti');
                 buktiEl.innerHTML = bukti && bukti.trim() ? '<a href="' + bukti + '" target="_blank" style="color:var(--primary); font-weight:600;">Lihat Bukti</a>' : '<span style="color:var(--gray)">Tidak ada bukti</span>';
 
-                detailModal.show();
-            });
+                document.getElementById('pengajuanDetailModal').style.display = 'block';
+            };
         });
-    });
+    }
 
-    function openModal() {
-        document.getElementById('pengajuanModal').classList.add('active');
-        document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
-    }
-    function closeModal() {
-        document.getElementById('pengajuanModal').classList.remove('active');
-    }
-    document.getElementById('pengajuanModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    function closeDetailModal() { document.getElementById('pengajuanDetailModal').style.display = 'none'; }
+    function openModal() { document.getElementById('pengajuanModal').style.display = 'block'; document.getElementById('tanggal').value = new Date().toISOString().split('T')[0]; }
+    function closeModal() { document.getElementById('pengajuanModal').style.display = 'none'; }
+
+    document.addEventListener('turbo:load', initPengajuan);
+    initPengajuan();
 </script>
 @endsection
