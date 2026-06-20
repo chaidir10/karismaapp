@@ -1345,12 +1345,24 @@
         return true;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // Bind modal events immediately + on pageshow (bfcache restore)
+    function bindModalEvents() {
         var presensiModal = document.getElementById('presensiModal');
-        if (presensiModal) {
+        if (presensiModal && !presensiModal._bound) {
+            presensiModal._bound = true;
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
         }
+    }
+    bindModalEvents();
+    window.addEventListener('pageshow', function(e) {
+        bindModalEvents();
+        initializeDetailModals();
+        initCarousel();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindModalEvents();
 
         // Detail map modals
         initializeDetailModals();
