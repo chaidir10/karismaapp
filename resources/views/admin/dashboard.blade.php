@@ -41,9 +41,8 @@
     }
 
     .admin-dashboard {
-        padding: 20px;
-        background: var(--light);
-        min-height: 100vh;
+        padding: 0;
+        background: transparent;
     }
 
     .dashboard-header {
@@ -657,7 +656,7 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-        .admin-dashboard { padding: 15px; }
+        .admin-dashboard { padding: 0; }
         .stats-grid { grid-template-columns: 1fr; gap: 15px; }
         .content-grid { gap: 15px; }
         .data-table th,

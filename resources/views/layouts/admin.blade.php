@@ -445,6 +445,11 @@
         [data-theme="dark"] #formModal > div { background: var(--dm-card) !important; }
         [data-theme="dark"] .modal-box { background: var(--dm-card) !important; border-color: var(--dm-border) !important; }
 
+        /* Date picker popup dark */
+        [data-theme="dark"] input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        [data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+
         .admin-theme-btn {
             width: 34px; height: 34px; border-radius: 8px; border: 1px solid #e5e7eb;
             background: transparent; color: #6b7280; cursor: pointer;

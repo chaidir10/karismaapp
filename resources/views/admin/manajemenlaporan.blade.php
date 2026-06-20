@@ -101,7 +101,7 @@
             <div style="flex:3; min-width:200px;">
                 <label class="text-sm font-medium block mb-2 text-gray-700">Pilih Pegawai</label>
                 <select name="user_id" id="user_id">
-                    <option value="">Semua Pegawai</option>
+                    <option value=""></option>
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
                     @endforeach
