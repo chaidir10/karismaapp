@@ -141,23 +141,42 @@
 @section('content')
 
 <!-- Card Absensi -->
-<div class="attendance-card">
-    <div class="attendance-date">
-        <i class="far fa-calendar-alt date-icon"></i>
-        <span>{{ now()->translatedFormat('d M Y') }}</span>
-    </div>
-    <div class="attendance-time">
-        <i class="far fa-clock time-icon"></i>
-        @if($shiftHariIni ?? false)
-            <span>{{ $shiftHariIni->nama }} ({{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }})</span>
-        @else
-            <span>Jam Kerja (07:30 - 16:00)</span>
-        @endif
+<div class="attendance-card" style="padding:0; overflow:hidden; border:none; box-shadow:0 8px 30px rgba(0,0,0,0.08);">
+    <!-- Info bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--white);">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">
+                <i class="far fa-calendar-alt"></i>
+            </div>
+            <div>
+                <div style="font-size:11px; color:var(--gray); font-weight:500;">{{ now()->translatedFormat('l') }}</div>
+                <div style="font-size:15px; font-weight:700; color:var(--dark); line-height:1.2;">{{ now()->translatedFormat('d F Y') }}</div>
+            </div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:10px; color:var(--gray); font-weight:500;">Jadwal</div>
+            <div style="font-size:13px; font-weight:700; color:var(--primary-dark);">
+                @if($shiftHariIni ?? false)
+                    {{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }}
+                @else
+                    07:30 - 16:00
+                @endif
+            </div>
+            @if($shiftHariIni ?? false)
+                <div style="font-size:9px; color:var(--primary); font-weight:600; margin-top:1px;">{{ $shiftHariIni->nama }}</div>
+            @endif
+        </div>
     </div>
 
-    <div class="attendance-actions">
-        <button class="attendance-btn {{ $sudahPresensiMasuk ? 'btn-disabled' : '' }}"
+    <!-- Divider -->
+    <div style="height:1px; background:var(--gray-light); margin:0 20px;"></div>
+
+    <!-- Buttons -->
+    <div style="display:flex; gap:10px; padding:16px 20px;">
+        <button class="{{ $sudahPresensiMasuk ? '' : 'absen-btn-active' }}"
             id="clock-in-btn"
+            style="flex:1; height:52px; border-radius:14px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px; font-weight:700; transition:all 0.2s;
+            {{ $sudahPresensiMasuk ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,#10b981,#059669); color:#fff; box-shadow:0 4px 14px rgba(16,185,129,0.3);' }}"
             @if($user->can_shift && $shifts->count() > 0 && !$sudahPresensiMasuk)
                 data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
             @else
@@ -165,14 +184,16 @@
             @endif
             onclick="setJenis('masuk'); setLembur(false)"
             {{ $sudahPresensiMasuk ? 'disabled' : '' }}>
-            <i class="fas fa-sign-in-alt attendance-icon"></i>
+            <i class="fas {{ $sudahPresensiMasuk ? 'fa-check-circle' : 'fa-sign-in-alt' }}" style="font-size:18px;"></i>
             {{ $sudahPresensiMasuk ? 'Sudah Masuk' : 'Masuk' }}
         </button>
-        <button class="attendance-btn {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'btn-disabled' : '' }}"
+        <button class="{{ (!$sudahPresensiMasuk || $sudahPresensiPulang) ? '' : 'absen-btn-active' }}"
             id="clock-out-btn"
+            style="flex:1; height:52px; border-radius:14px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px; font-weight:700; transition:all 0.2s;
+            {{ (!$sudahPresensiMasuk || $sudahPresensiPulang) ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 4px 14px rgba(245,158,11,0.3);' }}"
             onclick="handlePulangWithCheck()"
             {{ !$sudahPresensiMasuk || $sudahPresensiPulang ? 'disabled' : '' }}>
-            <i class="fas fa-sign-out-alt attendance-icon"></i>
+            <i class="fas {{ $sudahPresensiPulang ? 'fa-check-circle' : 'fa-sign-out-alt' }}" style="font-size:18px;"></i>
             {{ $sudahPresensiPulang ? 'Sudah Pulang' : 'Pulang' }}
         </button>
     </div>
