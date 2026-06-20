@@ -151,7 +151,7 @@
 
         /* Header */
         .app-header {
-            padding: 20px 20px 40px;
+            padding: 20px 20px 80px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border-bottom-right-radius: 24px;
@@ -200,7 +200,7 @@
         /* Attendance Card */
         .attendance-card {
             background-color: var(--white);
-            margin: -20px 20px 25px;
+            margin: -60px 20px 25px;
             padding: 25px;
             border-radius: 20px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
