@@ -88,13 +88,13 @@
 
 <!-- Floating Filter Bar -->
 <div class="filter-bar">
-    <select id="filterBulan" style="flex:3;">
+    <select id="filterBulan" style="flex:1;">
         @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
         @foreach($namaBulan as $i => $nb)
             <option value="{{ $i+1 }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
         @endforeach
     </select>
-    <select id="filterTahun" style="flex:2;">
+    <select id="filterTahun" style="flex:1;">
         @for($y = now()->year; $y >= 2024; $y--)
             <option value="{{ $y }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('Y') === $y ? 'selected' : '' }}>{{ $y }}</option>
         @endfor
