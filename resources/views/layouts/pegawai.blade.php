@@ -151,7 +151,7 @@
 
         /* Header */
         .app-header {
-            padding: 20px 20px 30px;
+            padding: 20px 20px 40px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border-bottom-right-radius: 24px;
