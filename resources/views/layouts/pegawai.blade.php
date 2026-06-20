@@ -200,7 +200,7 @@
         /* Attendance Card */
         .attendance-card {
             background-color: var(--white);
-            margin: -40px 20px 25px;
+            margin: -80px 20px 25px;
             padding: 25px;
             border-radius: 20px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
