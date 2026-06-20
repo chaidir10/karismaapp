@@ -189,15 +189,13 @@
         </div>
         <div style="text-align:right;">
             <div style="font-size:10px; color:var(--gray); font-weight:500;">Jadwal</div>
-            <div style="font-size:13px; font-weight:700; color:var(--primary-dark);">
-                @if($shiftHariIni ?? false)
-                    {{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }}
-                @else
-                    07:30 - 16:00
-                @endif
-            </div>
-            @if($shiftHariIni ?? false)
+            @if($isLiburHariIni ?? false)
+                <div style="font-size:13px; font-weight:700; color:var(--accent);">{{ $namaLibur }}</div>
+            @elseif($shiftHariIni ?? false)
+                <div style="font-size:13px; font-weight:700; color:var(--primary-dark);">{{ \Carbon\Carbon::parse($shiftHariIni->jam_masuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftHariIni->jam_pulang)->format('H:i') }}</div>
                 <div style="font-size:9px; color:var(--primary); font-weight:600; margin-top:1px;">{{ $shiftHariIni->nama }}</div>
+            @else
+                <div style="font-size:13px; font-weight:700; color:var(--primary-dark);">{{ \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_masuk'])->format('H:i') }} - {{ \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->format('H:i') }}</div>
             @endif
         </div>
     </div>

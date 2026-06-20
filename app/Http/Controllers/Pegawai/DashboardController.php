@@ -94,12 +94,34 @@ class DashboardController extends Controller
 
         $jamPulangTarget = $jadwalKerjaHariIni['jam_pulang'];
 
+        $isLiburHariIni = false;
+        $namaLibur = null;
+        $todayCarbon = \Carbon\Carbon::today();
+        if ($todayCarbon->dayOfWeek == 0 || $todayCarbon->dayOfWeek == 6) {
+            $isLiburHariIni = true;
+            $namaLibur = 'Libur';
+        } else {
+            try {
+                $json = @file_get_contents("https://libur.deno.dev/api?year={$todayCarbon->year}");
+                if ($json) {
+                    $holidays = @json_decode($json, true);
+                    if (is_array($holidays)) {
+                        foreach ($holidays as $h) {
+                            if (($h['date'] ?? '') === $today) {
+                                $isLiburHariIni = true;
+                                $namaLibur = $h['name'] ?? 'Libur Nasional';
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {}
+        }
+
         $pengumumans = Pengumuman::where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
-
-        $jadwalKerjaHariIni = $jadwalKerjaHariIni;
 
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
@@ -117,7 +139,9 @@ class DashboardController extends Controller
             'jamMasukHariIni',
             'jamPulangTarget',
             'pengumumans',
-            'jadwalKerjaHariIni'
+            'jadwalKerjaHariIni',
+            'isLiburHariIni',
+            'namaLibur'
         ));
     }
 }
