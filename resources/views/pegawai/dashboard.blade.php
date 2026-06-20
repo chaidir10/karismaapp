@@ -1074,9 +1074,8 @@
         currentPosition = null;
         isOutsideRadius = false;
 
-        // Reset is_lembur agar tidak bocor ke submit berikutnya
-        var lemburInput = document.getElementById('isLemburInput');
-        if (lemburInput) lemburInput.value = '0';
+        // Jangan reset is_lembur di sini — form.submit() mungkin belum selesai
+        // Reset dilakukan oleh onclick tombol reguler (setLembur(false))
 
         if (autoCloseTimer) {
             clearTimeout(autoCloseTimer);

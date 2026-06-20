@@ -34,7 +34,7 @@ class DashboardAdminController extends Controller
             ->whereDate('tanggal', $today)
             ->where('status', 'approved')
             ->where('is_lembur', false)
-            ->orderBy('jam', 'asc')
+            ->orderBy('jam', 'desc')
             ->get();
 
         foreach ($presensiHariIni as $presensi) {
@@ -102,7 +102,7 @@ class DashboardAdminController extends Controller
             ->whereDate('tanggal', $today)
             ->where('is_lembur', true)
             ->where('status', 'approved')
-            ->orderBy('jam', 'asc')
+            ->orderBy('jam', 'desc')
             ->get();
 
         // Statistik kehadiran 7 hari terakhir
@@ -130,6 +130,46 @@ class DashboardAdminController extends Controller
             $chartTelat[] = $telatCount;
         }
 
+        // Performa pegawai bulan ini
+        $bulanIni = Carbon::now();
+        $startMonth = $bulanIni->copy()->startOfMonth();
+        $endMonth = $bulanIni->copy()->endOfMonth();
+        $hariKerjaBulanIni = 0;
+        for ($d = $startMonth->copy(); $d->lte(Carbon::today()); $d->addDay()) {
+            if (!in_array($d->dayOfWeek, [0, 6])) $hariKerjaBulanIni++;
+        }
+
+        $allUsers = User::all();
+        $performaList = [];
+        foreach ($allUsers as $u) {
+            $presensiUser = Presensi::where('user_id', $u->id)
+                ->whereBetween('tanggal', [$startMonth, Carbon::today()])
+                ->where('status', 'approved')->where('is_lembur', false)->get();
+            $lemburUser = Presensi::where('user_id', $u->id)
+                ->whereBetween('tanggal', [$startMonth, Carbon::today()])
+                ->where('status', 'approved')->where('is_lembur', true)->get();
+
+            $hariHadir = $presensiUser->where('jenis', 'masuk')->unique('tanggal')->count();
+            $hariTelat = 0;
+            foreach ($presensiUser->where('jenis', 'masuk') as $pm) {
+                $jdw = $u->getJadwalKerja($pm->tanggal);
+                if ($pm->jam > date('H:i:s', strtotime($jdw['jam_masuk']) + 60)) $hariTelat++;
+            }
+            $hariLembur = $lemburUser->where('jenis', 'masuk')->count();
+
+            $skor = ($hariHadir * 10) + (($hariHadir - $hariTelat) * 5) + ($hariLembur * 3);
+            $performaList[] = [
+                'user' => $u,
+                'hadir' => $hariHadir,
+                'telat' => $hariTelat,
+                'lembur' => $hariLembur,
+                'skor' => $skor,
+                'persen' => $hariKerjaBulanIni > 0 ? round(($hariHadir / $hariKerjaBulanIni) * 100) : 0,
+            ];
+        }
+        usort($performaList, fn($a, $b) => $b['skor'] <=> $a['skor']);
+        $performaList = array_slice($performaList, 0, 10);
+
         return view('admin.dashboard', compact(
             'jumlahHadir',
             'jumlahPegawai',
@@ -140,7 +180,8 @@ class DashboardAdminController extends Controller
             'lemburHariIni',
             'chartLabels',
             'chartHadir',
-            'chartTelat'
+            'chartTelat',
+            'performaList'
         ));
     }
 

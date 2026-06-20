@@ -670,12 +670,12 @@
 
     {{-- Statistics Cards --}}
     <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card" style="border-left-color:#10b981;">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahHadir ?? 0 }}</h3>
                 <p class="stat-label">Hadir Hari Ini</p>
             </div>
-            <div class="stat-icon">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
                 <i class="fas fa-user-check"></i>
             </div>
         </div>
@@ -688,16 +688,61 @@
                 <i class="fas fa-users"></i>
             </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="border-left-color:#f59e0b;">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
                 <p class="stat-label">Pengajuan Pending</p>
             </div>
-            <div class="stat-icon">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">
                 <i class="fas fa-file-alt"></i>
             </div>
         </div>
     </div>
+
+    {{-- Grafik + Performa --}}
+    <div class="chart-performa-grid" style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px;">
+        <div class="content-card" style="margin:0;">
+            <div class="card-header">
+                <h2 class="card-title">Tren Kehadiran 7 Hari</h2>
+            </div>
+            <div class="card-content" style="padding:15px;">
+                <div style="position:relative; height:250px;">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="content-card" style="margin:0;">
+            <div class="card-header">
+                <h2 class="card-title">Performa Bulan Ini</h2>
+            </div>
+            <div class="card-content" style="padding:0; max-height:310px; overflow-y:auto;">
+                @foreach($performaList as $idx => $pf)
+                <div style="display:flex; align-items:center; gap:10px; padding:8px 14px; border-bottom:1px solid var(--gray-200); {{ $idx < 3 ? 'background:rgba(16,185,129,0.03);' : '' }}">
+                    <div style="width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0;
+                        {{ $idx === 0 ? 'background:#fbbf24;color:#fff;' : ($idx === 1 ? 'background:#94a3b8;color:#fff;' : ($idx === 2 ? 'background:#cd7f32;color:#fff;' : 'background:var(--gray-200);color:var(--gray-600);')) }}">
+                        {{ $idx + 1 }}
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:12px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $pf['user']->name }}</div>
+                        <div style="font-size:10px; color:var(--gray-500);">{{ $pf['hadir'] }} hadir · {{ $pf['telat'] }} telat · {{ $pf['lembur'] }} lembur</div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="font-size:14px; font-weight:700; color:{{ $pf['persen'] >= 80 ? '#10b981' : ($pf['persen'] >= 50 ? '#f59e0b' : '#ef4444') }};">{{ $pf['persen'] }}%</div>
+                    </div>
+                </div>
+                @endforeach
+                @if(count($performaList) === 0)
+                <div style="padding:20px; text-align:center; color:var(--gray-400); font-size:12px;">Belum ada data</div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @media (max-width: 1024px) {
+            .chart-performa-grid { grid-template-columns: 1fr !important; }
+        }
+    </style>
 
     {{-- Content Grid --}}
     <div class="content-grid">
@@ -956,18 +1001,6 @@
         </div>
 
     </div>{{-- end .content-grid --}}
-
-    {{-- Grafik Kehadiran 7 Hari --}}
-    <div class="content-card" style="margin-top:20px;">
-        <div class="card-header">
-            <h2 class="card-title">Tren Kehadiran 7 Hari Terakhir</h2>
-        </div>
-        <div class="card-content" style="padding:20px;">
-            <div style="position:relative; height:280px;">
-                <canvas id="attendanceChart"></canvas>
-            </div>
-        </div>
-    </div>
 
 </div>{{-- end .admin-dashboard --}}
 
@@ -1594,7 +1627,6 @@
                 });
 
                 instance.rows.forEach(function(row) { tbody.appendChild(row); });
-                instance.currentPage = 1;
                 render();
             });
         });
