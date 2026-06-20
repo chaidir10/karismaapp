@@ -4,687 +4,225 @@
 
 @section('content')
 <style>
-    /* Main Container */
+    .riwayat-page { padding: 20px; padding-bottom: 100px; }
 
+    /* Filter */
+    .filter-bar {
+        display: flex; align-items: center; gap: 12px;
+        background: var(--white); border-radius: 16px; padding: 12px 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;
+    }
+    .filter-bar select, .filter-bar input {
+        border: 1px solid var(--gray-light); border-radius: 10px;
+        padding: 10px 14px; font-size: 14px; background: var(--white);
+        outline: none; flex: 1; min-width: 0;
+    }
+    .filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); }
+    .btn-download {
+        width: 42px; height: 42px; border-radius: 10px; border: none; cursor: pointer;
+        background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;
+        display: flex; align-items: center; justify-content: center; font-size: 16px;
+        flex-shrink: 0; transition: transform 0.2s;
+    }
+    .btn-download:active { transform: scale(0.93); }
 
-    /* Riwayat Section - Mirip dengan pengajuan-section */
-    .riwayat-section {
-        background:none;
-        margin: 0;
-        position: relative;
-        z-index: 2;
-        padding: 25px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(109, 40, 217, 0.1);
-        border: 1px solid rgba(109, 40, 217, 0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        margin-bottom: 100px;
+    /* Date group */
+    .date-group { margin-bottom: 20px; }
+    .date-label {
+        font-size: 13px; font-weight: 700; color: var(--gray);
+        padding: 0 4px 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .date-label::after {
+        content: ''; flex: 1; height: 1px; background: var(--gray-light);
     }
 
-    .riwayat-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(109, 40, 217, 0.2);
+    /* Cards */
+    .presensi-card {
+        background: var(--white); border-radius: 14px; padding: 14px 16px;
+        margin-bottom: 10px; display: flex; align-items: center; gap: 14px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid transparent;
+        cursor: pointer; transition: all 0.2s;
     }
+    .presensi-card:active { transform: scale(0.98); }
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
+    .card-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; flex-shrink: 0;
     }
+    .icon-masuk { background: #d1fae5; color: #059669; }
+    .icon-pulang { background: #fef3c7; color: #d97706; }
+    .icon-lembur-masuk { background: #ede9fe; color: #7c3aed; }
+    .icon-lembur-pulang { background: #fce7f3; color: #db2777; }
 
-    .section-title {
-        font-weight: 700;
-        font-size: 17px;
-        color: var(--dark);
-        margin: 0;
+    .card-body { flex: 1; min-width: 0; }
+    .card-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--dark); }
+    .card-tag {
+        font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+        text-transform: uppercase; letter-spacing: 0.5px;
     }
+    .tag-reguler { background: #dbeafe; color: #2563eb; }
+    .tag-lembur { background: #ede9fe; color: #7c3aed; }
+    .card-time { font-size: 22px; font-weight: 800; color: var(--dark); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .card-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
 
-    /* Filter Form - Updated Style */
-    .filter-form {
-        width: 100%;
-        margin-top: 0;
+    .card-status { flex-shrink: 0; text-align: right; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .dot-approved { background: #10b981; }
+    .dot-pending { background: #f59e0b; }
+    .dot-rejected { background: #ef4444; }
+    .status-text { font-size: 11px; font-weight: 500; color: var(--gray); }
+
+    /* Empty */
+    .empty-box {
+        text-align: center; padding: 60px 20px; color: var(--gray);
+        background: var(--white); border-radius: 16px;
     }
+    .empty-box i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; display: block; }
+    .empty-box p { font-size: 14px; margin: 0; }
 
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-        width: 100%;
-    }
+    /* Modal (keep existing) */
+    .detail-modal .modal-content { background:var(--white); border-radius:0; height:100vh; margin:0; display:flex; flex-direction:column; width:100vw; max-width:none; overflow:hidden; }
+    .detail-modal .modal-dialog { margin:0; max-width:none; width:100%; height:100%; }
+    .detail-modal .modal-header { position:sticky; top:0; z-index:10; background:var(--white); border-bottom:1px solid var(--gray-light); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; min-height:44px; }
+    .detail-modal .modal-title { font-weight:700; color:var(--dark); font-size:18px; margin:0; }
+    .detail-modal .close-btn { background:none; border:none; font-size:24px; cursor:pointer; color:var(--gray); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+    .detail-content-container { display:flex; flex:1; width:100%; overflow:hidden; }
+    .detail-image-container { flex:3; height:100%; position:relative; border-right:1px solid var(--gray-light); }
+    .detail-map-container { flex:2; height:100%; position:relative; }
+    .detail-image { width:100%; height:100%; object-fit:cover; display:block; }
+    .detail-map { width:100%; height:100%; }
+    .no-photo-placeholder, .no-location-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--gray); gap:12px; background:var(--gray-light); }
+    .detail-info-section { padding:12px 16px; background:var(--white); flex-shrink:0; border-top:1px solid var(--gray-light); }
+    .detail-datetime-info { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; padding:12px 16px; border-radius:12px; margin-bottom:10px; text-align:center; }
+    .detail-type-badge { display:inline-block; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:700; margin-bottom:6px; background:rgba(255,255,255,0.2); }
+    .badge-masuk { background:rgba(16,185,129,0.3); }
+    .badge-pulang { background:rgba(239,68,68,0.3); }
+    .badge-lembur { background:rgba(124,58,237,0.3); }
+    .detail-date { font-size:13px; opacity:0.9; margin-bottom:4px; font-weight:500; }
+    .detail-location-address { margin-top:6px; font-size:12px; line-height:1.4; color:rgba(255,255,255,0.9); word-break:break-word; }
+    .loading-address { display:flex; align-items:center; justify-content:center; gap:8px; color:rgba(255,255,255,0.9); font-size:12px; }
+    .detail-back-btn { width:100%; padding:10px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; border:none; border-radius:10px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; min-height:40px; box-shadow:0 4px 8px rgba(90,182,234,0.3); }
 
-    .month-input {
-        border: 1px solid var(--gray-light);
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 10px;
-        font-size: 16px;
-        background: var(--white);
-        transition: all 0.3s;
-        width: 100%;
-        box-sizing: border-box;
-        -webkit-appearance: none;
-    }
-
-    .month-input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(90, 182, 234, 0.1);
-    }
-
-    .filter-btn {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 14px 20px;
-        font-weight: 600;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        min-height: 48px;
-        box-shadow: 0 4px 8px rgba(90, 182, 234, 0.3);
-    }
-
-    .filter-btn:hover {
-        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(90, 182, 234, 0.4);
-    }
-
-    /* Riwayat List - Mirip dengan pengajuan-list */
-    .riwayat-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .date-section {
-        margin-bottom: 5px;
-    }
-
-    .date-divider {
-        padding: 0px 0 5px 0;
-        border-bottom: 2px solid var(--primary);
-        margin-bottom: 12px;
-        position: relative;
-    }
-
-    .date-text {
-        font-weight: 700;
-        font-size: 16px;
-        color: var(--dark);
-        display: block;
-        padding: 8px 0;
-    }
-
-    /* Riwayat Item - Mirip dengan pengajuan-item */
-    .riwayat-item {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        margin-bottom: 10px;
-        background-color: var(--light);
-        border-radius: 16px;
-        transition: all 0.2s ease;
-        border: 1px solid var(--gray-light);
-        cursor: pointer;
-    }
-
-    .riwayat-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(109, 40, 217, 0.1);
-    }
-
-    /* Icon presensi */
-    .riwayat-icon {
-        width: 50px;
-        height: 50px;
-        margin-right: 15px;
-        flex-shrink: 0;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid var(--gray-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-soft);
-        font-size: 20px;
-    }
-
-    .riwayat-info {
-        flex-grow: 1;
-        min-width: 0;
-    }
-
-    .riwayat-jenis {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 2px;
-        color: var(--dark);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .riwayat-time {
-        font-size: 12px;
-        color: var(--gray);
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .riwayat-lokasi {
-        font-size: 10px;
-        font-weight: 500;
-        padding: 4px 8px;
-        border-radius: 6px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 150px;
-        background-color: rgba(100, 116, 139, 0.1);
-        color: var(--gray-dark);
-        display: inline-block;
-    }
-
-    .riwayat-status {
-        margin-left: auto;
-        flex-shrink: 0;
-    }
-
-    .riwayat-status .badge {
-        font-size: 11px;
-        padding: 5px 10px;
-        font-weight: 500;
-        border-radius: 6px;
-        white-space: nowrap;
-    }
-
-    /* Status Colors */
-    .status-masuk { 
-        background-color: var(--success-light); 
-        color: var(--success);
-    }
-    .status-pulang { 
-        background-color: var(--warning-light); 
-        color: var(--warning);
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--gray);
-        background: var(--white);
-        border-radius: 16px;
-        margin-top: 20px;
-    }
-
-    .empty-state i {
-        font-size: 48px;
-        margin-bottom: 16px;
-        opacity: 0.5;
-    }
-
-    .empty-state p {
-        font-size: 16px;
-        margin: 0;
-        font-weight: 500;
-    }
-
-    /* MODAL STYLES - IMPROVED */
-    .detail-modal .modal-content {
-        background: var(--white);
-        border-radius: 0;
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        width: 100vw;
-        max-width: none;
-        overflow: hidden;
-    }
-
-    .detail-modal .modal-dialog {
-        margin: 0;
-        max-width: none;
-        width: 100%;
-        height: 100%;
-    }
-
-    .detail-modal .modal-header {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        margin-bottom: 0;
-        background: var(--white);
-        border-bottom: 1px solid var(--gray-light);
-        padding: 8px 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        min-height: 44px;
-        box-sizing: border-box;
-    }
-
-    .detail-modal .modal-title {
-        font-weight: 700;
-        color: var(--dark);
-        font-size: 18px;
-        margin: 0;
-    }
-
-    .detail-modal .close-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: var(--gray);
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: background-color 0.3s;
-        padding: 0;
-    }
-
-    .detail-modal .close-btn:active {
-        background-color: var(--gray-light);
-    }
-
-    .detail-content-container {
-        display: flex;
-        flex: 1;
-        width: 100%;
-        margin: 0;
-        gap: 0;
-        overflow: hidden;
-    }
-
-    .detail-image-container {
-        flex: 3;
-        height: 100%;
-        position: relative;
-        margin: 0;
-        padding: 0;
-        border-right: 1px solid var(--card-border);
-    }
-
-    .detail-map-container {
-        flex: 2;
-        height: 100%;
-        position: relative;
-        margin: 0;
-        padding: 0;
-    }
-
-    .detail-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        margin: 0;
-        padding: 0;
-    }
-
-    .detail-map {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    .no-photo-placeholder,
-    .no-location-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: var(--gray);
-        gap: 12px;
-        background: var(--gray-light);
-        margin: 0;
-        padding: 0;
-        text-align: center;
-    }
-
-    .no-photo-placeholder i,
-    .no-location-placeholder i {
-        font-size: 32px;
-        opacity: 0.5;
-    }
-
-    .detail-info-section {
-        padding: 12px 16px;
-        background: var(--white);
-        flex-shrink: 0;
-        overflow-y: auto;
-        border-top: 1px solid var(--gray-light);
-        box-sizing: border-box;
-    }
-
-    .detail-datetime-info {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        padding: 12px 16px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-
-    .detail-type-badge {
-        display: inline-block;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-    }
-
-    .badge-masuk {
-        background: rgba(16, 185, 129, 0.3);
-    }
-
-    .badge-pulang {
-        background: rgba(239, 68, 68, 0.3);
-    }
-
-    .detail-date {
-        font-size: 13px;
-        opacity: 0.9;
-        margin-bottom: 4px;
-        font-weight: 500;
-    }
-
-    .detail-location-address {
-        margin-top: 6px;
-        font-size: 12px;
-        line-height: 1.4;
-        color: rgba(255, 255, 255, 0.9);
-        word-break: break-word;
-    }
-
-    .loading-address {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 12px;
-    }
-
-    .detail-back-btn {
-        width: 100%;
-        padding: 10px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-size: 14px;
-        min-height: 40px;
-        box-sizing: border-box;
-        box-shadow: 0 4px 8px rgba(90, 182, 234, 0.3);
-    }
-
-    .detail-back-btn:active {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 12px rgba(90, 182, 234, 0.4);
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .riwayat-section {
-        animation: fadeIn 0.2s 0.1s ease-out forwards;
-        margin: 20px;
-        opacity: 0;
-    }
-
-    .riwayat-item {
-        animation: fadeIn 0.2s ease-out forwards;
-        opacity: 0;
-    }
-
-    .riwayat-item:nth-child(1) { animation-delay: 0.15s; }
-    .riwayat-item:nth-child(2) { animation-delay: 0.2s; }
-    .riwayat-item:nth-child(3) { animation-delay: 0.25s; }
-    .riwayat-item:nth-child(4) { animation-delay: 0.3s; }
-    .riwayat-item:nth-child(5) { animation-delay: 0.35s; }
-
-    /* Responsive improvements */
-    @media (min-width: 768px) {
-        .container {
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .input-group {
-            flex-direction: row;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .month-input {
-            flex: 1;
-            margin-bottom: 0;
-        }
-        
-        .filter-btn {
-            width: auto;
-            min-width: 140px;
-            flex-shrink: 0;
-        }
-        
-        .detail-image-container,
-        .detail-map-container {
-            flex: 1;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .detail-content-container {
-            flex-direction: column;
-        }
-
-        .detail-image-container {
-            flex: 3;
-            border-right: none;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .detail-map-container {
-            flex: 2;
-        }
-    }
-
-    @media (max-width: 400px) {
-        .riwayat-item {
-            padding: 12px;
-        }
-
-        .riwayat-icon {
-            width: 45px;
-            height: 45px;
-            margin-right: 12px;
-            font-size: 18px;
-        }
-
-        .riwayat-jenis {
-            font-size: 13px;
-        }
-
-        .riwayat-time {
-            font-size: 11px;
-        }
-
-        .riwayat-status .badge {
-            font-size: 10px;
-            padding: 4px 8px;
-        }
+    @media (max-width:576px) {
+        .detail-content-container { flex-direction:column; }
+        .detail-image-container { flex:3; border-right:none; border-bottom:1px solid var(--gray-light); }
+        .detail-map-container { flex:2; }
     }
 </style>
 
-<div class="container">
-    <!-- Riwayat Section -->
-    <div class="riwayat-section">
-        <div class="section-header">
-            <h3 class="section-title">Riwayat Presensi</h3>
-        </div>
-        
-        {{-- Filter per bulan --}}
-        <form method="GET" class="filter-form">
-            <div >
-                <input type="month" id="bulan" name="bulan" value="{{ $bulan }}" class="month-input">
-                <button type="submit" class="filter-btn">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
-            </div>
-        </form>
+<div class="riwayat-page">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <select id="filterBulan">
+            @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
+            @foreach($namaBulan as $i => $nb)
+                <option value="{{ $i+1 }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
+            @endforeach
+        </select>
+        <select id="filterTahun">
+            @for($y = now()->year; $y >= 2024; $y--)
+                <option value="{{ $y }}" {{ (int)\Carbon\Carbon::parse($bulan)->format('Y') === $y ? 'selected' : '' }}>{{ $y }}</option>
+            @endfor
+        </select>
+        <a id="btnDownloadPdf" class="btn-download" title="Download PDF">
+            <i class="fas fa-file-pdf"></i>
+        </a>
+    </div>
 
-        <!-- Riwayat Content -->
-        <div class="riwayat-list">
-            @forelse($riwayat as $tanggal => $items)
-            <div class="date-section">
-                <div class="date-divider">
-                    <span class="date-text">{{ $tanggal }}</span>
+    <!-- Content -->
+    <div class="riwayat-content">
+        @forelse($riwayat as $tanggal => $items)
+        <div class="date-group">
+            <div class="date-label">{{ $tanggal }}</div>
+            @foreach($items as $p)
+            @php
+                $isLembur = $p->is_lembur;
+                $isMasuk = $p->jenis === 'masuk';
+                if ($isLembur) {
+                    $iconClass = $isMasuk ? 'icon-lembur-masuk' : 'icon-lembur-pulang';
+                    $iconName = $isMasuk ? 'fa-bolt' : 'fa-bolt';
+                    $label = $isMasuk ? 'Masuk Lembur' : 'Pulang Lembur';
+                    $tag = 'tag-lembur';
+                    $tagText = 'Lembur';
+                } else {
+                    $iconClass = $isMasuk ? 'icon-masuk' : 'icon-pulang';
+                    $iconName = $isMasuk ? 'fa-sign-in-alt' : 'fa-sign-out-alt';
+                    $label = $isMasuk ? 'Masuk' : 'Pulang';
+                    $tag = 'tag-reguler';
+                    $tagText = 'Reguler';
+                }
+            @endphp
+            <div class="presensi-card" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
+                <div class="card-icon {{ $iconClass }}">
+                    <i class="fas {{ $iconName }}"></i>
                 </div>
-                
-                <div class="presensi-items">
-                    @foreach($items as $p)
-                    <div class="riwayat-item" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
-                        <div class="riwayat-icon">
-                            @if($p->jenis === 'masuk')
-                            <i class="fas fa-sign-in-alt text-success"></i>
-                            @else
-                            <i class="fas fa-sign-out-alt text-warning"></i>
-                            @endif
-                        </div>
-
-                        <div class="riwayat-info">
-                            <h5 class="riwayat-jenis">{{ $p->jenis === 'masuk' ? 'Presensi Masuk' : 'Presensi Pulang' }}</h5>
-                            <p class="riwayat-time">{{ $p->jam }}</p>
-                            <span class="riwayat-lokasi">{{ $p->lokasi ? 'Lokasi tersedia' : 'Lokasi tidak tersedia' }}</span>
-                        </div>
-
-                        <div class="riwayat-status">
-                            <span class="badge status-{{ $p->jenis }}">
-                                <i class="fas fa-circle small me-1" style="font-size: 6px;"></i> 
-                                {{ $p->jenis === 'masuk' ? 'Masuk' : 'Pulang' }}
-                            </span>
-                        </div>
+                <div class="card-body">
+                    <div class="card-title-row">
+                        <span class="card-title">{{ $label }}</span>
+                        <span class="card-tag {{ $tag }}">{{ $tagText }}</span>
                     </div>
-                    @endforeach
+                    <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
+                    <div class="card-meta">{{ $p->lokasi ? 'Lokasi tercatat' : 'Tanpa lokasi' }}</div>
+                </div>
+                <div class="card-status">
+                    <span class="status-dot dot-{{ $p->status }}"></span>
+                    <span class="status-text">{{ ucfirst($p->status) }}</span>
                 </div>
             </div>
-            @empty
-            <div class="empty-state">
-                <i class="fas fa-history"></i>
-                <p>Belum ada riwayat presensi di bulan ini.</p>
-            </div>
-            @endforelse
+            @endforeach
         </div>
+        @empty
+        <div class="empty-box">
+            <i class="fas fa-calendar-times"></i>
+            <p>Belum ada riwayat presensi di bulan ini</p>
+        </div>
+        @endforelse
     </div>
 </div>
 
-<!-- Modal Detail untuk setiap presensi -->
+<!-- Modals -->
 @foreach($riwayat as $tanggal => $items)
     @foreach($items as $p)
     <div class="modal fade detail-modal" id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
             <div class="modal-content">
-                <!-- Header Modal -->
                 <div class="modal-header">
                     <h5 class="modal-title">Detail Presensi</h5>
-                    <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button type="button" class="close-btn" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
                 </div>
-
-                <!-- Content Container - Foto dan Maps Berdampingan -->
                 <div class="detail-content-container">
-                    <!-- Foto Section -->
                     <div class="detail-image-container">
                         @if($p->foto)
-                        <img src="{{ asset('public/storage/'.$p->foto) }}" class="detail-image" alt="Foto presensi" loading="lazy">
+                        <img src="{{ asset('public/storage/'.$p->foto) }}" class="detail-image" alt="Foto" loading="lazy">
                         @else
-                        <div class="no-photo-placeholder">
-                            <i class="fas fa-camera"></i>
-                            <span>Tidak ada foto</span>
-                        </div>
+                        <div class="no-photo-placeholder"><i class="fas fa-camera"></i><span>Tidak ada foto</span></div>
                         @endif
                     </div>
-
-                    <!-- Maps Section -->
                     <div class="detail-map-container">
                         @if($p->lokasi)
                         <div id="mapDetail{{ $p->id }}" class="detail-map"></div>
                         @else
-                        <div class="no-location-placeholder">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Lokasi tidak tersedia</span>
-                        </div>
+                        <div class="no-location-placeholder"><i class="fas fa-map-marker-alt"></i><span>Lokasi tidak tersedia</span></div>
                         @endif
                     </div>
                 </div>
-
-                <!-- Info Section -->
                 <div class="detail-info-section">
-                    <!-- Informasi Hari, Tanggal, dan Waktu -->
                     <div class="detail-datetime-info">
-                        <div class="detail-type-badge {{ $p->jenis === 'masuk' ? 'badge-masuk' : 'badge-pulang' }}">
-                            {{ $p->jenis === 'masuk' ? 'MASUK' : 'PULANG' }} - {{ $p->jam }}
+                        <div class="detail-type-badge {{ $p->is_lembur ? 'badge-lembur' : ($p->jenis === 'masuk' ? 'badge-masuk' : 'badge-pulang') }}">
+                            {{ $p->is_lembur ? 'LEMBUR ' : '' }}{{ strtoupper($p->jenis) }} - {{ $p->jam }}
                         </div>
-                        <div class="detail-date">
-                            {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l, d F Y') }}
-                        </div>
-                        
+                        <div class="detail-date">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l, d F Y') }}</div>
                         <div class="detail-location-address" id="locationAddress{{ $p->id }}">
                             @if($p->lokasi)
-                            <div class="loading-address">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <span>Mendeteksi alamat...</span>
-                            </div>
+                            <div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>
                             @else
                             <span>Lokasi tidak tersedia</span>
                             @endif
                         </div>
                     </div>
-
-                    <button type="button" class="detail-back-btn" data-bs-dismiss="modal">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Kembali</span>
-                    </button>
+                    <button type="button" class="detail-back-btn" data-bs-dismiss="modal"><i class="fas fa-arrow-left"></i><span>Kembali</span></button>
                 </div>
             </div>
         </div>
@@ -698,35 +236,50 @@
 <script>
     const wilayahAlamat = @json($wilayahAlamat);
 
+    // Auto-filter on change
+    function applyFilter() {
+        var b = document.getElementById('filterBulan').value;
+        var t = document.getElementById('filterTahun').value;
+        var bulan = t + '-' + String(b).padStart(2, '0');
+        window.location.href = "{{ route('pegawai.riwayat') }}?bulan=" + bulan;
+    }
+    document.getElementById('filterBulan').addEventListener('change', applyFilter);
+    document.getElementById('filterTahun').addEventListener('change', applyFilter);
+
+    // Download PDF
+    document.getElementById('btnDownloadPdf').addEventListener('click', function(e) {
+        e.preventDefault();
+        var b = document.getElementById('filterBulan').value;
+        var t = document.getElementById('filterTahun').value;
+        var bulan = t + '-' + String(b).padStart(2, '0');
+        window.open("{{ route('pegawai.riwayat.pdf') }}?bulan=" + bulan, '_blank');
+    });
+
+    // Maps
     document.addEventListener('DOMContentLoaded', function() {
         @foreach($riwayat as $tanggal => $items)
             @foreach($items as $p)
                 @if($p->lokasi)
                 (function() {
-                    const modal = document.getElementById('detailModal{{ $p->id }}');
-                    const status = @json($p->status);
+                    var modal = document.getElementById('detailModal{{ $p->id }}');
+                    var status = @json($p->status);
                     if (!modal) return;
 
                     modal.addEventListener('shown.bs.modal', function() {
-                        const coords = @json($p->lokasi).split(',');
-                        const lat = parseFloat(coords[0]);
-                        const lng = parseFloat(coords[1]);
-                        const addrEl = document.getElementById('locationAddress{{ $p->id }}');
+                        var coords = @json($p->lokasi).split(',');
+                        var lat = parseFloat(coords[0]);
+                        var lng = parseFloat(coords[1]);
+                        var addrEl = document.getElementById('locationAddress{{ $p->id }}');
 
-                        if (isNaN(lat) || isNaN(lng)) {
-                            if (addrEl) addrEl.innerHTML = '<span>Koordinat tidak valid</span>';
-                            return;
-                        }
+                        if (isNaN(lat) || isNaN(lng)) { if (addrEl) addrEl.innerHTML = '<span>Koordinat tidak valid</span>'; return; }
 
                         try {
-                            const map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                            var map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
                             L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Presensi').openPopup();
                             this._map = map;
-                            setTimeout(() => { try { map.invalidateSize(); } catch(e){} }, 300);
-                        } catch (e) {
-                            console.error('Map error:', e);
-                        }
+                            setTimeout(function() { try { map.invalidateSize(); } catch(e){} }, 300);
+                        } catch (e) {}
 
                         if (addrEl) {
                             if (status === 'approved' && wilayahAlamat) {
@@ -738,10 +291,7 @@
                     });
 
                     modal.addEventListener('hidden.bs.modal', function() {
-                        if (this._map) {
-                            try { this._map.remove(); } catch(e){}
-                            this._map = null;
-                        }
+                        if (this._map) { try { this._map.remove(); } catch(e){} this._map = null; }
                     });
                 })();
                 @endif
@@ -751,24 +301,13 @@
 
     function getAddressFromCoordinates(lat, lng, el) {
         el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
-
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-            .then(r => {
-                if (!r.ok) throw new Error(r.status);
-                return r.json();
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1')
+            .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function(data) {
+                if (data && data.display_name) { el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + data.display_name; }
+                else throw new Error();
             })
-            .then(data => {
-                if (data && data.display_name) {
-                    el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + data.display_name;
-                } else {
-                    throw new Error('no data');
-                }
-            })
-            .catch(() => {
-                el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
-            });
+            .catch(function() { el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6); });
     }
-
-    document.addEventListener('touchstart', function() {}, { passive: true });
 </script>
 @endsection

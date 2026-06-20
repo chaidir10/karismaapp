@@ -8,8 +8,10 @@ use Intervention\Image\Facades\Image;
 use App\Models\WilayahKerja;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\LaporanController;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use PDF;
 
 class PresensiController extends Controller
 {
@@ -245,4 +247,16 @@ class PresensiController extends Controller
         return $angle * $earthRadius;
     }
 
+    public function exportPdf(Request $request)
+    {
+        $request->validate(['bulan' => 'required|date_format:Y-m']);
+
+        $laporanController = app(LaporanController::class);
+        $fakeRequest = Request::create('/admin/laporan/pdf', 'GET', [
+            'user_id' => Auth::id(),
+            'bulan' => $request->bulan,
+        ]);
+
+        return $laporanController->exportPdf($fakeRequest);
+    }
 }

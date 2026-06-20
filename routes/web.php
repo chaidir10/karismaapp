@@ -68,6 +68,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::get('/presensi', fn() => redirect()->route('pegawai.dashboard'));
         Route::post('/presensi', [PresensiController::class, 'store'])->name('presensi.store');
         Route::get('/riwayat', [PresensiController::class, 'riwayat'])->name('riwayat');
+        Route::get('/riwayat/pdf', [PresensiController::class, 'exportPdf'])->name('riwayat.pdf');
 
         // Pengajuan presensi
         Route::get('/pengajuan', [PengajuanController::class, 'index'])->name('pengajuan.index');
