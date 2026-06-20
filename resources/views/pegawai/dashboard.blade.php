@@ -143,19 +143,26 @@
     .carousel-slide { min-width:100%; cursor:pointer; padding:0 20px; box-sizing:border-box; }
 
     .slide-content {
-        border-radius:16px; padding:16px; display:flex; gap:14px; align-items:flex-start;
-        box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid rgba(255,255,255,0.15);
+        border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center;
+        border:1px solid rgba(0,0,0,0.06);
     }
-    .slide-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .slide-icon {
+        width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+        font-size:20px; flex-shrink:0; color:#fff;
+    }
     .slide-body { flex:1; min-width:0; }
     .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
-    .slide-tag { font-size:9px; font-weight:700; color:#fff; padding:2px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px; }
-    .slide-date { font-size:10px; opacity:0.7; }
-    .slide-title { font-size:14px; font-weight:700; margin-bottom:4px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .slide-desc { font-size:12px; opacity:0.75; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .slide-link { font-size:11px; font-weight:600; margin-top:6px; opacity:0.85; }
+    .slide-tag { font-size:9px; font-weight:700; color:#fff; padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px; }
+    .slide-date { font-size:10px; color:#64748b; }
+    .slide-title { font-size:14px; font-weight:700; color:#1e293b; margin-bottom:3px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-desc { font-size:12px; color:#475569; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .slide-link { font-size:11px; font-weight:600; margin-top:6px; }
 
-    .slide-image { width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+    .slide-image {
+        width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center;
+        position:relative; overflow:hidden;
+        box-shadow:0 4px 16px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.06);
+    }
 
     .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
@@ -267,9 +274,9 @@
                 </div>
             </div>
             @else
-            {{-- No image, gradient card --}}
-            <div class="slide-content" style="background:linear-gradient(135deg, {{ $pmColor }}28, {{ $pmColor }}10);">
-                <div class="slide-icon" style="background:{{ $pmColor }}30; color:{{ $pmColor }}">
+            {{-- No image, card with left accent --}}
+            <div class="slide-content" style="background:#fff; border-left:4px solid {{ $pmColor }};">
+                <div class="slide-icon" style="background:{{ $pmColor }};">
                     <i class="fas {{ $pmIcon }}"></i>
                 </div>
                 <div class="slide-body">
