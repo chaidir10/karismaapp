@@ -1680,6 +1680,20 @@
                         pointBorderWidth: 2,
                         pointRadius: 5,
                         pointHoverRadius: 7
+                    },
+                    {
+                        label: 'Lembur',
+                        data: @json($chartLembur),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     }
                 ]
             },

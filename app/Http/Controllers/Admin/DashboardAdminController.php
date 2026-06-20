@@ -109,6 +109,7 @@ class DashboardAdminController extends Controller
         $chartLabels = [];
         $chartHadir = [];
         $chartTelat = [];
+        $chartLembur = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $chartLabels[] = $date->translatedFormat('D d/m');
@@ -128,6 +129,11 @@ class DashboardAdminController extends Controller
                 if ($m->jam > $batas) $telatCount++;
             }
             $chartTelat[] = $telatCount;
+
+            $lemburCount = Presensi::whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_lembur', true)
+                ->where('status', 'approved')->distinct('user_id')->count('user_id');
+            $chartLembur[] = $lemburCount;
         }
 
         // Performa pegawai bulan ini (sinkron dengan halaman Performa)
@@ -217,6 +223,7 @@ class DashboardAdminController extends Controller
             'chartLabels',
             'chartHadir',
             'chartTelat',
+            'chartLembur',
             'performaList'
         ));
     }
