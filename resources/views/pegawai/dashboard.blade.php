@@ -473,7 +473,7 @@
                             <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Status</div>
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <span style="width:8px; height:8px; border-radius:50%; background:{{ $p->status == 'approved' ? '#10b981' : ($p->status == 'pending' ? '#f59e0b' : '#ef4444') }};"></span>
-                                <span style="font-size:13px; font-weight:600; color:var(--dark);">{{ ucfirst($p->status) }}</span>
+                                <span style="font-size:13px; font-weight:600; color:var(--dark);">{{ $p->status === 'approved' ? 'Disetujui' : ($p->status === 'rejected' ? 'Ditolak' : 'Menunggu') }}</span>
                             </div>
                         </div>
                         <div style="flex:1; background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">

@@ -47,10 +47,32 @@ class PresensiController extends Controller
             ->orderBy('jam', 'asc')
             ->get();
 
+        $lemburByDate = $records->where('is_lembur', true)->groupBy('tanggal');
+
         foreach ($records as $p) {
             if ($p->is_lembur) {
-                $p->badge_text = null;
-                $p->badge_type = null;
+                if ($p->jenis === 'pulang') {
+                    $lemburMasuk = $lemburByDate->get($p->tanggal)?->firstWhere('jenis', 'masuk');
+                    if ($lemburMasuk) {
+                        $tanggalCarbon = Carbon::parse($p->tanggal);
+                        $isLibur = in_array($tanggalCarbon->dayOfWeek, [0, 6]) || \App\Helpers\HolidayHelper::isHoliday($p->tanggal);
+                        $minLembur = $isLibur ? 300 : 180;
+                        $durasi = (strtotime($p->jam) - strtotime($lemburMasuk->jam)) / 60;
+                        if ($durasi < $minLembur) {
+                            $p->badge_text = 'Pulang Cepat';
+                            $p->badge_type = 'warning';
+                        } else {
+                            $p->badge_text = null;
+                            $p->badge_type = null;
+                        }
+                    } else {
+                        $p->badge_text = null;
+                        $p->badge_type = null;
+                    }
+                } else {
+                    $p->badge_text = null;
+                    $p->badge_type = null;
+                }
             } else {
                 $jadwal = $user->getJadwalKerja($p->tanggal);
                 if ($p->jenis === 'masuk') {
@@ -63,8 +85,7 @@ class PresensiController extends Controller
                         $p->badge_type = 'success';
                     }
                 } else {
-                    $jamPulang = $jadwal['jam_pulang'];
-                    if ($p->jam < $jamPulang) {
+                    if ($p->jam < $jadwal['jam_pulang']) {
                         $p->badge_text = 'Pulang Cepat';
                         $p->badge_type = 'warning';
                     } else {

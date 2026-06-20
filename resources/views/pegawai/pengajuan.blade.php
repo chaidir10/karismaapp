@@ -123,7 +123,7 @@
             </div>
             <div class="p-status">
                 <span class="s-dot s-dot-{{ $p->status }}"></span>
-                <span class="s-text">{{ ucfirst($p->status) }}</span>
+                <span class="s-text">{{ $p->status === 'approved' ? 'Disetujui' : ($p->status === 'rejected' ? 'Ditolak' : 'Menunggu') }}</span>
             </div>
         </div>
         @empty
@@ -241,7 +241,7 @@
                 iconBox.innerHTML = '<i class="fas ' + icon.cls + '" style="color:' + icon.color + '"></i>';
                 statusBadge.style.background = ss.bg;
                 statusBadge.style.color = ss.color;
-                statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusBadge.textContent = status === 'approved' ? 'Disetujui' : (status === 'rejected' ? 'Ditolak' : 'Menunggu');
 
                 document.getElementById('modalPengajuanJenis').textContent = 'Pengajuan ' + jenis.charAt(0).toUpperCase() + jenis.slice(1);
                 document.getElementById('modalPengajuanTanggal').textContent = new Date(this.dataset.pengajuanTanggal).toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });

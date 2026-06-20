@@ -102,7 +102,8 @@ class LaporanController extends Controller
                         if (!$hasExplicitLembur) {
                             $row['lembur']       = $jamKerja;
                             $row['lembur_waktu'] = $jamMasukObj->format('H:i') . '-' . $jamPulangObj->format('H:i');
-                            $row['status_masuk'] = 'Lembur';
+                            $minLembur = $isHoliday ? 300 : 300;
+                            $row['status_masuk'] = $jamKerja < $minLembur ? 'Lembur (Pulang Cepat)' : 'Lembur';
                             $totalLembur += $jamKerja;
                             $totalHariLembur++;
                         }
@@ -163,7 +164,9 @@ class LaporanController extends Controller
                         $totalHariLembur++;
                     }
                     if (!$masuk && !$pulang) {
-                        $row['status_masuk'] = 'Lembur';
+                        $minLembur = $isLibur ? 300 : 180;
+                        $totalLemburMenit = is_numeric($row['lembur']) ? $row['lembur'] : 0;
+                        $row['status_masuk'] = $totalLemburMenit < $minLembur ? 'Lembur (Pulang Cepat)' : 'Lembur';
                     }
                 }
 

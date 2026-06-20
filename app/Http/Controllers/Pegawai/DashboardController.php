@@ -41,8 +41,27 @@ class DashboardController extends Controller
             }
 
             if ($p->is_lembur) {
-                $p->badge_text = null;
-                $p->badge_type = null;
+                if ($p->jenis === 'pulang') {
+                    $lemburMasuk = $riwayatHariIni->where('is_lembur', true)->where('jenis', 'masuk')->first();
+                    if ($lemburMasuk) {
+                        $todayIsLibur = in_array(\Carbon\Carbon::today()->dayOfWeek, [0, 6]) || \App\Helpers\HolidayHelper::isHoliday($today);
+                        $minLembur = $todayIsLibur ? 300 : 180;
+                        $durasi = (strtotime($p->jam) - strtotime($lemburMasuk->jam)) / 60;
+                        if ($durasi < $minLembur) {
+                            $p->badge_text = 'Pulang Cepat';
+                            $p->badge_type = 'warning';
+                        } else {
+                            $p->badge_text = null;
+                            $p->badge_type = null;
+                        }
+                    } else {
+                        $p->badge_text = null;
+                        $p->badge_type = null;
+                    }
+                } else {
+                    $p->badge_text = null;
+                    $p->badge_type = null;
+                }
             } elseif ($p->jenis === 'masuk') {
                 $p->badge_text = $p->terlambat ? 'Terlambat' : 'Tepat Waktu';
                 $p->badge_type = $p->terlambat ? 'danger' : 'success';
