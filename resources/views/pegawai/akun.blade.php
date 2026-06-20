@@ -6,460 +6,202 @@
 <style>
     .akun-page { padding: 20px; padding-bottom: 100px; }
 
-    /* Notifications */
-    .notif-success {
-        background: var(--success-light);
-        border: 1px solid var(--success);
-        color: var(--success);
-        padding: 12px 16px;
-        border-radius: 14px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        font-weight: 500;
-    }
-    .notif-error {
-        background: var(--danger-light);
-        border: 1px solid var(--danger);
-        color: var(--danger);
-        padding: 12px 16px;
-        border-radius: 14px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        font-weight: 500;
-    }
+    .notif-success { background:var(--success-light); border:1px solid var(--success); color:var(--success); padding:12px 16px; border-radius:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
+    .notif-error { background:var(--danger-light); border:1px solid var(--danger); color:var(--danger); padding:12px 16px; border-radius:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
 
-    /* Profile Section */
-    .profile-section {
-        text-align: center;
-        padding: 24px 0 20px;
+    /* Profile Hero */
+    .profile-hero {
+        background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius:20px; padding:28px 20px; text-align:center; margin-bottom:20px;
+        position:relative; overflow:hidden;
+    }
+    .profile-hero::before {
+        content:''; position:absolute; top:-40px; right:-40px;
+        width:120px; height:120px; border-radius:50%;
+        background:rgba(255,255,255,0.08);
+    }
+    .profile-hero::after {
+        content:''; position:absolute; bottom:-30px; left:-30px;
+        width:90px; height:90px; border-radius:50%;
+        background:rgba(255,255,255,0.06);
     }
 
     .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin: 0 auto 14px;
-        overflow: hidden;
-        border: 3px solid var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--primary-soft);
+        width:88px; height:88px; border-radius:50%; margin:0 auto 14px;
+        overflow:hidden; border:3px solid rgba(255,255,255,0.4);
+        cursor:pointer; position:relative; z-index:1;
+        -webkit-tap-highlight-color:transparent;
     }
-    .profile-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
+    .profile-avatar:active { opacity:0.9; }
+    .profile-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
     .profile-avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-weight: 700;
-        font-size: 26px;
+        width:100%; height:100%;
+        background:rgba(255,255,255,0.15);
+        display:flex; align-items:center; justify-content:center;
+        color:#fff; font-weight:700; font-size:28px;
     }
 
-    .profile-name {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--dark);
-        margin: 0 0 8px;
-    }
-
+    .profile-name { font-size:20px; font-weight:700; color:#fff; margin:0 0 4px; position:relative; z-index:1; }
+    .profile-nip { font-size:12px; color:rgba(255,255,255,0.7); margin:0 0 10px; position:relative; z-index:1; }
     .profile-tag {
-        display: inline-block;
-        background: rgba(90, 182, 234, 0.1);
-        color: var(--primary);
-        font-size: 12px;
-        font-weight: 600;
-        padding: 4px 14px;
-        border-radius: 20px;
+        display:inline-block; background:rgba(255,255,255,0.15); color:#fff;
+        font-size:11px; font-weight:600; padding:4px 14px; border-radius:20px;
+        position:relative; z-index:1;
     }
 
-    /* Info List */
-    .info-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin: 20px 0;
-    }
-
+    /* Info Cards */
+    .info-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
     .info-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 16px;
-        background: var(--card-bg);
-        border-radius: 14px;
-        border: 1px solid var(--card-border);
+        display:flex; align-items:center; gap:14px; padding:14px 16px;
+        background:var(--card-bg); border-radius:14px; border:1px solid var(--card-border);
     }
-
     .info-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        flex-shrink: 0;
-        background: var(--primary-soft);
-        color: var(--primary-dark);
+        width:44px; height:44px; border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:18px; flex-shrink:0;
+        background:var(--primary-soft); color:var(--primary-dark);
     }
+    .info-content { flex:1; min-width:0; }
+    .info-label { font-size:11px; color:var(--gray); font-weight:500; margin:0 0 2px; }
+    .info-value { font-size:14px; font-weight:600; color:var(--dark); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    .info-content {
-        flex: 1;
-        min-width: 0;
-    }
-    .info-label {
-        font-size: 12px;
-        color: var(--gray);
-        font-weight: 500;
-        margin: 0 0 2px;
-    }
-    .info-value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--dark);
-        margin: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* Edit Profile Button */
-    .btn-edit-profile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: #fff;
-        border: none;
-        border-radius: 14px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        margin-bottom: 16px;
-    }
-    .btn-edit-profile:active { opacity: 0.85; }
-
-    /* Action Cards */
-    .action-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
+    /* Actions */
+    .action-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
     .action-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 16px;
-        background: var(--card-bg);
-        border-radius: 14px;
-        border: 1px solid var(--card-border);
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        width: 100%;
-        text-align: left;
+        display:flex; align-items:center; gap:14px; padding:14px 16px;
+        background:var(--card-bg); border-radius:14px; border:1px solid var(--card-border);
+        cursor:pointer; -webkit-tap-highlight-color:transparent; width:100%; text-align:left;
     }
-    .action-item:active { opacity: 0.85; }
+    .action-item:active { opacity:0.85; }
+    .action-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .action-icon-edit { background:var(--primary-soft); color:var(--primary-dark); }
+    .action-icon-theme { background:var(--primary-soft); color:var(--primary-dark); }
+    .action-icon-logout { background:var(--danger-light); color:var(--danger); }
+    .action-content { flex:1; min-width:0; }
+    .action-title { font-size:14px; font-weight:600; color:var(--dark); margin:0 0 2px; }
+    .action-subtitle { font-size:12px; color:var(--gray); margin:0; }
+    .action-arrow { color:var(--gray); font-size:12px; flex-shrink:0; }
 
-    .action-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        flex-shrink: 0;
+    /* Photo Preview Modal */
+    .photo-preview-overlay {
+        display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9);
+        z-index:100; align-items:center; justify-content:center; flex-direction:column;
     }
-    .action-icon-theme {
-        background: var(--primary-soft);
-        color: var(--primary-dark);
-    }
-    .action-icon-logout {
-        background: var(--danger-light);
-        color: var(--danger);
-    }
-
-    .action-content {
-        flex: 1;
-        min-width: 0;
-    }
-    .action-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--dark);
-        margin: 0 0 2px;
-    }
-    .action-subtitle {
-        font-size: 12px;
-        color: var(--gray);
-        margin: 0;
-    }
-
-    .action-arrow {
-        color: var(--gray);
-        font-size: 14px;
-        flex-shrink: 0;
+    .photo-preview-overlay.visible { display:flex; }
+    .photo-preview-overlay img { max-width:90%; max-height:75vh; border-radius:12px; object-fit:contain; }
+    .photo-preview-close {
+        position:absolute; top:16px; right:16px; width:40px; height:40px; border-radius:50%;
+        background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:18px;
+        cursor:pointer; display:flex; align-items:center; justify-content:center;
     }
 
     /* Modal Overlay */
     .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 50;
-        padding: 16px;
-        overflow-y: auto;
-        align-items: center;
-        justify-content: center;
+        display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+        z-index:50; padding:16px; overflow-y:auto; align-items:center; justify-content:center;
     }
-    .modal-overlay.visible {
-        display: flex;
-    }
-
+    .modal-overlay.visible { display:flex; }
     .modal-box {
-        background: var(--card-bg);
-        border-radius: 20px;
-        width: 100%;
-        max-width: 420px;
-        padding: 24px;
-        position: relative;
-        max-height: 90vh;
-        overflow-y: auto;
-        border: 1px solid var(--card-border);
-        animation: modalSlideIn 0.3s ease-out;
+        background:var(--card-bg); border-radius:20px; width:100%; max-width:420px;
+        padding:24px; position:relative; max-height:90vh; overflow-y:auto;
+        border:1px solid var(--card-border); animation:modalSlideIn 0.3s ease-out;
     }
-
     .modal-close {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        background: none;
-        border: none;
-        font-size: 18px;
-        color: var(--gray);
-        cursor: pointer;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        -webkit-tap-highlight-color: transparent;
+        position:absolute; top:16px; right:16px; background:none; border:none;
+        font-size:18px; color:var(--gray); cursor:pointer; width:32px; height:32px;
+        display:flex; align-items:center; justify-content:center; border-radius:8px;
     }
-    .modal-close:active { background: var(--gray-light); }
+    .modal-close:active { background:var(--gray-light); }
+    .modal-heading { font-size:18px; font-weight:700; color:var(--dark); margin:0 0 20px; }
 
-    .modal-heading {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--dark);
-        margin: 0 0 20px;
-    }
+    .logout-icon-box { width:56px; height:56px; border-radius:14px; background:var(--danger-light); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:var(--danger); }
+    .logout-title { font-size:18px; font-weight:700; color:var(--dark); text-align:center; margin:0 0 8px; }
+    .logout-desc { font-size:14px; color:var(--gray); text-align:center; margin:0 0 24px; }
 
-    /* Logout modal */
-    .logout-icon-box {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
-        background: var(--danger-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 16px;
-        font-size: 24px;
-        color: var(--danger);
-    }
+    .modal-actions { display:flex; gap:10px; }
+    .btn-modal-cancel { flex:1; padding:14px; border-radius:14px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:14px; font-weight:600; cursor:pointer; }
+    .btn-modal-cancel:active { opacity:0.85; }
+    .btn-modal-danger { flex:1; padding:14px; border-radius:14px; border:none; background:var(--danger); color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
+    .btn-modal-danger:active { opacity:0.85; }
+    .btn-modal-primary { flex:1; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
+    .btn-modal-primary:active { opacity:0.85; }
 
-    .logout-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--dark);
-        text-align: center;
-        margin: 0 0 8px;
-    }
+    /* Form */
+    .form-field { margin-bottom:16px; }
+    .form-field label { display:block; font-size:13px; font-weight:600; color:var(--dark); margin-bottom:6px; }
+    .form-field input, .form-field textarea { width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; background:var(--card-bg); color:var(--dark); outline:none; }
+    .form-field input:focus, .form-field textarea:focus { border-color:var(--primary); }
+    .form-field input[type="file"] { padding:10px; font-size:13px; }
+    .field-error { font-size:12px; color:var(--danger); margin-top:4px; }
 
-    .logout-desc {
-        font-size: 14px;
-        color: var(--gray);
-        text-align: center;
-        margin: 0 0 24px;
+    /* Photo Crop Preview */
+    .photo-edit-area { margin-top:10px; display:none; }
+    .photo-edit-preview {
+        width:120px; height:120px; border-radius:50%; margin:0 auto;
+        overflow:hidden; border:3px solid var(--primary); position:relative;
     }
-
-    .modal-actions {
-        display: flex;
-        gap: 10px;
+    .photo-edit-preview img {
+        position:absolute; cursor:move; max-width:none;
+        -webkit-user-drag:none; user-select:none;
     }
-
-    .btn-modal-cancel {
-        flex: 1;
-        padding: 12px;
-        border-radius: 14px;
-        border: 1px solid var(--card-border);
-        background: var(--card-bg);
-        color: var(--dark);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .btn-modal-cancel:active { opacity: 0.85; }
-
-    .btn-modal-danger {
-        flex: 1;
-        padding: 12px;
-        border-radius: 14px;
-        border: none;
-        background: var(--danger);
-        color: #fff;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .btn-modal-danger:active { opacity: 0.85; }
-
-    .btn-modal-primary {
-        flex: 1;
-        padding: 12px;
-        border-radius: 14px;
-        border: none;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: #fff;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .btn-modal-primary:active { opacity: 0.85; }
-
-    /* Form fields */
-    .form-field {
-        margin-bottom: 16px;
-    }
-    .form-field label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--dark);
-        margin-bottom: 6px;
-    }
-    .form-field input,
-    .form-field textarea,
-    .form-field select {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid var(--card-border);
-        border-radius: 12px;
-        font-size: 14px;
-        background: var(--card-bg);
-        color: var(--dark);
-        outline: none;
-    }
-    .form-field input:focus,
-    .form-field textarea:focus,
-    .form-field select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(90, 182, 234, 0.15);
-    }
-    .form-field input[type="file"] {
-        padding: 10px;
-        font-size: 13px;
-    }
-    .field-error {
-        font-size: 12px;
-        color: var(--danger);
-        margin-top: 4px;
-    }
-    .field-hint {
-        font-size: 11px;
-        color: var(--gray);
-        margin-top: 4px;
-    }
+    .photo-edit-hint { text-align:center; font-size:11px; color:var(--gray); margin-top:8px; }
+    .photo-edit-zoom { display:flex; align-items:center; gap:10px; justify-content:center; margin-top:8px; }
+    .photo-edit-zoom input[type="range"] { width:120px; accent-color:var(--primary); }
+    .photo-edit-zoom span { font-size:11px; color:var(--gray); }
 
     @keyframes modalSlideIn {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity:0; transform:translateY(30px); }
+        to { opacity:1; transform:translateY(0); }
     }
 </style>
 
 <div class="akun-page">
-    {{-- Notifikasi sukses --}}
     @if(session('success'))
-    <div class="notif-success">
-        <i class="fas fa-check-circle"></i>
-        {{ session('success') }}
-    </div>
+    <div class="notif-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
     @endif
-
-    {{-- Notifikasi error --}}
     @if($errors->any())
-    <div class="notif-error">
-        <i class="fas fa-exclamation-circle"></i>
-        Terjadi kesalahan. Silakan periksa form di bawah.
-    </div>
+    <div class="notif-error"><i class="fas fa-exclamation-circle"></i> Terjadi kesalahan. Silakan periksa form di bawah.</div>
     @endif
 
-    {{-- Profile Section --}}
-    <div class="profile-section">
-        <div class="profile-avatar">
+    <!-- Profile Hero -->
+    <div class="profile-hero">
+        <div class="profile-avatar" onclick="openPhotoPreview()">
             @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
-            <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}"
-                alt="Foto Profil {{ $user->name }}"
-                onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\'profile-avatar-placeholder\'>{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}</div>'">
+            <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}" alt="Foto" id="mainAvatar">
             @else
-            <div class="profile-avatar-placeholder">{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->join('') }}</div>
+            <div class="profile-avatar-placeholder">{{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->take(2)->join('') }}</div>
             @endif
         </div>
         <h2 class="profile-name">{{ $user->name ?? 'Nama Pengguna' }}</h2>
+        <p class="profile-nip">NIP. {{ $user->nip ?? '-' }}</p>
         <span class="profile-tag">{{ $user->jabatan ?? 'Pegawai' }}</span>
     </div>
 
-    {{-- Info Items --}}
+    <!-- Info -->
     <div class="info-list">
         <div class="info-item">
-            <div class="info-icon">
-                <i class="fas fa-phone"></i>
+            <div class="info-icon"><i class="fas fa-id-card"></i></div>
+            <div class="info-content">
+                <p class="info-label">NIP</p>
+                <p class="info-value">{{ $user->nip ?? '-' }}</p>
             </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon"><i class="fas fa-phone"></i></div>
             <div class="info-content">
                 <p class="info-label">No HP</p>
                 <p class="info-value">{{ $user->no_hp ?? '-' }}</p>
             </div>
         </div>
-
         <div class="info-item">
-            <div class="info-icon">
-                <i class="fas fa-envelope"></i>
-            </div>
+            <div class="info-icon"><i class="fas fa-envelope"></i></div>
             <div class="info-content">
                 <p class="info-label">Email</p>
                 <p class="info-value">{{ $user->email ?? '-' }}</p>
             </div>
         </div>
-
         <div class="info-item">
-            <div class="info-icon">
-                <i class="fas fa-map-marker-alt"></i>
-            </div>
+            <div class="info-icon"><i class="fas fa-location-dot"></i></div>
             <div class="info-content">
                 <p class="info-label">Alamat</p>
                 <p class="info-value">{{ $user->alamat ?? '-' }}</p>
@@ -467,262 +209,215 @@
         </div>
     </div>
 
-    {{-- Edit Button --}}
-    <button onclick="openModal('editModal')" class="btn-edit-profile">
-        <i class="fas fa-edit"></i>
-        Edit Profil
-    </button>
-
-    {{-- Action Cards --}}
+    <!-- Actions -->
     <div class="action-list">
-        {{-- Dark/Light Mode --}}
+        <button type="button" onclick="openModal('editModal')" class="action-item">
+            <div class="action-icon action-icon-edit"><i class="fas fa-pen-to-square"></i></div>
+            <div class="action-content">
+                <p class="action-title">Edit Profil</p>
+                <p class="action-subtitle">Ubah foto, nama, kontak</p>
+            </div>
+            <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
+        </button>
+
         <button type="button" onclick="toggleTheme()" class="action-item">
             <div class="action-icon action-icon-theme">
-                <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"/>
-                    <line x1="12" y1="1" x2="12" y2="3"/>
-                    <line x1="12" y1="21" x2="12" y2="23"/>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                    <line x1="1" y1="12" x2="3" y2="12"/>
-                    <line x1="21" y1="12" x2="23" y2="12"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                </svg>
-                <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
+                <i class="fas fa-sun" id="theme-icon-sun"></i>
+                <i class="fas fa-moon" id="theme-icon-moon" style="display:none;"></i>
             </div>
             <div class="action-content">
                 <p class="action-title">Tampilan</p>
                 <p class="action-subtitle">Ubah ke mode gelap / terang</p>
             </div>
-            <div class="action-arrow">
-                <i class="fas fa-chevron-right"></i>
-            </div>
+            <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
         </button>
 
-        {{-- Logout --}}
         <form action="{{ route('pegawai.akun.logout') }}" method="POST" id="logoutForm">
             @csrf
             <button type="button" onclick="openLogoutModal()" class="action-item">
-                <div class="action-icon action-icon-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
+                <div class="action-icon action-icon-logout"><i class="fas fa-arrow-right-from-bracket"></i></div>
                 <div class="action-content">
                     <p class="action-title">Keluar</p>
                     <p class="action-subtitle">Logout dari aplikasi</p>
                 </div>
-                <div class="action-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
+                <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
             </button>
         </form>
     </div>
 </div>
 
-{{-- Modal Konfirmasi Logout --}}
+<!-- Photo Preview -->
+<div id="photoPreview" class="photo-preview-overlay">
+    <button class="photo-preview-close" onclick="closePhotoPreview()"><i class="fas fa-xmark"></i></button>
+    @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
+    <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}" alt="Foto Profil">
+    @else
+    <div style="color:#fff; font-size:80px; width:200px; height:200px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-weight:700;">
+        {{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->take(2)->join('') }}
+    </div>
+    @endif
+</div>
+
+<!-- Logout Modal -->
 <div id="logoutModal" class="modal-overlay">
     <div class="modal-box" style="text-align:center;">
-        <div class="logout-icon-box">
-            <i class="fas fa-sign-out-alt"></i>
-        </div>
+        <div class="logout-icon-box"><i class="fas fa-arrow-right-from-bracket"></i></div>
         <h3 class="logout-title">Konfirmasi Logout</h3>
         <p class="logout-desc">Apakah Anda yakin ingin keluar dari aplikasi?</p>
-
         <div class="modal-actions">
-            <button type="button" id="logoutCancelBtn" class="btn-modal-cancel">
-                Batal
-            </button>
-            <button type="button" id="logoutConfirmBtn" class="btn-modal-danger">
-                Ya, Logout
-            </button>
+            <button type="button" id="logoutCancelBtn" class="btn-modal-cancel">Batal</button>
+            <button type="button" id="logoutConfirmBtn" class="btn-modal-danger">Ya, Logout</button>
         </div>
     </div>
 </div>
 
-{{-- Modal Edit Akun --}}
+<!-- Edit Modal -->
 <div id="editModal" class="modal-overlay">
     <div class="modal-box">
-        <button type="button" class="modal-close" onclick="closeModal('editModal')">
-            <i class="fas fa-times"></i>
-        </button>
-
+        <button type="button" class="modal-close" onclick="closeModal('editModal')"><i class="fas fa-xmark"></i></button>
         <h3 class="modal-heading">Edit Profil</h3>
 
         <form action="{{ route('pegawai.akun.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
-
-            {{-- Nama --}}
             <div class="form-field">
-                <label for="name">Nama</label>
-                <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}">
-                @error('name')
-                <div class="field-error">{{ $message }}</div>
-                @enderror
+                <label>Nama</label>
+                <input type="text" name="name" value="{{ old('name', $user->name) }}">
+                @error('name')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-field">
+                <label>Email</label>
+                <input type="email" name="email" value="{{ old('email', $user->email) }}">
+                @error('email')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-field">
+                <label>No HP</label>
+                <input type="text" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}">
+                @error('no_hp')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-field">
+                <label>Alamat</label>
+                <textarea name="alamat" rows="3">{{ old('alamat', $user->alamat) }}</textarea>
+                @error('alamat')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-field">
+                <label>Password Baru</label>
+                <input type="password" name="password" placeholder="Kosongkan jika tidak diubah">
+                @error('password')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-field">
+                <label>Konfirmasi Password</label>
+                <input type="password" name="password_confirmation">
+            </div>
+            <div class="form-field">
+                <label>Foto Profil</label>
+                <input type="file" name="foto_profil" id="fotoInput" accept="image/*" onchange="onPhotoSelected(this)">
+                @error('foto_profil')<div class="field-error">{{ $message }}</div>@enderror
+
+                <div class="photo-edit-area" id="photoEditArea">
+                    <div class="photo-edit-preview" id="cropPreview">
+                        <img id="cropImg" src="" alt="Preview" draggable="false">
+                    </div>
+                    <div class="photo-edit-hint">Geser foto untuk mengatur posisi</div>
+                    <div class="photo-edit-zoom">
+                        <span><i class="fas fa-magnifying-glass-minus"></i></span>
+                        <input type="range" id="zoomSlider" min="100" max="300" value="150" oninput="onZoomChange(this.value)">
+                        <span><i class="fas fa-magnifying-glass-plus"></i></span>
+                    </div>
+                </div>
             </div>
 
-            {{-- Email --}}
-            <div class="form-field">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}">
-                @error('email')
-                <div class="field-error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            {{-- No HP --}}
-            <div class="form-field">
-                <label for="no_hp">No HP</label>
-                <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', $user->no_hp) }}">
-                @error('no_hp')
-                <div class="field-error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            {{-- Alamat --}}
-            <div class="form-field">
-                <label for="alamat">Alamat</label>
-                <textarea name="alamat" id="alamat" rows="3">{{ old('alamat', $user->alamat) }}</textarea>
-                @error('alamat')
-                <div class="field-error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            {{-- Password --}}
-            <div class="form-field">
-                <label for="password">Password Baru</label>
-                <input type="password" name="password" id="password" placeholder="Kosongkan jika tidak ingin diubah">
-                @error('password')
-                <div class="field-error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            {{-- Konfirmasi Password --}}
-            <div class="form-field">
-                <label for="password_confirmation">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation" id="password_confirmation">
-            </div>
-
-            {{-- Foto Profil --}}
-            <div class="form-field">
-                <label for="foto_profil">Foto Profil</label>
-                <input type="file" name="foto_profil" id="foto_profil" accept="image/*">
-                @error('foto_profil')
-                <div class="field-error">{{ $message }}</div>
-                @enderror
-                @if($user->foto_profil)
-                <div class="field-hint">Foto profil saat ini: {{ $user->foto_profil }}</div>
-                @endif
-            </div>
-
-            {{-- Tombol Aksi --}}
             <div class="modal-actions" style="margin-top:20px;">
-                <button type="button" class="btn-modal-cancel" onclick="closeModal('editModal')">
-                    Batal
-                </button>
-                <button type="submit" class="btn-modal-primary">
-                    Simpan
-                </button>
+                <button type="button" class="btn-modal-cancel" onclick="closeModal('editModal')">Batal</button>
+                <button type="submit" class="btn-modal-primary">Simpan</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    function openModal(modalId) {
-        document.getElementById(modalId).classList.add('visible');
-        document.body.style.overflow = 'hidden';
-    }
+    function openModal(id) { document.getElementById(id).classList.add('visible'); document.body.style.overflow='hidden'; }
+    function closeModal(id) { document.getElementById(id).classList.remove('visible'); document.body.style.overflow='auto'; }
+    function openLogoutModal() { openModal('logoutModal'); }
+    function closeLogoutModal() { closeModal('logoutModal'); }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('visible');
-        document.body.style.overflow = 'auto';
-    }
+    function openPhotoPreview() { document.getElementById('photoPreview').classList.add('visible'); }
+    function closePhotoPreview() { document.getElementById('photoPreview').classList.remove('visible'); }
+    document.getElementById('photoPreview').addEventListener('click', function(e) { if (e.target === this) closePhotoPreview(); });
 
-    function openLogoutModal() {
-        openModal('logoutModal');
-    }
-
-    function closeLogoutModal() {
-        closeModal('logoutModal');
-    }
-
-    // Initialize logout modal functionality
+    // Logout
     document.addEventListener('DOMContentLoaded', function() {
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutCancelBtn = document.getElementById('logoutCancelBtn');
-        const logoutConfirmBtn = document.getElementById('logoutConfirmBtn');
-        const logoutForm = document.getElementById('logoutForm');
-
-        // Cancel logout
-        logoutCancelBtn.addEventListener('click', closeLogoutModal);
-
-        // Confirm logout
-        logoutConfirmBtn.addEventListener('click', function() {
-            logoutForm.submit();
-        });
-
-        // Close modal when clicking outside
-        logoutModal.addEventListener('click', function(e) {
-            if (e.target === logoutModal) {
-                closeLogoutModal();
-            }
-        });
-
-        // Close modal with Escape key
+        document.getElementById('logoutCancelBtn').addEventListener('click', closeLogoutModal);
+        document.getElementById('logoutConfirmBtn').addEventListener('click', function() { document.getElementById('logoutForm').submit(); });
+        document.getElementById('logoutModal').addEventListener('click', function(e) { if (e.target === this) closeLogoutModal(); });
+        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editModal'); });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (logoutModal.classList.contains('visible')) {
-                    closeLogoutModal();
-                }
-                if (document.getElementById('editModal').classList.contains('visible')) {
-                    closeModal('editModal');
-                }
+                if (document.getElementById('photoPreview').classList.contains('visible')) closePhotoPreview();
+                else if (document.getElementById('logoutModal').classList.contains('visible')) closeLogoutModal();
+                else if (document.getElementById('editModal').classList.contains('visible')) closeModal('editModal');
             }
         });
-    });
 
-    // Close modal when clicking outside for edit modal
-    document.addEventListener('click', (e) => {
-        if (e.target.id === 'editModal') {
-            closeModal('editModal');
-        }
-    });
-
-    // Prevent modal close when clicking inside modal content
-    document.querySelectorAll('#editModal > div').forEach(modalContent => {
-        modalContent.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-    });
-
-    // Prevent modal close when clicking inside logout modal content
-    document.querySelectorAll('#logoutModal > div').forEach(modalContent => {
-        modalContent.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-    });
-
-    // Sync theme icon on load
-    document.addEventListener('DOMContentLoaded', function() {
+        // Theme icon sync
         var theme = document.documentElement.getAttribute('data-theme');
-        var sunIcon = document.getElementById('theme-icon-sun');
-        var moonIcon = document.getElementById('theme-icon-moon');
-        if (sunIcon && moonIcon) {
-            sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
-            moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
-        }
+        document.getElementById('theme-icon-sun').style.display = theme === 'dark' ? 'none' : 'inline';
+        document.getElementById('theme-icon-moon').style.display = theme === 'dark' ? 'inline' : 'none';
     });
 
-    // Handle image loading errors
-    document.addEventListener('DOMContentLoaded', function() {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-            img.addEventListener('error', function() {
-                this.src = 'https://avatar.iran.liara.run/public/48';
-            });
-        });
-    });
+    // Photo crop/position
+    var cropState = { isDragging:false, startX:0, startY:0, imgX:0, imgY:0, zoom:150 };
+
+    function onPhotoSelected(input) {
+        if (!input.files || !input.files[0]) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = document.getElementById('cropImg');
+            img.src = e.target.result;
+            document.getElementById('photoEditArea').style.display = 'block';
+            document.getElementById('zoomSlider').value = 150;
+            cropState.zoom = 150; cropState.imgX = 0; cropState.imgY = 0;
+            img.onload = function() { applyCrop(); };
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    function applyCrop() {
+        var img = document.getElementById('cropImg');
+        var box = document.getElementById('cropPreview');
+        var size = box.offsetWidth;
+        var scale = cropState.zoom / 100;
+        var w = size * scale;
+        var h = (img.naturalHeight / img.naturalWidth) * w;
+        img.style.width = w + 'px';
+        img.style.height = h + 'px';
+        var maxX = 0, minX = size - w;
+        var maxY = 0, minY = size - h;
+        cropState.imgX = Math.min(maxX, Math.max(minX, cropState.imgX));
+        cropState.imgY = Math.min(maxY, Math.max(minY, cropState.imgY));
+        img.style.left = cropState.imgX + 'px';
+        img.style.top = cropState.imgY + 'px';
+    }
+
+    function onZoomChange(val) {
+        cropState.zoom = parseInt(val);
+        applyCrop();
+    }
+
+    (function() {
+        var preview = document.getElementById('cropPreview');
+        if (!preview) return;
+
+        function startDrag(x, y) { cropState.isDragging = true; cropState.startX = x - cropState.imgX; cropState.startY = y - cropState.imgY; }
+        function moveDrag(x, y) { if (!cropState.isDragging) return; cropState.imgX = x - cropState.startX; cropState.imgY = y - cropState.startY; applyCrop(); }
+        function endDrag() { cropState.isDragging = false; }
+
+        preview.addEventListener('mousedown', function(e) { e.preventDefault(); startDrag(e.clientX, e.clientY); });
+        document.addEventListener('mousemove', function(e) { moveDrag(e.clientX, e.clientY); });
+        document.addEventListener('mouseup', endDrag);
+
+        preview.addEventListener('touchstart', function(e) { var t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive:true });
+        document.addEventListener('touchmove', function(e) { if (cropState.isDragging) { var t = e.touches[0]; moveDrag(t.clientX, t.clientY); } }, { passive:true });
+        document.addEventListener('touchend', endDrag);
+    })();
 </script>
 @endsection
