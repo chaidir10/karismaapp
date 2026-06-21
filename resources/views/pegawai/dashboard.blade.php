@@ -169,6 +169,37 @@
     .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
     .dot.active { background:var(--primary); width:20px; border-radius:4px; }
 
+    /* Quill content styling */
+    .ql-content {
+        font-size:14px; line-height:1.8; color:var(--dark);
+        word-wrap:break-word; overflow-wrap:break-word; word-break:break-word;
+    }
+    .ql-content a {
+        color:var(--primary); text-decoration:underline;
+        word-break:break-all;
+    }
+    .ql-content ul, .ql-content ol {
+        padding-left:20px; margin:8px 0;
+    }
+    .ql-content ul { list-style:disc; }
+    .ql-content ol { list-style:decimal; }
+    .ql-content li { margin-bottom:4px; padding-left:4px; }
+    .ql-content p { margin-bottom:8px; }
+    .ql-content h1, .ql-content h2, .ql-content h3 {
+        font-weight:700; color:var(--dark); margin:12px 0 6px;
+    }
+    .ql-content h1 { font-size:20px; }
+    .ql-content h2 { font-size:17px; }
+    .ql-content h3 { font-size:15px; }
+    .ql-content blockquote {
+        border-left:3px solid var(--primary);
+        padding:6px 12px; margin:8px 0;
+        color:var(--gray); font-style:italic;
+    }
+    .ql-content img { max-width:100%; border-radius:8px; margin:8px 0; }
+    .ql-content strong { font-weight:700; }
+    .ql-content em { font-style:italic; }
+
     .badge-baru {
         position:absolute; top:8px; right:8px; z-index:2;
         background:var(--accent); color:#fff;
@@ -331,33 +362,31 @@
 
 {{-- Modal Info Detail --}}
 @foreach($pengumumans as $pm)
-<div class="modal fade" id="infoModal{{ $pm->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile">
-        <div class="modal-content" style="border-radius:0; height:100vh; display:flex; flex-direction:column;">
-            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--gray-light); flex-shrink:0;">
-                <h5 style="font-weight:700; font-size:16px; margin:0; color:var(--dark);">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? 'Info' }}</h5>
-                <button type="button" data-bs-dismiss="modal" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--gray); width:40px; height:40px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="flex:1; overflow-y:auto; padding:20px;">
-                @if($pm->gambar)
-                <img src="{{ asset('public/storage/'.$pm->gambar) }}" style="width:100%; border-radius:12px; margin-bottom:16px; object-fit:cover; max-height:200px;" alt="">
-                @endif
-                <h2 style="font-size:20px; font-weight:800; color:var(--dark); margin-bottom:8px; line-height:1.3;">{{ $pm->judul }}</h2>
-                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px; font-size:12px; color:var(--gray);">
-                    <span style="background:{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['color'] ?? '#64748b' }}; color:#fff; padding:3px 10px; border-radius:8px; font-weight:600; font-size:11px;">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? $pm->jenis }}</span>
+<div id="infoModal{{ $pm->id }}" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
+    <div style="display:flex; flex-direction:column; height:100%;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeInfoModal({{ $pm->id }})" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
+                <i class="fas fa-chevron-left"></i> Kembali
+            </button>
+            <span style="font-size:13px; font-weight:600; color:var(--gray);">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? 'Info' }}</span>
+            <div style="width:60px;"></div>
+        </div>
+        <div style="flex:1; overflow-y:auto;">
+            @if($pm->gambar)
+            <img src="{{ asset('public/storage/'.$pm->gambar) }}" style="width:100%; object-fit:cover; max-height:220px;" alt="">
+            @endif
+            <div style="padding:20px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px;">
+                    <span style="background:{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['color'] ?? '#64748b' }}; color:#fff; padding:4px 12px; border-radius:8px; font-weight:600; font-size:11px;">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? $pm->jenis }}</span>
                     @if($pm->tanggal_mulai)
-                    <span><i class="far fa-calendar-alt" style="margin-right:4px;"></i>{{ $pm->tanggal_mulai->translatedFormat('d F Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->translatedFormat('d F Y') }}@endif</span>
+                    <span style="font-size:12px; color:var(--gray);"><i class="far fa-calendar-alt" style="margin-right:4px;"></i>{{ $pm->tanggal_mulai->translatedFormat('d F Y') }}@if($pm->tanggal_selesai && $pm->tanggal_selesai != $pm->tanggal_mulai) - {{ $pm->tanggal_selesai->translatedFormat('d F Y') }}@endif</span>
                     @endif
                     @if($pm->waktu)
-                    <span><i class="far fa-clock" style="margin-right:4px;"></i>{{ \Carbon\Carbon::parse($pm->waktu)->format('H:i') }}</span>
+                    <span style="font-size:12px; color:var(--gray);"><i class="far fa-clock" style="margin-right:4px;"></i>{{ \Carbon\Carbon::parse($pm->waktu)->format('H:i') }}</span>
                     @endif
                 </div>
-                <div style="font-size:14px; line-height:1.8; color:var(--dark); text-align:justify;" class="ql-content">{!! $pm->isi !!}</div>
-            </div>
-            <div style="padding:12px 16px; border-top:1px solid var(--gray-light); flex-shrink:0;">
-                <button type="button" data-bs-dismiss="modal" style="width:100%; padding:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; border:none; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer;">
-                    <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Kembali
-                </button>
+                <h2 style="font-size:20px; font-weight:800; color:var(--dark); margin-bottom:16px; line-height:1.3;">{{ $pm->judul }}</h2>
+                <div class="ql-content">{!! $pm->isi !!}</div>
             </div>
         </div>
     </div>
@@ -1042,9 +1071,7 @@
     initCarousel();
 
     function openInfoModal(id) {
-        if (window.bootstrap && window.bootstrap.Modal) {
-            new bootstrap.Modal(document.getElementById('infoModal' + id)).show();
-        }
+        document.getElementById('infoModal' + id).style.display = 'block';
         // Mark as read — hide badge
         var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
         if (read.indexOf(id) === -1) {
@@ -1053,6 +1080,9 @@
         }
         var badge = document.getElementById('badgeBaru' + id);
         if (badge) badge.style.display = 'none';
+    }
+    function closeInfoModal(id) {
+        document.getElementById('infoModal' + id).style.display = 'none';
     }
 
     // Profile photo map marker

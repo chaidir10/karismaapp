@@ -247,6 +247,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script>
     function getIcon(jenis) {
         if (jenis === 'masuk') return { cls: 'fa-arrow-right-to-bracket', color: 'var(--primary-dark)', bg: 'var(--primary-soft)' };
@@ -359,11 +360,30 @@
         info.style.color = 'var(--gray)';
         info.textContent = 'Mengompresi foto...';
 
+        // Convert HEIC/HEIF to JPEG first
+        var imgFile = file;
+        var isHeic = /\.(heic|heif)$/i.test(file.name) || file.type === 'image/heic' || file.type === 'image/heif' || file.type === '';
+        if (isHeic && typeof heic2any !== 'undefined') {
+            try {
+                info.textContent = 'Mengonversi HEIC...';
+                var jpegBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
+                if (Array.isArray(jpegBlob)) jpegBlob = jpegBlob[0];
+                imgFile = new File([jpegBlob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+                info.textContent = 'Mengompresi foto...';
+            } catch(he) {
+                info.style.color = 'var(--danger)';
+                info.innerHTML = '<strong>Format HEIC tidak dapat diproses.</strong><br>Silakan konversi ke JPG/PNG terlebih dahulu.';
+                compressed.value = '';
+                this.value = '';
+                return;
+            }
+        }
+
         var maxW = 800;
         var quality = 0.4;
 
         try {
-            var blob = await compressImage(file, maxW, quality);
+            var blob = await compressImage(imgFile, maxW, quality);
             if (blob.size > 102400) blob = await compressImage(file, 640, 0.25);
             if (blob.size > 102400) blob = await compressImage(file, 480, 0.15);
             if (blob.size > 2097152) {
