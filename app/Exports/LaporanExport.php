@@ -123,18 +123,23 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A5:{$lastCol}{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        $widths = [14, 10, 10, 14, 14, 14, 14, 12, 22];
+        $widths = [11, 8, 8, 9, 9, 10, 9, 9, 13];
         foreach (range('A', $lastCol) as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
+        $sheet->getStyle("A6:{$lastCol}{$lastRow}")
+            ->getAlignment()->setWrapText(true);
+        $sheet->getStyle("A6:{$lastCol}{$lastRow}")
+            ->getFont()->setSize(10);
+
         $sheet->getPageSetup()
-            ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
+            ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
-            ->setFitToHeight(1);
+            ->setFitToHeight(0);
         $sheet->getPageMargins()
-            ->setTop(0.3)->setRight(0.2)->setLeft(0.2)->setBottom(0.3);
+            ->setTop(0.4)->setRight(0.2)->setLeft(0.2)->setBottom(0.4);
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
         $highestRow = $sheet->getHighestRow();
