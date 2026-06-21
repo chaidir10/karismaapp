@@ -279,8 +279,8 @@
 </div>
 
 <!-- Edit Modal (Fullscreen) -->
-<div id="editModal" class="modal-overlay">
-    <div style="background:var(--card-bg); width:100%; max-width:500px; height:100vh; display:flex; flex-direction:column; animation:modalSlideIn 0.3s ease-out;">
+<div id="editModal" class="modal-overlay" style="padding:0;">
+    <div style="background:var(--card-bg); width:100%; height:100%; display:flex; flex-direction:column;">
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
             <button type="button" onclick="closeModal('editModal')" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
