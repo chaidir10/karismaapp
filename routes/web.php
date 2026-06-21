@@ -7,6 +7,7 @@ use App\Http\Controllers\Pegawai\DashboardController as PegawaiDashboardControll
 use App\Http\Controllers\Pegawai\PresensiController;
 use App\Http\Controllers\Pegawai\PengajuanController;
 use App\Http\Controllers\Pegawai\PegawaiController as PegawaiListController;
+use App\Http\Controllers\Pegawai\CutiController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\ManajemenPegawaiController;
 use App\Http\Controllers\Admin\ManajemenLokasiController;
@@ -93,6 +94,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         // Pengajuan presensi
         Route::get('/pengajuan', [PengajuanController::class, 'index'])->name('pengajuan.index');
         Route::post('/pengajuan', [PengajuanController::class, 'store'])->name('pengajuan.store');
+        Route::post('/cuti', [CutiController::class, 'store'])->name('cuti.store');
 
         // Daftar pegawai
         Route::get('/daftar', [PegawaiListController::class, 'index'])->name('daftar');

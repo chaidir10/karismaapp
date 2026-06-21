@@ -198,56 +198,101 @@
                 <i class="fas fa-chevron-left"></i> Batal
             </button>
             <span style="font-size:15px; font-weight:700; color:var(--dark);">Buat Pengajuan</span>
-            <button type="submit" form="createForm" style="background:none; border:none; color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent;">
+            <button type="button" id="btnKirimPengajuan" onclick="submitActiveForm()" style="background:none; border:none; color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent;">
                 Kirim
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex; gap:4px; padding:12px 16px 0; flex-shrink:0;">
+            <button type="button" class="pengajuan-tab active" data-tab="presensi" onclick="switchPengajuanTab('presensi')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--primary-soft); color:var(--primary-dark);">
+                <i class="fas fa-clock"></i> Presensi
+            </button>
+            <button type="button" class="pengajuan-tab" data-tab="cuti" onclick="switchPengajuanTab('cuti')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--light); color:var(--gray);">
+                <i class="fas fa-calendar-minus"></i> Cuti / DL
             </button>
         </div>
 
         <!-- Body -->
         <div style="flex:1; overflow-y:auto; padding:20px;">
-            <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false" id="createForm">
-                @csrf
 
-                <!-- Jenis -->
-                <div style="margin-bottom:14px;">
-                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Jenis Pengajuan</label>
-                    <select name="jenis" id="jenis" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; -webkit-appearance:none; appearance:none;">
-                        <option value="">-- Pilih Jenis --</option>
-                        <option value="masuk">Masuk</option>
-                        <option value="pulang">Pulang</option>
-                    </select>
-                </div>
-
-                <!-- Tanggal -->
-                <div style="margin-bottom:14px;">
-                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal</label>
-                    <input type="date" name="tanggal" id="tanggal" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
-                </div>
-
-                <!-- Waktu -->
-                <div style="margin-bottom:14px;">
-                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Waktu</label>
-                    <input type="time" name="waktu" id="waktuPengajuan" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
-                </div>
-
-                <!-- Alasan -->
-                <div style="margin-bottom:14px;">
-                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Alasan</label>
-                    <textarea name="alasan" id="alasan" rows="4" required placeholder="Jelaskan alasan pengajuan..." style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; resize:none; font-family:inherit;"></textarea>
-                </div>
-
-                <!-- Bukti -->
-                <div>
-                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Upload Bukti <span style="color:var(--danger);">*</span></label>
-                    <div id="buktiDropZone" style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
-                        <i class="fas fa-cloud-arrow-up" style="font-size:24px; color:var(--gray); margin-bottom:8px; display:block;"></i>
-                        <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">Foto otomatis dikompresi. PDF maks 2MB</div>
-                        <input type="file" id="buktiOriginal" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.heic,.heif,.pdf" required style="font-size:12px; color:var(--dark); width:100%;">
-                        <input type="file" name="bukti" id="buktiCompressed" style="display:none;">
-                        <div id="buktiInfo" style="display:none; margin-top:10px; font-size:11px; color:var(--gray);"></div>
+            <!-- Tab Presensi -->
+            <div id="tabPresensi">
+                <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false" id="createForm">
+                    @csrf
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Jenis Pengajuan</label>
+                        <select name="jenis" id="jenis" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; -webkit-appearance:none; appearance:none;">
+                            <option value="">-- Pilih Jenis --</option>
+                            <option value="masuk">Masuk</option>
+                            <option value="pulang">Pulang</option>
+                        </select>
                     </div>
-                </div>
-            </form>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal</label>
+                        <input type="date" name="tanggal" id="tanggal" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Waktu</label>
+                        <input type="time" name="waktu" id="waktuPengajuan" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Alasan</label>
+                        <textarea name="alasan" id="alasan" rows="3" required placeholder="Jelaskan alasan pengajuan..." style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; resize:none; font-family:inherit;"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Upload Bukti <span style="color:var(--danger);">*</span></label>
+                        <div id="buktiDropZone" style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
+                            <i class="fas fa-cloud-arrow-up" style="font-size:24px; color:var(--gray); margin-bottom:8px; display:block;"></i>
+                            <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">Foto otomatis dikompresi. PDF maks 2MB</div>
+                            <input type="file" id="buktiOriginal" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.heic,.heif,.pdf" required style="font-size:12px; color:var(--dark); width:100%;">
+                            <input type="file" name="bukti" id="buktiCompressed" style="display:none;">
+                            <div id="buktiInfo" style="display:none; margin-top:10px; font-size:11px; color:var(--gray);"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab Cuti / DL -->
+            <div id="tabCuti" style="display:none;">
+                <form action="{{ route('pegawai.cuti.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false" id="cutiForm">
+                    @csrf
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Jenis</label>
+                        <select name="jenis_cuti" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; -webkit-appearance:none; appearance:none;">
+                            <option value="">-- Pilih Jenis --</option>
+                            <option value="cuti_tahunan">Cuti Tahunan</option>
+                            <option value="cuti_sakit">Cuti Sakit</option>
+                            <option value="cuti_melahirkan">Cuti Melahirkan</option>
+                            <option value="cuti_besar">Cuti Besar</option>
+                            <option value="cuti_alasan_penting">Cuti Alasan Penting</option>
+                            <option value="dinas_luar">Dinas Luar (DL)</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:14px;">
+                        <div style="flex:1;">
+                            <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal Mulai</label>
+                            <input type="date" name="tanggal_mulai" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal Selesai</label>
+                            <input type="date" name="tanggal_selesai" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Keterangan <span style="font-weight:400; color:var(--gray);">(opsional)</span></label>
+                        <textarea name="keterangan" rows="3" placeholder="Keterangan tambahan..." style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; resize:none; font-family:inherit;"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Surat Cuti / Surat Tugas <span style="color:var(--danger);">*</span></label>
+                        <div style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
+                            <i class="fas fa-file-pdf" style="font-size:24px; color:var(--danger); margin-bottom:8px; display:block;"></i>
+                            <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">PDF, JPG, PNG (maks 2MB)</div>
+                            <input type="file" name="bukti_surat" accept=".pdf,.jpg,.jpeg,.png" required style="font-size:12px; color:var(--dark); width:100%;">
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -307,8 +352,35 @@
     }
 
     function closeDetailModal() { document.getElementById('pengajuanDetailModal').style.display = 'none'; }
-    function openModal() { document.getElementById('pengajuanModal').style.display = 'block'; document.getElementById('tanggal').value = new Date().toISOString().split('T')[0]; }
+    function openModal() {
+        document.getElementById('pengajuanModal').style.display = 'block';
+        document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
+        switchPengajuanTab('presensi');
+    }
     function closeModal() { document.getElementById('pengajuanModal').style.display = 'none'; }
+
+    var _activeTab = 'presensi';
+    function switchPengajuanTab(tab) {
+        _activeTab = tab;
+        document.getElementById('tabPresensi').style.display = tab === 'presensi' ? 'block' : 'none';
+        document.getElementById('tabCuti').style.display = tab === 'cuti' ? 'block' : 'none';
+        document.querySelectorAll('.pengajuan-tab').forEach(function(btn) {
+            if (btn.dataset.tab === tab) {
+                btn.style.background = 'var(--primary-soft)';
+                btn.style.color = 'var(--primary-dark)';
+            } else {
+                btn.style.background = 'var(--light)';
+                btn.style.color = 'var(--gray)';
+            }
+        });
+    }
+    function submitActiveForm() {
+        if (_activeTab === 'presensi') {
+            document.getElementById('createForm').requestSubmit();
+        } else {
+            document.getElementById('cutiForm').requestSubmit();
+        }
+    }
 
     // Auto-compress image before upload
     function formatSize(bytes) {

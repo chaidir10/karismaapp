@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Presensi;
+use App\Models\Cuti;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use PDF;
