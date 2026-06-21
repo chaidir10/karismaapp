@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Presensi;
 use App\Models\PengajuanPresensi;
+use App\Models\Cuti;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -80,6 +81,12 @@ class DashboardAdminController extends Controller
         $presensiPending = Presensi::with('user')
             ->where('status', 'pending')
             ->orderBy('tanggal', 'asc')
+            ->get();
+
+        // Cuti/DL pending
+        $cutiPending = Cuti::with('user')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // Jika request AJAX, return JSON response untuk auto-refresh
@@ -219,6 +226,7 @@ class DashboardAdminController extends Controller
             'presensiHariIni',
             'pengajuanPending',
             'presensiPending',
+            'cutiPending',
             'lemburHariIni',
             'chartLabels',
             'chartHadir',
@@ -309,52 +317,27 @@ class DashboardAdminController extends Controller
             $pengajuan = PengajuanPresensi::findOrFail($id);
 
             DB::transaction(function () use ($pengajuan) {
+                $jam = $pengajuan->waktu ? $pengajuan->waktu . ':00' : null;
 
-                // default jam masuk
-                $jamMasukDefault = '07:30:00';
-
-                // tentukan jam pulang berdasarkan hari
-                $hari = \Carbon\Carbon::parse($pengajuan->tanggal)->format('l'); // Friday, Monday, etc
-
-                if ($hari === 'Friday') {
-                    $jamPulangDefault = '16:30:00';   // Jumat
-                } else {
-                    $jamPulangDefault = '16:00:00';   // Senin – Kamis
+                if (!$jam) {
+                    $hari = Carbon::parse($pengajuan->tanggal)->format('l');
+                    $jam = $pengajuan->jenis === 'masuk' ? '07:30:00'
+                        : ($hari === 'Friday' ? '16:30:00' : '16:00:00');
                 }
 
-                // Jika pengajuan jam masuk
-                if ($pengajuan->jenis === 'masuk' || $pengajuan->jenis === 'keduanya') {
-                    Presensi::updateOrCreate(
-                        [
-                            'user_id' => $pengajuan->user_id,
-                            'tanggal' => $pengajuan->tanggal,
-                            'jenis' => 'masuk'
-                        ],
-                        [
-                            'jam' => $jamMasukDefault,
-                            'status' => 'approved',
-                            'foto' => $pengajuan->bukti ?? null,
-                            'lokasi' => $pengajuan->lokasi ?? null
-                        ]
-                    );
-                }
-
-                // Jika pengajuan jam pulang
-                if ($pengajuan->jenis === 'pulang' || $pengajuan->jenis === 'keduanya') {
-                    Presensi::updateOrCreate(
-                        [
-                            'user_id' => $pengajuan->user_id,
-                            'tanggal' => $pengajuan->tanggal,
-                            'jenis' => 'pulang'
-                        ],
-                        [
-                            'jam' => $jamPulangDefault,
-                            'status' => 'approved',
-                            'foto' => $pengajuan->bukti ?? null,
-                            'lokasi' => $pengajuan->lokasi ?? null
-                        ]
-                    );
-                }
+                Presensi::updateOrCreate(
+                    [
+                        'user_id' => $pengajuan->user_id,
+                        'tanggal' => $pengajuan->tanggal,
+                        'jenis' => $pengajuan->jenis,
+                    ],
+                    [
+                        'jam' => $jam,
+                        'status' => 'approved',
+                        'foto' => $pengajuan->bukti ?? null,
+                        'lokasi' => $pengajuan->lokasi ?? null,
+                    ]
+                );
 
                 // Simpan status pengajuan
                 $pengajuan->status = 'approved';
@@ -383,6 +366,29 @@ class DashboardAdminController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    // ----- Cuti Approve/Reject -----
+    public function approveCuti($id)
+    {
+        $cuti = Cuti::findOrFail($id);
+        $cuti->update([
+            'status' => 'approved',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+        return response()->json(['success' => true, 'message' => 'Cuti/DL disetujui.']);
+    }
+
+    public function rejectCuti($id)
+    {
+        $cuti = Cuti::findOrFail($id);
+        $cuti->update([
+            'status' => 'rejected',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+        return response()->json(['success' => true, 'message' => 'Cuti/DL ditolak.']);
     }
 
     // ----- Fungsi Approve/Reject Presensi Pending -----

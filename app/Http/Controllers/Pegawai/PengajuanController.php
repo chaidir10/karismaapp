@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pegawai;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PengajuanPresensi;
+use App\Models\Cuti;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +17,11 @@ class PengajuanController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('pegawai.pengajuan', compact('pengajuan'));
+        $cutiList = Cuti::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pegawai.pengajuan', compact('pengajuan', 'cutiList'));
     }
 
     public function create()

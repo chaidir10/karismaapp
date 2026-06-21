@@ -118,6 +118,8 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         // Pengajuan Approve / Reject
         Route::post('/pengajuan/{id}/approve', [DashboardAdminController::class, 'approve'])->name('pengajuan.approve');
         Route::post('/pengajuan/{id}/reject', [DashboardAdminController::class, 'reject'])->name('pengajuan.reject');
+        Route::post('/cuti/{id}/approve', [DashboardAdminController::class, 'approveCuti'])->name('cuti.approve');
+        Route::post('/cuti/{id}/reject', [DashboardAdminController::class, 'rejectCuti'])->name('cuti.reject');
 
         // Presensi Pending Approve / Reject
         Route::post('/presensi/{id}/approve', [DashboardAdminController::class, 'approvePresensi'])->name('presensi.approve');

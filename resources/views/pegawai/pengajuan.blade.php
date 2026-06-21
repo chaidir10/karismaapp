@@ -119,10 +119,49 @@
         @empty
         <div class="empty-box">
             <i class="fas fa-paper-plane"></i>
-            <p>Belum ada pengajuan</p>
+            <p>Belum ada pengajuan presensi</p>
         </div>
         @endforelse
     </div>
+
+    <!-- Cuti / DL Section -->
+    @if(isset($cutiList))
+    <div style="font-size:14px; font-weight:700; color:var(--dark); margin:20px 0 10px;">Cuti / Dinas Luar</div>
+    <div class="pengajuan-list">
+        @forelse($cutiList as $c)
+        @php
+            $cIcon = $c->jenis === 'dinas_luar'
+                ? ['cls' => 'fa-briefcase', 'color' => 'var(--primary-dark)', 'bg' => 'var(--primary-soft)']
+                : ['cls' => 'fa-calendar-minus', 'color' => '#f59e0b', 'bg' => '#fef3c7'];
+            $cStatus = $c->status === 'approved' ? ['bg' => 'var(--success-light)', 'color' => 'var(--success)', 'text' => 'Disetujui']
+                : ($c->status === 'rejected' ? ['bg' => 'var(--danger-light)', 'color' => 'var(--danger)', 'text' => 'Ditolak']
+                : ['bg' => '#fef3c7', 'color' => '#d97706', 'text' => 'Menunggu']);
+        @endphp
+        <div class="pengajuan-card" style="cursor:default;">
+            <div class="detail-icon-box" style="background:{{ $cIcon['bg'] }};"><i class="fas {{ $cIcon['cls'] }}" style="color:{{ $cIcon['color'] }};"></i></div>
+            <div style="flex:1; min-width:0;">
+                <div style="font-size:14px; font-weight:700; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $c->label }}</div>
+                <div style="font-size:11px; color:var(--gray); margin-top:2px;">
+                    {{ $c->tanggal_mulai->format('d M Y') }}
+                    @if($c->tanggal_mulai != $c->tanggal_selesai)
+                     - {{ $c->tanggal_selesai->format('d M Y') }}
+                    @endif
+                    <span style="margin-left:4px; font-weight:600;">({{ $c->jumlah_hari }} hari)</span>
+                </div>
+                @if($c->keterangan)
+                <div style="font-size:11px; color:var(--gray); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $c->keterangan }}</div>
+                @endif
+            </div>
+            <span style="background:{{ $cStatus['bg'] }}; color:{{ $cStatus['color'] }}; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:700; flex-shrink:0;">{{ $cStatus['text'] }}</span>
+        </div>
+        @empty
+        <div class="empty-box">
+            <i class="fas fa-calendar-minus"></i>
+            <p>Belum ada pengajuan cuti/DL</p>
+        </div>
+        @endforelse
+    </div>
+    @endif
 </div>
 
 <!-- Floating Button -->

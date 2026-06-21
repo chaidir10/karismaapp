@@ -1002,6 +1002,47 @@
             </div>
         </div>
 
+        {{-- Cuti / DL Pending --}}
+        @if(isset($cutiPending) && $cutiPending->count() > 0)
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">Cuti / Dinas Luar Pending</h2>
+                <span class="card-badge" style="background:rgba(139,92,246,0.1);color:#7c3aed;">{{ $cutiPending->count() }} pengajuan</span>
+            </div>
+            <div class="card-content" style="padding:0;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">NO</th>
+                            <th>PEGAWAI</th>
+                            <th>JENIS</th>
+                            <th>TANGGAL</th>
+                            <th>HARI</th>
+                            <th style="width:120px;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($cutiPending as $idx => $cp)
+                        <tr id="cutiRow{{ $cp->id }}">
+                            <td>{{ $idx + 1 }}</td>
+                            <td style="font-weight:600;">{{ $cp->user->name }}</td>
+                            <td><span style="background:rgba(139,92,246,0.1);color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;">{{ $cp->jenis === 'dinas_luar' ? 'DL' : str_replace('cuti_', 'C. ', $cp->jenis) }}</span></td>
+                            <td>{{ $cp->tanggal_mulai->format('d/m') }}@if($cp->tanggal_mulai != $cp->tanggal_selesai) - {{ $cp->tanggal_selesai->format('d/m') }}@endif</td>
+                            <td>{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}</td>
+                            <td>
+                                <div style="display:flex; gap:6px;">
+                                    <button onclick="actionCuti({{ $cp->id }}, 'approve')" class="btn-approve" title="Setujui"><i class="fas fa-check"></i></button>
+                                    <button onclick="actionCuti({{ $cp->id }}, 'reject')" class="btn-reject" title="Tolak"><i class="fas fa-xmark"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
         {{-- Lembur Hari Ini --}}
         <div class="content-card" id="lemburHariIniSection">
             <div class="card-header">
@@ -1312,6 +1353,19 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
+    // ─── Cuti Approve/Reject ─────────────────────────────────────────────────
+    function actionCuti(id, action) {
+        var url = '/admin/cuti/' + id + '/' + action;
+        fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'} })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    var row = document.getElementById('cutiRow' + id);
+                    if (row) { row.style.transition='opacity 0.3s'; row.style.opacity='0'; setTimeout(()=>row.remove(),300); }
+                }
+            });
+    }
+
     // ─── State ───────────────────────────────────────────────────────────────
     let presensiMap    = null;
     let currentMarker  = null;

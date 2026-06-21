@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Presensi;
+use App\Models\Cuti;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use PDF;
@@ -83,6 +84,21 @@ class PerformaController extends Controller
                 ->get()
                 ->groupBy('tanggal');
 
+            // Cuti/DL dates for this user
+            $userCuti = Cuti::where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->where('tanggal_mulai', '<=', $endDate)
+                ->where('tanggal_selesai', '>=', $startDate)
+                ->get();
+            $cutiDates = [];
+            foreach ($userCuti as $c) {
+                $cS = $c->tanggal_mulai->max($startDate);
+                $cE = $c->tanggal_selesai->min($endDate);
+                for ($cd = $cS->copy(); $cd->lte($cE); $cd->addDay()) {
+                    $cutiDates[] = $cd->format('Y-m-d');
+                }
+            }
+
             $hadir = 0;
             $tepatMasuk = 0;
             $telat = 0;
@@ -91,11 +107,17 @@ class PerformaController extends Controller
             $jamKerjaCukup = 0;
             $totalMenitKerja = 0;
             $totalMenitStandar = 0;
+            $hariCuti = 0;
 
             for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
                 $tanggal = $d->format('Y-m-d');
 
                 if ($d->dayOfWeek == 0 || $d->dayOfWeek == 6 || in_array($tanggal, $holidays)) {
+                    continue;
+                }
+
+                if (in_array($tanggal, $cutiDates)) {
+                    $hariCuti++;
                     continue;
                 }
 
@@ -138,10 +160,11 @@ class PerformaController extends Controller
                 }
             }
 
-            $skorKehadiran = round(($hadir / $hariKerja) * 25, 2);
-            $skorMasuk = round(($tepatMasuk / $hariKerja) * 30, 2);
-            $skorPulang = round(($pulangTepat / $hariKerja) * 20, 2);
-            $skorJamKerja = round(($jamKerjaCukup / $hariKerja) * 25, 2);
+            $hariKerjaUser = max($hariKerja - $hariCuti, 1);
+            $skorKehadiran = round(($hadir / $hariKerjaUser) * 25, 2);
+            $skorMasuk = round(($tepatMasuk / $hariKerjaUser) * 30, 2);
+            $skorPulang = round(($pulangTepat / $hariKerjaUser) * 20, 2);
+            $skorJamKerja = round(($jamKerjaCukup / $hariKerjaUser) * 25, 2);
             $totalPerforma = round($skorKehadiran + $skorMasuk + $skorPulang + $skorJamKerja, 2);
 
             $performa[] = [

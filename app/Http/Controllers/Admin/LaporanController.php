@@ -41,6 +41,21 @@ class LaporanController extends Controller
             $presensiReguler = $allPresensi->where('is_lembur', false)->groupBy('tanggal');
             $presensiLembur  = $allPresensi->where('is_lembur', true)->groupBy('tanggal');
 
+            // Cuti/DL approved untuk user ini di bulan ini
+            $cutiList = Cuti::where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->where('tanggal_mulai', '<=', $endDate)
+                ->where('tanggal_selesai', '>=', $startDate)
+                ->get();
+            $cutiDates = [];
+            foreach ($cutiList as $c) {
+                $cStart = $c->tanggal_mulai->max($startDate);
+                $cEnd = $c->tanggal_selesai->min($endDate);
+                for ($d = $cStart->copy(); $d->lte($cEnd); $d->addDay()) {
+                    $cutiDates[$d->format('Y-m-d')] = $c->label;
+                }
+            }
+
             $rows = [];
             $totalKeterlambatan = 0;
             $totalPulangCepat   = 0;
@@ -50,6 +65,7 @@ class LaporanController extends Controller
             $totalLembur        = 0;
             $totalHariLembur    = 0;
             $totalHariTelat     = 0;
+            $totalHariCuti      = 0;
 
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
                 $tanggal   = $date->format('Y-m-d');
@@ -90,7 +106,17 @@ class LaporanController extends Controller
                     'is_holiday'     => $isHoliday,
                     'holiday_name'   => $isHoliday ? $holidays[$tanggal] : null,
                     'status_masuk'   => $isLibur ? $statusLibur : 'Tidak Hadir',
+                    'is_cuti'        => false,
                 ];
+
+                // Cek cuti/DL — skip hari ini dari perhitungan kerja
+                if (isset($cutiDates[$tanggal]) && !$isLibur) {
+                    $row['status_masuk'] = $cutiDates[$tanggal];
+                    $row['is_cuti'] = true;
+                    $totalHariCuti++;
+                    $rows[] = $row;
+                    continue;
+                }
 
                 $hasExplicitLembur = $lemburMasuk && $lemburPulang;
 
@@ -178,9 +204,10 @@ class LaporanController extends Controller
 
             $laporan[] = [
                 'user'             => $user,
-                'total_hari_kerja'   => $totalHariKerja,
+                'total_hari_kerja'   => $totalHariKerja - $totalHariCuti,
                 'total_hari_telat'   => $totalHariTelat,
                 'total_hari_lembur'  => $totalHariLembur,
+                'total_hari_cuti'    => $totalHariCuti,
                 'is_shift'         => $isShiftUser,
                 'shift_nama'       => $isShiftUser ? 'Pegawai Shift' : null,
                 'rows'             => $rows,
