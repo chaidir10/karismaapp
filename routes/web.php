@@ -33,6 +33,13 @@ Route::get('/download', function () {
     return view('download');
 })->name('download');
 
+// PWA — serve SW from root scope
+Route::get('/sw.js', function () {
+    return response(file_get_contents(public_path('sw.js')), 200)
+        ->header('Content-Type', 'application/javascript')
+        ->header('Service-Worker-Allowed', '/');
+});
+
 // --------------------
 // Auth Routes
 // --------------------
