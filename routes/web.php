@@ -40,6 +40,18 @@ Route::get('/sw.js', function () {
         ->header('Service-Worker-Allowed', '/');
 });
 
+// Digital Asset Links — required for TWA (no address bar)
+Route::get('/.well-known/assetlinks.json', function () {
+    return response()->json([[
+        'relation' => ['delegate_permission/common.handle_all_urls'],
+        'target' => [
+            'namespace' => 'android_app',
+            'package_name' => 'com.karismaapp.twa',
+            'sha256_cert_fingerprints' => ['01:C2:65:6D:60:E7:CC:0D:9F:0A:E1:41:24:85:16:BE:B8:BB:DF:5B:70:3C:6C:0A:FC:FF:E3:3B:92:C7:0A:34'],
+        ],
+    ]]);
+});
+
 // --------------------
 // Auth Routes
 // --------------------
