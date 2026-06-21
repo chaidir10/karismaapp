@@ -289,7 +289,7 @@
         @endphp
         <div class="carousel-slide" onclick="openInfoModal({{ $pm->id }})" style="position:relative;">
             @if($pm->created_at->diffInHours(now()) < 42)
-            <span class="badge-baru">Baru</span>
+            <span class="badge-baru" id="badgeBaru{{ $pm->id }}">Baru</span>
             @endif
             @if($pm->gambar && ($pm->sembunyikan_detail ?? false))
             <div class="slide-image" style="background-image:url('{{ asset('public/storage/'.$pm->gambar) }}');"></div>
@@ -1030,13 +1030,29 @@
         track.onclick = function(e) { if(Math.abs(dragCurrentX-dragStartX)>10) e.stopPropagation(); };
     }
 
-    document.addEventListener('turbo:load', initCarousel);
+    document.addEventListener('turbo:load', function() {
+        initCarousel();
+        // Hide badges for already-read pengumuman
+        var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
+        read.forEach(function(id) {
+            var badge = document.getElementById('badgeBaru' + id);
+            if (badge) badge.style.display = 'none';
+        });
+    });
     initCarousel();
 
     function openInfoModal(id) {
         if (window.bootstrap && window.bootstrap.Modal) {
             new bootstrap.Modal(document.getElementById('infoModal' + id)).show();
         }
+        // Mark as read — hide badge
+        var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
+        if (read.indexOf(id) === -1) {
+            read.push(id);
+            localStorage.setItem('karisma-read-pengumuman', JSON.stringify(read));
+        }
+        var badge = document.getElementById('badgeBaru' + id);
+        if (badge) badge.style.display = 'none';
     }
 
     // Profile photo map marker
