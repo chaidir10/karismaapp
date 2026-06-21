@@ -370,7 +370,7 @@
 
         // Register SW
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("{{ asset('public/pwa/service-worker.js') }}", { scope: '/' });
+            navigator.serviceWorker.register("/sw.js", { scope: '/' });
         }
     </script>
 </body>

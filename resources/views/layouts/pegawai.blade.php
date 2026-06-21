@@ -1163,7 +1163,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register("{{ asset('public/pwa/service-worker.js') }}")
+                navigator.serviceWorker.register("/sw.js")
                     .then(function(r) {})
                     .catch(function(e) { console.error('SW failed:', e); });
             });
