@@ -137,32 +137,30 @@
     /* Photo Crop Modal (WA-style) */
     .crop-modal {
         display:none; position:fixed; inset:0; background:#000; z-index:200;
-        flex-direction:column; align-items:center; justify-content:center;
+        flex-direction:column;
     }
     .crop-modal.visible { display:flex; }
     .crop-header {
-        position:absolute; top:0; left:0; right:0; z-index:2;
         display:flex; align-items:center; justify-content:space-between;
-        padding:14px 16px;
+        padding:14px 16px; flex-shrink:0; z-index:2;
     }
     .crop-header button { background:none; border:none; color:#fff; font-size:14px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .crop-area {
-        position:relative; width:100%; flex:1; display:flex; align-items:center; justify-content:center;
+        position:relative; width:100%; flex:1;
         overflow:hidden; touch-action:none;
     }
     .crop-area img {
         position:absolute; max-width:none; -webkit-user-drag:none; user-select:none; cursor:move;
     }
-    .crop-circle-mask {
+    .crop-overlay {
         position:absolute; inset:0; z-index:1; pointer-events:none;
     }
     .crop-footer {
-        position:absolute; bottom:0; left:0; right:0; z-index:2;
         display:flex; align-items:center; justify-content:center; gap:16px;
-        padding:20px 16px 30px;
+        padding:16px 16px 34px; flex-shrink:0; z-index:2;
     }
     .crop-footer span { color:rgba(255,255,255,0.5); font-size:14px; }
-    .crop-footer input[type="range"] { width:160px; accent-color:#fff; }
+    .crop-footer input[type="range"] { width:180px; accent-color:#fff; }
 
     @keyframes modalSlideIn {
         from { opacity:0; transform:translateY(30px); }
@@ -366,20 +364,11 @@
     </div>
     <div class="crop-area" id="cropArea">
         <img id="cropImg" src="" alt="" draggable="false">
-        <svg class="crop-circle-mask" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-                <mask id="circleMask">
-                    <rect width="100" height="100" fill="white"/>
-                    <circle cx="50" cy="50" r="36" fill="black"/>
-                </mask>
-            </defs>
-            <rect width="100" height="100" fill="rgba(0,0,0,0.6)" mask="url(#circleMask)"/>
-            <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>
-        </svg>
+        <canvas id="cropOverlay" class="crop-overlay"></canvas>
     </div>
     <div class="crop-footer">
         <span><i class="fas fa-magnifying-glass-minus"></i></span>
-        <input type="range" id="zoomSlider" min="100" max="400" value="150" oninput="onZoomChange(this.value)">
+        <input type="range" id="zoomSlider" min="100" max="300" value="100" oninput="onZoomChange(this.value)">
         <span><i class="fas fa-magnifying-glass-plus"></i></span>
     </div>
 </div>
@@ -414,52 +403,77 @@
         document.getElementById('theme-icon-moon').style.display = theme === 'dark' ? 'inline' : 'none';
     });
 
-    // WA-style crop
-    var crop = { dragging:false, sx:0, sy:0, ix:0, iy:0, zoom:150, file:null, pinchDist:0 };
-    var cropArea = document.getElementById('cropArea');
-    var cropImg = document.getElementById('cropImg');
+    // Crop system — accurate circle crop with canvas
+    var C = { drag:false, sx:0, sy:0, ox:0, oy:0, zoom:100, baseScale:1, pinchDist:0, circleR:0 };
+    var _cropArea, _cropImg, _cropOverlay;
+
+    function _initCropRefs() {
+        _cropArea = document.getElementById('cropArea');
+        _cropImg = document.getElementById('cropImg');
+        _cropOverlay = document.getElementById('cropOverlay');
+    }
+
+    function drawMask() {
+        var rect = _cropArea.getBoundingClientRect();
+        var w = rect.width, h = rect.height;
+        _cropOverlay.width = w;
+        _cropOverlay.height = h;
+        C.circleR = Math.min(w, h) * 0.38;
+        var cx = w / 2, cy = h / 2;
+        var ctx = _cropOverlay.getContext('2d');
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(cx, cy, C.circleR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, C.circleR, 0, Math.PI * 2);
+        ctx.stroke();
+    }
 
     function onPhotoSelected(input) {
         if (!input.files || !input.files[0]) return;
-        crop.file = input.files[0];
+        _initCropRefs();
         var reader = new FileReader();
         reader.onload = function(e) {
-            cropImg.src = e.target.result;
-            crop.zoom = 150; crop.ix = 0; crop.iy = 0;
-            document.getElementById('zoomSlider').value = 150;
-            cropImg.onload = function() { centerCrop(); };
-            document.getElementById('cropModal').classList.add('visible');
+            _cropImg.onload = function() {
+                document.getElementById('cropModal').classList.add('visible');
+                setTimeout(function() {
+                    drawMask();
+                    var rect = _cropArea.getBoundingClientRect();
+                    var diameter = C.circleR * 2;
+                    C.baseScale = diameter / Math.min(_cropImg.naturalWidth, _cropImg.naturalHeight);
+                    C.zoom = 100;
+                    C.ox = 0; C.oy = 0;
+                    document.getElementById('zoomSlider').value = 100;
+                    positionImg();
+                }, 50);
+            };
+            _cropImg.src = e.target.result;
         };
-        reader.readAsDataURL(crop.file);
+        reader.readAsDataURL(input.files[0]);
     }
 
-    function centerCrop() {
-        var area = cropArea.getBoundingClientRect();
-        var scale = crop.zoom / 100;
-        var w = area.width * scale;
-        var h = (cropImg.naturalHeight / cropImg.naturalWidth) * w;
-        cropImg.style.width = w + 'px';
-        cropImg.style.height = h + 'px';
-        crop.ix = (area.width - w) / 2;
-        crop.iy = (area.height - h) / 2;
-        cropImg.style.left = crop.ix + 'px';
-        cropImg.style.top = crop.iy + 'px';
-    }
-
-    function applyCrop() {
-        var area = cropArea.getBoundingClientRect();
-        var scale = crop.zoom / 100;
-        var w = area.width * scale;
-        var h = (cropImg.naturalHeight / cropImg.naturalWidth) * w;
-        cropImg.style.width = w + 'px';
-        cropImg.style.height = h + 'px';
-        cropImg.style.left = crop.ix + 'px';
-        cropImg.style.top = crop.iy + 'px';
+    function positionImg() {
+        var rect = _cropArea.getBoundingClientRect();
+        var s = C.baseScale * (C.zoom / 100);
+        var iw = _cropImg.naturalWidth * s;
+        var ih = _cropImg.naturalHeight * s;
+        var x = (rect.width - iw) / 2 + C.ox;
+        var y = (rect.height - ih) / 2 + C.oy;
+        _cropImg.style.width = iw + 'px';
+        _cropImg.style.height = ih + 'px';
+        _cropImg.style.left = x + 'px';
+        _cropImg.style.top = y + 'px';
     }
 
     function onZoomChange(val) {
-        crop.zoom = parseInt(val);
-        centerCrop();
+        C.zoom = parseInt(val);
+        positionImg();
     }
 
     function cancelCrop() {
@@ -468,42 +482,89 @@
     }
 
     function confirmCrop() {
+        var rect = _cropArea.getBoundingClientRect();
+        var s = C.baseScale * (C.zoom / 100);
+        var iw = _cropImg.naturalWidth * s;
+        var ih = _cropImg.naturalHeight * s;
+        var imgX = (rect.width - iw) / 2 + C.ox;
+        var imgY = (rect.height - ih) / 2 + C.oy;
+        var cx = rect.width / 2;
+        var cy = rect.height / 2;
+
+        // Source rect in natural image coords
+        var srcX = (cx - C.circleR - imgX) / s;
+        var srcY = (cy - C.circleR - imgY) / s;
+        var srcW = (C.circleR * 2) / s;
+        var srcH = (C.circleR * 2) / s;
+
+        var outSize = 512;
+        var canvas = document.createElement('canvas');
+        canvas.width = outSize; canvas.height = outSize;
+        var ctx = canvas.getContext('2d');
+
+        // Clip to circle
+        ctx.beginPath();
+        ctx.arc(outSize / 2, outSize / 2, outSize / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(_cropImg, srcX, srcY, srcW, srcH, 0, 0, outSize, outSize);
+
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
         document.getElementById('cropModal').classList.remove('visible');
-        var avatarBox = document.getElementById('editAvatarPreview');
-        avatarBox.innerHTML = '<img src="' + cropImg.src + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
+
+        // Preview
+        var box = document.getElementById('editAvatarPreview');
+        box.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
+
+        // Set cropped file to input
+        canvas.toBlob(function(blob) {
+            var f = new File([blob], 'profile.jpg', { type:'image/jpeg' });
+            var dt = new DataTransfer();
+            dt.items.add(f);
+            document.getElementById('fotoInput').files = dt.files;
+        }, 'image/jpeg', 0.9);
     }
 
-    // Drag
-    cropArea.addEventListener('mousedown', function(e) { e.preventDefault(); crop.dragging = true; crop.sx = e.clientX - crop.ix; crop.sy = e.clientY - crop.iy; });
-    document.addEventListener('mousemove', function(e) { if (!crop.dragging) return; crop.ix = e.clientX - crop.sx; crop.iy = e.clientY - crop.sy; applyCrop(); });
-    document.addEventListener('mouseup', function() { crop.dragging = false; });
+    // Drag — mouse
+    document.addEventListener('mousedown', function(e) {
+        if (!_cropArea || !_cropArea.contains(e.target) || e.target === _cropOverlay) return;
+        e.preventDefault();
+        C.drag = true; C.sx = e.clientX - C.ox; C.sy = e.clientY - C.oy;
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!C.drag) return;
+        C.ox = e.clientX - C.sx; C.oy = e.clientY - C.sy;
+        positionImg();
+    });
+    document.addEventListener('mouseup', function() { C.drag = false; });
 
-    cropArea.addEventListener('touchstart', function(e) {
+    // Drag — touch
+    document.addEventListener('touchstart', function(e) {
+        if (!_cropArea || !_cropArea.contains(e.target)) return;
         if (e.touches.length === 1) {
-            crop.dragging = true;
-            crop.sx = e.touches[0].clientX - crop.ix;
-            crop.sy = e.touches[0].clientY - crop.iy;
+            C.drag = true;
+            C.sx = e.touches[0].clientX - C.ox;
+            C.sy = e.touches[0].clientY - C.oy;
         } else if (e.touches.length === 2) {
-            crop.dragging = false;
-            crop.pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            C.drag = false;
+            C.pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
         }
     }, { passive:true });
-
-    cropArea.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 1 && crop.dragging) {
-            crop.ix = e.touches[0].clientX - crop.sx;
-            crop.iy = e.touches[0].clientY - crop.sy;
-            applyCrop();
+    document.addEventListener('touchmove', function(e) {
+        if (!_cropArea || !_cropArea.contains(e.target)) return;
+        if (e.touches.length === 1 && C.drag) {
+            C.ox = e.touches[0].clientX - C.sx;
+            C.oy = e.touches[0].clientY - C.sy;
+            positionImg();
         } else if (e.touches.length === 2) {
             var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            var delta = dist - crop.pinchDist;
-            crop.zoom = Math.max(100, Math.min(400, crop.zoom + delta * 0.5));
-            crop.pinchDist = dist;
-            document.getElementById('zoomSlider').value = crop.zoom;
-            applyCrop();
+            var delta = dist - C.pinchDist;
+            C.zoom = Math.max(100, Math.min(300, C.zoom + delta * 0.3));
+            C.pinchDist = dist;
+            document.getElementById('zoomSlider').value = Math.round(C.zoom);
+            positionImg();
         }
     }, { passive:true });
-
-    cropArea.addEventListener('touchend', function() { crop.dragging = false; });
+    document.addEventListener('touchend', function() { C.drag = false; });
 </script>
 @endsection

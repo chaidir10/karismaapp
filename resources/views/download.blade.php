@@ -198,7 +198,7 @@
         <img src="{{ asset('public/images/icon-512x512.png') }}" alt="KARISMA" class="app-icon">
         <h1>KARISMA</h1>
         <p>Aplikasi Presensi ASN</p>
-        <span class="version">Balai KKK Kelas I Tarakan</span>
+        <span class="version">Balai Kekarantinaan Kesehatan Kelas I Tarakan</span>
     </div>
 
     <!-- Install Button -->
