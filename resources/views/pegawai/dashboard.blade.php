@@ -976,6 +976,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js" defer></script>
 <script>
     // Carousel with live drag
     var currentSlide = 0;
@@ -1473,38 +1474,88 @@
         if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
         if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
 
-        if (typeof FaceDetection === 'undefined') {
+        if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
+
+        // Try MediaPipe first, fallback to face-api.js
+        if (typeof FaceDetection !== 'undefined') {
+            var mpReady = false;
+            var mpTimeout = setTimeout(function() {
+                if (!mpReady) {
+                    console.warn('MediaPipe timeout, falling back to face-api.js');
+                    if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
+                    initFallbackFaceApi(video, submitBtn, statusEl);
+                }
+            }, 8000);
+
+            try {
+                mpFaceDetector = new FaceDetection({
+                    locateFile: function(file) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/' + file; }
+                });
+                mpFaceDetector.setOptions({ model: 'short', minDetectionConfidence: 0.6 });
+
+                mpFaceDetector.onResults(function(results) {
+                    if (!mpReady) { mpReady = true; clearTimeout(mpTimeout); }
+                    _faceDetecting = false;
+                    if (!videoStream) return;
+                    var found = false;
+                    if (results.detections && results.detections.length > 0) {
+                        found = isFaceInGuide(results.detections[0].boundingBox, video);
+                    }
+                    if (found !== faceDetected) { faceDetected = found; updateFaceStatus(found); }
+                });
+
+                _faceDetectTimer = setInterval(function() {
+                    if (!videoStream || !mpFaceDetector || _faceDetecting) return;
+                    if (video.readyState < 2 || video.paused) return;
+                    _faceDetecting = true;
+                    mpFaceDetector.send({ image: video }).catch(function() { _faceDetecting = false; });
+                }, 300);
+            } catch(e) {
+                clearTimeout(mpTimeout);
+                initFallbackFaceApi(video, submitBtn, statusEl);
+            }
+        } else {
+            initFallbackFaceApi(video, submitBtn, statusEl);
+        }
+    }
+
+    // Fallback: face-api.js (slower but works everywhere)
+    var _faceApiLoaded = false;
+    function initFallbackFaceApi(video, submitBtn, statusEl) {
+        if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
+        if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
+
+        if (typeof faceapi === 'undefined') {
             if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Face detection tidak tersedia'; }
             return;
         }
 
-        if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
+        if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...'; }
 
-        mpFaceDetector = new FaceDetection({
-            locateFile: function(file) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/' + file; }
-        });
-        mpFaceDetector.setOptions({ model: 'short', minDetectionConfidence: 0.6 });
-
-        mpFaceDetector.onResults(function(results) {
-            _faceDetecting = false;
-            if (!videoStream) return;
-            var found = false;
-            if (results.detections && results.detections.length > 0) {
-                found = isFaceInGuide(results.detections[0].boundingBox, video);
+        (async function() {
+            if (!_faceApiLoaded) {
+                try {
+                    await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/');
+                    _faceApiLoaded = true;
+                } catch(e) {
+                    if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memuat model'; }
+                    return;
+                }
             }
-            if (found !== faceDetected) {
-                faceDetected = found;
-                updateFaceStatus(found);
-            }
-        });
 
-        // Send frames manually via setInterval — no Camera utility needed
-        _faceDetectTimer = setInterval(function() {
-            if (!videoStream || !mpFaceDetector || _faceDetecting) return;
-            if (video.readyState < 2 || video.paused) return;
-            _faceDetecting = true;
-            mpFaceDetector.send({ image: video }).catch(function() { _faceDetecting = false; });
-        }, 300);
+            var opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 });
+            _faceDetectTimer = setInterval(async function() {
+                if (!videoStream || _faceDetecting) return;
+                if (video.readyState < 2 || video.paused) return;
+                _faceDetecting = true;
+                try {
+                    var dets = await faceapi.detectAllFaces(video, opts);
+                    var found = dets.length > 0 && isFaceInGuide(dets[0].box, video);
+                    if (found !== faceDetected) { faceDetected = found; updateFaceStatus(found); }
+                } catch(e) {}
+                _faceDetecting = false;
+            }, 500);
+        })();
     }
 
     function isFaceInGuide(bb, video) {
@@ -1513,11 +1564,22 @@
         var gr = oval.getBoundingClientRect();
         var vr = video.getBoundingClientRect();
 
-        // bb from MediaPipe is relative (0-1)
-        var faceW = bb.width * vr.width;
-        var faceH = bb.height * vr.height;
-        var faceX = vr.left + bb.xCenter * vr.width - faceW / 2;
-        var faceY = vr.top + bb.yCenter * vr.height - faceH / 2;
+        var faceX, faceY, faceW, faceH;
+        if (bb.xCenter !== undefined) {
+            // MediaPipe format (relative 0-1, centered)
+            faceW = bb.width * vr.width;
+            faceH = bb.height * vr.height;
+            faceX = vr.left + bb.xCenter * vr.width - faceW / 2;
+            faceY = vr.top + bb.yCenter * vr.height - faceH / 2;
+        } else {
+            // face-api.js format (absolute pixels)
+            var sx = vr.width / video.videoWidth;
+            var sy = vr.height / video.videoHeight;
+            faceW = bb.width * sx;
+            faceH = bb.height * sy;
+            faceX = vr.left + bb.x * sx;
+            faceY = vr.top + bb.y * sy;
+        }
 
         var m = 20;
         return faceX >= (gr.left - m) && faceY >= (gr.top - m) &&
