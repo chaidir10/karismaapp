@@ -29,9 +29,10 @@
     }
     .drag-handle:active { cursor: grabbing; color: #94a3b8; }
     .p-card .p-thumb {
-        width: 70px; height: 70px; border-radius: 14px; flex-shrink: 0;
+        width: 90px; height: 90px; border-radius: 14px; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; color: #fff; background-size: cover; background-position: center;
+        font-size: 24px; color: #fff; background-size: contain; background-position: center; background-repeat: no-repeat;
+        background-color: var(--dm-card, #f1f5f9);
     }
     .p-card .p-info { flex: 1; min-width: 0; }
     .p-card .p-title { font-size: 15px; font-weight: 700; color: var(--dm-text, #1e293b); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -91,11 +92,11 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
-        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    <!-- Note -->
+    <div style="background:var(--dm-card, #f0f9ff); border:1px solid var(--dm-border, #bae6fd); border-radius:12px; padding:10px 14px; margin-bottom:16px; display:flex; align-items:center; gap:10px; font-size:12px; color:var(--dm-muted, #0369a1);">
+        <i class="fas fa-grip-vertical" style="font-size:14px; opacity:0.5;"></i>
+        <span>Geser card untuk mengatur urutan. Urutan paling atas akan muncul pertama di slider pegawai.</span>
     </div>
-    @endif
 
     <!-- List -->
     <div id="pengumumanSortable">
@@ -253,10 +254,54 @@
 </div>
 
 <form id="deleteForm" method="POST" style="display:none;">@csrf @method('DELETE')</form>
+
+<!-- Toast -->
+<div id="toastNotif" style="position:fixed; top:20px; right:20px; z-index:999; transform:translateX(120%); transition:transform 0.3s ease; max-width:360px;">
+    <div style="background:var(--dm-card, #fff); border:1px solid var(--dm-border, #e2e8f0); border-radius:14px; padding:14px 18px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:flex; align-items:center; gap:12px;">
+        <div id="toastIcon" style="width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;"></div>
+        <div style="flex:1; min-width:0;">
+            <div id="toastMsg" style="font-size:13px; font-weight:600; color:var(--dm-text, #1e293b);"></div>
+            <div style="margin-top:6px; height:3px; border-radius:2px; background:var(--dm-border, #e2e8f0); overflow:hidden;">
+                <div id="toastTimer" style="height:100%; border-radius:2px; width:100%; transition:width linear;"></div>
+            </div>
+        </div>
+        <button onclick="hideToast()" style="background:none;border:none;color:var(--dm-muted,#94a3b8);font-size:14px;cursor:pointer;padding:4px;"><i class="fas fa-xmark"></i></button>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script>
+    // Toast notification
+    var _toastTimeout;
+    function showToast(msg, type) {
+        var el = document.getElementById('toastNotif');
+        var icon = document.getElementById('toastIcon');
+        var msgEl = document.getElementById('toastMsg');
+        var timer = document.getElementById('toastTimer');
+        msgEl.textContent = msg;
+        var color = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+        icon.style.background = color + '15';
+        icon.style.color = color;
+        icon.innerHTML = type === 'success' ? '<i class="fas fa-check"></i>' : type === 'error' ? '<i class="fas fa-xmark"></i>' : '<i class="fas fa-info"></i>';
+        timer.style.background = color;
+        timer.style.width = '100%';
+        timer.style.transitionDuration = '0s';
+        el.style.transform = 'translateX(0)';
+        setTimeout(function() { timer.style.transitionDuration = '3s'; timer.style.width = '0%'; }, 50);
+        if (_toastTimeout) clearTimeout(_toastTimeout);
+        _toastTimeout = setTimeout(hideToast, 3200);
+    }
+    function hideToast() {
+        document.getElementById('toastNotif').style.transform = 'translateX(120%)';
+        if (_toastTimeout) { clearTimeout(_toastTimeout); _toastTimeout = null; }
+    }
+
+    @if(session('success'))
+    document.addEventListener('DOMContentLoaded', function() { showToast(@json(session('success')), 'success'); });
+    @endif
+</script>
 <script>
     var quill = new Quill('#quillEditor', {
         theme: 'snow',

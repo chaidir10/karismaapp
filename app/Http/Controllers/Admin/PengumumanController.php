@@ -31,7 +31,9 @@ class PengumumanController extends Controller
         $data = $request->only(['judul', 'jenis', 'isi', 'tanggal_mulai', 'tanggal_selesai', 'waktu']);
         $data['is_active'] = true;
         $data['sembunyikan_detail'] = $request->boolean('sembunyikan_detail');
-        $data['urutan'] = Pengumuman::max('urutan') + 1;
+        // Geser semua urutan ke bawah, taruh yang baru di paling atas
+        Pengumuman::query()->increment('urutan');
+        $data['urutan'] = 0;
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('pengumuman', 'public');
