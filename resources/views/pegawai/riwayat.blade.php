@@ -121,7 +121,7 @@
                 $iconName = $isLembur ? 'fa-bolt' : ($isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
                 $label = ($isLembur ? 'Lembur ' : '') . ($isMasuk ? 'Masuk' : 'Pulang');
             @endphp
-            <div class="presensi-card" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
+            <div class="presensi-card" onclick="document.getElementById('detailModal{{ $p->id }}').style.display='block'" style="cursor:pointer;">
                 <div class="card-icon {{ $iconClass }}">
                     <i class="fas {{ $iconName }}"></i>
                 </div>
@@ -158,23 +158,15 @@
         $dIconColor = $dIsMasuk ? 'var(--primary-dark)' : 'var(--accent)';
         $dIconName = $dIsLembur ? 'fa-bolt' : ($dIsMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
     @endphp
-    <div class="modal fade" id="detailModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
-            <div class="modal-content" style="border-radius:0; border:none; height:100vh; background:var(--card-bg); display:flex; flex-direction:column;">
+    <div id="detailModal{{ $p->id }}" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
+        <div style="display:flex; flex-direction:column; height:100%;">
                 <!-- Header -->
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div style="width:36px; height:36px; border-radius:10px; background:{{ $dIconBg }}; display:flex; align-items:center; justify-content:center; color:{{ $dIconColor }}; font-size:16px;">
-                            <i class="fas {{ $dIconName }}"></i>
-                        </div>
-                        <div>
-                            <div style="font-size:14px; font-weight:700; color:var(--dark);">{{ $dIsLembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }}</div>
-                            <div style="font-size:11px; color:var(--gray);">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }} &middot; {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('d M Y') }}</div>
-                        </div>
-                    </div>
-                    <button type="button" data-bs-dismiss="modal" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
-                        <i class="fas fa-xmark"></i>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+                    <button onclick="document.getElementById('detailModal{{ $p->id }}').style.display='none'" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
+                        <i class="fas fa-chevron-left"></i> Kembali
                     </button>
+                    <span style="font-size:15px; font-weight:700; color:var(--dark);">{{ $dIsLembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }}</span>
+                    <div style="width:70px; text-align:right; font-size:12px; color:var(--gray);">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
                 </div>
 
                 <!-- Scrollable Content -->
@@ -242,13 +234,6 @@
                     </div>
                 </div>
 
-                <!-- Bottom Button -->
-                <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
-                    <button type="button" data-bs-dismiss="modal" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
     @endforeach
