@@ -708,7 +708,7 @@
 
     {{-- Statistics Cards --}}
     <div class="stats-grid">
-        <a href="#presensiHariIniSection" class="stat-card" onclick="event.preventDefault(); document.getElementById('presensiHariIniSection').scrollIntoView({behavior:'smooth',block:'start'})">
+        <a href="#presensiHariIniSection" class="stat-card" onclick="event.preventDefault(); var el=document.getElementById('presensiHariIniSection'); var top=el.getBoundingClientRect().top+window.scrollY-70; window.scrollTo({top:top,behavior:'smooth'})">
             <div class="stat-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">
                 <i class="fas fa-user-check"></i>
             </div>
@@ -726,7 +726,7 @@
                 <p class="stat-label">Total Pegawai</p>
             </div>
         </a>
-        <a href="#pengajuanPendingSection" class="stat-card" onclick="event.preventDefault(); document.getElementById('pengajuanPendingSection').scrollIntoView({behavior:'smooth',block:'start'})">
+        <a href="#pengajuanPendingSection" class="stat-card" onclick="event.preventDefault(); var el=document.getElementById('pengajuanPendingSection'); var top=el.getBoundingClientRect().top+window.scrollY-70; window.scrollTo({top:top,behavior:'smooth'})">
             <div class="stat-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">
                 <i class="fas fa-paper-plane"></i>
             </div>
@@ -735,7 +735,7 @@
                 <p class="stat-label">Pengajuan Pending</p>
             </div>
         </a>
-        <a href="#lemburHariIniSection" class="stat-card" onclick="event.preventDefault(); document.getElementById('lemburHariIniSection').scrollIntoView({behavior:'smooth',block:'start'})">
+        <a href="#lemburHariIniSection" class="stat-card" onclick="event.preventDefault(); var el=document.getElementById('lemburHariIniSection'); var top=el.getBoundingClientRect().top+window.scrollY-70; window.scrollTo({top:top,behavior:'smooth'})">
             <div class="stat-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">
                 <i class="fas fa-bolt"></i>
             </div>
