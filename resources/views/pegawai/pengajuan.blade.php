@@ -233,11 +233,13 @@
 
                 <!-- Bukti -->
                 <div>
-                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Upload Bukti <span style="font-weight:400; color:var(--gray);">(opsional)</span></label>
-                    <div style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
+                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Upload Bukti <span style="color:var(--danger);">*</span></label>
+                    <div id="buktiDropZone" style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
                         <i class="fas fa-cloud-arrow-up" style="font-size:24px; color:var(--gray); margin-bottom:8px; display:block;"></i>
-                        <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">JPG, PNG, PDF, HEIC (maks 2MB)</div>
-                        <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf,.heic,.heif" style="font-size:12px; color:var(--dark); width:100%;">
+                        <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">Foto otomatis dikompresi. PDF maks 2MB</div>
+                        <input type="file" id="buktiOriginal" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.heic,.heif,.pdf" required style="font-size:12px; color:var(--dark); width:100%;">
+                        <input type="file" name="bukti" id="buktiCompressed" style="display:none;">
+                        <div id="buktiInfo" style="display:none; margin-top:10px; font-size:11px; color:var(--gray);"></div>
                     </div>
                 </div>
             </form>
@@ -301,6 +303,97 @@
     function closeDetailModal() { document.getElementById('pengajuanDetailModal').style.display = 'none'; }
     function openModal() { document.getElementById('pengajuanModal').style.display = 'block'; document.getElementById('tanggal').value = new Date().toISOString().split('T')[0]; }
     function closeModal() { document.getElementById('pengajuanModal').style.display = 'none'; }
+
+    // Auto-compress image before upload
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(0) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    function compressImage(file, maxWidth, quality) {
+        return new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var w = img.width, h = img.height;
+                    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    canvas.toBlob(function(blob) { resolve(blob); }, 'image/jpeg', quality);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    document.getElementById('buktiOriginal').addEventListener('change', async function() {
+        var file = this.files[0];
+        var info = document.getElementById('buktiInfo');
+        var compressed = document.getElementById('buktiCompressed');
+        if (!file) { info.style.display = 'none'; return; }
+
+        // PDF — no compress, just pass through
+        if (file.type === 'application/pdf') {
+            if (file.size > 2097152) {
+                info.style.display = 'block';
+                info.style.color = 'var(--danger)';
+                info.textContent = 'PDF terlalu besar (' + formatSize(file.size) + '). Maks 2MB.';
+                compressed.value = '';
+                return;
+            }
+            var dt = new DataTransfer();
+            dt.items.add(file);
+            compressed.files = dt.files;
+            info.style.display = 'block';
+            info.style.color = 'var(--success)';
+            info.textContent = 'PDF — ' + formatSize(file.size);
+            return;
+        }
+
+        // Image — auto compress
+        info.style.display = 'block';
+        info.style.color = 'var(--gray)';
+        info.textContent = 'Mengompresi foto...';
+
+        var maxW = 800;
+        var quality = 0.4;
+
+        try {
+            var blob = await compressImage(file, maxW, quality);
+            if (blob.size > 102400) blob = await compressImage(file, 640, 0.25);
+            if (blob.size > 102400) blob = await compressImage(file, 480, 0.15);
+            if (blob.size > 2097152) {
+                info.style.color = 'var(--danger)';
+                info.innerHTML = '<strong>Foto terlalu besar</strong> (' + formatSize(blob.size) + ' setelah kompresi). Maks 2MB.<br>Silakan kompres foto terlebih dahulu sebelum diunggah.';
+                compressed.value = '';
+                this.value = '';
+                return;
+            }
+            var compFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+            var dt = new DataTransfer();
+            dt.items.add(compFile);
+            compressed.files = dt.files;
+            info.style.color = 'var(--success)';
+            info.textContent = formatSize(file.size) + ' → ' + formatSize(compFile.size) + ' (terkompresi)';
+        } catch(e) {
+            if (file.size > 2097152) {
+                info.style.color = 'var(--danger)';
+                info.innerHTML = '<strong>File terlalu besar</strong> (' + formatSize(file.size) + '). Maks 2MB.<br>Silakan kompres file terlebih dahulu sebelum diunggah.';
+                compressed.value = '';
+                this.value = '';
+                return;
+            }
+            var dt = new DataTransfer();
+            dt.items.add(file);
+            compressed.files = dt.files;
+            info.style.color = 'var(--gray)';
+            info.textContent = formatSize(file.size);
+        }
+    });
 
     document.addEventListener('turbo:load', initPengajuan);
     initPengajuan();

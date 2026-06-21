@@ -30,7 +30,7 @@ class PengajuanController extends Controller
             'jenis'   => 'required|in:masuk,pulang,keduanya',
             'tanggal' => 'required|date',
             'alasan'  => 'required|string|max:255',
-            'bukti'   => 'nullable|mimes:jpg,jpeg,png,pdf,heic,heif|max:2048',
+            'bukti'   => 'required|mimes:jpg,jpeg,png,webp,gif,bmp,tiff,heic,heif,pdf|max:2048',
         ]);
 
         // default null

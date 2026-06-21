@@ -7,182 +7,375 @@
 
     {{-- Manifest & PWA --}}
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
-    <meta name="theme-color" content="#0EA5E9">
+    <meta name="theme-color" content="#5AB6EA">
     <link rel="apple-touch-icon" href="{{ asset('public/pwa/icons/icon-192x192.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    {{-- Tailwind --}}
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .app-store-card {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Poppins',sans-serif;
+            min-height:100vh;
+            background:#0b0f1a;
+            color:#e2e8f0;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            overflow-x:hidden;
+        }
+
+        /* Hero */
+        .hero {
+            width:100%;
+            padding:60px 24px 40px;
+            text-align:center;
+            position:relative;
+            overflow:hidden;
+        }
+        .hero::before {
+            content:'';
+            position:absolute; inset:0;
+            background:radial-gradient(ellipse 600px 400px at 50% 0%, rgba(90,182,234,0.15), transparent);
+            pointer-events:none;
         }
         .app-icon {
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            border-radius: 22px;
+            width:100px; height:100px;
+            border-radius:24px;
+            box-shadow:0 20px 40px rgba(90,182,234,0.25), 0 0 0 1px rgba(255,255,255,0.08);
+            margin:0 auto 20px;
+            position:relative;
         }
+        .hero h1 {
+            font-size:32px; font-weight:800;
+            background:linear-gradient(135deg,#5AB6EA,#FEAA2B);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text;
+            margin-bottom:6px;
+        }
+        .hero p { font-size:14px; color:#94a3b8; font-weight:500; }
+        .hero .version {
+            display:inline-block; margin-top:10px;
+            padding:4px 14px; border-radius:20px;
+            background:rgba(90,182,234,0.1); border:1px solid rgba(90,182,234,0.2);
+            font-size:11px; font-weight:600; color:#5AB6EA;
+        }
+
+        /* Install Button */
         .install-btn {
-            background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
-            box-shadow: 0 4px 6px -1px rgba(14,165,233,0.3);
-            transition: all 0.3s ease;
+            display:flex; align-items:center; justify-content:center; gap:10px;
+            width:calc(100% - 48px); max-width:400px;
+            margin:0 auto 32px;
+            padding:16px 24px;
+            border:none; border-radius:16px;
+            background:linear-gradient(135deg,#5AB6EA,#2E97D4);
+            color:#fff; font-size:16px; font-weight:700;
+            cursor:pointer;
+            box-shadow:0 8px 24px rgba(90,182,234,0.3);
+            transition:all 0.3s;
+            -webkit-tap-highlight-color:transparent;
         }
-        .install-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(14,165,233,0.3);
+        .install-btn:active { transform:scale(0.97); }
+        .install-btn:disabled { opacity:0.6; cursor:default; }
+        .install-btn i { font-size:18px; }
+
+        /* Features */
+        .features {
+            width:100%; max-width:440px;
+            padding:0 24px;
+            display:grid; grid-template-columns:1fr 1fr; gap:12px;
+            margin-bottom:32px;
         }
+        .feat {
+            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:14px;
+            padding:16px 14px;
+            text-align:center;
+        }
+        .feat i {
+            font-size:20px; margin-bottom:8px; display:block;
+            color:#5AB6EA;
+        }
+        .feat span { font-size:11px; font-weight:600; color:#94a3b8; }
+
+        /* Guide Section */
+        .guide-section {
+            width:100%; max-width:440px;
+            padding:0 24px 40px;
+        }
+        .guide-title {
+            font-size:13px; font-weight:700; color:#64748b;
+            text-transform:uppercase; letter-spacing:1px;
+            margin-bottom:16px; text-align:center;
+        }
+
+        .guide-tabs {
+            display:flex; gap:8px; margin-bottom:16px;
+            background:rgba(255,255,255,0.04);
+            border-radius:12px; padding:4px;
+        }
+        .guide-tab {
+            flex:1; padding:10px; border:none; border-radius:10px;
+            background:transparent; color:#64748b;
+            font-size:13px; font-weight:600; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            transition:all 0.2s;
+            -webkit-tap-highlight-color:transparent;
+        }
+        .guide-tab.active {
+            background:rgba(90,182,234,0.12);
+            color:#5AB6EA;
+        }
+        .guide-tab i { font-size:16px; }
+
+        .guide-panel { display:none; }
+        .guide-panel.active { display:block; }
+
+        .step {
+            display:flex; gap:14px; align-items:flex-start;
+            padding:14px 0;
+            border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .step:last-child { border-bottom:none; }
+        .step-num {
+            width:32px; height:32px; border-radius:10px;
+            background:linear-gradient(135deg,#5AB6EA,#2E97D4);
+            color:#fff; font-size:13px; font-weight:700;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+        }
+        .step-text { flex:1; }
+        .step-text strong { color:#e2e8f0; font-weight:600; }
+        .step-text p { font-size:13px; color:#94a3b8; line-height:1.5; margin:0; }
+        .step-text .hint {
+            display:inline-flex; align-items:center; gap:4px;
+            margin-top:6px; padding:3px 10px;
+            background:rgba(255,255,255,0.05);
+            border-radius:8px; font-size:11px; color:#64748b;
+        }
+        .step-text .hint i { font-size:12px; }
+
+        /* Footer */
+        .footer {
+            text-align:center; padding:20px 24px 40px;
+            font-size:11px; color:#334155;
+        }
+        .footer a { color:#5AB6EA; text-decoration:none; }
+
+        /* Modal */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center; justify-content: center;
+            display:none; position:fixed; inset:0; z-index:1000;
+            background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);
+            align-items:center; justify-content:center;
         }
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.3s ease;
+        .modal-card {
+            background:#141b2d; border:1px solid rgba(255,255,255,0.06);
+            border-radius:20px; padding:28px; width:90%; max-width:360px;
+            text-align:center;
+            transform:scale(0.9); opacity:0;
+            transition:all 0.3s;
         }
-        .modal-show { transform: scale(1); opacity: 1; }
+        .modal-card.show { transform:scale(1); opacity:1; }
+        .modal-card h3 { font-size:18px; font-weight:700; color:#e2e8f0; margin-bottom:8px; }
+        .modal-card p { font-size:13px; color:#94a3b8; margin-bottom:20px; line-height:1.5; }
+        .modal-btns { display:flex; gap:10px; }
+        .modal-btns button {
+            flex:1; padding:12px; border-radius:12px; border:none;
+            font-size:14px; font-weight:600; cursor:pointer;
+        }
+        .btn-cancel { background:rgba(255,255,255,0.06); color:#94a3b8; }
+        .btn-confirm { background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; }
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-sky-50 to-blue-100 flex items-center justify-center min-h-screen p-4">
-    <div class="app-store-card rounded-3xl p-8 max-w-lg w-full">
-        <div class="flex flex-col items-center mb-8">
-            <img src="{{ asset('public/images/icon-512x512.png') }}" alt="Logo KARISMA" class="app-icon w-28 h-28 mb-6">
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">KARISMA</h1>
-            <p class="text-slate-600 text-lg">Presensi ASN</p>
-        </div>
-
-        <button id="installBtn" class="install-btn w-full text-white font-semibold py-4 rounded-xl mb-4 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-            </svg>
-            Download / Install Aplikasi
-        </button>
+<body>
+    <!-- Hero -->
+    <div class="hero">
+        <img src="{{ asset('public/images/icon-512x512.png') }}" alt="KARISMA" class="app-icon">
+        <h1>KARISMA</h1>
+        <p>Aplikasi Presensi ASN</p>
+        <span class="version">Balai KKK Kelas I Tarakan</span>
     </div>
 
-    <!-- Modal Install (Chrome) -->
-    <div id="installModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Install KARISMA</h3>
-            <p class="text-slate-600 mb-6">
-                Tambahkan aplikasi ke perangkat Anda untuk akses cepat dan pengalaman lebih baik.
-            </p>
-            <div class="flex space-x-3">
-                <button id="cancelInstall" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl transition">Batal</button>
-                <button id="confirmInstall" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition">Install</button>
+    <!-- Install Button -->
+    <button id="installBtn" class="install-btn">
+        <i class="fas fa-download"></i>
+        Install Aplikasi
+    </button>
+
+    <!-- Features -->
+    <div class="features">
+        <div class="feat"><i class="fas fa-camera"></i><span>Face Detection</span></div>
+        <div class="feat"><i class="fas fa-location-dot"></i><span>GPS Presensi</span></div>
+        <div class="feat"><i class="fas fa-bolt"></i><span>Lembur Otomatis</span></div>
+        <div class="feat"><i class="fas fa-bell"></i><span>Notifikasi</span></div>
+    </div>
+
+    <!-- Installation Guide -->
+    <div class="guide-section">
+        <div class="guide-title">Panduan Instalasi</div>
+
+        <div class="guide-tabs">
+            <button class="guide-tab active" onclick="switchGuide('android')">
+                <i class="fab fa-android"></i> Android
+            </button>
+            <button class="guide-tab" onclick="switchGuide('iphone')">
+                <i class="fab fa-apple"></i> iPhone
+            </button>
+        </div>
+
+        <!-- Android Guide -->
+        <div class="guide-panel active" id="guideAndroid">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">
+                    <p>Buka halaman ini di <strong>Google Chrome</strong> atau <strong>Samsung Internet</strong></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">
+                    <p>Tekan tombol <strong>"Install Aplikasi"</strong> di atas, atau tekan ikon menu <strong>( &#8942; )</strong> di pojok kanan atas browser</p>
+                    <span class="hint"><i class="fas fa-ellipsis-vertical"></i> Tiga titik vertikal</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">
+                    <p>Pilih <strong>"Instal aplikasi"</strong> atau <strong>"Tambahkan ke Layar utama"</strong></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text">
+                    <p>Tekan <strong>"Instal"</strong> untuk konfirmasi. Aplikasi akan muncul di layar utama</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- iPhone Guide -->
+        <div class="guide-panel" id="guideIphone">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">
+                    <p>Buka halaman ini di <strong>Safari</strong></p>
+                    <span class="hint"><i class="fas fa-circle-info"></i> Harus Safari, bukan Chrome</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">
+                    <p>Tekan ikon <strong>Bagikan</strong> di bagian bawah layar</p>
+                    <span class="hint"><i class="fas fa-arrow-up-from-bracket"></i> Kotak dengan panah ke atas</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">
+                    <p>Gulir ke bawah dan pilih <strong>"Tambahkan ke Layar Utama"</strong></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text">
+                    <p>Tekan <strong>"Tambahkan"</strong> di pojok kanan atas. Aplikasi akan muncul di home screen</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Panduan Manual -->
-    <div id="manualModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold text-slate-800 mb-3">Cara Install Aplikasi</h3>
-            <div id="manualChrome" style="display:none;">
-                <p class="text-slate-600 mb-4 text-sm">Ikuti langkah berikut di Chrome / Samsung Internet:</p>
-                <ol class="text-left text-slate-700 space-y-3 text-sm">
-                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">1</span><span>Tekan tombol <strong>menu ( &#8942; )</strong> di pojok kanan atas browser</span></li>
-                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">2</span><span>Pilih <strong>"Instal aplikasi"</strong> atau <strong>"Tambahkan ke Layar utama"</strong></span></li>
-                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">3</span><span>Tekan <strong>"Instal"</strong> untuk konfirmasi</span></li>
-                </ol>
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2026 KARISMA &mdash; Balai Kekarantinaan Kesehatan Kelas I Tarakan
+    </div>
+
+    <!-- Modal Install (native prompt) -->
+    <div id="installModal" class="modal-overlay" onclick="if(event.target===this)hideModal(installModal)">
+        <div class="modal-card">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(90,182,234,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                <i class="fas fa-download" style="font-size:22px;color:#5AB6EA;"></i>
             </div>
-            <div id="manualSafari" style="display:none;">
-                <p class="text-slate-600 mb-4 text-sm">Ikuti langkah berikut di Safari:</p>
-                <ol class="text-left text-slate-700 space-y-3 text-sm">
-                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">1</span><span>Tekan ikon <strong>Bagikan</strong> (kotak dengan panah ke atas) di bawah layar</span></li>
-                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">2</span><span>Gulir ke bawah, pilih <strong>"Tambahkan ke Layar Utama"</strong></span></li>
-                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">3</span><span>Tekan <strong>"Tambahkan"</strong> untuk konfirmasi</span></li>
-                </ol>
+            <h3>Install KARISMA</h3>
+            <p>Tambahkan aplikasi ke perangkat Anda untuk akses cepat tanpa perlu buka browser.</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" id="cancelInstall">Batal</button>
+                <button class="btn-confirm" id="confirmInstall">Install</button>
             </div>
-            <button id="closeManualModal" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition font-semibold">Mengerti</button>
         </div>
     </div>
 
     <script>
+        // Guide tabs
+        function switchGuide(type) {
+            document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.guide-panel').forEach(p => p.classList.remove('active'));
+            if (type === 'android') {
+                document.querySelectorAll('.guide-tab')[0].classList.add('active');
+                document.getElementById('guideAndroid').classList.add('active');
+            } else {
+                document.querySelectorAll('.guide-tab')[1].classList.add('active');
+                document.getElementById('guideIphone').classList.add('active');
+            }
+        }
+
+        // Auto-detect device and show relevant tab
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) switchGuide('iphone');
+
+        // Modal
+        const installModal = document.getElementById('installModal');
+        function showModal(m) {
+            m.style.display = 'flex';
+            setTimeout(() => m.querySelector('.modal-card').classList.add('show'), 10);
+        }
+        function hideModal(m) {
+            m.querySelector('.modal-card').classList.remove('show');
+            setTimeout(() => m.style.display = 'none', 300);
+        }
+
+        // PWA Install
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
-        const installModal = document.getElementById('installModal');
-        const manualModal = document.getElementById('manualModal');
-        const confirmInstallBtn = document.getElementById('confirmInstall');
-        const cancelInstallBtn = document.getElementById('cancelInstall');
 
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-        function showModal(modal) {
-            modal.style.display = 'flex';
-            setTimeout(() => modal.querySelector('.modal-content').classList.add('modal-show'), 10);
-        }
-        function hideModal(modal) {
-            modal.querySelector('.modal-content').classList.remove('modal-show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        function showManualGuide() {
-            if (isSafari) {
-                document.getElementById('manualSafari').style.display = 'block';
-                document.getElementById('manualChrome').style.display = 'none';
-            } else {
-                document.getElementById('manualChrome').style.display = 'block';
-                document.getElementById('manualSafari').style.display = 'none';
-            }
-            showModal(manualModal);
-        }
-
-        document.getElementById('closeManualModal').addEventListener('click', () => hideModal(manualModal));
-
-        // Capture native install prompt (Chrome/Edge/Brave)
-        window.addEventListener("beforeinstallprompt", (e) => {
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
         });
 
-        installBtn.addEventListener("click", () => {
+        installBtn.addEventListener('click', () => {
             if (deferredPrompt) {
                 showModal(installModal);
             } else {
-                showManualGuide();
+                // Scroll to guide section
+                document.querySelector('.guide-section').scrollIntoView({ behavior:'smooth', block:'start' });
             }
         });
 
-        confirmInstallBtn.addEventListener("click", async () => {
+        document.getElementById('confirmInstall').addEventListener('click', async () => {
             hideModal(installModal);
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === "accepted") {
-                installBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Aplikasi Terinstal';
+            if (outcome === 'accepted') {
+                installBtn.innerHTML = '<i class="fas fa-check-circle"></i> Aplikasi Terinstal';
                 installBtn.disabled = true;
-                installBtn.style.opacity = '0.7';
             }
             deferredPrompt = null;
         });
 
-        cancelInstallBtn.addEventListener("click", () => hideModal(installModal));
+        document.getElementById('cancelInstall').addEventListener('click', () => hideModal(installModal));
 
-        window.addEventListener("appinstalled", () => {
-            installBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Aplikasi Terinstal';
+        window.addEventListener('appinstalled', () => {
+            installBtn.innerHTML = '<i class="fas fa-check-circle"></i> Aplikasi Terinstal';
             installBtn.disabled = true;
-            installBtn.style.opacity = '0.7';
             hideModal(installModal);
         });
 
-        // Register SW from download page
+        // Register SW
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register("{{ asset('public/pwa/service-worker.js') }}", { scope: '/' });
         }
