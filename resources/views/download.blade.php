@@ -346,25 +346,18 @@
             deferredPrompt = e;
         });
 
-        installBtn.addEventListener('click', () => {
+        installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                showModal(installModal);
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.innerHTML = '<i class="fas fa-check-circle"></i> Aplikasi Terinstal';
+                    installBtn.disabled = true;
+                }
+                deferredPrompt = null;
             } else {
-                // Scroll to guide section
                 document.querySelector('.guide-section').scrollIntoView({ behavior:'smooth', block:'start' });
             }
-        });
-
-        document.getElementById('confirmInstall').addEventListener('click', async () => {
-            hideModal(installModal);
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBtn.innerHTML = '<i class="fas fa-check-circle"></i> Aplikasi Terinstal';
-                installBtn.disabled = true;
-            }
-            deferredPrompt = null;
         });
 
         document.getElementById('cancelInstall').addEventListener('click', () => hideModal(installModal));
