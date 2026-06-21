@@ -31,8 +31,8 @@
     .p-card .p-thumb {
         width: 180px; height: 90px; border-radius: 12px; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; color: #fff; background-size: contain; background-position: center; background-repeat: no-repeat;
-        background-color: var(--dm-card, #f1f5f9);
+        font-size: 24px; color: #fff; background-size: cover; background-position: center; background-repeat: no-repeat;
+        background-color: var(--dm-card, #f1f5f9); overflow: hidden;
     }
     .p-card .p-info { flex: 1; min-width: 0; }
     .p-card .p-title { font-size: 15px; font-weight: 700; color: var(--dm-text, #1e293b); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
