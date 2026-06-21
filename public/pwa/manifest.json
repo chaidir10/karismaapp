@@ -2,21 +2,24 @@
     "name": "Karisma",
     "short_name": "Karisma",
     "description": "Aplikasi Presensi ASN",
-    "start_url": "/",
+    "start_url": "/pegawai/dashboard",
+    "scope": "/",
     "display": "standalone",
     "orientation": "portrait",
-    "background_color": "#ffffff",
-    "theme_color": "#2E97D4",
+    "background_color": "#0b0f19",
+    "theme_color": "#5AB6EA",
     "icons": [
         {
-            "src": "https://karismaapp.com/public/icons/icon-192x192.png",
+            "src": "/public/pwa/icons/icon-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
-            "src": "https://karismaapp.com/public/pwa/icons/icon-512x512.png",
+            "src": "/public/pwa/icons/icon-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

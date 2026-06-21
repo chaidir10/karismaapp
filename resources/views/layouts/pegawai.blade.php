@@ -11,7 +11,7 @@
 
     <!-- External CSS -->
     <!-- Manifest -->
-    <link rel="manifest" href="public/pwa/manifest.json">
+    <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
 
     <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
