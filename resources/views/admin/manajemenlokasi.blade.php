@@ -286,9 +286,9 @@
     <!-- Main Content: Map and Table -->
     <div class="grid grid-cols-1 lg:grid-cols-10 gap-6 relative">
         <!-- Map Container (6/10) -->
-        <div class="lg:col-span-5 bg-white rounded-xl p-4 shadow-md relative">
+        <div class="lg:col-span-5 bg-white rounded-xl p-4 shadow-md relative" style="display:flex; flex-direction:column;">
             <h2 class="text-lg font-semibold mb-4">Sebaran Titik Presensi</h2>
-            <div id="mainMap" class="h-[500px] w-full rounded-xl border relative z-0"></div>
+            <div id="mainMap" class="w-full rounded-xl border relative z-0" style="flex:1; min-height:400px;"></div>
         </div>
 
         <!-- Table Container (4/10) -->

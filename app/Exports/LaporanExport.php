@@ -137,10 +137,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ->setTop(0.3)->setRight(0.2)->setLeft(0.2)->setBottom(0.3);
         $sheet->getPageSetup()->setHorizontalCentered(true);
 
+        $highestRow = $sheet->getHighestRow();
         $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$highestRow}");
         $sheet->getSheetView()->setView('pageBreakPreview');
-
-        $highestRow = $sheet->getHighestRow();
         for ($r = $highestRow - 6; $r <= $highestRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");

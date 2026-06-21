@@ -192,40 +192,53 @@
 <!-- Create Modal — Fullscreen -->
 <div id="pengajuanModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
     <div style="display:flex; flex-direction:column; height:100%;">
+        <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500;">
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
                 <i class="fas fa-chevron-left"></i> Batal
             </button>
             <span style="font-size:15px; font-weight:700; color:var(--dark);">Buat Pengajuan</span>
-            <button type="submit" form="createForm" style="background:none; border:none; color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer;">
+            <button type="submit" form="createForm" style="background:none; border:none; color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent;">
                 Kirim
             </button>
         </div>
+
+        <!-- Body -->
         <div style="flex:1; overflow-y:auto; padding:20px;">
             <form action="{{ route('pegawai.pengajuan.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false" id="createForm">
                 @csrf
-                <div style="background:var(--light); border-radius:14px; padding:4px 0; border:1px solid var(--card-border); margin-bottom:16px;">
-                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
-                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Jenis Pengajuan</div>
-                        <select name="jenis" id="jenis" required style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
-                            <option value="">-- Pilih --</option>
-                            <option value="masuk">Masuk</option>
-                            <option value="pulang">Pulang</option>
-                            <option value="keduanya">Keduanya</option>
-                        </select>
-                    </div>
-                    <div style="padding:12px 16px; border-bottom:1px solid var(--card-border);">
-                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Tanggal</div>
-                        <input type="date" name="tanggal" id="tanggal" required style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0;">
-                    </div>
-                    <div style="padding:12px 16px;">
-                        <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Alasan</div>
-                        <textarea name="alasan" id="alasan" rows="3" required style="width:100%; border:none; background:transparent; font-size:15px; font-weight:600; color:var(--dark); outline:none; padding:0; resize:none;"></textarea>
-                    </div>
+
+                <!-- Jenis -->
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Jenis Pengajuan</label>
+                    <select name="jenis" id="jenis" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; -webkit-appearance:none; appearance:none;">
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="masuk">Masuk</option>
+                        <option value="pulang">Pulang</option>
+                        <option value="keduanya">Keduanya</option>
+                    </select>
                 </div>
-                <div style="background:var(--light); border-radius:14px; padding:12px 16px; border:1px solid var(--card-border);">
-                    <div style="font-size:11px; color:var(--gray); font-weight:500; margin-bottom:4px;">Upload Bukti (opsional)</div>
-                    <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf,.heic,.heif" style="font-size:13px; color:var(--dark);">
+
+                <!-- Tanggal -->
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal</label>
+                    <input type="date" name="tanggal" id="tanggal" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                </div>
+
+                <!-- Alasan -->
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Alasan</label>
+                    <textarea name="alasan" id="alasan" rows="4" required placeholder="Jelaskan alasan pengajuan..." style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; resize:none; font-family:inherit;"></textarea>
+                </div>
+
+                <!-- Bukti -->
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Upload Bukti <span style="font-weight:400; color:var(--gray);">(opsional)</span></label>
+                    <div style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
+                        <i class="fas fa-cloud-arrow-up" style="font-size:24px; color:var(--gray); margin-bottom:8px; display:block;"></i>
+                        <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">JPG, PNG, PDF, HEIC (maks 2MB)</div>
+                        <input type="file" name="bukti" id="bukti" accept=".jpg,.jpeg,.png,.pdf,.heic,.heif" style="font-size:12px; color:var(--dark); width:100%;">
+                    </div>
                 </div>
             </form>
         </div>

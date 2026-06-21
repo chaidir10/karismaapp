@@ -90,19 +90,27 @@
         </div>
     </div>
 
-    <!-- Modal Safari (Manual Instruction) -->
-    <div id="safariModal" class="modal-overlay">
+    <!-- Modal Panduan Manual -->
+    <div id="manualModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 class="text-xl font-bold text-slate-800 mb-3">Tambahkan ke Layar Utama</h3>
-            <p class="text-slate-600 mb-4">
-                Untuk menginstal di iPhone atau iPad:
-            </p>
-            <ol class="text-left text-slate-700 space-y-2 text-sm">
-                <li>1️⃣ Tekan ikon <strong><i class="fa-solid fa-arrow-up-from-bracket"></i> Bagikan</strong> di Safari</li>
-                <li>2️⃣ Gulir ke bawah, pilih <strong>Tambahkan ke Layar Utama</strong></li>
-                <li>3️⃣ Tekan <strong>Tambahkan</strong> untuk menginstal</li>
-            </ol>
-            <button id="closeSafariModal" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition">Tutup</button>
+            <h3 class="text-xl font-bold text-slate-800 mb-3">Cara Install Aplikasi</h3>
+            <div id="manualChrome" style="display:none;">
+                <p class="text-slate-600 mb-4 text-sm">Ikuti langkah berikut di Chrome / Samsung Internet:</p>
+                <ol class="text-left text-slate-700 space-y-3 text-sm">
+                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">1</span><span>Tekan tombol <strong>menu ( &#8942; )</strong> di pojok kanan atas browser</span></li>
+                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">2</span><span>Pilih <strong>"Instal aplikasi"</strong> atau <strong>"Tambahkan ke Layar utama"</strong></span></li>
+                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">3</span><span>Tekan <strong>"Instal"</strong> untuk konfirmasi</span></li>
+                </ol>
+            </div>
+            <div id="manualSafari" style="display:none;">
+                <p class="text-slate-600 mb-4 text-sm">Ikuti langkah berikut di Safari:</p>
+                <ol class="text-left text-slate-700 space-y-3 text-sm">
+                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">1</span><span>Tekan ikon <strong>Bagikan</strong> (kotak dengan panah ke atas) di bawah layar</span></li>
+                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">2</span><span>Gulir ke bawah, pilih <strong>"Tambahkan ke Layar Utama"</strong></span></li>
+                    <li class="flex items-start gap-3"><span class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0 text-xs">3</span><span>Tekan <strong>"Tambahkan"</strong> untuk konfirmasi</span></li>
+                </ol>
+            </div>
+            <button id="closeManualModal" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition font-semibold">Mengerti</button>
         </div>
     </div>
 
@@ -110,10 +118,9 @@
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
         const installModal = document.getElementById('installModal');
-        const safariModal = document.getElementById('safariModal');
+        const manualModal = document.getElementById('manualModal');
         const confirmInstallBtn = document.getElementById('confirmInstall');
         const cancelInstallBtn = document.getElementById('cancelInstall');
-        const closeSafariModal = document.getElementById('closeSafariModal');
 
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
@@ -126,39 +133,58 @@
             setTimeout(() => modal.style.display = 'none', 300);
         }
 
-        if (isSafari) {
-            // Safari → tampilkan panduan manual
-            installBtn.addEventListener('click', () => showModal(safariModal));
-            closeSafariModal.addEventListener('click', () => hideModal(safariModal));
-        } else {
-            // Chrome / Edge / Brave → gunakan beforeinstallprompt
-            window.addEventListener("beforeinstallprompt", (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-            });
+        function showManualGuide() {
+            if (isSafari) {
+                document.getElementById('manualSafari').style.display = 'block';
+                document.getElementById('manualChrome').style.display = 'none';
+            } else {
+                document.getElementById('manualChrome').style.display = 'block';
+                document.getElementById('manualSafari').style.display = 'none';
+            }
+            showModal(manualModal);
+        }
 
-            installBtn.addEventListener("click", () => {
-                if (deferredPrompt) showModal(installModal);
-                else alert("Gunakan menu browser → 'Tambahkan ke layar utama'");
-            });
+        document.getElementById('closeManualModal').addEventListener('click', () => hideModal(manualModal));
 
-            confirmInstallBtn.addEventListener("click", async () => {
-                hideModal(installModal);
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === "accepted") {
-                    installBtn.textContent = "Aplikasi Terinstal ✅";
-                    installBtn.disabled = true;
-                }
-                deferredPrompt = null;
-            });
+        // Capture native install prompt (Chrome/Edge/Brave)
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
 
-            cancelInstallBtn.addEventListener("click", () => hideModal(installModal));
+        installBtn.addEventListener("click", () => {
+            if (deferredPrompt) {
+                showModal(installModal);
+            } else {
+                showManualGuide();
+            }
+        });
 
-            window.addEventListener("appinstalled", () => {
-                installBtn.textContent = "Aplikasi Terinstal ✅";
-                hideModal(installModal);
-            });
+        confirmInstallBtn.addEventListener("click", async () => {
+            hideModal(installModal);
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === "accepted") {
+                installBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Aplikasi Terinstal';
+                installBtn.disabled = true;
+                installBtn.style.opacity = '0.7';
+            }
+            deferredPrompt = null;
+        });
+
+        cancelInstallBtn.addEventListener("click", () => hideModal(installModal));
+
+        window.addEventListener("appinstalled", () => {
+            installBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Aplikasi Terinstal';
+            installBtn.disabled = true;
+            installBtn.style.opacity = '0.7';
+            hideModal(installModal);
+        });
+
+        // Register SW from download page
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ asset('public/pwa/service-worker.js') }}", { scope: '/' });
         }
     </script>
 </body>
