@@ -28,14 +28,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Dark scrollbar */
-        @media (prefers-color-scheme: dark) {
-            * { scrollbar-color: #334155 #1e293b; }
-            ::-webkit-scrollbar { width:8px; height:8px; }
-            ::-webkit-scrollbar-track { background:#1e293b; }
-            ::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
-            ::-webkit-scrollbar-thumb:hover { background:#475569; }
-        }
+        /* Scrollbar styling */
+        * { scrollbar-width:thin; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:20px; }
+        ::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
 
         * {
             font-family: 'Poppins', sans-serif;

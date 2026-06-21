@@ -101,13 +101,14 @@
             min-height: 100vh;
         }
 
-        /* Dark scrollbar */
-        [data-theme="dark"] * {
-            scrollbar-color: #334155 #141b2d;
-        }
-        [data-theme="dark"] ::-webkit-scrollbar { width:8px; height:8px; }
-        [data-theme="dark"] ::-webkit-scrollbar-track { background:#141b2d; }
-        [data-theme="dark"] ::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
+        /* Scrollbar styling */
+        * { scrollbar-width:thin; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:20px; }
+        ::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
+        [data-theme="dark"] * { scrollbar-color:#334155 transparent; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background:#334155; }
         [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background:#475569; }
 
         /* Sidebar styling - FIXED */

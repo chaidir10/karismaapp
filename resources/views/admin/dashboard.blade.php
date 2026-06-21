@@ -45,11 +45,6 @@
         background: transparent;
     }
 
-    /* Scrollbar dark mode */
-    [data-theme="dark"] .card-content::-webkit-scrollbar { width: 6px; }
-    [data-theme="dark"] .card-content::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 3px; }
-    [data-theme="dark"] .card-content::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
-    [data-theme="dark"] .card-content { scrollbar-color: var(--gray-300) var(--gray-100); }
 
     .dashboard-header {
         margin-bottom: 30px;
