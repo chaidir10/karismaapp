@@ -29,7 +29,7 @@
     }
     .drag-handle:active { cursor: grabbing; color: #94a3b8; }
     .p-card .p-thumb {
-        width: 120px; height: 80px; border-radius: 12px; flex-shrink: 0;
+        width: 180px; height: 90px; border-radius: 12px; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
         font-size: 24px; color: #fff; background-size: contain; background-position: center; background-repeat: no-repeat;
         background-color: var(--dm-card, #f1f5f9);
