@@ -1521,16 +1521,12 @@
         if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
         if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
 
-        // Enable button immediately — don't block user
-        if (submitBtn) submitBtn.disabled = false;
+        // Disable button while loading
+        if (submitBtn) submitBtn.disabled = true;
         if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; }
 
-        // Timeout: if face detection doesn't start in 6s, give up gracefully
-        var initTimeout = setTimeout(function() {
-            if (!_faceDetectionActive) {
-                enableWithoutDetection(statusEl);
-            }
-        }, 6000);
+        // MediaPipe timeout — if no result after 10s, try face-api.js
+        var mpTimeout = null;
 
         // Try MediaPipe
         if (typeof FaceDetection !== 'undefined') {
@@ -1540,8 +1536,16 @@
                 });
                 mpFaceDetector.setOptions({ model: 'short', minDetectionConfidence: 0.6 });
 
+                mpTimeout = setTimeout(function() {
+                    if (!_faceDetectionActive) {
+                        if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
+                        if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
+                        tryFaceApi(video, submitBtn, statusEl);
+                    }
+                }, 10000);
+
                 mpFaceDetector.onResults(function(results) {
-                    if (!_faceDetectionActive) { _faceDetectionActive = true; clearTimeout(initTimeout); }
+                    if (!_faceDetectionActive) { _faceDetectionActive = true; if (mpTimeout) clearTimeout(mpTimeout); }
                     _faceDetecting = false;
                     if (!videoStream) return;
                     var found = results.detections && results.detections.length > 0 && isFaceInGuide(results.detections[0].boundingBox, video);
@@ -1558,13 +1562,18 @@
             } catch(e) {}
         }
 
-        // Try face-api.js
+        // MediaPipe not available, try face-api.js directly
+        tryFaceApi(video, submitBtn, statusEl);
+    }
+
+    function tryFaceApi(video, submitBtn, statusEl) {
+        if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...'; }
+
         if (typeof faceapi !== 'undefined') {
             (async function() {
                 try {
                     await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/');
                     _faceDetectionActive = true;
-                    clearTimeout(initTimeout);
                     var opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 });
                     _faceDetectTimer = setInterval(async function() {
                         if (!videoStream || _faceDetecting) return;
@@ -1578,29 +1587,26 @@
                         _faceDetecting = false;
                     }, 500);
                 } catch(e) {
-                    enableWithoutDetection(statusEl);
+                    showFaceDetectionError(statusEl);
                 }
             })();
             return;
         }
 
-        // Nothing available
-        clearTimeout(initTimeout);
-        enableWithoutDetection(statusEl);
+        // Both engines unavailable
+        showFaceDetectionError(statusEl);
     }
 
-    function enableWithoutDetection(statusEl) {
+    function showFaceDetectionError(statusEl) {
         if (_faceDetectTimer) { clearInterval(_faceDetectTimer); _faceDetectTimer = null; }
         if (mpFaceDetector) { try { mpFaceDetector.close(); } catch(e) {} mpFaceDetector = null; }
-        faceDetected = true; // allow submit
+        faceDetected = false;
         var submitBtn = document.querySelector('.submit-btn-large');
-        if (submitBtn) submitBtn.disabled = false;
+        if (submitBtn) submitBtn.disabled = true;
         if (statusEl) {
-            statusEl.className = 'face-status face-ok';
-            statusEl.innerHTML = '<i class="fas fa-camera"></i> Pastikan wajah terlihat jelas';
+            statusEl.className = 'face-status no-face';
+            statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Face detection gagal. <span onclick="location.reload()" style="text-decoration:underline;cursor:pointer;font-weight:700;">Refresh</span>';
         }
-        var ovalEl = document.getElementById('faceGuideOval');
-        if (ovalEl) ovalEl.classList.add('detected');
     }
 
     function isFaceInGuide(bb, video) {
