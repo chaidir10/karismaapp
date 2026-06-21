@@ -176,6 +176,7 @@
             this.clear();
         },
     });
+    ts.clear();
 
     // Fungsi untuk menampilkan notifikasi
     function showNotification(message, type) {

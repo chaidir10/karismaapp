@@ -71,20 +71,36 @@
     /* Statistics Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
     }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
 
     .stat-card {
         background: var(--white);
         padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        border-left: 4px solid var(--primary);
+        gap: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        border: 1px solid var(--gray-200);
+        -webkit-tap-highlight-color: transparent;
+    }
+    .stat-card:active { opacity: 0.85; }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
     }
 
     .stat-content {
@@ -92,10 +108,10 @@
     }
 
     .stat-value {
-        font-size: 28px;
-        font-weight: 700;
+        font-size: 24px;
+        font-weight: 800;
         color: var(--dark);
-        margin: 0 0 5px 0;
+        margin: 0 0 2px 0;
         line-height: 1;
     }
 
@@ -692,33 +708,42 @@
 
     {{-- Statistics Cards --}}
     <div class="stats-grid">
-        <div class="stat-card" style="border-left-color:#10b981;">
+        <a href="#presensiHariIniSection" class="stat-card">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">
+                <i class="fas fa-user-check"></i>
+            </div>
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahHadir ?? 0 }}</h3>
                 <p class="stat-label">Hadir Hari Ini</p>
             </div>
-            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
-                <i class="fas fa-user-check"></i>
+        </a>
+        <a href="{{ route('admin.manajemenpegawai.index') }}" class="stat-card">
+            <div class="stat-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">
+                <i class="fas fa-user-group"></i>
             </div>
-        </div>
-        <div class="stat-card">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
                 <p class="stat-label">Total Pegawai</p>
             </div>
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
+        </a>
+        <a href="#pengajuanPendingSection" class="stat-card">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">
+                <i class="fas fa-paper-plane"></i>
             </div>
-        </div>
-        <div class="stat-card" style="border-left-color:#f59e0b;">
             <div class="stat-content">
                 <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
                 <p class="stat-label">Pengajuan Pending</p>
             </div>
-            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">
-                <i class="fas fa-file-alt"></i>
+        </a>
+        <a href="#lemburHariIniSection" class="stat-card">
+            <div class="stat-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">
+                <i class="fas fa-bolt"></i>
             </div>
-        </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ $lemburHariIni->where('jenis','masuk')->count() }}</h3>
+                <p class="stat-label">Lembur Hari Ini</p>
+            </div>
+        </a>
     </div>
 
     {{-- Grafik + Performa --}}
@@ -843,7 +868,7 @@
         </div>
 
         {{-- Pengajuan Pending --}}
-        <div class="content-card">
+        <div class="content-card" id="pengajuanPendingSection">
             <div class="card-header">
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) }} menunggu</span>
@@ -914,7 +939,7 @@
         </div>
 
         {{-- Presensi Hari Ini --}}
-        <div class="content-card">
+        <div class="content-card" id="presensiHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Daftar Presensi Hari Ini</h2>
                 <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
@@ -983,7 +1008,7 @@
         </div>
 
         {{-- Lembur Hari Ini --}}
-        <div class="content-card">
+        <div class="content-card" id="lemburHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Lembur Hari Ini</h2>
                 <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburHariIni->where('jenis','masuk')->count() }} pegawai</span>
