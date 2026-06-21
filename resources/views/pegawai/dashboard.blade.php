@@ -229,11 +229,11 @@
             {{ $masukDisabled ? 'background:var(--gray-light); color:var(--gray); opacity:0.6; cursor:not-allowed;' : 'background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 14px rgba(90,182,234,0.3);' }}"
             @if(!$masukDisabled)
                 @if($user->can_shift && $shifts->count() > 0)
-                    data-bs-toggle="modal" data-bs-target="#shiftPickerModal"
+                    onclick="setJenis('masuk'); setLembur(false); openSimpleModal('shiftPickerModal')"
                 @else
                     data-bs-toggle="modal" data-bs-target="#presensiModal"
+                    onclick="setJenis('masuk'); setLembur(false)"
                 @endif
-                onclick="setJenis('masuk'); setLembur(false)"
             @endif
             {{ $masukDisabled ? 'disabled' : '' }}>
             <i class="fas {{ $sudahPresensiMasuk ? 'fa-check-circle' : 'fa-arrow-right-to-bracket' }}" style="font-size:20px;"></i>
@@ -378,7 +378,7 @@
         ->where('tanggal', now()->format('Y-m-d'))
         ->where('jenis', 'masuk')->where('is_lembur', true)->first();
 @endphp
-<button class="lembur-fab lembur-active" data-bs-toggle="modal" data-bs-target="#confirmLemburModal">
+<button class="lembur-fab lembur-active" onclick="openLemburConfirm()">
     <div class="lembur-fab-icon pulse"><i class="fas fa-bolt"></i></div>
     <div class="lembur-fab-text">
         <span class="lembur-fab-label">Selesai Lembur</span>
@@ -535,52 +535,40 @@
 @endforeach
 
 {{-- Modal Peringatan Jam Kerja Belum Terpenuhi --}}
-<div class="modal fade" id="earlyPulangModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:20px; border:none;">
-            <div class="modal-body p-4 text-center">
-                <div style="width:56px;height:56px;background:#fef3c7;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size:24px;color:#f59e0b;"></i>
-                </div>
-                <h5 style="font-weight:700; font-size:16px; margin-bottom:8px;">Jam Kerja Belum Terpenuhi</h5>
-                <p style="font-size:13px; color:var(--gray-dark); margin-bottom:16px;" id="earlyPulangMsg">Apakah Anda yakin ingin absen pulang?</p>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-secondary" style="flex:1;" data-bs-dismiss="modal">Batal</button>
-                    <button style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;"
-                        onclick="proceedPulang()">Ya, Pulang</button>
-                </div>
-            </div>
+<div id="earlyPulangModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('earlyPulangModal')">
+    <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
+        <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--warning);"></i>
+        </div>
+        <h5 style="font-weight:700; font-size:16px; margin-bottom:8px; color:var(--dark);">Jam Kerja Belum Terpenuhi</h5>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:16px;" id="earlyPulangMsg">Apakah Anda yakin ingin absen pulang?</p>
+        <div style="display:flex; gap:10px;">
+            <button onclick="closeSimpleModal('earlyPulangModal')" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">Batal</button>
+            <button onclick="proceedPulang()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Pulang</button>
         </div>
     </div>
 </div>
 
 {{-- Modal Konfirmasi Selesai Lembur --}}
-<div class="modal fade" id="confirmLemburModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:20px; border:none;">
-            <div class="modal-body p-4 text-center">
-                <div style="width:56px;height:56px;background:#d1fae5;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-                    <i class="fas fa-bolt" style="font-size:24px;color:#10b981;"></i>
-                </div>
-                <h5 style="font-weight:700; font-size:16px; margin-bottom:8px;">Selesai Lembur</h5>
-                <p style="font-size:13px; color:var(--gray-dark); margin-bottom:16px;">Yakin ingin mengakhiri lembur?</p>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-secondary" style="flex:1;" data-bs-dismiss="modal">Batal</button>
-                    <button style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-weight:600; font-size:14px; cursor:pointer;"
-                        onclick="proceedSelesaiLembur()">Ya, Selesai</button>
-                </div>
-            </div>
+<div id="confirmLemburModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeLemburConfirm()">
+    <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
+        <div style="width:56px;height:56px;background:var(--success-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <i class="fas fa-bolt" style="font-size:24px;color:var(--success);"></i>
+        </div>
+        <h5 style="font-weight:700; font-size:16px; margin-bottom:8px; color:var(--dark);">Selesai Lembur</h5>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:16px;">Yakin ingin mengakhiri lembur?</p>
+        <div style="display:flex; gap:10px;">
+            <button onclick="closeLemburConfirm()" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">Batal</button>
+            <button onclick="proceedSelesaiLembur()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Selesai</button>
         </div>
     </div>
 </div>
 
 {{-- Modal Pilih Shift --}}
 @if($user->can_shift && $shifts->count() > 0)
-<div class="modal fade" id="shiftPickerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:20px; border:none;">
-            <div class="modal-body p-4">
-                <h5 style="font-weight:700; font-size:16px; text-align:center; margin-bottom:16px;">Pilih Jadwal Kerja</h5>
+<div id="shiftPickerModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('shiftPickerModal')">
+    <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:380px;">
+                <h5 style="font-weight:700; font-size:16px; text-align:center; margin-bottom:16px; color:var(--dark);">Pilih Jadwal Kerja</h5>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     <button class="shift-pick-btn" onclick="pickShift('')"
                         style="padding:14px; border-radius:12px; border:2px solid var(--gray-light); background:var(--white); font-size:14px; font-weight:500; cursor:pointer; text-align:left; transition:all 0.2s;">
@@ -595,8 +583,6 @@
                     </button>
                     @endforeach
                 </div>
-            </div>
-        </div>
     </div>
 </div>
 @endif
@@ -657,42 +643,34 @@
 </div>
 
 <!-- Modal Konfirmasi Presensi (Luar Radius) -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden; background:var(--card-bg);">
-            <div style="padding:24px 24px 0; text-align:center;">
-                <div style="width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
-                    <i class="fas fa-map-marker-alt" style="font-size:22px; color:#fff;"></i>
-                </div>
-                <h5 style="font-weight:700; font-size:17px; color:var(--dark); margin-bottom:6px;">Di Luar Wilayah Kerja</h5>
-                <p style="font-size:13px; color:var(--gray); margin-bottom:16px; line-height:1.5;">Presensi di luar radius memerlukan persetujuan admin</p>
-
-                <div style="background:var(--light); border-radius:14px; padding:14px; text-align:left; margin-bottom:16px; border:1px solid var(--card-border);">
-                    <div style="display:flex; gap:16px; margin-bottom:10px;">
-                        <div style="flex:1;">
-                            <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Jenis</div>
-                            <div id="confirmationJenis" style="font-size:14px; font-weight:700; color:var(--dark);"></div>
-                        </div>
-                        <div style="flex:1;">
-                            <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Waktu</div>
-                            <div id="confirmationWaktu" style="font-size:14px; font-weight:700; color:var(--dark);"></div>
-                        </div>
+<div id="confirmationModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('confirmationModal')">
+    <div style="background:var(--card-bg); border-radius:20px; width:90%; max-width:380px; overflow:hidden;">
+        <div style="padding:24px 24px 0; text-align:center;">
+            <div style="width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                <i class="fas fa-location-dot" style="font-size:22px; color:#fff;"></i>
+            </div>
+            <h5 style="font-weight:700; font-size:17px; color:var(--dark); margin-bottom:6px;">Di Luar Wilayah Kerja</h5>
+            <p style="font-size:13px; color:var(--gray); margin-bottom:16px; line-height:1.5;">Presensi di luar radius memerlukan persetujuan admin</p>
+            <div style="background:var(--light); border-radius:14px; padding:14px; text-align:left; margin-bottom:16px; border:1px solid var(--card-border);">
+                <div style="display:flex; gap:16px; margin-bottom:10px;">
+                    <div style="flex:1;">
+                        <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Jenis</div>
+                        <div id="confirmationJenis" style="font-size:14px; font-weight:700; color:var(--dark);"></div>
                     </div>
-                    <div>
-                        <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Lokasi</div>
-                        <div id="confirmationLokasi" style="font-size:12px; color:var(--gray-dark); line-height:1.4;"></div>
+                    <div style="flex:1;">
+                        <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Waktu</div>
+                        <div id="confirmationWaktu" style="font-size:14px; font-weight:700; color:var(--dark);"></div>
                     </div>
                 </div>
+                <div>
+                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Lokasi</div>
+                    <div id="confirmationLokasi" style="font-size:12px; color:var(--gray-dark); line-height:1.4;"></div>
+                </div>
             </div>
-
-            <div style="display:flex; gap:10px; padding:0 24px 24px;">
-                <button type="button" data-bs-dismiss="modal" style="flex:1; padding:14px; border-radius:14px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">
-                    Batal
-                </button>
-                <button type="button" onclick="prosesPresensi()" id="confirmPresensiBtn" style="flex:1; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">
-                    Ya, Presensi
-                </button>
-            </div>
+        </div>
+        <div style="display:flex; gap:10px; padding:0 24px 24px;">
+            <button type="button" onclick="closeSimpleModal('confirmationModal')" style="flex:1; padding:14px; border-radius:14px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">Batal</button>
+            <button type="button" onclick="prosesPresensi()" id="confirmPresensiBtn" style="flex:1; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Presensi</button>
         </div>
     </div>
 </div>
@@ -746,25 +724,14 @@
 </div> -->
 
 <!-- Modal Peringatan Belum Presensi Masuk -->
-<div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-2xl">
-            <div class="modal-body p-0">
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Presensi Masuk</h3>
-                    <p class="text-gray-600 mb-4">Anda belum melakukan presensi masuk hari ini. Silakan lakukan presensi masuk terlebih dahulu sebelum presensi pulang.</p>
-                </div>
-
-                <div class="border-t border-gray-200">
-                    <button type="button" class="w-full py-4 bg-yellow-500 text-white font-medium hover:bg-yellow-600 rounded-b-2xl transition-colors" data-bs-dismiss="modal">
-                        <i class="fas fa-check mr-2"></i>Mengerti
-                    </button>
-                </div>
-            </div>
+<div id="warningModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('warningModal')">
+    <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
+        <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--warning);"></i>
         </div>
+        <h5 style="font-weight:700; font-size:16px; margin-bottom:8px; color:var(--dark);">Belum Presensi Masuk</h5>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:16px; line-height:1.5;">Silakan lakukan presensi masuk terlebih dahulu sebelum presensi pulang.</p>
+        <button onclick="closeSimpleModal('warningModal')" style="width:100%; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Mengerti</button>
     </div>
 </div>
 
@@ -1177,13 +1144,14 @@
         if (el) el.value = val ? '1' : '0';
     }
 
+    function openSimpleModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeSimpleModal(id) { document.getElementById(id).style.display = 'none'; }
+
     function pickShift(shiftId) {
         document.getElementById('jamShiftIdInput').value = shiftId;
-        var shiftModal = bootstrap.Modal.getInstance(document.getElementById('shiftPickerModal'));
-        if (shiftModal) shiftModal.hide();
+        closeSimpleModal('shiftPickerModal');
         setTimeout(function() {
-            var presensiModal = new bootstrap.Modal(document.getElementById('presensiModal'));
-            presensiModal.show();
+            new bootstrap.Modal(document.getElementById('presensiModal')).show();
         }, 300);
     }
 
@@ -1290,7 +1258,7 @@
     function handlePulangWithCheck() {
         if (!sudahPresensiMasuk) {
             if (window.bootstrap?.Modal) {
-                new bootstrap.Modal(document.getElementById('warningModal')).show();
+                openSimpleModal('warningModal');
             }
             return;
         }
@@ -1307,18 +1275,23 @@
             if (msg) {
                 msg.textContent = 'Jam kerja hari ini belum terpenuhi (' + (clockEl ? clockEl.textContent : '') + '). Apakah yakin ingin absen pulang?';
             }
-            new bootstrap.Modal(document.getElementById('earlyPulangModal')).show();
+            openSimpleModal('earlyPulangModal');
         } else {
             new bootstrap.Modal(document.getElementById('presensiModal')).show();
         }
     }
 
+    function openLemburConfirm() {
+        document.getElementById('confirmLemburModal').style.display = 'flex';
+    }
+    function closeLemburConfirm() {
+        document.getElementById('confirmLemburModal').style.display = 'none';
+    }
+
     function proceedSelesaiLembur() {
         setJenis('pulang');
         setLembur(true);
-
-        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmLemburModal'));
-        if (confirmModal) confirmModal.hide();
+        closeLemburConfirm();
 
         setTimeout(function() {
             new bootstrap.Modal(document.getElementById('presensiModal')).show();
@@ -1326,8 +1299,7 @@
     }
 
     function proceedPulang() {
-        var modal = bootstrap.Modal.getInstance(document.getElementById('earlyPulangModal'));
-        if (modal) modal.hide();
+        closeSimpleModal('earlyPulangModal');
         setTimeout(function() {
             new bootstrap.Modal(document.getElementById('presensiModal')).show();
         }, 300);
@@ -1335,12 +1307,7 @@
 
     function handlePulangClick() {
         if (!sudahPresensiMasuk) {
-            if (window.bootstrap?.Modal) {
-                const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
-                warningModal.show();
-            } else {
-                alert('Bootstrap JS belum termuat.');
-            }
+            openSimpleModal('warningModal');
             return false;
         }
         setJenis('pulang');
@@ -1861,10 +1828,7 @@
             confirmBtn.disabled = false;
         }
 
-        if (window.bootstrap?.Modal) {
-            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-            confirmationModal.show();
-        }
+        openSimpleModal('confirmationModal');
     }
 
     function langsungProsesPresensi() {
@@ -1902,8 +1866,7 @@
             const form = document.getElementById('formPresensi');
             if (form) form.submit();
 
-            const confirmationModal = window.bootstrap?.Modal?.getInstance(document.getElementById('confirmationModal'));
-            if (confirmationModal) confirmationModal.hide();
+            closeSimpleModal('confirmationModal');
 
             const presensiModal = window.bootstrap?.Modal?.getInstance(document.getElementById('presensiModal'));
             if (presensiModal) presensiModal.hide();
