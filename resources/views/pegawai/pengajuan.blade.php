@@ -215,7 +215,6 @@
                         <option value="">-- Pilih Jenis --</option>
                         <option value="masuk">Masuk</option>
                         <option value="pulang">Pulang</option>
-                        <option value="keduanya">Keduanya</option>
                     </select>
                 </div>
 
@@ -223,6 +222,12 @@
                 <div style="margin-bottom:14px;">
                     <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal</label>
                     <input type="date" name="tanggal" id="tanggal" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                </div>
+
+                <!-- Waktu -->
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Waktu</label>
+                    <input type="time" name="waktu" id="waktuPengajuan" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
                 </div>
 
                 <!-- Alasan -->

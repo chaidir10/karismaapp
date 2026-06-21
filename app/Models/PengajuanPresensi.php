@@ -12,6 +12,7 @@ class PengajuanPresensi extends Model
         'user_id',
         'jenis',
         'tanggal',
+        'waktu',
         'alasan',
         'bukti',
         'status',

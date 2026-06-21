@@ -27,16 +27,14 @@ class PengajuanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis'   => 'required|in:masuk,pulang,keduanya',
+            'jenis'   => 'required|in:masuk,pulang',
             'tanggal' => 'required|date',
+            'waktu'   => 'required|date_format:H:i',
             'alasan'  => 'required|string|max:255',
             'bukti'   => 'required|mimes:jpg,jpeg,png,webp,gif,bmp,tiff,heic,heif,pdf|max:2048',
         ]);
 
-        // default null
         $path = null;
-
-        // hanya simpan file kalau ada
         if ($request->hasFile('bukti')) {
             $path = $request->file('bukti')->store('bukti_pengajuan', 'public');
         }
@@ -45,8 +43,9 @@ class PengajuanController extends Controller
             'user_id' => Auth::id(),
             'jenis'   => $request->jenis,
             'tanggal' => $request->tanggal,
+            'waktu'   => $request->waktu,
             'alasan'  => $request->alasan,
-            'bukti'   => $path, // bisa null kalau tidak upload
+            'bukti'   => $path,
             'status'  => 'pending',
         ]);
 
