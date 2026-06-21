@@ -134,14 +134,17 @@
 <!-- Detail Modal — Fullscreen -->
 <div id="pengajuanDetailModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
     <div style="display:flex; flex-direction:column; height:100%;">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
-            <button onclick="closeDetailModal()" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
-                <i class="fas fa-chevron-left"></i> Kembali
-            </button>
-            <span style="font-size:15px; font-weight:700; color:var(--dark);" id="modalPengajuanJenis">Detail Pengajuan</span>
-            <div style="width:70px; display:flex; justify-content:flex-end;">
-                <span class="detail-status-badge" id="modalPengajuanStatus" style="background:var(--primary-soft); color:var(--primary-dark); font-size:11px; padding:3px 10px; border-radius:8px; font-weight:600;">-</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="detail-icon-box" id="modalPengajuanIconBox"></div>
+                <div>
+                    <div class="detail-title" id="modalPengajuanJenis">-</div>
+                    <div class="detail-subtitle"><span class="detail-status-badge" id="modalPengajuanStatus" style="background:var(--primary-soft); color:var(--primary-dark);">-</span></div>
+                </div>
             </div>
+            <button onclick="closeDetailModal()" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
+                <i class="fas fa-xmark"></i>
+            </button>
         </div>
         <div style="flex:1; overflow-y:auto; padding:16px;">
             <!-- Bukti Preview -->
@@ -177,6 +180,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeDetailModal()" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
+            </button>
         </div>
     </div>
 </div>

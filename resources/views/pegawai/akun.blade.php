@@ -137,32 +137,32 @@
     /* Photo Crop Modal (WA-style) */
     .crop-modal {
         display:none; position:fixed; inset:0; background:#000; z-index:200;
-        flex-direction:column;
+        flex-direction:column; align-items:center; justify-content:center;
     }
     .crop-modal.visible { display:flex; }
     .crop-header {
-        position:relative; z-index:2;
+        position:absolute; top:0; left:0; right:0; z-index:2;
         display:flex; align-items:center; justify-content:space-between;
-        padding:14px 16px; flex-shrink:0;
+        padding:14px 16px;
     }
     .crop-header button { background:none; border:none; color:#fff; font-size:14px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .crop-area {
-        position:relative; width:100%; flex:1;
+        position:relative; width:100%; flex:1; display:flex; align-items:center; justify-content:center;
         overflow:hidden; touch-action:none;
     }
     .crop-area img {
         position:absolute; max-width:none; -webkit-user-drag:none; user-select:none; cursor:move;
     }
-    .crop-circle-overlay {
+    .crop-circle-mask {
         position:absolute; inset:0; z-index:1; pointer-events:none;
     }
     .crop-footer {
-        position:relative; z-index:2;
+        position:absolute; bottom:0; left:0; right:0; z-index:2;
         display:flex; align-items:center; justify-content:center; gap:16px;
-        padding:16px 16px 30px; flex-shrink:0;
+        padding:20px 16px 30px;
     }
     .crop-footer span { color:rgba(255,255,255,0.5); font-size:14px; }
-    .crop-footer input[type="range"] { width:180px; accent-color:#fff; }
+    .crop-footer input[type="range"] { width:160px; accent-color:#fff; }
 
     @keyframes modalSlideIn {
         from { opacity:0; transform:translateY(30px); }
@@ -366,7 +366,16 @@
     </div>
     <div class="crop-area" id="cropArea">
         <img id="cropImg" src="" alt="" draggable="false">
-        <canvas id="cropOverlay" class="crop-circle-overlay"></canvas>
+        <svg class="crop-circle-mask" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+                <mask id="circleMask">
+                    <rect width="100" height="100" fill="white"/>
+                    <circle cx="50" cy="50" r="36" fill="black"/>
+                </mask>
+            </defs>
+            <rect width="100" height="100" fill="rgba(0,0,0,0.6)" mask="url(#circleMask)"/>
+            <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>
+        </svg>
     </div>
     <div class="crop-footer">
         <span><i class="fas fa-magnifying-glass-minus"></i></span>
@@ -405,35 +414,10 @@
         document.getElementById('theme-icon-moon').style.display = theme === 'dark' ? 'inline' : 'none';
     });
 
-    // Crop system
-    var crop = { dragging:false, sx:0, sy:0, ix:0, iy:0, zoom:100, file:null, pinchDist:0, circleSize:0, circleCx:0, circleCy:0 };
+    // WA-style crop
+    var crop = { dragging:false, sx:0, sy:0, ix:0, iy:0, zoom:150, file:null, pinchDist:0 };
     var cropArea = document.getElementById('cropArea');
     var cropImg = document.getElementById('cropImg');
-    var cropOverlay = document.getElementById('cropOverlay');
-
-    function drawOverlay() {
-        var rect = cropArea.getBoundingClientRect();
-        var w = rect.width, h = rect.height;
-        cropOverlay.width = w; cropOverlay.height = h;
-        var ctx = cropOverlay.getContext('2d');
-        var size = Math.min(w, h) * 0.72;
-        crop.circleSize = size;
-        crop.circleCx = w / 2;
-        crop.circleCy = h / 2;
-
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(0, 0, w, h);
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(crop.circleCx, crop.circleCy, size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(crop.circleCx, crop.circleCy, size / 2, 0, Math.PI * 2);
-        ctx.stroke();
-    }
 
     function onPhotoSelected(input) {
         if (!input.files || !input.files[0]) return;
@@ -441,40 +425,41 @@
         var reader = new FileReader();
         reader.onload = function(e) {
             cropImg.src = e.target.result;
-            crop.zoom = 100; crop.ix = 0; crop.iy = 0;
-            document.getElementById('zoomSlider').value = 100;
-            cropImg.onload = function() {
-                drawOverlay();
-                fitAndCenter();
-            };
+            crop.zoom = 150; crop.ix = 0; crop.iy = 0;
+            document.getElementById('zoomSlider').value = 150;
+            cropImg.onload = function() { centerCrop(); };
             document.getElementById('cropModal').classList.add('visible');
         };
         reader.readAsDataURL(crop.file);
     }
 
-    function fitAndCenter() {
-        var rect = cropArea.getBoundingClientRect();
-        var natW = cropImg.naturalWidth, natH = cropImg.naturalHeight;
-        var minDim = crop.circleSize;
-        var baseScale = Math.max(minDim / natW, minDim / natH);
-        crop._baseScale = baseScale;
-        applyTransform();
-    }
-
-    function applyTransform() {
-        var rect = cropArea.getBoundingClientRect();
-        var natW = cropImg.naturalWidth, natH = cropImg.naturalHeight;
-        var scale = crop._baseScale * (crop.zoom / 100);
-        var w = natW * scale, h = natH * scale;
+    function centerCrop() {
+        var area = cropArea.getBoundingClientRect();
+        var scale = crop.zoom / 100;
+        var w = area.width * scale;
+        var h = (cropImg.naturalHeight / cropImg.naturalWidth) * w;
         cropImg.style.width = w + 'px';
         cropImg.style.height = h + 'px';
-        cropImg.style.left = (rect.width / 2 - w / 2 + crop.ix) + 'px';
-        cropImg.style.top = (rect.height / 2 - h / 2 + crop.iy) + 'px';
+        crop.ix = (area.width - w) / 2;
+        crop.iy = (area.height - h) / 2;
+        cropImg.style.left = crop.ix + 'px';
+        cropImg.style.top = crop.iy + 'px';
+    }
+
+    function applyCrop() {
+        var area = cropArea.getBoundingClientRect();
+        var scale = crop.zoom / 100;
+        var w = area.width * scale;
+        var h = (cropImg.naturalHeight / cropImg.naturalWidth) * w;
+        cropImg.style.width = w + 'px';
+        cropImg.style.height = h + 'px';
+        cropImg.style.left = crop.ix + 'px';
+        cropImg.style.top = crop.iy + 'px';
     }
 
     function onZoomChange(val) {
         crop.zoom = parseInt(val);
-        applyTransform();
+        centerCrop();
     }
 
     function cancelCrop() {
@@ -483,51 +468,16 @@
     }
 
     function confirmCrop() {
-        var rect = cropArea.getBoundingClientRect();
-        var natW = cropImg.naturalWidth, natH = cropImg.naturalHeight;
-        var scale = crop._baseScale * (crop.zoom / 100);
-        var imgW = natW * scale, imgH = natH * scale;
-        var imgLeft = rect.width / 2 - imgW / 2 + crop.ix;
-        var imgTop = rect.height / 2 - imgH / 2 + crop.iy;
-
-        var r = crop.circleSize / 2;
-        var cx = crop.circleCx, cy = crop.circleCy;
-        var srcX = (cx - r - imgLeft) / scale;
-        var srcY = (cy - r - imgTop) / scale;
-        var srcSize = crop.circleSize / scale;
-
-        var outSize = 400;
-        var canvas = document.createElement('canvas');
-        canvas.width = outSize; canvas.height = outSize;
-        var ctx = canvas.getContext('2d');
-
-        ctx.beginPath();
-        ctx.arc(outSize / 2, outSize / 2, outSize / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(cropImg, srcX, srcY, srcSize, srcSize, 0, 0, outSize, outSize);
-
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         document.getElementById('cropModal').classList.remove('visible');
-
         var avatarBox = document.getElementById('editAvatarPreview');
-        avatarBox.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
-
-        // Convert to file and set to hidden input
-        canvas.toBlob(function(blob) {
-            var f = new File([blob], 'profile.jpg', { type:'image/jpeg' });
-            var dt = new DataTransfer();
-            dt.items.add(f);
-            document.getElementById('fotoInput').files = dt.files;
-        }, 'image/jpeg', 0.85);
+        avatarBox.innerHTML = '<img src="' + cropImg.src + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
     }
 
-    // Drag (mouse)
+    // Drag
     cropArea.addEventListener('mousedown', function(e) { e.preventDefault(); crop.dragging = true; crop.sx = e.clientX - crop.ix; crop.sy = e.clientY - crop.iy; });
-    document.addEventListener('mousemove', function(e) { if (!crop.dragging) return; crop.ix = e.clientX - crop.sx; crop.iy = e.clientY - crop.sy; applyTransform(); });
+    document.addEventListener('mousemove', function(e) { if (!crop.dragging) return; crop.ix = e.clientX - crop.sx; crop.iy = e.clientY - crop.sy; applyCrop(); });
     document.addEventListener('mouseup', function() { crop.dragging = false; });
 
-    // Drag (touch)
     cropArea.addEventListener('touchstart', function(e) {
         if (e.touches.length === 1) {
             crop.dragging = true;
@@ -543,14 +493,14 @@
         if (e.touches.length === 1 && crop.dragging) {
             crop.ix = e.touches[0].clientX - crop.sx;
             crop.iy = e.touches[0].clientY - crop.sy;
-            applyTransform();
+            applyCrop();
         } else if (e.touches.length === 2) {
             var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
             var delta = dist - crop.pinchDist;
             crop.zoom = Math.max(100, Math.min(400, crop.zoom + delta * 0.5));
             crop.pinchDist = dist;
             document.getElementById('zoomSlider').value = crop.zoom;
-            applyTransform();
+            applyCrop();
         }
     }, { passive:true });
 
