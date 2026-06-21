@@ -1461,8 +1461,35 @@
         })
         .catch(function(err) {
             console.error(err);
-            showError("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.");
+            var statusEl = document.getElementById('faceStatus');
+            if (statusEl) {
+                statusEl.className = 'face-status no-face';
+                statusEl.innerHTML = '<i class="fas fa-camera-rotate"></i> Kamera gagal';
+            }
+            showCameraError();
         });
+    }
+
+    function showCameraError() {
+        var video = document.getElementById('video');
+        if (!video) return;
+        var parent = video.parentElement;
+        var existing = document.getElementById('cameraErrorOverlay');
+        if (existing) existing.remove();
+        var overlay = document.createElement('div');
+        overlay.id = 'cameraErrorOverlay';
+        overlay.style.cssText = 'position:absolute;inset:0;z-index:15;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;';
+        overlay.innerHTML = '<i class="fas fa-camera" style="font-size:32px;opacity:0.3;"></i>' +
+            '<div style="font-size:14px;font-weight:600;">Kamera tidak dapat diakses</div>' +
+            '<div style="font-size:11px;color:rgba(255,255,255,0.6);text-align:center;padding:0 20px;">Pastikan izin kamera diaktifkan, lalu coba lagi</div>' +
+            '<button onclick="retryCamera()" style="margin-top:8px;padding:10px 24px;border-radius:12px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;"><i class="fas fa-rotate-right"></i> Coba Lagi</button>';
+        parent.appendChild(overlay);
+    }
+
+    function retryCamera() {
+        var overlay = document.getElementById('cameraErrorOverlay');
+        if (overlay) overlay.remove();
+        initializeCamera();
     }
 
     // MediaPipe Face Detection — NO Camera utility (avoids stream conflict)
@@ -1553,11 +1580,21 @@
         if (submitBtn) submitBtn.disabled = true;
     }
 
+    function retryLocation() {
+        var addrEl = document.getElementById('location-address-mini');
+        if (addrEl) addrEl.textContent = 'Mendeteksi lokasi...';
+        var infoEl = document.getElementById('locationRadiusInfo');
+        if (infoEl) infoEl.innerHTML = '';
+        initializeLocation();
+    }
+
     function initializeLocation() {
-        const addrEl = document.getElementById('location-address-mini');
+        var addrEl = document.getElementById('location-address-mini');
 
         if (!navigator.geolocation) {
-            if (addrEl) addrEl.textContent = "Browser tidak mendukung geolokasi";
+            if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Browser tidak mendukung geolokasi</span>';
+            var infoEl = document.getElementById('locationRadiusInfo');
+            if (infoEl) infoEl.innerHTML = '<button onclick="location.reload()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Refresh Halaman</button>';
             initializeMiniMapWithDefault();
             return;
         }
@@ -1570,7 +1607,9 @@
             },
             err => {
                 console.error(err);
-                if (addrEl) addrEl.textContent = "Gagal mendapatkan lokasi (izin ditolak / GPS mati)";
+                if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Lokasi gagal dideteksi</span>';
+                var infoEl = document.getElementById('locationRadiusInfo');
+                if (infoEl) infoEl.innerHTML = '<button onclick="retryLocation()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Coba Lagi</button>';
                 initializeMiniMapWithDefault();
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
