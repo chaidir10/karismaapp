@@ -461,8 +461,7 @@
         align-items:center; justify-content:center; background:var(--gray-100);
         position:relative;
     }
-    .modal-col-content img { width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0; }
-    .modal-col-content iframe { position:absolute; inset:0; }
+    .modal-col-content.foto-wrapper > img { width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0; }
     [data-theme="dark"] .modal-col-content { background:rgba(255,255,255,0.03); }
     .modal-info-col {
         padding:16px; display:flex; flex-direction:column;
@@ -1457,13 +1456,18 @@
         });
     }
 
-    // Prevent scroll when clicking search
-    document.querySelectorAll('.card-search input').forEach(function(inp) {
-        inp.addEventListener('focus', function() {
-            var y = window.scrollY;
-            requestAnimationFrame(function() { window.scrollTo(0, y); });
+    // Table instances (must be before searchTable)
+    var tableInstances = {};
+
+    // Prevent scroll when clicking search (deferred to DOMContentLoaded)
+    function initSearchScroll() {
+        document.querySelectorAll('.card-search input').forEach(function(inp) {
+            inp.addEventListener('focus', function() {
+                var y = window.scrollY;
+                requestAnimationFrame(function() { window.scrollTo(0, y); });
+            });
         });
-    });
+    }
 
     function searchTable(input, tbodyId) {
         var query = input.value.toLowerCase().trim();
@@ -1933,8 +1937,6 @@
     }
 
     // ===== TABLE SORT + PAGINATION =====
-    var tableInstances = {};
-
     function initTable(tbodyId) {
         var tbody = document.getElementById(tbodyId);
         if (!tbody) return;
@@ -2037,6 +2039,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        try { initSearchScroll(); } catch(e) { console.error('initSearchScroll:', e); }
         initTable('presensiPendingTable');
         initTable('pengajuanPendingTable');
         initTable('cutiPendingTable');
