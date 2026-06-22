@@ -47,10 +47,23 @@
                         <div class="text-xs mt-1" style="color:var(--dm-muted,#64748b);">Wajah harus terdeteksi sebelum bisa absen. Jika dinonaktifkan, pegawai bisa langsung absen tanpa verifikasi wajah.</div>
                     </div>
                     <div class="relative ml-4 flex-shrink-0">
-                        <input type="checkbox" name="enable_face_detection" value="1" class="sr-only peer" {{ ($settings['enable_face_detection'] ?? '1') === '1' ? 'checked' : '' }}>
+                        <input type="checkbox" name="enable_face_detection" value="1" class="sr-only peer" id="toggleFaceDetect" {{ ($settings['enable_face_detection'] ?? '1') === '1' ? 'checked' : '' }}>
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                     </div>
                 </label>
+
+                @php $faceUserIds = json_decode($settings['face_detection_users'] ?? '[]', true) ?: []; @endphp
+                <div id="faceDetectUserSection" style="margin-top:12px; {{ ($settings['enable_face_detection'] ?? '1') !== '1' ? 'display:none;' : '' }}">
+                    <div class="text-xs mb-2" style="color:var(--dm-muted,#64748b);">Pilih pegawai yang wajib face detection. <strong>Kosongkan</strong> = semua pegawai wajib.</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; max-height:160px; overflow-y:auto;">
+                        @foreach(\App\Models\User::where('role','!=','superadmin')->orderBy('name')->get() as $pg)
+                        <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-size:12px; color:var(--dm-text,#374151); padding:4px 10px; border-radius:8px; background:var(--dm-bg,#f9fafb);">
+                            <input type="checkbox" name="face_detection_users[]" value="{{ $pg->id }}" {{ in_array($pg->id, $faceUserIds) ? 'checked' : '' }}>
+                            {{ $pg->name }}
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
 
                 <div class="pt-4" style="border-top:1px solid var(--dm-border,#e2e8f0);">
                     <label class="flex items-center justify-between cursor-pointer">
@@ -70,10 +83,23 @@
                             <div class="text-xs mt-1" style="color:var(--dm-muted,#64748b);">Halaman absen alternatif tanpa cache dan face detection. Aktifkan jika sistem utama mengalami gangguan.</div>
                         </div>
                         <div class="relative ml-4 flex-shrink-0">
-                            <input type="checkbox" name="enable_absen_darurat" value="1" class="sr-only peer" {{ ($settings['enable_absen_darurat'] ?? '0') === '1' ? 'checked' : '' }}>
+                            <input type="checkbox" name="enable_absen_darurat" value="1" class="sr-only peer" id="toggleDarurat" {{ ($settings['enable_absen_darurat'] ?? '0') === '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                         </div>
                     </label>
+
+                    @php $allowedIds = json_decode($settings['absen_darurat_users'] ?? '[]', true) ?: []; @endphp
+                    <div id="daruratUserSection" style="margin-top:12px; {{ ($settings['enable_absen_darurat'] ?? '0') !== '1' ? 'display:none;' : '' }}">
+                        <div class="text-xs mb-2" style="color:var(--dm-muted,#64748b);">Pilih pegawai yang boleh akses absen darurat. <strong>Kosongkan</strong> = semua pegawai boleh.</div>
+                        <div style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; max-height:160px; overflow-y:auto;">
+                            @foreach(\App\Models\User::where('role','!=','superadmin')->orderBy('name')->get() as $pg)
+                            <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-size:12px; color:var(--dm-text,#374151); padding:4px 10px; border-radius:8px; background:var(--dm-bg,#f9fafb);">
+                                <input type="checkbox" name="absen_darurat_users[]" value="{{ $pg->id }}" {{ in_array($pg->id, $allowedIds) ? 'checked' : '' }}>
+                                {{ $pg->name }}
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
                 </div>
             </div>
@@ -84,4 +110,14 @@
         </button>
     </form>
 </div>
+@push('scripts')
+<script>
+    document.getElementById('toggleDarurat').addEventListener('change', function() {
+        document.getElementById('daruratUserSection').style.display = this.checked ? '' : 'none';
+    });
+    document.getElementById('toggleFaceDetect').addEventListener('change', function() {
+        document.getElementById('faceDetectUserSection').style.display = this.checked ? '' : 'none';
+    });
+</script>
+@endpush
 @endsection

@@ -213,8 +213,10 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::post('/pengaturan', function (\Illuminate\Http\Request $request) {
             \App\Models\AppSetting::setValue('disable_presensi_hari_libur', $request->boolean('disable_presensi_hari_libur') ? '1' : '0');
             \App\Models\AppSetting::setValue('enable_face_detection', $request->boolean('enable_face_detection') ? '1' : '0');
+            \App\Models\AppSetting::setValue('face_detection_users', json_encode($request->input('face_detection_users', [])));
             \App\Models\AppSetting::setValue('require_masuk_before_pulang', $request->boolean('require_masuk_before_pulang') ? '1' : '0');
             \App\Models\AppSetting::setValue('enable_absen_darurat', $request->boolean('enable_absen_darurat') ? '1' : '0');
+            \App\Models\AppSetting::setValue('absen_darurat_users', json_encode($request->input('absen_darurat_users', [])));
             return redirect()->route('admin.pengaturan.index')->with('success', 'Pengaturan berhasil disimpan');
         })->name('pengaturan.update');
     });
