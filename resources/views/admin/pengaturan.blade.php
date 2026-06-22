@@ -150,8 +150,8 @@
             <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--dm-border,#e2e8f0);">
                 <div style="font-size:12px; color:var(--dm-muted,#64748b);"><span id="userModalSelected">0</span> dipilih</div>
                 <div style="display:flex; gap:8px;">
-                    <button type="button" onclick="closeUserModal()" class="btn-secondary" style="padding:8px 16px;">Batal</button>
-                    <button type="button" onclick="confirmUserModal()" class="btn-primary" style="padding:8px 16px;">Simpan</button>
+                    <button type="button" id="modalBtnBatal" class="btn-secondary" style="padding:8px 16px;">Batal</button>
+                    <button type="button" id="modalBtnSimpan" class="btn-primary" style="padding:8px 16px;">Simpan</button>
                 </div>
             </div>
         </div>
@@ -317,16 +317,11 @@
     }
 
     function confirmUserModal() {
-        var key = currentTarget + '_' + currentMode;
-        savedSelections[key] = tempSelected.slice();
-
-        // Rebuild hidden inputs — store ALL selections for this target (both modes)
         var containerId = currentTarget === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs';
         var countId = currentTarget === 'face' ? 'faceUserCount' : 'daruratUserCount';
         var inputName = currentTarget === 'face' ? 'face_detection_users[]' : 'absen_darurat_users[]';
         var container = document.getElementById(containerId);
         container.innerHTML = '';
-        // Only save the current mode's selections (active mode)
         tempSelected.forEach(function(id) {
             var inp = document.createElement('input');
             inp.type = 'hidden'; inp.name = inputName; inp.value = id;
@@ -335,6 +330,10 @@
         document.getElementById(countId).textContent = tempSelected.length;
         closeUserModal();
     }
+
+    // Bind modal buttons
+    document.getElementById('modalBtnSimpan').addEventListener('click', confirmUserModal);
+    document.getElementById('modalBtnBatal').addEventListener('click', closeUserModal);
 </script>
 @endpush
 @endsection
