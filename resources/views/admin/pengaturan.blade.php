@@ -159,41 +159,56 @@
 </div>
 @push('scripts')
 <script>
-    // Simpan scroll position sebelum submit/refresh
+    // Scroll persistence — save continuously, restore on load
     var mainContent = document.querySelector('.main-content');
-    var scrollTarget = mainContent || window;
 
-    function saveScroll() {
-        sessionStorage.setItem('pengaturan-scroll', (mainContent ? mainContent.scrollTop : window.scrollY));
-    }
-    function restoreScroll() {
-        var pos = sessionStorage.getItem('pengaturan-scroll');
-        if (pos) {
-            if (mainContent) mainContent.scrollTop = parseInt(pos);
-            else window.scrollTo(0, parseInt(pos));
-        }
+    function getScroll() { return mainContent ? mainContent.scrollTop : window.scrollY; }
+    function setScroll(pos) {
+        if (mainContent) mainContent.scrollTop = pos;
+        else window.scrollTo(0, pos);
     }
 
-    // Simpan saat form submit
-    document.querySelector('form').addEventListener('submit', saveScroll);
-    // Simpan saat toggle/dropdown berubah
-    document.querySelectorAll('input[type="checkbox"].sr-only, select').forEach(function(el) {
-        el.addEventListener('change', saveScroll);
+    // Continuously save scroll position
+    (mainContent || window).addEventListener('scroll', function() {
+        sessionStorage.setItem('pengaturan-scroll', getScroll());
+    }, { passive: true });
+
+    // Also save before unload (form submit, navigation)
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('pengaturan-scroll', getScroll());
     });
-    // Restore saat load
-    restoreScroll();
+
+    // Restore on load
+    var savedPos = sessionStorage.getItem('pengaturan-scroll');
+    if (savedPos) {
+        var pos = parseInt(savedPos);
+        setScroll(pos);
+        // Retry restore after layout settles
+        requestAnimationFrame(function() { setScroll(pos); });
+        setTimeout(function() { setScroll(pos); }, 100);
+    }
+
+    function keepScroll(fn) {
+        var pos = getScroll();
+        fn();
+        requestAnimationFrame(function() { setScroll(pos); });
+    }
 
     document.getElementById('toggleDarurat').addEventListener('change', function() {
-        document.getElementById('daruratUserSection').style.display = this.checked ? '' : 'none';
+        var el = this;
+        keepScroll(function() { document.getElementById('daruratUserSection').style.display = el.checked ? '' : 'none'; });
     });
     document.getElementById('toggleFaceDetect').addEventListener('change', function() {
-        document.getElementById('faceDetectUserSection').style.display = this.checked ? '' : 'none';
+        var el = this;
+        keepScroll(function() { document.getElementById('faceDetectUserSection').style.display = el.checked ? '' : 'none'; });
     });
     document.getElementById('faceDetectMode').addEventListener('change', function() {
-        document.getElementById('faceUserBtn').style.display = this.value !== 'all' ? 'block' : 'none';
+        var el = this;
+        keepScroll(function() { document.getElementById('faceUserBtn').style.display = el.value !== 'all' ? 'block' : 'none'; });
     });
     document.getElementById('daruratMode').addEventListener('change', function() {
-        document.getElementById('daruratUserBtn').style.display = this.value !== 'all' ? 'block' : 'none';
+        var el = this;
+        keepScroll(function() { document.getElementById('daruratUserBtn').style.display = el.value !== 'all' ? 'block' : 'none'; });
     });
 
     // User picker modal — separate lists per target+mode
