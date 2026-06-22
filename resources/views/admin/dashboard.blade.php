@@ -900,14 +900,8 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <form action="{{ route('admin.pengajuan.approve', $peng->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn-success" title="Setujui"><i class="fas fa-check"></i></button>
-                                        </form>
-                                        <form action="{{ route('admin.pengajuan.reject', $peng->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn-danger" title="Tolak"><i class="fas fa-times"></i></button>
-                                        </form>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('{{ route('admin.pengajuan.approve', $peng->id) }}', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('{{ route('admin.pengajuan.reject', $peng->id) }}', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -923,8 +917,8 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button onclick="actionCuti({{ $cp->id }}, 'approve')" class="btn-success" title="Setujui"><i class="fas fa-check"></i></button>
-                                        <button onclick="actionCuti({{ $cp->id }}, 'reject')" class="btn-danger" title="Tolak"><i class="fas fa-times"></i></button>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('{{ route('admin.cuti.approve', $cp->id) }}', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('{{ route('admin.cuti.reject', $cp->id) }}', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -1188,14 +1182,8 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <form id="formApprovePengajuan" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn-success"><i class="fas fa-check"></i> Setujui</button>
-                </form>
-                <form id="formRejectPengajuan" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn-danger"><i class="fas fa-times"></i> Tolak</button>
-                </form>
+                <button type="button" class="btn-success" id="modalBtnApprove"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="btn-danger" id="modalBtnReject"><i class="fas fa-times"></i> Tolak</button>
                 <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">Tutup</button>
             </div>
         </div>
@@ -1317,40 +1305,27 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    // ─── AJAX Approve/Reject ─────────────────────────────────────────────────
-    var _csrfToken = '{{ csrf_token() }}';
-    function actionPengajuan(id, action) {
-        var url = '/admin/pengajuan/' + id + '/' + action;
-        fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':_csrfToken,'Accept':'application/json'} })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    // Remove row from table
-                    var rows = document.querySelectorAll('#pengajuanPendingTable tr');
-                    rows.forEach(function(row) {
-                        if (row.dataset.approveUrl && row.dataset.approveUrl.indexOf('/' + id + '/') !== -1) {
-                            row.style.transition='opacity 0.3s'; row.style.opacity='0';
-                            setTimeout(function(){ row.remove(); }, 300);
-                        }
-                    });
-                    closeModal('modalPengajuanPending');
+    // ─── AJAX Approve/Reject (no page reload) ──────────────────────────────
+    function ajaxAction(url, btnEl) {
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                var row = btnEl ? btnEl.closest('tr') : null;
+                if (row) {
+                    row.style.transition = 'opacity 0.3s';
+                    row.style.opacity = '0';
+                    setTimeout(function() { row.remove(); }, 300);
                 }
-            });
+            } else {
+                alert(data.message || 'Gagal memproses');
+            }
+        })
+        .catch(function() { alert('Terjadi kesalahan jaringan'); });
     }
-
-    function actionCuti(id, action) {
-        var url = '/admin/cuti/' + id + '/' + action;
-        fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':_csrfToken,'Accept':'application/json'} })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    var row = document.getElementById('cutiRow' + id);
-                    if (row) { row.style.transition='opacity 0.3s'; row.style.opacity='0'; setTimeout(function(){ row.remove(); },300); }
-                }
-            });
-    }
-
-    var _currentPengajuanId = null;
 
     // ─── State ───────────────────────────────────────────────────────────────
     let presensiMap    = null;
@@ -1501,8 +1476,8 @@
             ? '<a href="' + data.bukti_url + '" target="_blank"><img src="' + data.bukti_url + '" class="bukti-image" onerror="this.style.display=\'none\'"></a>'
             : '<span class="text-muted">Tidak ada bukti</span>';
 
-        setFormAction('formApprovePengajuan', data.approve_url);
-        setFormAction('formRejectPengajuan', data.reject_url);
+        document.getElementById('modalBtnApprove').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPengajuanPending'); };
+        document.getElementById('modalBtnReject').onclick = function() { ajaxAction(data.reject_url, null); closeModal('modalPengajuanPending'); };
 
         openModal('modalPengajuanPending');
     }
