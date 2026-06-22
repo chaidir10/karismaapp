@@ -292,10 +292,11 @@
         </div>
 
         <!-- Footer Actions -->
-        <div style="display:flex; gap:8px; padding:16px 24px; border-top:1px solid var(--dm-border,#e2e8f0);">
-            <button onclick="openEditModalFromDetail()" class="btn-warning" style="flex:1; padding:10px; justify-content:center;"><i class="fas fa-edit"></i> Edit</button>
-            <button onclick="showResetPasswordConfirmation()" class="btn-primary" style="flex:1; padding:10px; justify-content:center;"><i class="fas fa-key"></i> Reset Password</button>
-            <button onclick="showDeleteConfirmation()" class="btn-danger" style="flex:1; padding:10px; justify-content:center;"><i class="fas fa-trash-alt"></i> Hapus</button>
+        <div style="display:flex; align-items:center; gap:8px; padding:16px 24px; border-top:1px solid var(--dm-border,#e2e8f0);">
+            <button onclick="showDeleteConfirmation()" class="btn-danger" style="padding:10px 16px;"><i class="fas fa-trash-alt"></i> Hapus</button>
+            <div style="flex:1;"></div>
+            <button onclick="showResetPasswordConfirmation()" class="btn-primary" style="padding:10px 16px;"><i class="fas fa-key"></i> Reset Password</button>
+            <button onclick="openEditModalFromDetail()" class="btn-warning" style="padding:10px 16px;"><i class="fas fa-edit"></i> Edit</button>
             <button onclick="closeModal('modalDetail')" class="btn-secondary" style="padding:10px 20px;">Tutup</button>
         </div>
     </div>
