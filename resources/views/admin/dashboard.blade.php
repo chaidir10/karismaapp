@@ -442,36 +442,48 @@
     }
 
     .modal-large { max-width: 900px; }
-    .modal-wide { max-width: 920px; }
-    .modal-split {
-        display:flex; flex-direction:column; gap:0;
+    .modal-wide { max-width: 1000px; }
+    .modal-3col {
+        display:grid; grid-template-columns:1fr 1fr 1.2fr; min-height:380px;
     }
-    .modal-media-row {
-        display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px 20px;
-        border-bottom:1px solid var(--gray-200);
+    .modal-col {
+        padding:16px; display:flex; flex-direction:column;
+        border-right:1px solid var(--gray-200);
     }
-    [data-theme="dark"] .modal-media-row { border-color:rgba(255,255,255,0.06); }
-    .modal-info-section {
-        display:flex; flex-direction:column; padding:16px 20px;
+    .modal-col:last-child { border-right:none; }
+    [data-theme="dark"] .modal-col { border-color:rgba(255,255,255,0.06); }
+    .modal-col-label {
+        font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase;
+        letter-spacing:0.3px; margin-bottom:8px;
     }
-    .modal-info-section .info-grid {
+    .modal-col-content {
+        flex:1; border-radius:10px; overflow:hidden; display:flex;
+        align-items:center; justify-content:center; background:var(--gray-100);
+    }
+    [data-theme="dark"] .modal-col-content { background:rgba(255,255,255,0.03); }
+    .modal-info-col {
+        padding:16px; display:flex; flex-direction:column;
+    }
+    .modal-info-col .info-grid {
         display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;
     }
-    .modal-info-section .info-item {
+    .modal-info-col .info-item {
         background:var(--gray-100); border-radius:8px; padding:8px 10px;
     }
-    [data-theme="dark"] .modal-info-section .info-item { background:rgba(255,255,255,0.04); }
-    .modal-info-section .info-item label {
+    [data-theme="dark"] .modal-info-col .info-item { background:rgba(255,255,255,0.04); }
+    .modal-info-col .info-item label {
         font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase;
         letter-spacing:0.3px; display:block; margin:0 0 2px;
     }
-    .modal-info-section .info-item label::after { content:''; }
-    .modal-info-section .info-item span {
+    .modal-info-col .info-item label::after { content:''; }
+    .modal-info-col .info-item span {
         font-size:13px; font-weight:500; color:var(--dark); word-break:break-word;
     }
-    .modal-info-section .info-item.full { grid-column:1/-1; }
-    @media (max-width:640px) {
-        .modal-media-row { grid-template-columns:1fr; }
+    .modal-info-col .info-item.full { grid-column:1/-1; }
+    @media (max-width:768px) {
+        .modal-3col { grid-template-columns:1fr; }
+        .modal-col { border-right:none; border-bottom:1px solid var(--gray-200); }
+        .modal-col-content { min-height:180px; }
     }
 
     .modal-header {
@@ -635,8 +647,8 @@
 
     .foto-wrapper .foto-image {
         width: 100%;
-        height: auto;
-        max-height: none;
+        height: 100%;
+        object-fit: contain;
         display: block;
         border: none;
         border-radius: 0;
@@ -1193,16 +1205,22 @@
             <h3 class="modal-title">Detail Presensi Pending</h3>
             <button class="modal-close" onclick="closeModal('modalPresensiPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-split">
-            <div class="modal-media-row">
-                <div class="map-container" style="height:220px; border-radius:10px; overflow:hidden;">
+        <div class="modal-3col">
+            <div class="modal-col">
+                <div class="modal-col-label">Peta Lokasi</div>
+                <div class="modal-col-content map-container">
                     <div id="presensiMap" style="width:100%;height:100%;"></div>
                     <div id="mapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
                     <div id="mapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="foto-wrapper" style="height:220px; border-radius:10px;" id="detailFotoPresensi"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-info-section">
+            <div class="modal-col">
+                <div class="modal-col-label">Foto</div>
+                <div class="modal-col-content foto-wrapper" id="detailFotoPresensi">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>
+                </div>
+            </div>
+            <div class="modal-info-col">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPresensi">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPresensi">-</span></div>
@@ -1211,7 +1229,7 @@
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi" style="font-size:11px;">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
                 </div>
-                <div style="display:flex; gap:8px; margin-top:8px;">
+                <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-success" id="modalBtnApprovePresensi" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
                     <button type="button" class="btn-danger" id="modalBtnRejectPresensi" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
                     <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')" style="padding:10px 16px;">Tutup</button>
@@ -1229,21 +1247,25 @@
             <h3 class="modal-title">Detail Pengajuan Pending</h3>
             <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-split">
-            <div class="modal-media-row">
-                <div id="detailBuktiPengajuan" style="height:220px; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; grid-column:1/-1;">
-                    <span class="text-muted" style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
+        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
+            {{-- Left: Bukti --}}
+            <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
+                <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Pengajuan</div>
+                <div id="detailBuktiPengajuan" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
+                    <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
+                    <span style="font-size:12px; color:var(--gray-400);">Tidak ada bukti</span>
                 </div>
             </div>
-            <div class="modal-info-section">
-                <div class="info-grid">
+            {{-- Right: Info --}}
+            <div style="padding:16px 20px; display:flex; flex-direction:column;">
+                <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
-                    <div class="info-item full"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
+                    <div class="info-item full" style="grid-column:1/-1;"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
                 </div>
-                <div style="display:flex; gap:8px; margin-top:8px;">
+                <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-success" id="modalBtnApprove" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
                     <button type="button" class="btn-danger" id="modalBtnReject" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
                     <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')" style="padding:10px 16px;">Tutup</button>
@@ -1261,16 +1283,22 @@
             <h3 class="modal-title">Detail Presensi</h3>
             <button class="modal-close" onclick="closeModal('modalDetailHariIni')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-split">
-            <div class="modal-media-row">
-                <div class="map-container" style="height:220px; border-radius:10px; overflow:hidden;">
+        <div class="modal-3col">
+            <div class="modal-col">
+                <div class="modal-col-label">Peta Lokasi</div>
+                <div class="modal-col-content map-container">
                     <div id="hariIniMap" style="width:100%;height:100%;"></div>
                     <div id="hariIniMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
                     <div id="hariIniMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="foto-wrapper" style="height:220px; border-radius:10px;" id="detailFotoHariIni"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-info-section">
+            <div class="modal-col">
+                <div class="modal-col-label">Foto</div>
+                <div class="modal-col-content foto-wrapper" id="detailFotoHariIni">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>
+                </div>
+            </div>
+            <div class="modal-info-col">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailNamaHariIni">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalHariIni">-</span></div>
@@ -1280,7 +1308,7 @@
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="display:flex; gap:8px; margin-top:8px;">
+                <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1295,16 +1323,22 @@
             <h3 class="modal-title">Detail Lembur</h3>
             <button class="modal-close" onclick="closeModal('modalDetailLembur')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-split">
-            <div class="modal-media-row">
-                <div class="map-container" style="height:220px; border-radius:10px; overflow:hidden;">
+        <div class="modal-3col">
+            <div class="modal-col">
+                <div class="modal-col-label">Peta Lokasi</div>
+                <div class="modal-col-content map-container">
                     <div id="lemburMap" style="width:100%;height:100%;"></div>
                     <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
                     <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="foto-wrapper" style="height:220px; border-radius:10px;" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-info-section">
+            <div class="modal-col">
+                <div class="modal-col-label">Foto</div>
+                <div class="modal-col-content foto-wrapper" id="detailFotoLembur">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>
+                </div>
+            </div>
+            <div class="modal-info-col">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
@@ -1313,7 +1347,7 @@
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="display:flex; gap:8px; margin-top:8px;">
+                <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1635,7 +1669,7 @@
         var fotoEl = document.getElementById('detailFotoPresensi');
         fotoEl.innerHTML = data.foto_url
             ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
-            : '<span class="text-muted">Tidak ada foto</span>';
+            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         // Wire modal buttons
         document.getElementById('modalBtnApprovePresensi').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPresensiPending'); };
@@ -1670,9 +1704,16 @@
         document.getElementById('detailAlasanPengajuan').textContent   = data.alasan   || 'Tidak ada alasan';
 
         var buktiEl = document.getElementById('detailBuktiPengajuan');
-        buktiEl.innerHTML = data.bukti_url
-            ? '<a href="' + data.bukti_url + '" target="_blank"><img src="' + data.bukti_url + '" class="bukti-image" onerror="this.style.display=\'none\'"></a>'
-            : '<span class="text-muted">Tidak ada bukti</span>';
+        if (data.bukti_url && data.bukti_url.match(/\.pdf$/i)) {
+            buktiEl.style.background = 'transparent';
+            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
+        } else if (data.bukti_url) {
+            buktiEl.style.background = 'var(--gray-100)';
+            buktiEl.innerHTML = '<img src="' + data.bukti_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<div style=width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px><i class=fas&nbsp;fa-image style=font-size:18px;color:var(--gray-400)></i></div><span style=font-size:12px;color:var(--gray-400)>Gagal memuat</span>\'">';
+        } else {
+            buktiEl.style.background = 'var(--gray-100)';
+            buktiEl.innerHTML = '<div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>';
+        }
 
         document.getElementById('modalBtnApprove').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPengajuanPending'); };
         document.getElementById('modalBtnReject').onclick = function() { ajaxAction(data.reject_url, null); closeModal('modalPengajuanPending'); };
@@ -1706,7 +1747,7 @@
         var fotoEl = document.getElementById('detailFotoHariIni');
         fotoEl.innerHTML = data.foto_url
             ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
-            : '<span class="text-muted">Tidak ada foto</span>';
+            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         // Koordinat
         var lat = NaN, lng = NaN;
@@ -1739,7 +1780,7 @@
         var fotoEl = document.getElementById('detailFotoLembur');
         fotoEl.innerHTML = data.foto_url
             ? '<img src="' + data.foto_url + '" alt="Foto" class="foto-image" onerror="this.style.display=\'none\'">'
-            : '<span class="text-muted">Tidak ada foto</span>';
+            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         var lat = NaN, lng = NaN;
         if (data.lokasi) {
