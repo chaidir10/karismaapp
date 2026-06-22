@@ -1281,7 +1281,11 @@
     function ajaxAction(url, btnEl) {
         fetch(url, {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -1292,11 +1296,9 @@
                     row.style.opacity = '0';
                     setTimeout(function() { row.remove(); }, 300);
                 }
-            } else {
-                alert(data.message || 'Gagal memproses');
             }
         })
-        .catch(function() { alert('Terjadi kesalahan jaringan'); });
+        .catch(function(e) { console.error(e); location.reload(); });
     }
 
     // ─── State ───────────────────────────────────────────────────────────────
