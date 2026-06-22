@@ -442,9 +442,9 @@
     }
 
     .modal-large { max-width: 900px; }
-    .modal-wide { max-width: 1100px; }
+    .modal-wide { max-width: 1000px; }
     .modal-3col {
-        display:grid; grid-template-columns:1fr 1fr 1.2fr; min-height:480px;
+        display:grid; grid-template-columns:1fr 1fr 1.2fr; min-height:380px;
     }
     .modal-col {
         padding:16px; display:flex; flex-direction:column;
@@ -459,9 +459,7 @@
     .modal-col-content {
         flex:1; border-radius:10px; overflow:hidden; display:flex;
         align-items:center; justify-content:center; background:var(--gray-100);
-        position:relative;
     }
-    .modal-col-content.foto-wrapper > img { width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0; }
     [data-theme="dark"] .modal-col-content { background:rgba(255,255,255,0.03); }
     .modal-info-col {
         padding:16px; display:flex; flex-direction:column;
@@ -481,7 +479,6 @@
     .modal-info-col .info-item span {
         font-size:13px; font-weight:500; color:var(--dark); word-break:break-word;
     }
-    .modal-info-col .info-item span.badge { color:inherit; font-size:11px; }
     .modal-info-col .info-item.full { grid-column:1/-1; }
     @media (max-width:768px) {
         .modal-3col { grid-template-columns:1fr; }
@@ -556,7 +553,6 @@
         color: var(--dark);
         word-break: break-word;
     }
-    .detail-item span.badge, .info-item span.badge { color:inherit !important; font-size:11px; }
 
     .modal-actions {
         display: flex;
@@ -652,7 +648,7 @@
     .foto-wrapper .foto-image {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         display: block;
         border: none;
         border-radius: 0;
@@ -992,7 +988,7 @@
 
         {{-- Modal Detail Cuti/DL --}}
         <div id="modalCutiDetail" class="modal-overlay" style="display:none;">
-            <div class="modal-container" style="max-width:1100px;">
+            <div class="modal-container modal-wide">
                 <div class="modal-header">
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:14px;">
@@ -1002,25 +998,22 @@
                     </div>
                     <button class="modal-close" onclick="closeModal('modalCutiDetail')"><i class="fas fa-times"></i></button>
                 </div>
-                <div style="display:grid; grid-template-columns:3fr 2fr; min-height:520px;">
-                    <div class="modal-col">
-                        <div class="modal-col-label">Bukti Surat</div>
-                        <div class="modal-col-content" id="cutiModalBukti" style="flex-direction:column;">
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                                <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;">
-                                    <i class="fas fa-file-pdf" style="font-size:18px;color:var(--gray-400);"></i>
-                                </div>
-                                <span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>
-                            </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
+                    {{-- Left: Bukti --}}
+                    <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
+                        <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Surat</div>
+                        <div id="cutiModalBukti" style="flex:1; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
+                            <span style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
                         </div>
                     </div>
-                    <div class="modal-info-col">
-                        <div class="info-grid">
+                    {{-- Right: Info --}}
+                    <div style="padding:16px 20px; display:flex; flex-direction:column;">
+                        <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
                             <div class="info-item"><label>Pegawai</label><span id="cutiModalUser">-</span></div>
-                            <div class="info-item"><label>Jenis</label><span id="cutiModalJenis">-</span></div>
+                            <div class="info-item"><label>Jenis</label><span id="cutiModalJenis" style="color:#7c3aed;">-</span></div>
                             <div class="info-item"><label>Periode</label><span id="cutiModalPeriode">-</span></div>
                             <div class="info-item"><label>Durasi</label><span id="cutiModalHari">-</span></div>
-                            <div class="info-item full"><label>Keterangan</label><span id="cutiModalKeterangan">-</span></div>
+                            <div class="info-item full" style="grid-column:1/-1;"><label>Keterangan</label><span id="cutiModalKeterangan">-</span></div>
                         </div>
                         <div style="margin-top:auto; display:flex; gap:8px;">
                             <button type="button" class="btn-success" style="flex:1;padding:10px;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
@@ -1081,9 +1074,9 @@
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if($p->terlambat)
-                                        <span class="badge badge-danger"><i class="fas fa-clock" style="font-size:9px;"></i> Terlambat</span>
+                                        <span class="status-badge late"><i class="fas fa-clock" style="font-size:9px;"></i> Terlambat</span>
                                     @else
-                                        <span class="badge badge-success"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
+                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
                                     @endif
                                 </td>
                             </tr>
@@ -1125,9 +1118,9 @@
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if(($p->waktu_kurang_menit ?? 0) > 0)
-                                        <span class="badge badge-warning"><i class="fas fa-clock" style="font-size:9px;"></i> Pulang Cepat</span>
+                                        <span class="status-badge pending"><i class="fas fa-clock" style="font-size:9px;"></i> Pulang Cepat</span>
                                     @else
-                                        <span class="badge badge-success"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
+                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
                                     @endif
                                 </td>
                             </tr>
@@ -1233,7 +1226,7 @@
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPresensi">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPresensi">-</span></div>
                     <div class="info-item"><label>Jam</label><span id="detailJamPresensi">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi" style="font-size:11px;">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
                 </div>
                 <div style="margin-top:auto; display:flex; gap:8px;">
@@ -1254,23 +1247,23 @@
             <h3 class="modal-title">Detail Pengajuan Pending</h3>
             <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:420px;">
-            <div class="modal-col">
-                <div class="modal-col-label">Bukti Pengajuan</div>
-                <div class="modal-col-content" id="detailBuktiPengajuan" style="position:relative;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                        <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
-                        <span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>
-                    </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
+            {{-- Left: Bukti --}}
+            <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
+                <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Pengajuan</div>
+                <div id="detailBuktiPengajuan" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
+                    <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
+                    <span style="font-size:12px; color:var(--gray-400);">Tidak ada bukti</span>
                 </div>
             </div>
-            <div class="modal-info-col">
-                <div class="info-grid">
+            {{-- Right: Info --}}
+            <div style="padding:16px 20px; display:flex; flex-direction:column;">
+                <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
-                    <div class="info-item full"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
+                    <div class="info-item full" style="grid-column:1/-1;"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
                 </div>
                 <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-success" id="modalBtnApprove" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
@@ -1313,9 +1306,9 @@
                     <div class="info-item"><label>Jam</label><span id="detailJamHariIni">-</span></div>
                     <div class="info-item"><label>Kehadiran</label><span id="detailStatusHariIni">-</span></div>
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px; justify-content:flex-end;">
+                <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1352,9 +1345,9 @@
                     <div class="info-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
                     <div class="info-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px; justify-content:flex-end;">
+                <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1402,16 +1395,14 @@
 
         var buktiEl = document.getElementById('cutiModalBukti');
         var buktiUrl = row.dataset.cutiBukti;
-        var emptyIcon = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-file-pdf" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span></div>';
         if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
-            buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;';
-            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '#view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
+            buktiEl.style.background = 'transparent';
+            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
         } else if (buktiUrl) {
-            buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
-            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
+            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<span style=font-size:13px;color:var(--gray-400)>Gagal memuat</span>\'">';
         } else {
-            buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
-            buktiEl.innerHTML = emptyIcon;
+            buktiEl.style.background = 'var(--gray-100)';
+            buktiEl.innerHTML = '<span style="font-size:13px;color:var(--gray-400);">Tidak ada bukti</span>';
         }
 
         var approveUrl = row.dataset.cutiApprove;
@@ -1456,18 +1447,13 @@
         });
     }
 
-    // Table instances (must be before searchTable)
-    var tableInstances = {};
-
-    // Prevent scroll when clicking search (deferred to DOMContentLoaded)
-    function initSearchScroll() {
-        document.querySelectorAll('.card-search input').forEach(function(inp) {
-            inp.addEventListener('focus', function() {
-                var y = window.scrollY;
-                requestAnimationFrame(function() { window.scrollTo(0, y); });
-            });
+    // Prevent scroll when clicking search
+    document.querySelectorAll('.card-search input').forEach(function(inp) {
+        inp.addEventListener('focus', function() {
+            var y = window.scrollY;
+            requestAnimationFrame(function() { window.scrollTo(0, y); });
         });
-    }
+    });
 
     function searchTable(input, tbodyId) {
         var query = input.value.toLowerCase().trim();
@@ -1675,12 +1661,14 @@
         document.getElementById('detailTanggalPresensi').textContent  = data.tanggal  || '-';
         document.getElementById('detailJenisPresensi').textContent    = capitalize(data.jenis);
         document.getElementById('detailJamPresensi').textContent      = data.jam      || '-';
-        resolveAddress(data.lokasi, document.getElementById('detailLokasiPresensi'));
+        document.getElementById('detailLokasiPresensi').textContent   = data.lokasi
+            ? data.lokasi
+            : 'Tidak ada lokasi';
 
         // Foto
         var fotoEl = document.getElementById('detailFotoPresensi');
         fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
             : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         // Wire modal buttons
@@ -1716,21 +1704,15 @@
         document.getElementById('detailAlasanPengajuan').textContent   = data.alasan   || 'Tidak ada alasan';
 
         var buktiEl = document.getElementById('detailBuktiPengajuan');
-        var emptyBukti = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400)"></i></div><span style="font-size:12px;color:var(--gray-400)">Tidak ada bukti</span></div>';
         if (data.bukti_url && data.bukti_url.match(/\.pdf$/i)) {
-            buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;position:relative;';
-            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
+            buktiEl.style.background = 'transparent';
+            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
         } else if (data.bukti_url) {
-            buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;position:relative;';
-            var img = document.createElement('img');
-            img.src = data.bukti_url;
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;';
-            img.onerror = function() { buktiEl.innerHTML = emptyBukti; buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;'; };
-            buktiEl.innerHTML = '';
-            buktiEl.appendChild(img);
+            buktiEl.style.background = 'var(--gray-100)';
+            buktiEl.innerHTML = '<img src="' + data.bukti_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<div style=width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px><i class=fas&nbsp;fa-image style=font-size:18px;color:var(--gray-400)></i></div><span style=font-size:12px;color:var(--gray-400)>Gagal memuat</span>\'">';
         } else {
-            buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
-            buktiEl.innerHTML = emptyBukti;
+            buktiEl.style.background = 'var(--gray-100)';
+            buktiEl.innerHTML = '<div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>';
         }
 
         document.getElementById('modalBtnApprove').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPengajuanPending'); };
@@ -1745,27 +1727,26 @@
         document.getElementById('detailTanggalHariIni').textContent = data.tanggal   || '-';
         document.getElementById('detailJenisHariIni').textContent   = capitalize(data.jenis);
         document.getElementById('detailJamHariIni').textContent     = data.jam       || '-';
-        resolveAddress(data.lokasi, document.getElementById('detailLokasiHariIni'));
+        document.getElementById('detailLokasiHariIni').textContent  = data.lokasi    || 'Tidak ada lokasi';
 
         // Status kehadiran
         var statusEl = document.getElementById('detailStatusHariIni');
         var label = (data.status_label || '-').trim();
-        var cls = 'badge-neutral';
-        if (label === 'Tepat Waktu') cls = 'badge-success';
-        else if (label === 'Terlambat' || label === 'Waktu Kurang' || label === 'Pulang Cepat') cls = 'badge-danger';
-        statusEl.innerHTML = '<span class="badge ' + cls + '">' + label + '</span>';
+        var cls = 'neutral';
+        if (label === 'Tepat Waktu') cls = 'on-time';
+        else if (label === 'Terlambat' || label === 'Waktu Kurang') cls = 'late';
+        statusEl.innerHTML = '<span class="status-badge ' + cls + '">' + label + '</span>';
 
         // Status verifikasi
         var verifEl = document.getElementById('detailVerifikasiHariIni');
         var st = (data.status || '').toLowerCase();
-        var verifCls = st === 'approved' ? 'badge-success' : st === 'rejected' ? 'badge-danger' : 'badge-warning';
-        var verifLabel = st === 'approved' ? 'Disetujui' : st === 'rejected' ? 'Ditolak' : 'Menunggu';
-        verifEl.innerHTML = '<span class="badge ' + verifCls + '">' + verifLabel + '</span>';
+        var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
+        verifEl.innerHTML = '<span class="status-badge ' + verifCls + '">' + capitalize(st) + '</span>';
 
         // Foto
         var fotoEl = document.getElementById('detailFotoHariIni');
         fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
             : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         // Koordinat
@@ -1790,7 +1771,7 @@
         document.getElementById('detailTanggalLembur').textContent = data.tanggal   || '-';
         document.getElementById('detailJenisLembur').textContent   = data.jenis     || '-';
         document.getElementById('detailJamLembur').textContent     = data.jam       || '-';
-        resolveAddress(data.lokasi, document.getElementById('detailLokasiLembur'));
+        document.getElementById('detailLokasiLembur').textContent  = data.lokasi    || 'Tidak ada lokasi';
 
         var st = (data.status || '').toLowerCase();
         var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
@@ -1798,7 +1779,7 @@
 
         var fotoEl = document.getElementById('detailFotoLembur');
         fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + data.foto_url + '" alt="Foto" class="foto-image" onerror="this.style.display=\'none\'">'
             : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         var lat = NaN, lng = NaN;
@@ -1908,24 +1889,6 @@
     }
 
     // ─── Utilities ────────────────────────────────────────────────────────────
-    function resolveAddress(lokasi, el) {
-        if (!lokasi || !el) { el.textContent = 'Tidak ada lokasi'; return; }
-        var parts = lokasi.split(',');
-        if (parts.length < 2) { el.textContent = lokasi; return; }
-        var lat = parts[0].trim(), lng = parts[1].trim();
-        el.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:10px;margin-right:4px;"></i> Mendeteksi...';
-        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data && data.display_name) {
-                    el.textContent = data.display_name;
-                } else {
-                    el.textContent = lat + ', ' + lng;
-                }
-            })
-            .catch(function() { el.textContent = lat + ', ' + lng; });
-    }
-
     function capitalize(str) {
         if (!str) return '-';
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -1937,6 +1900,8 @@
     }
 
     // ===== TABLE SORT + PAGINATION =====
+    var tableInstances = {};
+
     function initTable(tbodyId) {
         var tbody = document.getElementById(tbodyId);
         if (!tbody) return;
@@ -2039,7 +2004,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        try { initSearchScroll(); } catch(e) { console.error('initSearchScroll:', e); }
         initTable('presensiPendingTable');
         initTable('pengajuanPendingTable');
         initTable('cutiPendingTable');
@@ -2118,7 +2082,7 @@
     });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var ctx = document.getElementById('attendanceChart');
