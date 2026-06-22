@@ -356,10 +356,10 @@
             content: '';
             position: absolute;
             left: -10px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
+            bottom: 0;
             width: 3px;
-            height: 20px;
+            height: auto;
             border-radius: 0 3px 3px 0;
             background: #2E97D4;
         }
