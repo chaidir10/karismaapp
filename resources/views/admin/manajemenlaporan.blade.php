@@ -112,15 +112,15 @@
                 <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid #d1d5db; border-radius:12px; padding:0 16px; font-size:14px; outline:none;">
             </div>
             <div style="flex:3; min-width:200px; display:flex; gap:8px;">
-                <button type="submit" id="btnTampilkan" disabled class="bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-sm disabled:opacity-40 disabled:cursor-not-allowed" style="flex:2; height:42px; border:none; cursor:pointer;">
+                <button type="submit" id="btnTampilkan" disabled class="btn-primary" style="flex:2; height:42px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                     Tampilkan
                 </button>
-                <a href="#" id="btnPdf" class="bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center text-sm disabled:opacity-40 disabled:pointer-events-none" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
+                <a href="#" id="btnPdf" class="btn-danger" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     PDF
                 </a>
-                <a href="#" id="btnExcel" class="bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center text-sm" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
+                <a href="#" id="btnExcel" class="btn-success" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     Excel
                 </a>

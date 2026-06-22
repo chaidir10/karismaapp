@@ -145,25 +145,6 @@
         color: white;
     }
 
-    /* Button Styles untuk Header */
-    .btn-primary {
-        background: white;
-        color: #3b82f6;
-        padding: 12px 20px;
-        border-radius: 12px;
-        border: none;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-primary:hover {
-        background: #f8fafc;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
 
     .radius-slider-container {
         display: flex;
@@ -433,7 +414,7 @@
                 <div class="flex justify-end gap-3 pt-3 border-t border-gray-200 mt-2">
                     <!-- Tombol Batal -->
                     <button type="button"
-                        class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                        class="btn-secondary"
                         onclick="confirmCancel()">
                         <i class="fas fa-times mr-2"></i>
                         Batal
@@ -441,7 +422,7 @@
 
                     <!-- Tombol Simpan -->
                     <button type="submit"
-                        class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center text-sm">
+                        class="btn-primary">
                         <i class="fas fa-check mr-2"></i>
                         Simpan
                     </button>
@@ -500,7 +481,7 @@
                 <!-- Buttons -->
                 <div class="flex justify-end gap-3 pt-3 border-t border-gray-200 mt-2">
                     <button
-                        class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-xs"
+                        class="btn-secondary"
                         onclick="closeModal('modalDetail')">
                         <i class="fas fa-times mr-2"></i>
                         Tutup
@@ -530,13 +511,13 @@
         <p class="text-xs text-gray-500 mt-2">Data yang dihapus tidak dapat dikembalikan</p>
         <div class="flex justify-center gap-3 mt-6">
             <button
-                class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                class="btn-secondary"
                 onclick="closeModal('modalDelete')">
                 <i class="fas fa-times mr-2"></i>
                 Batal
             </button>
             <button id="confirmDelete"
-                class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center text-sm">
+                class="btn-danger">
                 <i class="fas fa-trash mr-2"></i>
                 Hapus
             </button>
@@ -562,13 +543,13 @@
         <p class="text-xs text-gray-500 mt-2">Semua perubahan yang belum disimpan akan hilang</p>
         <div class="flex justify-center gap-3 mt-6">
             <button
-                class="px-5 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                class="btn-secondary"
                 onclick="closeModal('modalConfirmCancel')">
                 <i class="fas fa-edit mr-2"></i>
                 Lanjutkan Edit
             </button>
             <button
-                class="px-5 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors flex items-center text-sm"
+                class="btn-danger"
                 onclick="closeModal('modalForm'); closeModal('modalConfirmCancel');">
                 <i class="fas fa-times mr-2"></i>
                 Batalkan
@@ -594,7 +575,7 @@
         <p class="text-gray-600">Data titik presensi berhasil disimpan</p>
         <div class="flex justify-center mt-6">
             <button
-                class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center text-sm"
+                class="btn-primary"
                 onclick="closeModal('modalConfirmSave'); closeModal('modalForm'); location.reload();">
                 <i class="fas fa-check mr-2"></i>
                 Oke

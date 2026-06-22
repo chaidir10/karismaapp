@@ -11,7 +11,7 @@
                 <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Pegawai</h1>
                 <p class="text-blue-100 mt-1">Kelola data seluruh pegawai</p>
             </div>
-            <button onclick="openModal('modalAdd')" class="w-full sm:w-auto bg-white hover:bg-gray-100 text-blue-600 px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md">
+            <button onclick="openModal('modalAdd')" class="btn-primary">
                 <i class="fas fa-user-plus mr-2"></i>
                 <span class="font-medium">Tambah Pegawai</span>
             </button>
@@ -231,10 +231,10 @@
 
 
             <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalAdd')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <button type="button" onclick="closeModal('modalAdd')" class="btn-secondary">
                     Batal
                 </button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-colors duration-200 flex items-center">
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-save mr-2"></i> Simpan
                 </button>
             </div>
@@ -268,13 +268,13 @@
 
                 <!-- Action Buttons -->
                 <div class="mt-4 space-y-3">
-                    <button onclick="openEditModalFromDetail()" class="w-full px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl transition-colors duration-200 flex items-center justify-center">
+                    <button onclick="openEditModalFromDetail()" class="btn-warning w-full justify-center">
                         <i class="fas fa-edit mr-2"></i> Edit Data
                     </button>
-                    <button onclick="showResetPasswordConfirmation()" class="w-full px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors duration-200 flex items-center justify-center">
+                    <button onclick="showResetPasswordConfirmation()" class="btn-warning w-full justify-center">
                         <i class="fas fa-key mr-2"></i> Reset Password
                     </button>
-                    <button onclick="showDeleteConfirmation()" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors duration-200 flex items-center justify-center">
+                    <button onclick="showDeleteConfirmation()" class="btn-danger w-full justify-center">
                         <i class="fas fa-trash-alt mr-2"></i> Hapus Pegawai
                     </button>
                 </div>
@@ -338,7 +338,7 @@
         </div>
 
         <div class="flex justify-end space-x-4 pt-6 mt-6 border-t border-gray-200">
-            <button onclick="closeModal('modalDetail')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+            <button onclick="closeModal('modalDetail')" class="btn-secondary">
                 Tutup
             </button>
         </div>
@@ -434,10 +434,10 @@
             </div>
 
             <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalEdit')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <button type="button" onclick="closeModal('modalEdit')" class="btn-secondary">
                     Batal
                 </button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-colors duration-200 flex items-center">
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-sync-alt mr-2"></i> Perbarui
                 </button>
             </div>
@@ -457,11 +457,11 @@
 
             <div class="flex justify-center space-x-3">
                 <button type="button" onclick="closeModal('modalDeleteConfirmation')"
-                    class="px-5 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200 font-medium">
+                    class="btn-secondary">
                     Batal
                 </button>
                 <button type="button" onclick="confirmDelete()"
-                    class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm transition-colors duration-200 font-medium flex items-center">
+                    class="btn-danger">
                     <i class="fas fa-trash-alt mr-2"></i> Hapus
                 </button>
             </div>
@@ -481,11 +481,11 @@
 
             <div class="flex justify-center space-x-3">
                 <button type="button" onclick="closeModal('modalResetPasswordConfirmation')"
-                    class="px-5 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-200 font-medium">
+                    class="btn-secondary">
                     Batal
                 </button>
                 <button type="button" onclick="confirmResetPassword()"
-                    class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-sm transition-colors duration-200 font-medium flex items-center">
+                    class="btn-warning">
                     <i class="fas fa-sync-alt mr-2"></i> Reset Password
                 </button>
             </div>

@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors flex items-center gap-2">
+        <button type="submit" class="btn-primary">
             <i class="fas fa-save"></i> Simpan Pengaturan
         </button>
     </form>

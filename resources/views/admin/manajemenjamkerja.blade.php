@@ -143,8 +143,8 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalAddJam')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm flex items-center">
+                <button type="button" onclick="closeModal('modalAddJam')" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-plus mr-2"></i> Simpan
                 </button>
             </div>
@@ -186,8 +186,8 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalEditJam')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm flex items-center">
+                <button type="button" onclick="closeModal('modalEditJam')" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-sync-alt mr-2"></i> Perbarui
                 </button>
             </div>
@@ -222,8 +222,8 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalAddShift')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="submit" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-sm flex items-center">
+                <button type="button" onclick="closeModal('modalAddShift')" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-plus mr-2"></i> Tambah
                 </button>
             </div>
@@ -259,8 +259,8 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalEditShift')" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="submit" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-sm flex items-center">
+                <button type="button" onclick="closeModal('modalEditShift')" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-sync-alt mr-2"></i> Perbarui
                 </button>
             </div>
@@ -310,44 +310,6 @@
         color: white;
     }
 
-    /* Button Styles untuk Header */
-    .btn-primary {
-        background: white;
-        color: #3b82f6;
-        padding: 12px 20px;
-        border-radius: 12px;
-        border: none;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-primary:hover {
-        background: #f8fafc;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-success {
-        background: white;
-        color: #10b981;
-        padding: 12px 20px;
-        border-radius: 12px;
-        border: none;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-success:hover {
-        background: #f8fafc;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
 </style>
 @endsection
 

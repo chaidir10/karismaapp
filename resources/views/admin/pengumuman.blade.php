@@ -86,7 +86,7 @@
                 <h1 class="text-2xl font-bold text-white">Pengumuman</h1>
                 <p class="text-blue-100 mt-1">Kelola pengumuman dan informasi untuk pegawai</p>
             </div>
-            <button onclick="openModal()" class="bg-white text-blue-600 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-sm">
+            <button onclick="openModal()" class="btn-primary">
                 <i class="fas fa-plus"></i> Tambah Pengumuman
             </button>
         </div>
@@ -244,8 +244,8 @@
 
             <!-- Actions -->
             <div style="display:flex; gap:10px; justify-content:flex-end;">
-                <button type="button" onclick="closeModal()" style="padding:10px 20px; border-radius:12px; border:1px solid var(--dm-border, #e2e8f0); background:var(--dm-card, #fff); font-size:14px; cursor:pointer; font-weight:500; color:var(--dm-text, #475569);">Batal</button>
-                <button type="submit" style="padding:10px 28px; border-radius:12px; border:none; background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; font-size:14px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                <button type="button" onclick="closeModal()" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-save" style="margin-right:6px;"></i> Simpan
                 </button>
             </div>
