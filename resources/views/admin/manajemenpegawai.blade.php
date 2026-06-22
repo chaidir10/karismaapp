@@ -368,7 +368,7 @@
                 </div>
                 <div style="grid-column:1/-1;">
                     <label style="{{ $labelStyle }}">Lokasi Presensi (boleh lebih dari 1)</label>
-                    <div id="editWilayahCheckboxes" style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; max-height:80px; overflow-y:auto;">
+                    <div id="editWilayahCheckboxes" style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px;">
                         @foreach($units as $u)
                         <label style="display:flex; align-items:center; gap:4px; cursor:pointer; font-size:12px; color:var(--dm-text,#374151); padding:3px 8px; border-radius:6px; background:var(--dm-bg,#f9fafb);">
                             <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="edit-wilayah-cb" style="accent-color:#2E97D4;">

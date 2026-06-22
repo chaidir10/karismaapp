@@ -246,18 +246,23 @@
         [data-theme="dark"] .btn-delete:hover { background:#ef4444; color:#fff; }
 
         /* Custom checkbox */
-        input[type="checkbox"] {
-            width:16px; height:16px; border-radius:4px; border:1.5px solid var(--dm-border,#cbd5e1);
-            appearance:none; -webkit-appearance:none; background:var(--dm-card,#fff); cursor:pointer;
-            display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; vertical-align:middle;
+        input[type="checkbox"]:not(.sr-only) {
+            width:16px; height:16px; min-width:16px; border-radius:4px; border:1.5px solid var(--dm-border,#cbd5e1);
+            -webkit-appearance:none; -moz-appearance:none; appearance:none;
+            background-color:var(--dm-card,#fff); cursor:pointer;
+            flex-shrink:0; vertical-align:middle; position:relative;
+            transition: background 0.15s, border-color 0.15s;
         }
-        input[type="checkbox"]:checked {
-            background:#2E97D4; border-color:#2E97D4;
-            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
-            background-size:12px; background-repeat:no-repeat; background-position:center;
+        input[type="checkbox"]:not(.sr-only):checked {
+            background-color:#2E97D4; border-color:#2E97D4;
         }
-        [data-theme="dark"] input[type="checkbox"] { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.15); }
-        [data-theme="dark"] input[type="checkbox"]:checked { background:#2E97D4; border-color:#2E97D4; }
+        input[type="checkbox"]:not(.sr-only):checked::after {
+            content:''; position:absolute; top:2px; left:5px;
+            width:4px; height:8px; border:solid #fff; border-width:0 2px 2px 0;
+            transform:rotate(45deg);
+        }
+        [data-theme="dark"] input[type="checkbox"]:not(.sr-only) { background-color:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.2); }
+        [data-theme="dark"] input[type="checkbox"]:not(.sr-only):checked { background-color:#2E97D4; border-color:#2E97D4; }
 
         /* Fix Tailwind divide/border colors for dark mode */
         [data-theme="dark"] .divide-y > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255,255,255,0.06); }
