@@ -1007,7 +1007,7 @@
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js" defer></script>
 <script>
     // Carousel with live drag
@@ -1365,6 +1365,23 @@
         setJenis('pulang');
         return true;
     }
+
+    // Cleanup kamera saat Turbo cache halaman
+    document.addEventListener('turbo:before-cache', function() {
+        cleanupPresensiModal();
+        var video = document.getElementById('video');
+        if (video) { video.srcObject = null; video.load(); }
+    });
+
+    // Re-init kamera saat kembali dari bfcache
+    window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+            var modal = document.getElementById('presensiModal');
+            if (modal && modal.classList.contains('show')) {
+                initializePresensiModal();
+            }
+        }
+    });
 
     document.addEventListener('turbo:load', function() {
         const presensiModal = document.getElementById('presensiModal');

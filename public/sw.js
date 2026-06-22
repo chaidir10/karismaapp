@@ -1,4 +1,4 @@
-const CACHE_NAME = "karisma-pwa-v4";
+const CACHE_NAME = "karisma-pwa-v5";
 
 const urlsToCache = [
     "/public/pwa/icons/icon-192x192.png",

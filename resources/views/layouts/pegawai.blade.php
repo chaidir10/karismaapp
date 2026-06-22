@@ -1164,7 +1164,17 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register("/sw.js")
-                    .then(function(r) {})
+                    .then(function(reg) {
+                        reg.update();
+                        reg.addEventListener('updatefound', function() {
+                            var newWorker = reg.installing;
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'activated') {
+                                    location.reload();
+                                }
+                            });
+                        });
+                    })
                     .catch(function(e) { console.error('SW failed:', e); });
             });
         }
