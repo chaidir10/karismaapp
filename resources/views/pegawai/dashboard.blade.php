@@ -1304,11 +1304,10 @@
         setInterval(update, 1000);
     })();
 
+    var requireMasukFirst = @json($requireMasukBeforePulang);
     function handlePulangWithCheck() {
-        if (!sudahPresensiMasuk) {
-            if (window.bootstrap?.Modal) {
-                openSimpleModal('warningModal');
-            }
+        if (requireMasukFirst && !sudahPresensiMasuk) {
+            openSimpleModal('warningModal');
             return;
         }
 
