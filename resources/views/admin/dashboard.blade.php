@@ -162,6 +162,22 @@
         border: 1px solid rgba(255,255,255,0.06);
     }
 
+    .card-search {
+        position:relative; padding:0 16px 12px;
+    }
+    .card-search input {
+        width:100%; padding:9px 14px 9px 36px; border:1px solid var(--gray-200);
+        border-radius:10px; font-size:12px; background:var(--white); color:var(--dark); outline:none;
+    }
+    .card-search input:focus { border-color:var(--primary); }
+    .card-search i {
+        position:absolute; left:28px; top:50%; transform:translateY(-50%);
+        color:var(--gray-400); font-size:12px; pointer-events:none;
+    }
+    [data-theme="dark"] .card-search input {
+        background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.08); color:var(--dm-text);
+    }
+
     .card-header {
         display: flex;
         justify-content: space-between;
@@ -313,45 +329,47 @@
     }
 
     /* Badges */
-    .badge {
-        padding: 4px 8px;
-        border-radius: 6px;
+    .badge, .status-badge {
+        padding: 4px 10px;
+        border-radius: 8px;
         font-size: 11px;
-        font-weight: 500;
-        text-transform: capitalize;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        letter-spacing: 0.1px;
     }
 
-    .jenis-badge {
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--primary);
-        border: 1px solid rgba(59, 130, 246, 0.2);
+    .jenis-badge, .jenis-masuk {
+        background: rgba(90,182,234,0.12);
+        color: #2E97D4;
+        border: 1px solid rgba(90,182,234,0.2);
     }
-
-    .status-badge {
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 500;
+    .jenis-pulang {
+        background: rgba(254,170,43,0.12);
+        color: #d97706;
+        border: 1px solid rgba(254,170,43,0.2);
     }
 
     .status-badge.on-time {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
+        background: rgba(16,185,129,0.1);
+        color: #10b981;
+        border: 1px solid rgba(16,185,129,0.15);
     }
-
     .status-badge.late {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
+        background: rgba(239,68,68,0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239,68,68,0.15);
     }
-
     .status-badge.neutral {
-        background: rgba(100, 116, 139, 0.1);
+        background: rgba(100,116,139,0.08);
         color: var(--gray-500);
+        border: 1px solid rgba(100,116,139,0.12);
     }
-
     .status-badge.pending {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--warning);
+        background: rgba(245,158,11,0.1);
+        color: #d97706;
+        border: 1px solid rgba(245,158,11,0.15);
     }
 
     .date-cell {
@@ -420,24 +438,36 @@
     /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 30px 20px;
+        padding: 40px 20px;
+        height: 220px;
+        vertical-align: middle;
     }
 
     .empty-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         color: var(--gray-400);
     }
 
-    .empty-content i {
-        font-size: 32px;
+    .empty-content .empty-icon {
+        width: 56px; height: 56px; border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px;
+        background: rgba(148,163,184,0.08);
+        color: var(--gray-300);
+        margin-bottom: 4px;
+    }
+    [data-theme="dark"] .empty-content .empty-icon {
+        background: rgba(148,163,184,0.06);
+        color: var(--gray-500);
     }
 
     .empty-content p {
         margin: 0;
         font-size: 13px;
+        font-weight: 500;
     }
 
     /* Modal Styles */
@@ -818,6 +848,7 @@
                 <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
             </div>
             <div class="card-content">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -857,7 +888,7 @@
                             <tr>
                                 <td colspan="5" class="empty-state">
                                     <div class="empty-content">
-                                        <i class="fas fa-inbox"></i>
+                                        <div class="empty-icon"><i class="fas fa-shield-check"></i></div>
                                         <p>Tidak ada presensi pending</p>
                                     </div>
                                 </td>
@@ -875,16 +906,17 @@
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
-            <div style="display:flex; gap:6px; padding:14px 16px 0; background:var(--dm-card,#fff);">
-                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:10px 14px; border:none; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
+                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-clock"></i> Presensi ({{ count($pengajuanPending ?? []) }})
                 </button>
-                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:10px 14px; border:none; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.06); color:var(--dm-muted,#64748b); box-shadow:inset 0 1px 2px rgba(0,0,0,0.04); backdrop-filter:blur(4px); -webkit-tap-highlight-color:transparent;">
+                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-calendar-minus"></i> Cuti/DL ({{ count($cutiPending ?? []) }})
                 </button>
             </div>
             {{-- Tab Presensi --}}
             <div class="card-content" id="adminTabPresensi">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'pengajuanPendingTable')"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -918,7 +950,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="5" class="empty-state"><div class="empty-content"><i class="fas fa-inbox"></i><p>Tidak ada pengajuan presensi pending</p></div></td></tr>
+                            <tr><td colspan="5" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-paper-plane"></i></div><p>Tidak ada pengajuan presensi pending</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -926,6 +958,7 @@
             </div>
             {{-- Tab Cuti/DL --}}
             <div class="card-content" id="adminTabCuti" style="display:none;">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'cutiPendingTable')"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -938,7 +971,7 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="cutiPendingTable">
                             @forelse($cutiPending ?? [] as $idx => $cp)
                             <tr style="cursor:pointer;" onclick="openCutiModal({{ $cp->id }})" id="cutiRow{{ $cp->id }}"
                                 data-cuti-id="{{ $cp->id }}"
@@ -964,7 +997,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="6" class="empty-state"><div class="empty-content"><i class="fas fa-calendar-minus"></i><p>Tidak ada pengajuan cuti/DL pending</p></div></td></tr>
+                            <tr><td colspan="6" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-calendar-xmark"></i></div><p>Tidak ada pengajuan cuti/DL pending</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1021,25 +1054,38 @@
         </div>
 
         {{-- Presensi Hari Ini --}}
+        @php
+            $presensiMasuk = collect($presensiHariIni ?? [])->where('jenis','masuk');
+            $presensiPulangHI = collect($presensiHariIni ?? [])->where('jenis','pulang');
+        @endphp
         <div class="content-card" id="presensiHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Daftar Presensi Hari Ini</h2>
                 <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
             </div>
-            <div class="card-content">
+            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
+                <button type="button" class="hi-tab active" data-hitab="masuk" onclick="switchHiTab('masuk')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $presensiMasuk->count() }})
+                </button>
+                <button type="button" class="hi-tab" data-hitab="pulang" onclick="switchHiTab('pulang')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                    <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $presensiPulangHI->count() }})
+                </button>
+            </div>
+            {{-- Tab Masuk --}}
+            <div class="card-content" id="hiTabMasuk">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiMasukTable')"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th data-sort="text">Nama Pegawai <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Status <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Nama Pegawai</th>
+                                <th data-sort="text">Jam</th>
+                                <th data-sort="text">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="presensiHariIniTable" data-paginate="5">
-                            @forelse($presensiHariIni ?? [] as $index => $p)
+                        <tbody id="presensiMasukTable" data-paginate="5">
+                            @forelse($presensiMasuk as $index => $p)
                             <tr class="clickable-row"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
@@ -1048,40 +1094,66 @@
                                 data-lokasi="{{ $p->lokasi ?? '' }}"
                                 data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
                                 data-status="{{ $p->status ?? '' }}"
-                                data-status-label="@if(($p->jenis ?? '') === 'masuk'){{ $p->terlambat ? 'Terlambat' : 'Tepat Waktu' }}@elseif(($p->jenis ?? '') === 'pulang'){{ ($p->waktu_kurang_menit ?? 0) > 0 ? 'Waktu Kurang' : 'Tepat Waktu' }}@else -@endif">
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                                data-status-label="{{ $p->terlambat ? 'Terlambat' : 'Tepat Waktu' }}"
+                                data-approve-url="/admin/presensi/{{ $p->id }}/approve"
+                                data-reject-url="/admin/presensi/{{ $p->id }}/reject">
+                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
-                                <td>
-                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
-                                </td>
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
-                                    @if(($p->jenis ?? '') === 'masuk')
-                                        @if($p->terlambat)
-                                            <span class="status-badge late">Terlambat</span>
-                                        @else
-                                            <span class="status-badge on-time">Tepat Waktu</span>
-                                        @endif
-                                    @elseif(($p->jenis ?? '') === 'pulang')
-                                        @if($p->waktu_kurang_menit > 0)
-                                            <span class="status-badge late">Waktu Kurang</span>
-                                        @else
-                                            <span class="status-badge on-time">Tepat Waktu</span>
-                                        @endif
+                                    @if($p->terlambat)
+                                        <span class="status-badge late"><i class="fas fa-clock" style="font-size:9px;"></i> Terlambat</span>
                                     @else
-                                        <span class="status-badge neutral">-</span>
+                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
                                     @endif
                                 </td>
                             </tr>
                             @empty
+                            <tr><td colspan="4" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-fingerprint"></i></div><p>Belum ada presensi masuk</p></div></td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{-- Tab Pulang --}}
+            <div class="card-content" id="hiTabPulang" style="display:none;">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPulangTable')"></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <td colspan="5" class="empty-state">
-                                    <div class="empty-content">
-                                        <i class="fas fa-clipboard-list"></i>
-                                        <p>Belum ada presensi hari ini</p>
-                                    </div>
+                                <th class="text-center">No</th>
+                                <th data-sort="text">Nama Pegawai</th>
+                                <th data-sort="text">Jam</th>
+                                <th data-sort="text">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="presensiPulangTable" data-paginate="5">
+                            @forelse($presensiPulangHI as $index => $p)
+                            <tr class="clickable-row"
+                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="{{ $p->jenis ?? '' }}"
+                                data-jam="{{ $p->jam ?? '-' }}"
+                                data-lokasi="{{ $p->lokasi ?? '' }}"
+                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
+                                data-status="{{ $p->status ?? '' }}"
+                                data-status-label="{{ ($p->waktu_kurang_menit ?? 0) > 0 ? 'Pulang Cepat' : 'Tepat Waktu' }}"
+                                data-approve-url="/admin/presensi/{{ $p->id }}/approve"
+                                data-reject-url="/admin/presensi/{{ $p->id }}/reject">
+                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="time-cell">{{ $p->jam ?? '-' }}</td>
+                                <td>
+                                    @if(($p->waktu_kurang_menit ?? 0) > 0)
+                                        <span class="status-badge pending"><i class="fas fa-clock" style="font-size:9px;"></i> Pulang Cepat</span>
+                                    @else
+                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
+                                    @endif
                                 </td>
                             </tr>
+                            @empty
+                            <tr><td colspan="4" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-arrow-right-from-bracket"></i></div><p>Belum ada presensi pulang</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1096,6 +1168,7 @@
                 <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburHariIni->where('jenis','masuk')->count() }} pegawai</span>
             </div>
             <div class="card-content">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburHariIniTable')"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1125,7 +1198,7 @@
                             <tr>
                                 <td colspan="4" class="empty-state">
                                     <div class="empty-content">
-                                        <i class="fas fa-moon"></i>
+                                        <div class="empty-icon"><i class="fas fa-bolt-lightning"></i></div>
                                         <p>Tidak ada lembur hari ini</p>
                                     </div>
                                 </td>
@@ -1426,13 +1499,25 @@
         openModal('modalCutiDetail');
     }
 
+    function searchTable(input, tbodyId) {
+        var query = input.value.toLowerCase().trim();
+        var tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+        var rows = tbody.querySelectorAll('tr:not(.empty-row)');
+        rows.forEach(function(row) {
+            if (row.querySelector('.empty-state')) return;
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.indexOf(query) !== -1 ? '' : 'none';
+        });
+    }
+
     function refreshTablePagination(tbodyId) {
         var tbody = document.getElementById(tbodyId);
         if (!tbody || !tableInstances[tbodyId]) return;
         var inst = tableInstances[tbodyId];
         inst.rows = Array.from(tbody.querySelectorAll('tr'));
         if (inst.rows.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="empty-content"><i class="fas fa-inbox"></i><p>Tidak ada data</p></div></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-circle-check"></i></div><p>Semua pengajuan telah diproses</p></div></td></tr>';
             var pg = tbody.closest('table').parentElement.querySelector('.table-pagination');
             if (pg) pg.style.display = 'none';
             return;
