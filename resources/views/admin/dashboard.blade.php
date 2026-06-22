@@ -931,9 +931,9 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th data-sort="text">Pegawai</th>
-                                <th data-sort="date">Tanggal</th>
-                                <th data-sort="text">Jenis</th>
+                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -973,9 +973,9 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th>Pegawai</th>
-                                <th>Jenis</th>
-                                <th>Tanggal</th>
+                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th>
                                 <th>Hari</th>
                                 <th class="text-center">Aksi</th>
                             </tr>

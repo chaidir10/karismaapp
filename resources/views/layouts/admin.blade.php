@@ -295,18 +295,18 @@
 
         /* Sidebar styling - FIXED */
         .sidebar {
-            width: 250px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 230px;
+            background: var(--dm-card, #fff);
+            border-right: 1px solid var(--dm-border, #e2e8f0);
             position: fixed;
             left: 0;
             top: 0;
             height: 100vh;
             z-index: 40;
-            display: none; /* Default hidden untuk mobile */
+            display: none;
         }
+        [data-theme="dark"] .sidebar { background: #0d1117; border-color: rgba(255,255,255,0.06); }
 
-        /* Sidebar untuk desktop */
         @media (min-width: 640px) {
             .sidebar {
                 display: flex;
@@ -318,46 +318,73 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            overflow-y: auto; /* Scroll sendiri untuk sidebar */
         }
 
         .sidebar-scrollable {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 1rem;
+            padding: 8px 0 16px;
         }
 
         .sidebar-item {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
-            color: #4b5563;
+            gap: 10px;
+            padding: 9px 14px;
+            color: var(--dm-muted, #64748b);
             text-decoration: none;
-            transition: all 0.2s;
-            border-radius: 8px;
-            margin: 4px 10px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 10px;
+            margin: 2px 10px;
             cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
         }
 
-        .sidebar-item:hover,
+        .sidebar-item:hover {
+            background: rgba(90,182,234,0.08);
+            color: var(--dm-text, #1e293b);
+        }
+
         .sidebar-item.active {
-            background-color: rgba(79, 70, 229, 0.1);
-            color: #2099dfff;
+            background: rgba(90,182,234,0.12);
+            color: #2E97D4;
+            font-weight: 600;
+        }
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            border-radius: 0 3px 3px 0;
+            background: #2E97D4;
         }
 
         .sidebar-item i {
-            width: 20px;
-            margin-right: 12px;
+            width: 18px;
+            font-size: 14px;
+            text-align: center;
+            flex-shrink: 0;
         }
 
         .sidebar-title {
-            font-size: 14px;
-            font-weight: 600;
-            padding: 0 20px;
-            margin: 20px 0 8px 0;
-            color: #6b7280;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 0 16px;
+            margin: 16px 0 6px;
+            color: var(--dm-muted, #94a3b8);
             text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
+
+        [data-theme="dark"] .sidebar-item { color: #8b9cb8; }
+        [data-theme="dark"] .sidebar-item:hover { background: rgba(90,182,234,0.08); color: #e2e8f0; }
+        [data-theme="dark"] .sidebar-item.active { background: rgba(90,182,234,0.12); color: #7dd3fc; }
+        [data-theme="dark"] .sidebar-item.active::before { background: #5AB6EA; }
 
         /* Content area */
         .content-area {
@@ -526,10 +553,7 @@
         }
         /* ─── Dark Mode ─── */
         [data-theme="dark"] body { background-color: var(--dm-bg) !important; color: var(--dm-text) !important; }
-        [data-theme="dark"] .sidebar { background: var(--dm-sidebar) !important; border-color: var(--dm-border) !important; }
-        [data-theme="dark"] .sidebar-item { color: var(--dm-muted) !important; }
-        [data-theme="dark"] .sidebar-item:hover, [data-theme="dark"] .sidebar-item.active { background-color: rgba(90,182,234,0.1) !important; color: #5AB6EA !important; }
-        [data-theme="dark"] .sidebar-title { color: var(--dm-muted) !important; }
+        /* sidebar dark mode handled in .sidebar CSS above */
         [data-theme="dark"] .topbar { background: var(--dm-topbar) !important; box-shadow: none !important; border-bottom: 1px solid var(--dm-border) !important; }
         [data-theme="dark"] .main-content { background: var(--dm-bg) !important; }
         [data-theme="dark"] .mobile-sidebar-content { background: var(--dm-sidebar) !important; border-color: var(--dm-border) !important; }
@@ -676,50 +700,46 @@
         <!-- Desktop Sidebar -->
         <div class="sidebar">
             <div class="sidebar-content">
-                <div class="p-4 border-b">
-                    <h2 class="text-xl font-bold text-blue-400">Admin Panel</h2>
+                <div style="padding:20px 16px 16px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,#5AB6EA,#2E97D4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px;">K</div>
+                        <div>
+                            <div style="font-size:14px; font-weight:700; color:var(--dm-text,#1e293b);">KARISMA</div>
+                            <div style="font-size:10px; color:var(--dm-muted,#94a3b8);">Admin Panel</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="sidebar-scrollable">
-                    <div class="p-2">
+                    <div style="padding:4px 0;">
                         <div class="sidebar-title">Menu Utama</div>
                         <a href="{{ route('admin.dashboard') }}" class="sidebar-item @if(request()->routeIs('admin.dashboard')) active @endif">
-                            <i class="fas fa-home"></i>
-                            Dashboard
+                            <i class="fas fa-house"></i> Dashboard
                         </a>
                         <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
-                            <i class="fas fa-users"></i>
-                            Pegawai
+                            <i class="fas fa-user-group"></i> Pegawai
                         </a>
                         <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
-                            <i class="fas fa-clock"></i>
-                            Jam Kerja
+                            <i class="fas fa-clock"></i> Jam Kerja
                         </a>
-
                         <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
-                            <i class="fas fa-map-marker-alt"></i>
-                            Lokasi
+                            <i class="fas fa-location-dot"></i> Lokasi
                         </a>
-
                         <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
-                            <i class="fas fa-chart-bar"></i>
-                            Laporan
+                            <i class="fas fa-chart-column"></i> Laporan
                         </a>
                         <a href="{{ route('admin.performa.index') }}" class="sidebar-item @if(request()->routeIs('admin.performa.*')) active @endif">
-                            <i class="fas fa-trophy"></i>
-                            Performa
+                            <i class="fas fa-ranking-star"></i> Performa
                         </a>
                         <a href="{{ route('admin.pengumuman.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengumuman.*')) active @endif">
-                            <i class="fas fa-bullhorn"></i>
-                            Pengumuman
+                            <i class="fas fa-bullhorn"></i> Pengumuman
                         </a>
 
-                        <div class="sidebar-title mt-6">Pengaturan</div>
+                        <div class="sidebar-title">Pengaturan</div>
                         <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengaturan.*')) active @endif">
-                            <i class="fas fa-cog"></i>
-                            Pengaturan
+                            <i class="fas fa-gear"></i> Pengaturan
                         </a>
                         <a href="#" class="sidebar-item logout-trigger">
-                            <i class="fas fa-sign-out-alt"></i> Logout
+                            <i class="fas fa-arrow-right-from-bracket"></i> Logout
                         </a>
 
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
@@ -768,49 +788,46 @@
     <!-- Mobile Sidebar -->
     <div id="mobileSidebar" class="mobile-sidebar sm:hidden">
         <div class="mobile-sidebar-content">
-            <div class="p-4 border-b">
-                <h2 class="text-xl font-bold text-indigo-600">Admin Panel</h2>
+            <div style="padding:20px 16px 16px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,#5AB6EA,#2E97D4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px;">K</div>
+                    <div>
+                        <div style="font-size:14px; font-weight:700; color:var(--dm-text,#1e293b);">KARISMA</div>
+                        <div style="font-size:10px; color:var(--dm-muted,#94a3b8);">Admin Panel</div>
+                    </div>
+                </div>
             </div>
             <div class="sidebar-scrollable">
-                <div class="p-2">
+                <div style="padding:4px 0;">
                     <div class="sidebar-title">Menu Utama</div>
                     <a href="{{ route('admin.dashboard') }}" class="sidebar-item @if(request()->routeIs('admin.dashboard')) active @endif">
-                        <i class="fas fa-home"></i>
-                        Dashboard
+                        <i class="fas fa-house"></i> Dashboard
                     </a>
                     <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
-                        <i class="fas fa-users"></i>
-                        Pegawai
+                        <i class="fas fa-user-group"></i> Pegawai
                     </a>
                     <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
-                        <i class="fas fa-clock"></i>
-                        Jam Kerja
+                        <i class="fas fa-clock"></i> Jam Kerja
                     </a>
                     <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Lokasi
+                        <i class="fas fa-location-dot"></i> Lokasi
                     </a>
                     <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif">
-                        <i class="fas fa-chart-bar"></i>
-                        Laporan
+                        <i class="fas fa-chart-column"></i> Laporan
                     </a>
                     <a href="{{ route('admin.performa.index') }}" class="sidebar-item @if(request()->routeIs('admin.performa.*')) active @endif">
-                        <i class="fas fa-trophy"></i>
-                        Performa
+                        <i class="fas fa-ranking-star"></i> Performa
                     </a>
                     <a href="{{ route('admin.pengumuman.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengumuman.*')) active @endif">
-                        <i class="fas fa-bullhorn"></i>
-                        Pengumuman
+                        <i class="fas fa-bullhorn"></i> Pengumuman
                     </a>
 
-                    <div class="sidebar-title mt-6">Pengaturan</div>
-                    <a href="" class="sidebar-item">
-                        <i class="fas fa-cog"></i>
-                        Settings
+                    <div class="sidebar-title">Pengaturan</div>
+                    <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengaturan.*')) active @endif">
+                        <i class="fas fa-gear"></i> Pengaturan
                     </a>
                     <a href="#" class="sidebar-item logout-trigger">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Logout
+                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
                     </a>
                 </div>
             </div>
