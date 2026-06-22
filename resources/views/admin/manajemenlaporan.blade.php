@@ -14,7 +14,7 @@
         min-height: 0 !important;
     }
     .ts-wrapper.single .ts-control {
-        border: 1px solid #d1d5db !important;
+        border: 1px solid var(--dm-border,#d1d5db) !important;
         border-radius: 12px !important;
         padding: 0 32px 0 16px !important;
         font-size: 14px;
@@ -22,7 +22,7 @@
         min-height: 42px !important;
         max-height: 42px !important;
         line-height: 40px;
-        background: #fff !important;
+        background: var(--dm-card,#fff) !important;
         box-shadow: none !important;
         display: flex;
         align-items: center;
@@ -30,8 +30,8 @@
     }
     .ts-wrapper.single.focus .ts-control { border-color: #6366f1 !important; }
     .ts-wrapper.single .ts-control > input { font-size: 14px; line-height: 40px; padding: 0 !important; margin: 0 !important; }
-    .ts-wrapper.single .ts-control .item { color: #374151; line-height: 40px; }
-    .ts-dropdown { border: 1px solid #d1d5db; border-radius: 12px; font-size: 14px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .ts-wrapper.single .ts-control .item { color: var(--dm-text,#374151); line-height: 40px; }
+    .ts-dropdown { border: 1px solid var(--dm-border,#d1d5db); border-radius: 12px; font-size: 14px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: var(--dm-card,#fff); }
     .ts-dropdown .option { padding: 9px 16px; }
     .ts-dropdown .option.active { background: #eef2ff; color: #4338ca; }
 
@@ -91,11 +91,11 @@
     </div>
 
     <!-- Filter Section -->
-    <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">Filter Laporan</h2>
+    <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:20px; margin-bottom:20px;">
+        <h2 class="text-lg font-semibold mb-4" style="color:var(--dm-text,#1e293b);">Filter Laporan</h2>
         <form id="formFilter" style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
             <div style="flex:3; min-width:200px;">
-                <label class="text-sm font-medium block mb-2 text-gray-700">Pilih Pegawai</label>
+                <label class="text-sm font-medium block mb-2" style="color:var(--dm-text,#374151);">Pilih Pegawai</label>
                 <select name="user_id" id="user_id">
                     <option value="">Semua Pegawai</option>
                     @foreach($users as $user)
@@ -104,8 +104,8 @@
                 </select>
             </div>
             <div style="flex:2; min-width:160px;">
-                <label class="text-sm font-medium block mb-2 text-gray-700">Bulan</label>
-                <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid #d1d5db; border-radius:12px; padding:0 16px; font-size:14px; outline:none;">
+                <label class="text-sm font-medium block mb-2" style="color:var(--dm-text,#374151);">Bulan</label>
+                <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid var(--dm-border,#d1d5db); border-radius:12px; padding:0 16px; font-size:14px; outline:none; background:var(--dm-card,#fff); color:var(--dm-text);">
             </div>
             <div style="flex:3; min-width:200px; display:flex; gap:8px;">
                 <button type="submit" id="btnTampilkan" disabled class="btn-primary" style="flex:2; height:42px;">
@@ -125,23 +125,23 @@
     </div>
 
     <!-- Tabel Laporan -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
+                <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama Pegawai</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Masuk</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Pulang</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Keterlambatan</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Pulang Cepat</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jam Kerja</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Waktu Kurang</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lembur</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Nama Pegawai</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Masuk</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Pulang</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Keterlambatan</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Pulang Cepat</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Jam Kerja</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Waktu Kurang</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Lembur</th>
                     </tr>
                 </thead>
-                <tbody id="laporanBody" class="bg-white divide-y divide-gray-200 text-xs">
+                <tbody id="laporanBody" class="divide-y text-xs" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
                     <tr>
                         <td colspan="8" class="px-4 py-6 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">

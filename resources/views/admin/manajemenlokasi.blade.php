@@ -16,10 +16,10 @@
     }
 
     .radius-control {
-        background: white;
+        background: var(--dm-card, #fff);
         padding: 10px;
         border-radius: 4px;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--dm-border, #e2e8f0);
     }
 
     .radius-control input {
@@ -88,9 +88,9 @@
     .address-container {
         margin-top: 10px;
         padding: 10px;
-        background-color: #f8fafc;
+        background-color: var(--dm-bg, #f8fafc);
         border-radius: 0.5rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--dm-border, #e2e8f0);
     }
 
     /* Action Buttons - Konsisten dengan Dashboard */
@@ -221,9 +221,9 @@
     }
 
     .modal-content {
-        background: white;
-        border-radius: 1rem;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        background: var(--dm-card, #fff);
+        border: 1px solid var(--dm-border, #e2e8f0);
+        border-radius: 14px;
         width: 100%;
         max-width: 90vw;
         max-height: 90vh;
@@ -264,13 +264,13 @@
     <!-- Main Content: Map and Table -->
     <div class="grid grid-cols-1 lg:grid-cols-10 gap-6 relative">
         <!-- Map Container (6/10) -->
-        <div class="lg:col-span-5 bg-white rounded-xl p-4 shadow-md relative" style="display:flex; flex-direction:column;">
-            <h2 class="text-lg font-semibold mb-4">Sebaran Titik Presensi</h2>
+        <div class="lg:col-span-5 p-4 relative" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; display:flex; flex-direction:column;">
+            <h2 class="text-lg font-semibold mb-4" style="color:var(--dm-text,#1e293b);">Sebaran Titik Presensi</h2>
             <div id="mainMap" class="w-full rounded-xl border relative z-0" style="flex:1; min-height:400px;"></div>
         </div>
 
         <!-- Table Container (4/10) -->
-        <div class="lg:col-span-5 bg-white rounded-xl p-4 shadow-md relative z-10">
+        <div class="lg:col-span-5 p-4 relative z-10" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
             <!-- Search and Filter -->
             <div class="mb-4 flex flex-col md:flex-row gap-4">
                 <div class="relative flex-grow">
@@ -278,32 +278,32 @@
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
                     <input type="text" id="searchInput" placeholder="Cari titik presensi..."
-                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-1 focus:outline-none text-sm shadow-sm" />
+                        class="pl-10 w-full px-4 py-2 rounded-xl focus:ring-1 focus:outline-none text-sm" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" />
                 </div>
                 <button id="btnSort"
-                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 flex items-center text-sm">
+                    class="px-4 py-2 rounded-xl flex items-center text-sm" style="background:var(--dm-bg,#f1f5f9); color:var(--dm-text,#374151);">
                     <i class="fas fa-sort mr-2"></i>
                     Urutkan
                 </button>
             </div>
 
             <!-- Table -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="rounded-xl overflow-hidden" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0);">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
+                        <thead style="background:var(--dm-bg,#f9fafb);">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Nama
                                     Titik</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Radius
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Radius
                                 </th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi
+                                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Aksi
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="titikTableBody" class="bg-white divide-y divide-gray-200 text-xs">
+                        <tbody id="titikTableBody" class="divide-y text-xs" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
                             @forelse($lokasi as $item)
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr class="transition-colors">
                                 <td class="px-4 py-3">
                                     <div class="font-medium text-xs">{{ $item->nama }}</div>
                                     <div class="text-gray-500 text-xs mt-1">{{ $item->alamat ?? 'Tidak ada alamat' }}</div>
@@ -375,26 +375,26 @@
             <div class="col-span-12 md:col-span-5 space-y-4">
                 <div>
                     <label class="text-sm font-medium block mb-1">Nama Titik <span class="text-red-500">*</span></label>
-                    <input type="text" id="nama" name="nama" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm required">
+                    <input type="text" id="nama" name="nama" class="w-full px-4 py-2 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px; required">
                     <div id="namaError" class="text-red-500 text-xs mt-1 hidden">Nama titik harus diisi</div>
                 </div>
                 <div>
                     <label class="text-sm font-medium block mb-1">Alamat</label>
                     <textarea id="alamat" name="alamat"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm"
+                        class="w-full px-4 py-2 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;"
                         rows="3"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-sm font-medium mb-1">Latitude <span class="text-red-500">*</span></label>
                         <input type="text" id="latitude" name="latitude"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm"
+                            class="w-full px-4 py-2 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;"
                             required>
                     </div>
                     <div>
                         <label class="text-sm font-medium mb-1">Longitude <span class="text-red-500">*</span></label>
                         <input type="text" id="longitude" name="longitude"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm"
+                            class="w-full px-4 py-2 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;"
                             required>
                     </div>
                 </div>
@@ -403,12 +403,12 @@
                     <div class="radius-slider-container">
                         <input type="range" id="radiusSlider" min="0" max="500" value="0" class="radius-slider">
                         <input type="number" id="radius" name="radius" min="0" max="500" value="0"
-                            class="radius-input px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-sm">
+                            class="radius-input px-3 py-2 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     </div>
                     <div id="radiusError" class="text-red-500 text-xs mt-1 hidden">Radius minimal 10 meter</div>
                     <div class="text-xs text-gray-500 mt-1">Jarak maksimal untuk dapat melakukan presensi</div>
                 </div>
-                <div class="flex justify-end gap-3 pt-3 border-t border-gray-200 mt-2">
+                <div class="flex justify-end gap-3 pt-3 mt-2" style="border-top:1px solid var(--dm-border,#e2e8f0);">
                     <!-- Tombol Batal -->
                     <button type="button"
                         class="btn-secondary"
@@ -452,31 +452,31 @@
 
             <!-- Detail Info -->
             <div class="col-span-12 md:col-span-5 space-y-4">
-                <div class="bg-gray-50 p-4 rounded-xl">
-                    <p class="font-semibold text-gray-700 text-xs">Nama Titik:</p>
+                <div class="p-4 rounded-xl" style="background:var(--dm-bg,#f9fafb);">
+                    <p class="font-semibold text-xs" style="color:var(--dm-text,#374151);">Nama Titik:</p>
                     <p id="detailNama" class="mt-1 text-sm"></p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl">
-                    <p class="font-semibold text-gray-700 text-xs">Alamat:</p>
+                <div class="p-4 rounded-xl" style="background:var(--dm-bg,#f9fafb);">
+                    <p class="font-semibold text-xs" style="color:var(--dm-text,#374151);">Alamat:</p>
                     <p id="detailAlamat" class="mt-1 text-sm"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 p-4 rounded-xl">
-                        <p class="font-semibold text-gray-700 text-xs">Latitude:</p>
+                    <div class="p-4 rounded-xl" style="background:var(--dm-bg,#f9fafb);">
+                        <p class="font-semibold text-xs" style="color:var(--dm-text,#374151);">Latitude:</p>
                         <p id="detailLat" class="mt-1 text-sm"></p>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-xl">
-                        <p class="font-semibold text-gray-700 text-xs">Longitude:</p>
+                    <div class="p-4 rounded-xl" style="background:var(--dm-bg,#f9fafb);">
+                        <p class="font-semibold text-xs" style="color:var(--dm-text,#374151);">Longitude:</p>
                         <p id="detailLon" class="mt-1 text-sm"></p>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl">
-                    <p class="font-semibold text-gray-700 text-xs">Radius:</p>
+                <div class="p-4 rounded-xl" style="background:var(--dm-bg,#f9fafb);">
+                    <p class="font-semibold text-xs" style="color:var(--dm-text,#374151);">Radius:</p>
                     <p id="detailRadius" class="mt-1 text-sm"></p>
                 </div>
 
                 <!-- Buttons -->
-                <div class="flex justify-end gap-3 pt-3 border-t border-gray-200 mt-2">
+                <div class="flex justify-end gap-3 pt-3 mt-2" style="border-top:1px solid var(--dm-border,#e2e8f0);">
                     <button
                         class="btn-secondary"
                         onclick="closeModal('modalDetail')">
@@ -504,7 +504,7 @@
         </div>
         <h2 class="text-xl font-bold mb-2">Hapus Titik Presensi</h2>
         <p class="text-gray-600">Apakah Anda yakin ingin menghapus <span id="deleteNama"
-                class="font-semibold text-gray-800"></span>?</p>
+                class="font-semibold" style="color:var(--dm-text,#1e293b);"></span>?</p>
         <p class="text-xs text-gray-500 mt-2">Data yang dihapus tidak dapat dikembalikan</p>
         <div class="flex justify-center gap-3 mt-6">
             <button

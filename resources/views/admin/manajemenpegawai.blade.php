@@ -17,21 +17,21 @@
     </div>
 
     <!-- Search & Filter Card -->
-    <div class="bg-white rounded-2xl shadow-md p-5 mb-6 border border-gray-100 text-sm">
+    <div class="p-5 mb-6 text-sm" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div class="md:col-span-5">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cari Pegawai</label>
+                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Cari Pegawai</label>
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="Cari nama atau NIP..."
-                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
                 </div>
             </div>
             <div class="md:col-span-3">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Filter Unit</label>
-                <select id="filterUnit" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Filter Unit</label>
+                <select id="filterUnit" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Unit</option>
                     @foreach($units as $unit)
                     <option value="{{ $unit->id }}">{{ $unit->nama }}</option>
@@ -39,8 +39,8 @@
                 </select>
             </div>
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Filter Jenis Pegawai</label>
-                <select id="filterJenis" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Filter Jenis Pegawai</label>
+                <select id="filterJenis" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Jenis</option>
                     <option value="asn">ASN</option>
                     <option value="non_asn">Non ASN</option>
@@ -48,7 +48,7 @@
                 </select>
             </div>
             <div class="md:col-span-2">
-                <button id="resetFilter" class="w-full h-[42px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm shadow-sm transition-colors duration-200 flex items-center justify-center">
+                <button id="resetFilter" class="w-full h-[42px] px-4 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-center" style="background:var(--dm-bg,#f1f5f9); color:var(--dm-text,#374151);">
                     <i class="fas fa-sync-alt mr-2"></i> Reset
                 </button>
             </div>
@@ -56,33 +56,33 @@
     </div>
 
     <!-- Employee Table Card -->
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+    <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
+                <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
-                        <th colspan="8" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+                        <th colspan="8" class="px-6 py-4 text-right text-sm font-semibold" style="color:var(--dm-text,#374151);">
                             Total Pegawai: <span id="totalPegawai">{{ $users->count() }}</span>
                         </th>
                     </tr>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">No</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Foto</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jabatan</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Shift</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">No</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Foto</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Nama</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Jabatan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Shift</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="pegawaiTableBody" class="bg-white divide-y divide-gray-200">
+                <tbody id="pegawaiTableBody" class="divide-y" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
                     @foreach($users as $i => $user)
-                    <tr class="pegawai-row hover:bg-gray-50 transition-colors duration-150"
+                    <tr class="pegawai-row transition-colors duration-150"
                         data-name="{{ strtolower($user->name) }}"
                         data-nip="{{ $user->nip }}"
                         data-unit="{{ $user->unit_id ?? '' }}"
                         data-jenis="{{ $user->jenis_pegawai }}">
-                        <td class="px-6 py-4 text-sm text-gray-900">{{ $i+1 }}</td>
+                        <td class="px-6 py-4 text-sm" style="color:var(--dm-text,#1e293b);">{{ $i+1 }}</td>
                         <td class="px-6 py-4">
                             <div class="flex justify-center">
                                 <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
@@ -93,18 +93,18 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
+                        <td class="px-6 py-4 text-sm" style="color:var(--dm-text,#1e293b);">
                             {{ $user->name ?? '-' }} <br>
                             <small class="font-semibold text-blue-500">
                                 {{ $user->nip ?? 'N/A' }}
                             </small>
                         </td>
 
-                        <td class="px-6 py-4 text-sm text-gray-900">{{ $user->jabatan ?? '-' }} <br>
+                        <td class="px-6 py-4 text-sm" style="color:var(--dm-text,#1e293b);">{{ $user->jabatan ?? '-' }} <br>
                             <small class="font-semibold text-blue-500">{{ ucwords(str_replace('_', ' ', $user->jenis_pegawai)) }}</small>
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
+                        <td class="px-6 py-4 text-sm" style="color:var(--dm-text,#1e293b);">
                             {{ $user->wilayahKerja->nama ?? '-' }}
                             @if($user->wilayahKerjaList->count() > 1)
                             <br><small class="text-blue-500">+{{ $user->wilayahKerjaList->count() - 1 }} lokasi lain</small>
@@ -138,35 +138,35 @@
 
 <!-- Add Employee Modal -->
 <div id="modalAdd" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300 overflow-y-auto py-8">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalAddContent">
+    <div class="w-full max-w-2xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalAddContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <button onclick="closeModal('modalAdd')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200 z-10">
             <i class="fas fa-times"></i>
         </button>
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Tambah Pegawai Baru</h2>
-            <p class="text-gray-500 mt-1">Isi formulir untuk menambahkan pegawai baru</p>
+            <h2 class="text-2xl font-bold" style="color:var(--dm-text,#1e293b);">Tambah Pegawai Baru</h2>
+            <p class="mt-1" style="color:var(--dm-muted,#64748b);">Isi formulir untuk menambahkan pegawai baru</p>
         </div>
         <form id="formAdd" enctype="multipart/form-data" class="space-y-5">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">NIP</label>
-                    <input type="number" name="nip" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">NIP</label>
+                    <input type="number" name="nip" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                    <input type="text" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Nama Lengkap</label>
+                    <input type="text" name="name" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" required>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jabatan</label>
-                    <input type="text" name="jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Jabatan</label>
+                    <input type="text" name="jabatan" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Utama</label>
-                    <select name="unit_id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Unit Utama</label>
+                    <select name="unit_id" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
@@ -176,12 +176,12 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi Presensi (boleh pilih lebih dari 1)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 border border-gray-300 rounded-xl max-h-40 overflow-y-auto">
+                <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Lokasi Presensi (boleh pilih lebih dari 1)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 rounded-xl max-h-40 overflow-y-auto" style="border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     @foreach($units as $u)
                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
                         <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">{{ $u->nama }}</span>
+                        <span class="text-sm" style="color:var(--dm-text,#374151);">{{ $u->nama }}</span>
                     </label>
                     @endforeach
                 </div>
@@ -189,33 +189,33 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Pegawai</label>
-                    <select name="jenis_pegawai" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Jenis Pegawai</label>
+                    <select name="jenis_pegawai" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                         <option value="asn">ASN</option>
                         <option value="non_asn">Non ASN</option>
                         <option value="outsourcing">Outsourcing</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Email</label>
+                    <input type="email" name="email" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
-                    <input type="text" name="no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">No HP</label>
+                    <input type="text" name="no_hp" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                    <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Password</label>
+                    <input type="password" name="password" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
-                    <select name="can_shift" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Pegawai Shift?</label>
+                    <select name="can_shift" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
                     </select>
@@ -223,8 +223,8 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
-                <textarea name="alamat" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" rows="3"></textarea>
+                <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Alamat</label>
+                <textarea name="alamat" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" rows="3"></textarea>
             </div>
 
 
@@ -242,25 +242,25 @@
 
 <!-- Detail Employee Modal - Improved Layout -->
 <div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300 overflow-y-auto py-8">
-    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalDetailContent">
+    <div class="w-full max-w-4xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalDetailContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <button onclick="closeModal('modalDetail')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200">
             <i class="fas fa-times"></i>
         </button>
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Detail Data Pegawai</h2>
-            <p class="text-gray-500 mt-1">Informasi lengkap pegawai</p>
+            <h2 class="text-2xl font-bold" style="color:var(--dm-text,#1e293b);">Detail Data Pegawai</h2>
+            <p class="mt-1" style="color:var(--dm-muted,#64748b);">Informasi lengkap pegawai</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Photo & Basic Info -->
             <div class="lg:col-span-1">
-                <div class="bg-gray-50 rounded-xl p-6 text-center">
+                <div class="rounded-xl p-6 text-center" style="background:var(--dm-bg,#f9fafb);">
                     <div class="flex justify-center mb-4">
                         <img id="detailFoto" class="h-32 w-32 rounded-full object-cover border-4 border-white shadow-lg mx-auto">
                     </div>
-                    <h3 id="detailNama" class="text-xl font-bold text-gray-800 mb-2"></h3>
-                    <p id="detailJabatan" class="text-gray-600 mb-1"></p>
-                    <p id="detailNIP" class="text-sm text-gray-500 mb-3"></p>
+                    <h3 id="detailNama" class="text-xl font-bold mb-2" style="color:var(--dm-text,#1e293b);"></h3>
+                    <p id="detailJabatan" class="mb-1" style="color:var(--dm-muted,#64748b);"></p>
+                    <p id="detailNIP" class="text-sm mb-3" style="color:var(--dm-muted,#64748b);"></p>
                     <div id="detailJenisPegawai" class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"></div>
                 </div>
 
@@ -280,62 +280,62 @@
 
             <!-- Detailed Information -->
             <div class="lg:col-span-2">
-                <div class="bg-white border border-gray-200 rounded-xl p-6">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informasi Kontak & Lainnya</h4>
+                <div class="rounded-xl p-6" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0);">
+                    <h4 class="text-lg font-semibold mb-4 pb-2" style="color:var(--dm-text,#1e293b); border-bottom:1px solid var(--dm-border,#e2e8f0);">Informasi Kontak & Lainnya</h4>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
-                                <p id="detailEmail" class="text-gray-800 font-medium"></p>
+                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Email</label>
+                                <p id="detailEmail" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">No. Telepon</label>
-                                <p id="detailNoHP" class="text-gray-800 font-medium"></p>
+                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">No. Telepon</label>
+                                <p id="detailNoHP" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Unit Kerja</label>
-                                <p id="detailUnit" class="text-gray-800 font-medium"></p>
+                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Unit Kerja</label>
+                                <p id="detailUnit" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
                             </div>
                         </div>
 
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Jenis Pegawai</label>
-                                <p id="detailJenis" class="text-gray-800 font-medium"></p>
+                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Jenis Pegawai</label>
+                                <p id="detailJenis" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Status</label>
+                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Status</label>
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-500">
                                     <i class="fas fa-circle text-xs mr-1"></i> Aktif
                                 </span>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Tanggal Bergabung</label>
-                                <p id="detailTanggal" class="text-gray-800 font-medium">-</p>
+                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Tanggal Bergabung</label>
+                                <p id="detailTanggal" class="font-medium" style="color:var(--dm-text,#1e293b);">-</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-2">Lokasi Presensi</label>
+                        <label class="block text-sm font-medium mb-2" style="color:var(--dm-muted,#64748b);">Lokasi Presensi</label>
                         <div id="detailLokasiPresensi" class="bg-blue-50 rounded-lg p-3 text-blue-800 border border-blue-200 text-sm">-</div>
                     </div>
 
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-2">Jadwal Kerja</label>
+                        <label class="block text-sm font-medium mb-2" style="color:var(--dm-muted,#64748b);">Jadwal Kerja</label>
                         <div id="detailShift" class="bg-indigo-50 rounded-lg p-3 text-indigo-800 border border-indigo-200 text-sm">Jam Kerja Normal</div>
                     </div>
 
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-2">Alamat</label>
-                        <div id="detailAlamat" class="bg-gray-50 rounded-lg p-4 text-gray-800 border border-gray-200"></div>
+                        <label class="block text-sm font-medium mb-2" style="color:var(--dm-muted,#64748b);">Alamat</label>
+                        <div id="detailAlamat" class="rounded-lg p-4" style="background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0);"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-end space-x-4 pt-6 mt-6 border-t border-gray-200">
+        <div class="flex justify-end space-x-4 pt-6 mt-6" style="border-top:1px solid var(--dm-border,#e2e8f0);">
             <button onclick="closeModal('modalDetail')" class="btn-secondary">
                 Tutup
             </button>
@@ -345,13 +345,13 @@
 
 <!-- Edit Employee Modal -->
 <div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300 overflow-y-auto py-8">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalEditContent">
+    <div class="w-full max-w-2xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <button onclick="closeModal('modalEdit')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200">
             <i class="fas fa-times"></i>
         </button>
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Edit Data Pegawai</h2>
-            <p class="text-gray-500 mt-1">Perbarui informasi pegawai</p>
+            <h2 class="text-2xl font-bold" style="color:var(--dm-text,#1e293b);">Edit Data Pegawai</h2>
+            <p class="mt-1" style="color:var(--dm-muted,#64748b);">Perbarui informasi pegawai</p>
         </div>
         <form id="formEdit" enctype="multipart/form-data" class="space-y-5">
             @csrf
@@ -359,23 +359,23 @@
             <input type="hidden" name="id" id="edit_id">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">NIP</label>
-                    <input type="number" name="nip" id="edit_nip" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">NIP</label>
+                    <input type="number" name="nip" id="edit_nip" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                    <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" required>
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Nama Lengkap</label>
+                    <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" required>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jabatan</label>
-                    <input type="text" name="jabatan" id="edit_jabatan" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Jabatan</label>
+                    <input type="text" name="jabatan" id="edit_jabatan" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Utama</label>
-                    <select name="unit_id" id="edit_unit" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Unit Utama</label>
+                    <select name="unit_id" id="edit_unit" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
@@ -385,12 +385,12 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi Presensi (boleh pilih lebih dari 1)</label>
-                <div id="editWilayahCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 border border-gray-300 rounded-xl max-h-40 overflow-y-auto">
+                <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Lokasi Presensi (boleh pilih lebih dari 1)</label>
+                <div id="editWilayahCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 rounded-xl max-h-40 overflow-y-auto" style="border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     @foreach($units as $u)
                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
                         <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 edit-wilayah-cb">
-                        <span class="text-sm text-gray-700">{{ $u->nama }}</span>
+                        <span class="text-sm" style="color:var(--dm-text,#374151);">{{ $u->nama }}</span>
                     </label>
                     @endforeach
                 </div>
@@ -398,28 +398,28 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Pegawai</label>
-                    <select name="jenis_pegawai" id="edit_jenis_pegawai" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Jenis Pegawai</label>
+                    <select name="jenis_pegawai" id="edit_jenis_pegawai" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                         <option value="asn">ASN</option>
                         <option value="non_asn">Non ASN</option>
                         <option value="outsourcing">Outsourcing</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" name="email" id="edit_email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Email</label>
+                    <input type="email" name="email" id="edit_email" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
-                    <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">No HP</label>
+                    <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Pegawai Shift?</label>
+                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Pegawai Shift?</label>
                     <select name="can_shift" id="edit_can_shift"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none">
+                        class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
                     </select>
@@ -427,8 +427,8 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
-                <textarea name="alamat" id="edit_alamat" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" rows="3"></textarea>
+                <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Alamat</label>
+                <textarea name="alamat" id="edit_alamat" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" rows="3"></textarea>
             </div>
 
             <div class="flex justify-end space-x-4 pt-4">
@@ -445,13 +445,13 @@
 
 <!-- Delete Confirmation Modal -->
 <div id="modalDeleteConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative mx-4 transform transition-all duration-300 scale-95">
+    <div class="w-full max-w-md p-6 relative mx-4 transform transition-all duration-300 scale-95" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                 <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Hapus</h3>
-            <p class="text-gray-500 mb-6">Apakah Anda yakin ingin menghapus data pegawai ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <h3 class="text-lg font-semibold mb-2" style="color:var(--dm-text,#1e293b);">Konfirmasi Hapus</h3>
+            <p class="mb-6" style="color:var(--dm-muted,#64748b);">Apakah Anda yakin ingin menghapus data pegawai ini? Tindakan ini tidak dapat dibatalkan.</p>
 
             <div class="flex justify-center space-x-3">
                 <button type="button" onclick="closeModal('modalDeleteConfirmation')"
@@ -469,13 +469,13 @@
 
 <!-- Reset Password Confirmation Modal -->
 <div id="modalResetPasswordConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative mx-4 transform transition-all duration-300 scale-95">
+    <div class="w-full max-w-md p-6 relative mx-4 transform transition-all duration-300 scale-95" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                 <i class="fas fa-key text-green-600 text-xl"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Reset Password</h3>
-            <p class="text-gray-500 mb-6">Password akan direset ke NIP pegawai. Apakah Anda yakin?</p>
+            <h3 class="text-lg font-semibold mb-2" style="color:var(--dm-text,#1e293b);">Reset Password</h3>
+            <p class="mb-6" style="color:var(--dm-muted,#64748b);">Password akan direset ke NIP pegawai. Apakah Anda yakin?</p>
 
             <div class="flex justify-center space-x-3">
                 <button type="button" onclick="closeModal('modalResetPasswordConfirmation')"
@@ -529,9 +529,9 @@
 
 <!-- Loading Overlay -->
 <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl p-6 flex items-center space-x-3">
+    <div class="p-6 flex items-center space-x-3" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-        <span class="text-gray-700 font-medium">Memproses...</span>
+        <span class="font-medium" style="color:var(--dm-text,#374151);">Memproses...</span>
     </div>
 </div>
 

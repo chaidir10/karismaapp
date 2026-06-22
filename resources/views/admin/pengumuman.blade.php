@@ -13,12 +13,12 @@
     .ql-editor.ql-blank::before { color: var(--gray) !important; }
 
     .p-card {
-        background: #fff; border-radius: 16px; margin-bottom: 12px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;
+        background: var(--dm-card, #fff); border-radius: 14px; margin-bottom: 12px;
+        border: 1px solid var(--dm-border, #e2e8f0);
         overflow: hidden; transition: box-shadow 0.2s, transform 0.15s;
         cursor: default;
     }
-    .p-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .p-card:hover { box-shadow: none; }
     .p-card.dragging { opacity:0.5; transform:scale(0.98); }
     .p-card.drag-over { border-top:2px solid #3b82f6; }
     .p-card-inner { display: flex; gap: 12px; padding: 16px 20px; align-items: center; }
@@ -150,7 +150,7 @@
             </div>
         </div>
         @empty
-        <div class="bg-white rounded-xl" style="text-align:center; padding:60px 20px;">
+        <div class="rounded-xl" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; text-align:center; padding:60px 20px;">
             <div style="width:64px; height:64px; border-radius:16px; background:var(--dm-card, #f1f5f9); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:var(--dm-muted, #94a3b8);">
                 <i class="fas fa-bullhorn"></i>
             </div>

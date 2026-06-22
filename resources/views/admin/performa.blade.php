@@ -118,22 +118,22 @@
     <!-- Tabel Performa -->
     <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
+                <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase w-12">#</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Pegawai</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Hadir</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Tepat Masuk</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Telat</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Pulang Tepat</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Pulang Cepat</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Jam Kerja Cukup</th>
-                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Total Durasi</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase" style="min-width:180px">Performa</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase w-12" style="color:var(--dm-text,#374151);">#</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Pegawai</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Hadir</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Tepat Masuk</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Telat</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Pulang Tepat</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Pulang Cepat</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Jam Kerja Cukup</th>
+                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Total Durasi</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); min-width:180px">Performa</th>
                     </tr>
                 </thead>
-                <tbody id="performaBody" class="bg-white divide-y divide-gray-200 text-sm">
+                <tbody id="performaBody" class="divide-y text-sm" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
                     <tr>
                         <td colspan="10" class="px-4 py-8 text-center text-gray-500">
                             <i class="fas fa-trophy text-4xl text-gray-300 mb-3 block"></i>
