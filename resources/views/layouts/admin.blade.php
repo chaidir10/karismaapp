@@ -224,6 +224,19 @@
             background:rgba(90,182,234,0.12); color:#7dd3fc; border-color:rgba(90,182,234,0.2);
         }
 
+        /* Fix Tailwind divide/border colors for dark mode */
+        [data-theme="dark"] .divide-y > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255,255,255,0.06); }
+        [data-theme="dark"] .divide-x > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255,255,255,0.06); }
+        [data-theme="dark"] .border-gray-100, [data-theme="dark"] .border-gray-200,
+        [data-theme="dark"] .border-gray-300 { border-color: rgba(255,255,255,0.06) !important; }
+        [data-theme="dark"] .bg-gray-50, [data-theme="dark"] .bg-gray-100 { background: rgba(255,255,255,0.03) !important; }
+        [data-theme="dark"] .text-gray-400 { color: #475569 !important; }
+        [data-theme="dark"] .text-gray-500, [data-theme="dark"] .text-gray-600 { color: #94a3b8 !important; }
+        [data-theme="dark"] .text-gray-700, [data-theme="dark"] .text-gray-800, [data-theme="dark"] .text-gray-900 { color: #e2e8f0 !important; }
+        [data-theme="dark"] .bg-white { background: var(--dm-card) !important; }
+        [data-theme="dark"] .border-white { border-color: rgba(255,255,255,0.1) !important; }
+        [data-theme="dark"] .shadow-sm, [data-theme="dark"] .shadow-md, [data-theme="dark"] .shadow-lg { box-shadow: none !important; }
+
         /* Layout utama */
         .main-container {
             display: flex;
