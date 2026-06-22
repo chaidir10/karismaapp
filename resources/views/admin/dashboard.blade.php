@@ -1255,23 +1255,23 @@
             <h3 class="modal-title">Detail Pengajuan Pending</h3>
             <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
-            {{-- Left: Bukti --}}
-            <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
-                <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Pengajuan</div>
-                <div id="detailBuktiPengajuan" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
-                    <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
-                    <span style="font-size:12px; color:var(--gray-400);">Tidak ada bukti</span>
+        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:420px;">
+            <div class="modal-col">
+                <div class="modal-col-label">Bukti Pengajuan</div>
+                <div class="modal-col-content" id="detailBuktiPengajuan" style="position:relative;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                        <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
+                        <span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>
+                    </div>
                 </div>
             </div>
-            {{-- Right: Info --}}
-            <div style="padding:16px 20px; display:flex; flex-direction:column;">
-                <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div class="modal-info-col">
+                <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
-                    <div class="info-item full" style="grid-column:1/-1;"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
+                    <div class="info-item full"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
                 </div>
                 <div style="margin-top:auto; display:flex; gap:8px;">
                     <button type="button" class="btn-success" id="modalBtnApprove" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
