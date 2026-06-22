@@ -140,10 +140,9 @@
     </div>
 
     <!-- Cuti / DL Section -->
-    @if(isset($cutiList))
     <div style="font-size:14px; font-weight:700; color:var(--dark); margin:20px 0 10px;">Cuti / Dinas Luar</div>
     <div class="pengajuan-list">
-        @forelse($cutiList as $c)
+        @forelse(($cutiList ?? collect()) as $c)
         @php
             $cIcon = $c->jenis === 'dinas_luar'
                 ? ['cls' => 'fa-briefcase', 'color' => 'var(--primary-dark)', 'bg' => 'var(--primary-soft)']
@@ -152,8 +151,8 @@
                 : ($c->status === 'rejected' ? ['bg' => 'var(--danger-light)', 'color' => 'var(--danger)', 'text' => 'Ditolak']
                 : ['bg' => '#fef3c7', 'color' => '#d97706', 'text' => 'Menunggu']);
         @endphp
-        <div class="pengajuan-card" style="cursor:default;">
-            <div class="detail-icon-box" style="background:{{ $cIcon['bg'] }};"><i class="fas {{ $cIcon['cls'] }}" style="color:{{ $cIcon['color'] }};"></i></div>
+        <div class="p-card" style="cursor:default;">
+            <div class="p-icon" style="background:{{ $cIcon['bg'] }}; color:{{ $cIcon['color'] }};"><i class="fas {{ $cIcon['cls'] }}"></i></div>
             <div style="flex:1; min-width:0;">
                 <div style="font-size:14px; font-weight:700; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $c->label }}</div>
                 <div style="font-size:11px; color:var(--gray); margin-top:2px;">
@@ -176,7 +175,6 @@
         </div>
         @endforelse
     </div>
-    @endif
 </div>
 
 <!-- Floating Button -->
