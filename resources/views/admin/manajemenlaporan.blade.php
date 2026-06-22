@@ -93,29 +93,30 @@
     <!-- Filter Section -->
     <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:20px; margin-bottom:20px;">
         <h2 class="text-lg font-semibold mb-4" style="color:var(--dm-text,#1e293b);">Filter Laporan</h2>
-        <form id="formFilter" style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
-            <div style="flex:3; min-width:200px;">
-                <label class="text-sm font-medium block mb-2" style="color:var(--dm-text,#374151);">Pilih Pegawai</label>
-                <select name="user_id" id="user_id">
-                    <option value="">Semua Pegawai</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
-                    @endforeach
-                </select>
+        <form id="formFilter">
+            <div style="display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+                <div style="flex:1; min-width:200px;">
+                    <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Pilih Pegawai</label>
+                    <select name="user_id" id="user_id">
+                        <option value="">Semua Pegawai</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="flex:0 0 180px;">
+                    <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Bulan</label>
+                    <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; padding:0 14px; font-size:13px; outline:none; background:var(--dm-card,#fff); color:var(--dm-text);">
+                </div>
             </div>
-            <div style="flex:2; min-width:160px;">
-                <label class="text-sm font-medium block mb-2" style="color:var(--dm-text,#374151);">Bulan</label>
-                <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid var(--dm-border,#d1d5db); border-radius:12px; padding:0 16px; font-size:14px; outline:none; background:var(--dm-card,#fff); color:var(--dm-text);">
-            </div>
-            <div style="flex:3; min-width:200px; display:flex; gap:8px;">
-                <button type="submit" id="btnTampilkan" disabled class="btn-primary" style="flex:2; height:42px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
-                    Tampilkan
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="submit" id="btnTampilkan" disabled class="btn-primary" style="height:40px; flex:1; min-width:120px;">
+                    <i class="fas fa-search"></i> Tampilkan
                 </button>
-                <a href="#" id="btnPdf" class="btn-danger" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
+                <a href="#" id="btnPdf" class="btn-danger" style="height:40px; flex:1; min-width:140px; opacity:0.4; pointer-events:none;">
                     <i class="fas fa-file-pdf"></i> Download PDF
                 </a>
-                <a href="#" id="btnExcel" class="btn-success" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
+                <a href="#" id="btnExcel" class="btn-success" style="height:40px; flex:1; min-width:140px; opacity:0.4; pointer-events:none;">
                     <i class="fas fa-file-excel"></i> Download Excel
                 </a>
             </div>
