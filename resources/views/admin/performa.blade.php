@@ -4,6 +4,17 @@
 
 @push('styles')
 <style>
+    .info-note-warning {
+        background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2);
+        border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:#92400e;
+    }
+    .info-note-warning i { color:#d97706; }
+    [data-theme="dark"] .info-note-warning {
+        background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.2); color:#fbbf24;
+    }
+    [data-theme="dark"] .info-note-warning i { color:#fbbf24; }
+    [data-theme="dark"] .info-note-warning strong { color:#fde68a; }
+
     .perf-bar {
         height: 6px;
         border-radius: 3px;
@@ -72,9 +83,9 @@
     </div>
 
     <!-- Info Metodologi -->
-    <div style="background:var(--dm-card,#fffbeb); border:1px solid var(--dm-border,#fde68a); border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:var(--dm-text,#92400e);">
+    <div class="info-note-warning">
         <div style="display:flex; gap:8px; align-items:flex-start;">
-            <i class="fas fa-info-circle" style="margin-top:2px; color:var(--dm-muted,#d97706);"></i>
+            <i class="fas fa-info-circle" style="margin-top:2px;"></i>
             <div>
                 <strong>Sistem Penilaian (4 Komponen):</strong>
                 Kehadiran (25%) + Kedisiplinan Masuk (30%) + Kedisiplinan Pulang (20%) + Jam Kerja Terpenuhi (25%) = Total Performa.
