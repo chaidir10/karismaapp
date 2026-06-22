@@ -63,7 +63,7 @@
                         <option value="only" {{ $faceMode === 'only' ? 'selected' : '' }}>Aktifkan hanya untuk...</option>
                     </select>
                     <div id="faceUserBtn" style="display:{{ $faceMode !== 'all' ? 'block' : 'none' }};">
-                        <button type="button" onclick="openUserModal('face')" style="width:100%; padding:9px 12px; border:1px dashed var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; color:var(--dm-muted,#64748b); background:var(--dm-bg,#f9fafb); cursor:pointer; text-align:left;">
+                        <button type="button" onclick="event.preventDefault();openUserModal('face')" style="width:100%; padding:9px 12px; border:1px dashed var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; color:var(--dm-muted,#64748b); background:var(--dm-bg,#f9fafb); cursor:pointer; text-align:left;">
                             <i class="fas fa-user-group" style="margin-right:6px;"></i>
                             <span id="faceUserCount">{{ count($faceUserIds) }}</span> pegawai dipilih — <span style="color:var(--dm-text,#2E97D4);">Ubah</span>
                         </button>
@@ -104,7 +104,7 @@
                             <option value="only" {{ $daruratMode === 'only' ? 'selected' : '' }}>Aktifkan hanya untuk...</option>
                         </select>
                         <div id="daruratUserBtn" style="display:{{ $daruratMode !== 'all' ? 'block' : 'none' }};">
-                            <button type="button" onclick="openUserModal('darurat')" style="width:100%; padding:9px 12px; border:1px dashed var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; color:var(--dm-muted,#64748b); background:var(--dm-bg,#f9fafb); cursor:pointer; text-align:left;">
+                            <button type="button" onclick="event.preventDefault();openUserModal('darurat')" style="width:100%; padding:9px 12px; border:1px dashed var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; color:var(--dm-muted,#64748b); background:var(--dm-bg,#f9fafb); cursor:pointer; text-align:left;">
                                 <i class="fas fa-user-group" style="margin-right:6px;"></i>
                                 <span id="daruratUserCount">{{ count($allowedIds) }}</span> pegawai dipilih — <span style="color:var(--dm-text,#2E97D4);">Ubah</span>
                             </button>
@@ -169,7 +169,7 @@
     });
 
     // User picker modal
-    @php $allPegawai = \App\Models\User::where('role','!=','superadmin')->orderBy('name')->get(['id','name','nip']); @endphp
+    @php $allPegawai = \App\Models\User::orderBy('name')->get(['id','name','nip']); @endphp
     var allUsers = @json($allPegawai);
     var currentTarget = '';
     var tempSelected = [];
@@ -183,6 +183,7 @@
         renderUserList('');
         var modal = document.getElementById('userPickerModal');
         var inner = document.getElementById('userPickerInner');
+        document.body.style.overflow = 'hidden';
         modal.style.display = 'flex';
         requestAnimationFrame(function() {
             modal.style.opacity = '1';
@@ -198,31 +199,43 @@
         modal.style.opacity = '0';
         inner.style.transform = 'translateY(12px)';
         inner.style.opacity = '0';
-        setTimeout(function() { modal.style.display = 'none'; }, 200);
+        setTimeout(function() {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 200);
     }
 
     function filterUserModal() { renderUserList(document.getElementById('userModalSearch').value.toLowerCase()); }
 
     function renderUserList(q) {
-        var html = '';
-        var count = 0;
+        var checked = [], unchecked = [];
         allUsers.forEach(function(u) {
             if (q && u.name.toLowerCase().indexOf(q) === -1 && (u.nip || '').indexOf(q) === -1) return;
-            var checked = tempSelected.indexOf(u.id) !== -1;
-            if (checked) count++;
-            html += '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--dm-border,#f1f5f9);cursor:pointer;">' +
-                '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleUser(' + u.id + ',this.checked)">' +
-                '<div><div style="font-size:13px;font-weight:500;color:var(--dm-text,#1e293b);">' + u.name + '</div>' +
+            var isChecked = tempSelected.indexOf(u.id) !== -1;
+            var item = '<label style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--dm-border,#f1f5f9);cursor:pointer;">' +
+                '<input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="toggleUser(' + u.id + ',this.checked)">' +
+                '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--dm-text,#1e293b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + u.name + '</div>' +
                 '<div style="font-size:10px;color:var(--dm-muted,#94a3b8);">' + (u.nip || '-') + '</div></div></label>';
+            isChecked ? checked.push(item) : unchecked.push(item);
         });
+        var html = '';
+        if (checked.length > 0) {
+            html += '<div style="font-size:10px;font-weight:700;color:var(--dm-muted,#94a3b8);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Dipilih (' + checked.length + ')</div>';
+            html += checked.join('');
+        }
+        if (unchecked.length > 0) {
+            if (checked.length > 0) html += '<div style="height:8px;border-bottom:2px solid var(--dm-border,#e2e8f0);margin-bottom:8px;"></div>';
+            html += '<div style="font-size:10px;font-weight:700;color:var(--dm-muted,#94a3b8);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Belum dipilih (' + unchecked.length + ')</div>';
+            html += unchecked.join('');
+        }
         document.getElementById('userModalList').innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--dm-muted,#94a3b8);font-size:13px;">Tidak ditemukan</div>';
         updateSelectedCount();
     }
 
-    function toggleUser(id, checked) {
-        if (checked && tempSelected.indexOf(id) === -1) tempSelected.push(id);
-        if (!checked) tempSelected = tempSelected.filter(function(x) { return x !== id; });
-        updateSelectedCount();
+    function toggleUser(id, chk) {
+        if (chk && tempSelected.indexOf(id) === -1) tempSelected.push(id);
+        if (!chk) tempSelected = tempSelected.filter(function(x) { return x !== id; });
+        renderUserList(document.getElementById('userModalSearch').value.toLowerCase());
     }
 
     function updateSelectedCount() {
