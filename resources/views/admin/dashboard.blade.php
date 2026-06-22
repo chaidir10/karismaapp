@@ -442,9 +442,9 @@
     }
 
     .modal-large { max-width: 900px; }
-    .modal-wide { max-width: 1000px; }
+    .modal-wide { max-width: 1100px; }
     .modal-3col {
-        display:grid; grid-template-columns:1fr 1fr 1.2fr; min-height:380px;
+        display:grid; grid-template-columns:1fr 1fr 1.2fr; min-height:480px;
     }
     .modal-col {
         padding:16px; display:flex; flex-direction:column;
@@ -1074,9 +1074,9 @@
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if($p->terlambat)
-                                        <span class="status-badge late"><i class="fas fa-clock" style="font-size:9px;"></i> Terlambat</span>
+                                        <span class="badge badge-danger"><i class="fas fa-clock" style="font-size:9px;"></i> Terlambat</span>
                                     @else
-                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
+                                        <span class="badge badge-success"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
                                     @endif
                                 </td>
                             </tr>
@@ -1118,9 +1118,9 @@
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if(($p->waktu_kurang_menit ?? 0) > 0)
-                                        <span class="status-badge pending"><i class="fas fa-clock" style="font-size:9px;"></i> Pulang Cepat</span>
+                                        <span class="badge badge-warning"><i class="fas fa-clock" style="font-size:9px;"></i> Pulang Cepat</span>
                                     @else
-                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
+                                        <span class="badge badge-success"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
                                     @endif
                                 </td>
                             </tr>
@@ -1732,16 +1732,17 @@
         // Status kehadiran
         var statusEl = document.getElementById('detailStatusHariIni');
         var label = (data.status_label || '-').trim();
-        var cls = 'neutral';
-        if (label === 'Tepat Waktu') cls = 'on-time';
-        else if (label === 'Terlambat' || label === 'Waktu Kurang') cls = 'late';
-        statusEl.innerHTML = '<span class="status-badge ' + cls + '">' + label + '</span>';
+        var cls = 'badge-neutral';
+        if (label === 'Tepat Waktu') cls = 'badge-success';
+        else if (label === 'Terlambat' || label === 'Waktu Kurang' || label === 'Pulang Cepat') cls = 'badge-danger';
+        statusEl.innerHTML = '<span class="badge ' + cls + '">' + label + '</span>';
 
         // Status verifikasi
         var verifEl = document.getElementById('detailVerifikasiHariIni');
         var st = (data.status || '').toLowerCase();
-        var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
-        verifEl.innerHTML = '<span class="status-badge ' + verifCls + '">' + capitalize(st) + '</span>';
+        var verifCls = st === 'approved' ? 'badge-success' : st === 'rejected' ? 'badge-danger' : 'badge-warning';
+        var verifLabel = st === 'approved' ? 'Disetujui' : st === 'rejected' ? 'Ditolak' : 'Menunggu';
+        verifEl.innerHTML = '<span class="badge ' + verifCls + '">' + verifLabel + '</span>';
 
         // Foto
         var fotoEl = document.getElementById('detailFotoHariIni');
