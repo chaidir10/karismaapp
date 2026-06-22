@@ -133,14 +133,18 @@
     </form>
 
     <!-- User Picker Modal -->
-    <div id="userPickerModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s ease;" onclick="if(event.target===this)closeUserModal()">
+    <div id="userPickerModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s ease;">
         <div id="userPickerInner" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; width:90%; max-width:480px; max-height:80vh; display:flex; flex-direction:column; overflow:hidden; transform:translateY(12px); opacity:0; transition:transform 0.2s ease, opacity 0.2s ease;">
             <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
                 <h3 style="font-size:15px; font-weight:700; color:var(--dm-text,#1e293b); margin:0;" id="userModalTitle">Pilih Pegawai</h3>
                 <button onclick="closeUserModal()" style="width:32px;height:32px;border-radius:8px;border:none;background:var(--dm-bg,#f1f5f9);color:var(--dm-muted,#64748b);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;"><i class="fas fa-times"></i></button>
             </div>
-            <div style="padding:12px 20px 8px;">
-                <input type="text" id="userModalSearch" placeholder="Cari nama pegawai..." oninput="filterUserModal()" style="width:100%; padding:8px 12px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text); outline:none;">
+            <div style="padding:12px 20px 0;">
+                <input type="text" id="userModalSearch" placeholder="Cari nama pegawai..." oninput="filterUserModal()" style="width:100%; padding:8px 12px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text); outline:none; margin-bottom:8px;">
+                <div style="display:flex; gap:8px;">
+                    <button type="button" onclick="checkAll(true)" style="flex:1; padding:6px; border:1px solid var(--dm-border,#d1d5db); border-radius:6px; font-size:11px; font-weight:600; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#374151); cursor:pointer;"><i class="fas fa-check-double" style="margin-right:4px;color:#10b981;"></i> Pilih Semua</button>
+                    <button type="button" onclick="checkAll(false)" style="flex:1; padding:6px; border:1px solid var(--dm-border,#d1d5db); border-radius:6px; font-size:11px; font-weight:600; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#374151); cursor:pointer;"><i class="fas fa-xmark" style="margin-right:4px;color:#ef4444;"></i> Hapus Semua</button>
+                </div>
             </div>
             <div style="flex:1; overflow-y:auto; padding:8px 20px;" id="userModalList"></div>
             <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--dm-border,#e2e8f0);">
@@ -155,6 +159,30 @@
 </div>
 @push('scripts')
 <script>
+    // Simpan scroll position sebelum submit/refresh
+    var mainContent = document.querySelector('.main-content');
+    var scrollTarget = mainContent || window;
+
+    function saveScroll() {
+        sessionStorage.setItem('pengaturan-scroll', (mainContent ? mainContent.scrollTop : window.scrollY));
+    }
+    function restoreScroll() {
+        var pos = sessionStorage.getItem('pengaturan-scroll');
+        if (pos) {
+            if (mainContent) mainContent.scrollTop = parseInt(pos);
+            else window.scrollTo(0, parseInt(pos));
+        }
+    }
+
+    // Simpan saat form submit
+    document.querySelector('form').addEventListener('submit', saveScroll);
+    // Simpan saat toggle/dropdown berubah
+    document.querySelectorAll('input[type="checkbox"].sr-only, select').forEach(function(el) {
+        el.addEventListener('change', saveScroll);
+    });
+    // Restore saat load
+    restoreScroll();
+
     document.getElementById('toggleDarurat').addEventListener('change', function() {
         document.getElementById('daruratUserSection').style.display = this.checked ? '' : 'none';
     });
@@ -168,17 +196,36 @@
         document.getElementById('daruratUserBtn').style.display = this.value !== 'all' ? 'block' : 'none';
     });
 
-    // User picker modal
+    // User picker modal — separate lists per target+mode
     @php $allPegawai = \App\Models\User::orderBy('name')->get(['id','name','nip']); @endphp
     var allUsers = @json($allPegawai);
     var currentTarget = '';
+    var currentMode = '';
     var tempSelected = [];
+    // Store selections per key: face_except, face_only, darurat_except, darurat_only
+    var savedSelections = {};
+
+    function initSavedSelections() {
+        ['face','darurat'].forEach(function(t) {
+            ['except','only'].forEach(function(m) {
+                var container = document.getElementById(t === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs');
+                var key = t + '_' + m;
+                savedSelections[key] = Array.from(container.querySelectorAll('input[data-mode="' + m + '"]')).map(function(i) { return parseInt(i.value); });
+            });
+        });
+    }
+    initSavedSelections();
 
     function openUserModal(target) {
         currentTarget = target;
-        var container = document.getElementById(target === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs');
-        tempSelected = Array.from(container.querySelectorAll('input')).map(function(i) { return parseInt(i.value); });
-        document.getElementById('userModalTitle').textContent = target === 'face' ? 'Pilih Pegawai (Face Detection)' : 'Pilih Pegawai (Absen Darurat)';
+        var modeEl = document.getElementById(target === 'face' ? 'faceDetectMode' : 'daruratMode');
+        currentMode = modeEl.value;
+        var key = target + '_' + currentMode;
+        tempSelected = (savedSelections[key] || []).slice();
+
+        var modeLabel = currentMode === 'except' ? 'Kecuali' : 'Hanya Untuk';
+        var targetLabel = target === 'face' ? 'Face Detection' : 'Absen Darurat';
+        document.getElementById('userModalTitle').textContent = targetLabel + ' — ' + modeLabel;
         document.getElementById('userModalSearch').value = '';
         renderUserList('');
         var modal = document.getElementById('userPickerModal');
@@ -207,8 +254,17 @@
 
     function filterUserModal() { renderUserList(document.getElementById('userModalSearch').value.toLowerCase()); }
 
+    function checkAll(state) {
+        if (state) {
+            tempSelected = allUsers.map(function(u) { return u.id; });
+        } else {
+            tempSelected = [];
+        }
+        renderUserList(document.getElementById('userModalSearch').value.toLowerCase());
+    }
+
     function renderUserList(q) {
-        var checked = [], unchecked = [];
+        var checkedItems = [], uncheckedItems = [];
         allUsers.forEach(function(u) {
             if (q && u.name.toLowerCase().indexOf(q) === -1 && (u.nip || '').indexOf(q) === -1) return;
             var isChecked = tempSelected.indexOf(u.id) !== -1;
@@ -216,20 +272,20 @@
                 '<input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="toggleUser(' + u.id + ',this.checked)">' +
                 '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--dm-text,#1e293b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + u.name + '</div>' +
                 '<div style="font-size:10px;color:var(--dm-muted,#94a3b8);">' + (u.nip || '-') + '</div></div></label>';
-            isChecked ? checked.push(item) : unchecked.push(item);
+            isChecked ? checkedItems.push(item) : uncheckedItems.push(item);
         });
         var html = '';
-        if (checked.length > 0) {
-            html += '<div style="font-size:10px;font-weight:700;color:var(--dm-muted,#94a3b8);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Dipilih (' + checked.length + ')</div>';
-            html += checked.join('');
+        if (checkedItems.length > 0) {
+            html += '<div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Dipilih (' + checkedItems.length + ')</div>';
+            html += checkedItems.join('');
         }
-        if (unchecked.length > 0) {
-            if (checked.length > 0) html += '<div style="height:8px;border-bottom:2px solid var(--dm-border,#e2e8f0);margin-bottom:8px;"></div>';
-            html += '<div style="font-size:10px;font-weight:700;color:var(--dm-muted,#94a3b8);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Belum dipilih (' + unchecked.length + ')</div>';
-            html += unchecked.join('');
+        if (uncheckedItems.length > 0) {
+            if (checkedItems.length > 0) html += '<div style="height:8px;border-bottom:2px solid var(--dm-border,#e2e8f0);margin-bottom:8px;"></div>';
+            html += '<div style="font-size:10px;font-weight:700;color:var(--dm-muted,#94a3b8);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Belum dipilih (' + uncheckedItems.length + ')</div>';
+            html += uncheckedItems.join('');
         }
         document.getElementById('userModalList').innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--dm-muted,#94a3b8);font-size:13px;">Tidak ditemukan</div>';
-        updateSelectedCount();
+        document.getElementById('userModalSelected').textContent = tempSelected.length;
     }
 
     function toggleUser(id, chk) {
@@ -238,16 +294,17 @@
         renderUserList(document.getElementById('userModalSearch').value.toLowerCase());
     }
 
-    function updateSelectedCount() {
-        document.getElementById('userModalSelected').textContent = tempSelected.length;
-    }
-
     function confirmUserModal() {
+        var key = currentTarget + '_' + currentMode;
+        savedSelections[key] = tempSelected.slice();
+
+        // Rebuild hidden inputs — store ALL selections for this target (both modes)
         var containerId = currentTarget === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs';
         var countId = currentTarget === 'face' ? 'faceUserCount' : 'daruratUserCount';
         var inputName = currentTarget === 'face' ? 'face_detection_users[]' : 'absen_darurat_users[]';
         var container = document.getElementById(containerId);
         container.innerHTML = '';
+        // Only save the current mode's selections (active mode)
         tempSelected.forEach(function(id) {
             var inp = document.createElement('input');
             inp.type = 'hidden'; inp.name = inputName; inp.value = id;
