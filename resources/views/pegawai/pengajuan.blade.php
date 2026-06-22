@@ -403,6 +403,11 @@
         _activeTab = tab;
         document.getElementById('tabPresensi').style.display = tab === 'presensi' ? 'block' : 'none';
         document.getElementById('tabCuti').style.display = tab === 'cuti' ? 'block' : 'none';
+
+        // Toggle required agar hidden form tidak block submit
+        document.querySelectorAll('#tabPresensi [required]').forEach(function(el) { el.required = (tab === 'presensi'); });
+        document.querySelectorAll('#tabCuti [required]').forEach(function(el) { el.required = (tab === 'cuti'); });
+
         document.querySelectorAll('.pengajuan-tab').forEach(function(btn) {
             if (btn.dataset.tab === tab) {
                 btn.style.background = 'var(--primary-soft)';
@@ -414,10 +419,11 @@
         });
     }
     function submitActiveForm() {
-        if (_activeTab === 'presensi') {
-            document.getElementById('createForm').requestSubmit();
+        var form = _activeTab === 'presensi' ? document.getElementById('createForm') : document.getElementById('cutiForm');
+        if (form.requestSubmit) {
+            form.requestSubmit();
         } else {
-            document.getElementById('cutiForm').requestSubmit();
+            form.submit();
         }
     }
 
