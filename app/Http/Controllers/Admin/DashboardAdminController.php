@@ -321,10 +321,11 @@ class DashboardAdminController extends Controller
             $pengajuan = PengajuanPresensi::findOrFail($id);
 
             // Tentukan jam
-            $jam = null;
-            try { $jam = $pengajuan->waktu; } catch (\Exception $e) {}
-            if ($jam) $jam = $jam . ':00';
-            if (!$jam) {
+            $jam = $pengajuan->waktu ?? null;
+            if ($jam) {
+                // Normalisasi ke H:i:s — hindari double :00
+                $jam = Carbon::parse($jam)->format('H:i:s');
+            } else {
                 $hari = Carbon::parse($pengajuan->tanggal)->format('l');
                 $jam = $pengajuan->jenis === 'masuk' ? '07:30:00'
                     : ($hari === 'Friday' ? '16:30:00' : '16:00:00');
