@@ -1672,8 +1672,6 @@
         document.getElementById('detailJenisPresensi').textContent    = capitalize(data.jenis);
         document.getElementById('detailJamPresensi').textContent      = data.jam      || '-';
         resolveAddress(data.lokasi, document.getElementById('detailLokasiPresensi'));
-            ? data.lokasi
-            : 'Tidak ada lokasi';
 
         // Foto
         var fotoEl = document.getElementById('detailFotoPresensi');
