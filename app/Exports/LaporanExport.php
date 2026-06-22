@@ -154,9 +154,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
-            ->setFitToHeight(0);
+            ->setFitToHeight(1);
         $sheet->getPageMargins()
-            ->setTop(0.5)->setRight(0.3)->setLeft(0.3)->setBottom(0.5);
+            ->setTop(0.15)->setRight(0.15)->setLeft(0.15)->setBottom(0.15)
+            ->setHeader(0.1)->setFooter(0.1);
         $sheet->getPageSetup()->setHorizontalCentered(true);
         $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$lastRow}");
 
