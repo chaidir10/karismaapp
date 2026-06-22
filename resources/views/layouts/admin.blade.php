@@ -245,6 +245,20 @@
         [data-theme="dark"] .btn-delete { background:rgba(239,68,68,0.15); color:#f87171; }
         [data-theme="dark"] .btn-delete:hover { background:#ef4444; color:#fff; }
 
+        /* Custom checkbox */
+        input[type="checkbox"] {
+            width:16px; height:16px; border-radius:4px; border:1.5px solid var(--dm-border,#cbd5e1);
+            appearance:none; -webkit-appearance:none; background:var(--dm-card,#fff); cursor:pointer;
+            display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; vertical-align:middle;
+        }
+        input[type="checkbox"]:checked {
+            background:#2E97D4; border-color:#2E97D4;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+            background-size:12px; background-repeat:no-repeat; background-position:center;
+        }
+        [data-theme="dark"] input[type="checkbox"] { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.15); }
+        [data-theme="dark"] input[type="checkbox"]:checked { background:#2E97D4; border-color:#2E97D4; }
+
         /* Fix Tailwind divide/border colors for dark mode */
         [data-theme="dark"] .divide-y > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255,255,255,0.06); }
         [data-theme="dark"] .divide-x > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255,255,255,0.06); }

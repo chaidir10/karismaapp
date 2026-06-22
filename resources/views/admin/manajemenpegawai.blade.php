@@ -303,100 +303,86 @@
 </div>
 
 <!-- Edit Employee Modal -->
-<div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300 overflow-y-auto py-8">
-    <div class="w-full max-w-2xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
-        <button onclick="closeModal('modalEdit')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold" style="color:var(--dm-text,#1e293b);">Edit Data Pegawai</h2>
-            <p class="mt-1" style="color:var(--dm-muted,#64748b);">Perbarui informasi pegawai</p>
+<div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-4">
+    <div class="w-full max-w-4xl relative mx-4 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+            <h2 style="font-size:16px; font-weight:700; color:var(--dm-text,#1e293b); margin:0;">Edit Data Pegawai</h2>
+            <button onclick="closeModal('modalEdit')" style="width:32px;height:32px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;background:var(--dm-bg,#f1f5f9);color:var(--dm-muted,#64748b);"><i class="fas fa-times"></i></button>
         </div>
-        <form id="formEdit" enctype="multipart/form-data" class="space-y-5">
+        <form id="formEdit" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <input type="hidden" name="id" id="edit_id">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">NIP</label>
-                    <input type="number" name="nip" id="edit_nip" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Nama Lengkap</label>
-                    <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" required>
-                </div>
-            </div>
+            @php $inputStyle = 'width:100%; padding:9px 12px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text); outline:none;'; $labelStyle = 'display:block; font-size:11px; font-weight:600; color:var(--dm-muted,#64748b); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.3px;'; @endphp
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Form Grid -->
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding:20px 24px;">
                 <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Jabatan</label>
-                    <input type="text" name="jabatan" id="edit_jabatan" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
+                    <label style="{{ $labelStyle }}">NIP</label>
+                    <input type="number" name="nip" id="edit_nip" style="{{ $inputStyle }}" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Unit Utama</label>
-                    <select name="unit_id" id="edit_unit" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
+                    <label style="{{ $labelStyle }}">Nama Lengkap</label>
+                    <input type="text" name="name" id="edit_name" style="{{ $inputStyle }}" required>
+                </div>
+                <div>
+                    <label style="{{ $labelStyle }}">Jabatan</label>
+                    <input type="text" name="jabatan" id="edit_jabatan" style="{{ $inputStyle }}">
+                </div>
+                <div>
+                    <label style="{{ $labelStyle }}">Email</label>
+                    <input type="email" name="email" id="edit_email" style="{{ $inputStyle }}">
+                </div>
+                <div>
+                    <label style="{{ $labelStyle }}">No HP</label>
+                    <input type="text" name="no_hp" id="edit_no_hp" style="{{ $inputStyle }}">
+                </div>
+                <div>
+                    <label style="{{ $labelStyle }}">Unit Utama</label>
+                    <select name="unit_id" id="edit_unit" style="{{ $inputStyle }}">
                         <option value="">-- Pilih Unit --</option>
                         @foreach($units as $u)
                         <option value="{{ $u->id }}">{{ $u->nama }}</option>
                         @endforeach
                     </select>
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Lokasi Presensi (boleh pilih lebih dari 1)</label>
-                <div id="editWilayahCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 rounded-xl max-h-40 overflow-y-auto" style="border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
-                    @foreach($units as $u)
-                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg">
-                        <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 edit-wilayah-cb">
-                        <span class="text-sm" style="color:var(--dm-text,#374151);">{{ $u->nama }}</span>
-                    </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Jenis Pegawai</label>
-                    <select name="jenis_pegawai" id="edit_jenis_pegawai" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
+                    <label style="{{ $labelStyle }}">Jenis Pegawai</label>
+                    <select name="jenis_pegawai" id="edit_jenis_pegawai" style="{{ $inputStyle }}">
                         <option value="asn">ASN</option>
                         <option value="non_asn">Non ASN</option>
                         <option value="outsourcing">Outsourcing</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Email</label>
-                    <input type="email" name="email" id="edit_email" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">No HP</label>
-                    <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Pegawai Shift?</label>
-                    <select name="can_shift" id="edit_can_shift"
-                        class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
+                    <label style="{{ $labelStyle }}">Pegawai Shift?</label>
+                    <select name="can_shift" id="edit_can_shift" style="{{ $inputStyle }}">
                         <option value="0">Tidak</option>
                         <option value="1">Ya</option>
                     </select>
                 </div>
+                <div>
+                    <label style="{{ $labelStyle }}">Alamat</label>
+                    <input type="text" name="alamat" id="edit_alamat" style="{{ $inputStyle }}">
+                </div>
+                <div style="grid-column:1/-1;">
+                    <label style="{{ $labelStyle }}">Lokasi Presensi (boleh lebih dari 1)</label>
+                    <div id="editWilayahCheckboxes" style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; max-height:80px; overflow-y:auto;">
+                        @foreach($units as $u)
+                        <label style="display:flex; align-items:center; gap:4px; cursor:pointer; font-size:12px; color:var(--dm-text,#374151); padding:3px 8px; border-radius:6px; background:var(--dm-bg,#f9fafb);">
+                            <input type="checkbox" name="wilayah_ids[]" value="{{ $u->id }}" class="edit-wilayah-cb" style="accent-color:#2E97D4;">
+                            {{ $u->nama }}
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium mb-2" style="color:var(--dm-text,#374151);">Alamat</label>
-                <textarea name="alamat" id="edit_alamat" class="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;" rows="3"></textarea>
-            </div>
-
-            <div class="flex justify-end space-x-4 pt-4">
-                <button type="button" onclick="closeModal('modalEdit')" class="btn-secondary">
-                    Batal
-                </button>
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-sync-alt mr-2"></i> Perbarui
-                </button>
+            <!-- Footer -->
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:16px 24px; border-top:1px solid var(--dm-border,#e2e8f0);">
+                <button type="button" onclick="closeModal('modalEdit')" class="btn-secondary" style="padding:10px 20px;">Batal</button>
+                <button type="submit" class="btn-primary" style="padding:10px 20px;"><i class="fas fa-save"></i> Simpan</button>
             </div>
         </form>
     </div>
