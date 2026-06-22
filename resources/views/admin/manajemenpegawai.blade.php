@@ -232,105 +232,71 @@
     </div>
 </div>
 
-<!-- Detail Employee Modal - Improved Layout -->
-<div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300 overflow-y-auto py-8">
-    <div class="w-full max-w-4xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalDetailContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
-        <button onclick="closeModal('modalDetail')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold" style="color:var(--dm-text,#1e293b);">Detail Data Pegawai</h2>
-            <p class="mt-1" style="color:var(--dm-muted,#64748b);">Informasi lengkap pegawai</p>
+<!-- Detail Employee Modal -->
+<div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-8">
+    <div class="w-full max-w-3xl relative mx-4 my-auto" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+            <h2 style="font-size:16px; font-weight:700; color:var(--dm-text,#1e293b); margin:0;">Detail Pegawai</h2>
+            <button onclick="closeModal('modalDetail')" class="modal-close" style="width:32px;height:32px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;background:var(--dm-bg,#f1f5f9);color:var(--dm-muted,#64748b);"><i class="fas fa-times"></i></button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Photo & Basic Info -->
-            <div class="lg:col-span-1">
-                <div class="rounded-xl p-6 text-center" style="background:var(--dm-bg,#f9fafb);">
-                    <div class="flex justify-center mb-4">
-                        <img id="detailFoto" class="h-32 w-32 rounded-full object-cover border-4 border-white shadow-lg mx-auto">
-                    </div>
-                    <h3 id="detailNama" class="text-xl font-bold mb-2" style="color:var(--dm-text,#1e293b);"></h3>
-                    <p id="detailJabatan" class="mb-1" style="color:var(--dm-muted,#64748b);"></p>
-                    <p id="detailNIP" class="text-sm mb-3" style="color:var(--dm-muted,#64748b);"></p>
-                    <div id="detailJenisPegawai" class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"></div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div style="display:flex; gap:8px; margin-top:16px;">
-                    <button onclick="openEditModalFromDetail()" class="btn-warning" style="flex:1; padding:10px; justify-content:center;">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button onclick="showResetPasswordConfirmation()" class="btn-primary" style="flex:1; padding:10px; justify-content:center;">
-                        <i class="fas fa-key"></i> Reset Password
-                    </button>
-                    <button onclick="showDeleteConfirmation()" class="btn-danger" style="flex:1; padding:10px; justify-content:center;">
-                        <i class="fas fa-trash-alt"></i> Hapus
-                    </button>
+        <!-- Profile Banner -->
+        <div style="display:flex; align-items:center; gap:16px; padding:20px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+            <img id="detailFoto" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:3px solid var(--dm-border,#e2e8f0); flex-shrink:0;">
+            <div style="flex:1; min-width:0;">
+                <div id="detailNama" style="font-size:18px; font-weight:700; color:var(--dm-text,#1e293b); margin-bottom:2px;"></div>
+                <div id="detailJabatan" style="font-size:13px; color:var(--dm-muted,#64748b); margin-bottom:6px;"></div>
+                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                    <span id="detailJenisPegawai" class="badge badge-primary"></span>
+                    <span id="detailNIP" style="font-size:11px; color:var(--dm-muted,#94a3b8);"></span>
                 </div>
             </div>
+            <span class="badge badge-success"><i class="fas fa-circle" style="font-size:6px;"></i> Aktif</span>
+        </div>
 
-            <!-- Detailed Information -->
-            <div class="lg:col-span-2">
-                <div class="rounded-xl p-6" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0);">
-                    <h4 class="text-lg font-semibold mb-4 pb-2" style="color:var(--dm-text,#1e293b); border-bottom:1px solid var(--dm-border,#e2e8f0);">Informasi Kontak & Lainnya</h4>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Email</label>
-                                <p id="detailEmail" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">No. Telepon</label>
-                                <p id="detailNoHP" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Unit Kerja</label>
-                                <p id="detailUnit" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Jenis Pegawai</label>
-                                <p id="detailJenis" class="font-medium" style="color:var(--dm-text,#1e293b);"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Status</label>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-500">
-                                    <i class="fas fa-circle text-xs mr-1"></i> Aktif
-                                </span>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1" style="color:var(--dm-muted,#64748b);">Tanggal Bergabung</label>
-                                <p id="detailTanggal" class="font-medium" style="color:var(--dm-text,#1e293b);">-</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium mb-2" style="color:var(--dm-muted,#64748b);">Lokasi Presensi</label>
-                        <div id="detailLokasiPresensi" class="bg-blue-50 rounded-lg p-3 text-blue-800 border border-blue-200 text-sm">-</div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium mb-2" style="color:var(--dm-muted,#64748b);">Jadwal Kerja</label>
-                        <div id="detailShift" class="bg-indigo-50 rounded-lg p-3 text-indigo-800 border border-indigo-200 text-sm">Jam Kerja Normal</div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium mb-2" style="color:var(--dm-muted,#64748b);">Alamat</label>
-                        <div id="detailAlamat" class="rounded-lg p-4" style="background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0);"></div>
-                    </div>
-                </div>
+        <!-- Info Grid -->
+        <div style="padding:20px 24px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Email</div>
+                <div id="detailEmail" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);"></div>
+            </div>
+            <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">No. Telepon</div>
+                <div id="detailNoHP" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);"></div>
+            </div>
+            <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Unit Kerja</div>
+                <div id="detailUnit" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);"></div>
+            </div>
+            <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Jenis Pegawai</div>
+                <div id="detailJenis" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);"></div>
+            </div>
+            <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Tanggal Bergabung</div>
+                <div id="detailTanggal" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);">-</div>
+            </div>
+            <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Jadwal Kerja</div>
+                <div id="detailShift" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);">Jam Kerja Normal</div>
+            </div>
+            <div style="grid-column:1/-1; background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Lokasi Presensi</div>
+                <div id="detailLokasiPresensi" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);">-</div>
+            </div>
+            <div style="grid-column:1/-1; background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
+                <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Alamat</div>
+                <div id="detailAlamat" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b); line-height:1.5;">-</div>
             </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:8px; padding-top:16px; margin-top:16px; border-top:1px solid var(--dm-border,#e2e8f0);">
-            <button onclick="closeModal('modalDetail')" class="btn-secondary" style="padding:10px 20px;">
-                Tutup
-            </button>
+        <!-- Footer Actions -->
+        <div style="display:flex; gap:8px; padding:16px 24px; border-top:1px solid var(--dm-border,#e2e8f0);">
+            <button onclick="openEditModalFromDetail()" class="btn-warning" style="flex:1; padding:10px; justify-content:center;"><i class="fas fa-edit"></i> Edit</button>
+            <button onclick="showResetPasswordConfirmation()" class="btn-primary" style="flex:1; padding:10px; justify-content:center;"><i class="fas fa-key"></i> Reset Password</button>
+            <button onclick="showDeleteConfirmation()" class="btn-danger" style="flex:1; padding:10px; justify-content:center;"><i class="fas fa-trash-alt"></i> Hapus</button>
+            <button onclick="closeModal('modalDetail')" class="btn-secondary" style="padding:10px 20px;">Tutup</button>
         </div>
     </div>
 </div>
