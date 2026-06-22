@@ -129,8 +129,8 @@
 </div>
 
 <!-- Add Employee Modal -->
-<div id="modalAdd" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300 overflow-y-auto py-8">
-    <div class="w-full max-w-2xl p-6 relative mx-4 transform transition-all duration-300 scale-95 my-auto" id="modalAddContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+<div id="modalAdd" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50   overflow-y-auto py-8">
+    <div class="w-full max-w-2xl p-6 relative mx-4  my-auto" id="modalAddContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <button onclick="closeModal('modalAdd')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200 z-10">
             <i class="fas fa-times"></i>
         </button>
@@ -233,7 +233,7 @@
 </div>
 
 <!-- Detail Employee Modal -->
-<div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-8">
+<div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto py-8">
     <div class="w-full max-w-3xl relative mx-4 my-auto" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
@@ -303,7 +303,7 @@
 </div>
 
 <!-- Edit Employee Modal -->
-<div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-4">
+<div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto py-4">
     <div class="w-full max-w-4xl relative mx-4 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
@@ -389,8 +389,8 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="modalDeleteConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300">
-    <div class="w-full max-w-md p-6 relative mx-4 transform transition-all duration-300 scale-95" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+<div id="modalDeleteConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  ">
+    <div class="w-full max-w-md p-6 relative mx-4 " style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                 <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
@@ -413,8 +413,8 @@
 </div>
 
 <!-- Reset Password Confirmation Modal -->
-<div id="modalResetPasswordConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300">
-    <div class="w-full max-w-md p-6 relative mx-4 transform transition-all duration-300 scale-95" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+<div id="modalResetPasswordConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  ">
+    <div class="w-full max-w-md p-6 relative mx-4 " style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                 <i class="fas fa-key text-green-600 text-xl"></i>
@@ -473,7 +473,7 @@
 </div>
 
 <!-- Loading Overlay -->
-<div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+<div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
     <div class="p-6 flex items-center space-x-3" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
         <span class="font-medium" style="color:var(--dm-text,#374151);">Memproses...</span>
