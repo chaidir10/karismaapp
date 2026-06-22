@@ -15,6 +15,23 @@ use PDF;
 
 class PresensiController extends Controller
 {
+    public function darurat()
+    {
+        $user = Auth::user();
+        $wilayahList = $user->wilayahKerjaList;
+        if ($wilayahList->isEmpty() && $user->wilayahKerja) {
+            $wilayahList = collect([$user->wilayahKerja]);
+        }
+        $wilayahJson = $wilayahList->map(fn($w) => [
+            'lat' => (float)$w->latitude, 'lng' => (float)$w->longitude,
+            'radius' => (float)($w->radius ?? 100), 'alamat' => $w->alamat ?? '',
+        ])->values()->toArray();
+
+        $shifts = $user->can_shift ? \App\Models\JamShift::all() : collect();
+
+        return view('pegawai.absen-darurat', compact('user', 'wilayahJson', 'shifts'));
+    }
+
     /**
      * Riwayat presensi hari ini (untuk dashboard pegawai)
      */
