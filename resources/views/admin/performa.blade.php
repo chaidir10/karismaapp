@@ -38,12 +38,12 @@
     </div>
 
     <!-- Filter -->
-    <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">Pilih Periode</h2>
+    <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:20px; margin-bottom:20px;">
+        <h2 style="font-size:15px; font-weight:600; margin-bottom:14px; color:var(--dm-text,#1e293b);">Pilih Periode</h2>
         <form id="formFilter" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div class="md:col-span-3">
-                <label class="text-sm font-medium block mb-2 text-gray-700">Bulan</label>
-                <select id="filterBulan" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
+                <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Bulan</label>
+                <select id="filterBulan" style="width:100%; padding:8px 14px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none;">
                     @php $namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
                     @foreach($namaBulan as $i => $nb)
                         <option value="{{ $i+1 }}" {{ (int)now()->format('m') === $i+1 ? 'selected' : '' }}>{{ $nb }}</option>
@@ -51,8 +51,8 @@
                 </select>
             </div>
             <div class="md:col-span-2">
-                <label class="text-sm font-medium block mb-2 text-gray-700">Tahun</label>
-                <select id="filterTahun" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
+                <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Tahun</label>
+                <select id="filterTahun" style="width:100%; padding:8px 14px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none;">
                     @for($y = now()->year; $y >= 2024; $y--)
                         <option value="{{ $y }}">{{ $y }}</option>
                     @endfor
@@ -72,9 +72,9 @@
     </div>
 
     <!-- Info Metodologi -->
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm text-amber-800">
-        <div class="flex items-start gap-2">
-            <i class="fas fa-info-circle mt-0.5"></i>
+    <div style="background:var(--dm-card,#fffbeb); border:1px solid var(--dm-border,#fde68a); border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:var(--dm-text,#92400e);">
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+            <i class="fas fa-info-circle" style="margin-top:2px; color:var(--dm-muted,#d97706);"></i>
             <div>
                 <strong>Sistem Penilaian (4 Komponen):</strong>
                 Kehadiran (25%) + Kedisiplinan Masuk (30%) + Kedisiplinan Pulang (20%) + Jam Kerja Terpenuhi (25%) = Total Performa.
@@ -86,26 +86,26 @@
 
     <!-- Ringkasan -->
     <div id="summaryCards" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 hidden">
-        <div class="bg-white rounded-xl p-4 shadow-md text-center">
-            <div class="text-2xl font-bold text-gray-800" id="sumHariKerja">-</div>
-            <div class="text-xs text-gray-500 mt-1">Hari Kerja Efektif</div>
+        <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:16px; text-align:center;">
+            <div style="font-size:22px; font-weight:700; color:var(--dm-text,#1e293b);" id="sumHariKerja">-</div>
+            <div style="font-size:11px; color:var(--dm-muted,#64748b); margin-top:4px;">Hari Kerja Efektif</div>
         </div>
-        <div class="bg-white rounded-xl p-4 shadow-md text-center">
-            <div class="text-2xl font-bold text-green-600" id="sumTotalPegawai">-</div>
-            <div class="text-xs text-gray-500 mt-1">Total Pegawai</div>
+        <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:16px; text-align:center;">
+            <div style="font-size:22px; font-weight:700; color:#10b981;" id="sumTotalPegawai">-</div>
+            <div style="font-size:11px; color:var(--dm-muted,#64748b); margin-top:4px;">Total Pegawai</div>
         </div>
-        <div class="bg-white rounded-xl p-4 shadow-md text-center">
-            <div class="text-2xl font-bold text-amber-600" id="sumRataPerforma">-</div>
-            <div class="text-xs text-gray-500 mt-1">Rata-rata Performa</div>
+        <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:16px; text-align:center;">
+            <div style="font-size:22px; font-weight:700; color:#d97706;" id="sumRataPerforma">-</div>
+            <div style="font-size:11px; color:var(--dm-muted,#64748b); margin-top:4px;">Rata-rata Performa</div>
         </div>
-        <div class="bg-white rounded-xl p-4 shadow-md text-center">
-            <div class="text-2xl font-bold text-blue-600" id="sumPerfect">-</div>
-            <div class="text-xs text-gray-500 mt-1">Skor Sempurna (100%)</div>
+        <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:16px; text-align:center;">
+            <div style="font-size:22px; font-weight:700; color:#2E97D4;" id="sumPerfect">-</div>
+            <div style="font-size:11px; color:var(--dm-muted,#64748b); margin-top:4px;">Skor Sempurna (100%)</div>
         </div>
     </div>
 
     <!-- Tabel Performa -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -135,7 +135,7 @@
     </div>
 </div>
 
-<div id="notification" class="fixed top-5 right-5 px-5 py-3 rounded-xl text-white z-50 opacity-0 transform -translate-y-5 transition-all duration-300 shadow-lg" style="display:none"></div>
+<div id="notification" style="position:fixed; top:20px; right:20px; padding:12px 20px; border-radius:12px; color:#fff; z-index:50; opacity:0; transform:translateY(-20px); transition:all 0.3s; display:none;"></div>
 @endsection
 
 @push('scripts')
