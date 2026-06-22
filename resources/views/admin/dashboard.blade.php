@@ -1712,15 +1712,21 @@
         document.getElementById('detailAlasanPengajuan').textContent   = data.alasan   || 'Tidak ada alasan';
 
         var buktiEl = document.getElementById('detailBuktiPengajuan');
+        var emptyBukti = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400)"></i></div><span style="font-size:12px;color:var(--gray-400)">Tidak ada bukti</span></div>';
         if (data.bukti_url && data.bukti_url.match(/\.pdf$/i)) {
-            buktiEl.style.background = 'transparent';
-            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
+            buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;position:relative;';
+            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
         } else if (data.bukti_url) {
-            buktiEl.style.background = 'var(--gray-100)';
-            buktiEl.innerHTML = '<img src="' + data.bukti_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<div style=width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px><i class=fas&nbsp;fa-image style=font-size:18px;color:var(--gray-400)></i></div><span style=font-size:12px;color:var(--gray-400)>Gagal memuat</span>\'">';
+            buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;position:relative;';
+            var img = document.createElement('img');
+            img.src = data.bukti_url;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;';
+            img.onerror = function() { buktiEl.innerHTML = emptyBukti; buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;'; };
+            buktiEl.innerHTML = '';
+            buktiEl.appendChild(img);
         } else {
-            buktiEl.style.background = 'var(--gray-100)';
-            buktiEl.innerHTML = '<div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>';
+            buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
+            buktiEl.innerHTML = emptyBukti;
         }
 
         document.getElementById('modalBtnApprove').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPengajuanPending'); };
