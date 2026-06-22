@@ -97,20 +97,25 @@
 
         /* Global Buttons */
         .btn-primary, .btn-submit {
-            padding:8px 18px; border:none; border-radius:10px;
+            padding:8px 18px; border-radius:10px;
             font-size:13px; font-weight:600; cursor:pointer;
-            display:inline-flex; align-items:center; gap:6px;
-            background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff;
-            box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2);
+            display:inline-flex; align-items:center; justify-content:center; gap:6px;
+            background:rgba(90,182,234,0.12); color:#2E97D4;
+            border:1px solid rgba(90,182,234,0.2);
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
+        .btn-primary:hover, .btn-submit:hover { background:rgba(90,182,234,0.2); }
         .btn-primary:active, .btn-submit:active { transform:scale(0.96); }
-        .btn-primary:hover, .btn-submit:hover { box-shadow:0 4px 12px rgba(90,182,234,0.35); }
+        .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+        [data-theme="dark"] .btn-primary, [data-theme="dark"] .btn-submit {
+            background:rgba(90,182,234,0.15); color:#7dd3fc; border-color:rgba(90,182,234,0.25);
+        }
+        [data-theme="dark"] .btn-primary:hover, [data-theme="dark"] .btn-submit:hover { background:rgba(90,182,234,0.25); }
 
         .btn-success {
-            padding:6px 12px; border:none; border-radius:8px;
+            padding:6px 12px; border-radius:8px;
             font-size:11px; font-weight:600; cursor:pointer;
-            display:inline-flex; align-items:center; gap:5px;
+            display:inline-flex; align-items:center; justify-content:center; gap:5px;
             background:rgba(16,185,129,0.12); color:#10b981;
             border:1px solid rgba(16,185,129,0.2);
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
@@ -120,9 +125,9 @@
         [data-theme="dark"] .btn-success { background:rgba(16,185,129,0.15); color:#34d399; border-color:rgba(16,185,129,0.25); }
 
         .btn-danger {
-            padding:6px 12px; border:none; border-radius:8px;
+            padding:6px 12px; border-radius:8px;
             font-size:11px; font-weight:600; cursor:pointer;
-            display:inline-flex; align-items:center; gap:5px;
+            display:inline-flex; align-items:center; justify-content:center; gap:5px;
             background:rgba(239,68,68,0.12); color:#ef4444;
             border:1px solid rgba(239,68,68,0.2);
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
@@ -132,9 +137,9 @@
         [data-theme="dark"] .btn-danger { background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.25); }
 
         .btn-warning {
-            padding:6px 12px; border:none; border-radius:8px;
+            padding:6px 12px; border-radius:8px;
             font-size:11px; font-weight:600; cursor:pointer;
-            display:inline-flex; align-items:center; gap:5px;
+            display:inline-flex; align-items:center; justify-content:center; gap:5px;
             background:rgba(245,158,11,0.12); color:#d97706;
             border:1px solid rgba(245,158,11,0.2);
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
