@@ -304,6 +304,19 @@
                 }
 
                 data.forEach(item => {
+                    // Summary row
+                    var s = item.summary || {};
+                    var hk = item.total_hari_kerja || 0;
+                    var hc = item.total_hari_cuti || 0;
+                    var hl = item.total_hari_lembur || 0;
+                    tbody.innerHTML += '<tr style="background:rgba(90,182,234,0.06);"><td colspan="9" style="padding:8px 16px;"><div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:11px;"><strong style="color:var(--dm-text,#1e293b);">' + item.user.name + '</strong>' +
+                        '<span style="color:var(--dm-muted,#64748b);">Hari Kerja: <b>' + hk + '</b></span>' +
+                        (hc > 0 ? '<span style="color:#7c3aed;">Cuti/DL: <b>' + hc + ' hari</b></span>' : '') +
+                        (hl > 0 ? '<span style="color:#d97706;">Lembur: <b>' + hl + ' hari</b></span>' : '') +
+                        '<span style="color:var(--dm-muted,#64748b);">Keterlambatan: <b>' + (s.total_keterlambatan || 0) + ' mnt</b></span>' +
+                        '<span style="color:var(--dm-muted,#64748b);">Jam Kerja: <b>' + Math.floor((s.total_jam_kerja||0)/60) + 'j ' + ((s.total_jam_kerja||0)%60) + 'm</b></span>' +
+                        '</div></td></tr>';
+
                     item.rows.forEach(row => {
                         // Format jam kerja
                         let jamKerja = row.jam_kerja;
@@ -324,7 +337,7 @@
                         const waktuKurangClass = row.waktu_kurang > 0 ? 'text-red-600 font-medium' : 'text-gray-600';
 
                         tbody.innerHTML += `
-                            <tr class="transition-colors ${row.is_weekend ? 'bg-gray-100' : 'hover:bg-gray-50'}">
+                            <tr class="transition-colors ${row.is_cuti ? '' : (row.is_weekend ? 'bg-gray-100' : 'hover:bg-gray-50')}" style="${row.is_cuti ? 'background:rgba(139,92,246,0.05)' : ''}">
 
                                 <td class="px-4 py-3">
                                     <div class="font-medium text-xs text-gray-900">${item.user.name}</div>

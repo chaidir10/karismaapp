@@ -78,6 +78,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $rows[] = [];
 
         $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
+        $rows[] = ['Total Hari Cuti/DL', '', $this->data['total_hari_cuti'] ?? 0];
         $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
         $rows[] = ['Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];

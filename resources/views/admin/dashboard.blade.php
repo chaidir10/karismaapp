@@ -987,7 +987,7 @@
                                 data-cuti-jenis="{{ $cp->jenis === 'dinas_luar' ? 'Dinas Luar' : \App\Models\Cuti::jenisOptions()[$cp->jenis] ?? $cp->jenis }}"
                                 data-cuti-mulai="{{ $cp->tanggal_mulai->format('d M Y') }}"
                                 data-cuti-selesai="{{ $cp->tanggal_selesai->format('d M Y') }}"
-                                data-cuti-hari="{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}"
+                                data-cuti-hari="{{ $cp->jumlah_hari }}"
                                 data-cuti-keterangan="{{ $cp->keterangan ?? '-' }}"
                                 data-cuti-bukti="{{ $cp->bukti_surat ? asset('public/storage/' . $cp->bukti_surat) : '' }}"
                                 data-cuti-approve="/admin/cuti/{{ $cp->id }}/approve"
@@ -996,7 +996,7 @@
                                 <td class="user-name">{{ $cp->user->name ?? 'N/A' }}</td>
                                 <td><span class="badge" style="background:rgba(139,92,246,0.1);color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;">{{ $cp->jenis === 'dinas_luar' ? 'Dinas Luar' : \App\Models\Cuti::jenisOptions()[$cp->jenis] ?? $cp->jenis }}</span></td>
                                 <td class="date-cell">{{ $cp->tanggal_mulai->format('d M') }}@if($cp->tanggal_mulai != $cp->tanggal_selesai) - {{ $cp->tanggal_selesai->format('d M') }}@endif</td>
-                                <td class="text-center">{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}</td>
+                                <td class="text-center">{{ $cp->jumlah_hari }}</td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
                                         <button type="button" class="btn-success" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
