@@ -826,23 +826,9 @@
                                     <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
-                                        @if(Auth::user()->can_approve_pengajuan)
-                                        <form action="{{ route('admin.presensi.approve', $p->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-success" title="Setujui">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.presensi.reject', $p->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-danger" title="Tolak">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                        @else
-                                        <span class="text-gray-400 text-xs">Tidak memiliki hak akses</span>
-                                        @endif
+                                    <div class="action-buttons" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -1120,23 +1106,9 @@
                 </div>
             </div>
             <div class="modal-actions">
-                @if(Auth::user()->can_approve_pengajuan)
-                <form id="formApprovePresensi" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-success" title="Setujui">
-                        <i class="fas fa-check"></i> 
-                    </button>
-                </form>
-                <form id="formRejectPresensi" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-danger" title="Tolak">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </form>
-                @endif
-                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">
-                    Tutup
-                </button>
+                <button type="button" class="btn-success" id="modalBtnApprovePresensi"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="btn-danger" id="modalBtnRejectPresensi"><i class="fas fa-times"></i> Tolak</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">Tutup</button>
             </div>
         </div>
     </div>
@@ -1439,9 +1411,9 @@
             ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
             : '<span class="text-muted">Tidak ada foto</span>';
 
-        // Form action
-        setFormAction('formApprovePresensi', data.approve_url);
-        setFormAction('formRejectPresensi',  data.reject_url);
+        // Wire modal buttons
+        document.getElementById('modalBtnApprovePresensi').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPresensiPending'); };
+        document.getElementById('modalBtnRejectPresensi').onclick = function() { ajaxAction(data.reject_url, null); closeModal('modalPresensiPending'); };
 
         // Parse koordinat dari string lokasi format "lat,lng"
         var lat = NaN;

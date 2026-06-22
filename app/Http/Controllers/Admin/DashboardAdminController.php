@@ -416,8 +416,10 @@ class DashboardAdminController extends Controller
             $presensi->status = 'approved';
             $presensi->save();
 
+            if (request()->ajax()) return response()->json(['success' => true, 'message' => 'Presensi disetujui']);
             return redirect()->back()->with('success', 'Presensi berhasil disetujui.');
         } catch (\Exception $e) {
+            if (request()->ajax()) return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -429,8 +431,10 @@ class DashboardAdminController extends Controller
             $presensi->status = 'rejected';
             $presensi->save();
 
+            if (request()->ajax()) return response()->json(['success' => true, 'message' => 'Presensi ditolak']);
             return redirect()->back()->with('success', 'Presensi ditolak.');
         } catch (\Exception $e) {
+            if (request()->ajax()) return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
