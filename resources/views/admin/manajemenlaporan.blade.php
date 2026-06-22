@@ -311,8 +311,8 @@
                     var hl = item.total_hari_lembur || 0;
                     tbody.innerHTML += '<tr style="background:rgba(90,182,234,0.06);"><td colspan="9" style="padding:8px 16px;"><div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:11px;"><strong style="color:var(--dm-text,#1e293b);">' + item.user.name + '</strong>' +
                         '<span style="color:var(--dm-muted,#64748b);">Hari Kerja: <b>' + hk + '</b></span>' +
-                        (hc > 0 ? '<span style="color:#7c3aed;">Cuti/DL: <b>' + hc + ' hari</b></span>' : '') +
-                        (hl > 0 ? '<span style="color:#d97706;">Lembur: <b>' + hl + ' hari</b></span>' : '') +
+                        '<span style="color:#7c3aed;">Cuti/DL: <b>' + hc + ' hari</b></span>' +
+                        '<span style="color:#d97706;">Lembur: <b>' + hl + ' hari</b></span>' +
                         '<span style="color:var(--dm-muted,#64748b);">Keterlambatan: <b>' + (s.total_keterlambatan || 0) + ' mnt</b></span>' +
                         '<span style="color:var(--dm-muted,#64748b);">Jam Kerja: <b>' + Math.floor((s.total_jam_kerja||0)/60) + 'j ' + ((s.total_jam_kerja||0)%60) + 'm</b></span>' +
                         '</div></td></tr>';

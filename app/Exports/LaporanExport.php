@@ -105,67 +105,89 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
     public function styles(Worksheet $sheet)
     {
         $lastCol = 'I';
+        $lastRow = $sheet->getHighestRow();
 
+        // --- Header (baris 1-3) ---
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->mergeCells("A3:{$lastCol}3");
-
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->getStyle('A3')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(11);
         $sheet->getStyle("A1:{$lastCol}4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->getStyle("A5:{$lastCol}5")->getFont()->setBold(true)->getColor()->setRGB('000000');
+        // --- Kolom header (baris 5) ---
+        $sheet->getStyle("A5:{$lastCol}5")->getFont()->setBold(true)->setSize(10);
         $sheet->getStyle("A5:{$lastCol}5")->getFill()->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()->setRGB('BFBFBF');
-        $sheet->getStyle("A5:{$lastCol}5")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            ->getStartColor()->setRGB('D9E2F3');
+        $sheet->getStyle("A5:{$lastCol}5")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
 
-        $lastRow = $sheet->getHighestRow();
+        // --- Border seluruh data ---
         $sheet->getStyle("A5:{$lastCol}{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        $widths = [11, 8, 8, 9, 9, 10, 9, 9, 13];
+        // --- Lebar kolom (landscape A4 = ~277mm usable) ---
+        $widths = [13, 10, 10, 13, 13, 14, 13, 13, 18];
         foreach (range('A', $lastCol) as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
+        // --- Font dan alignment data ---
         $sheet->getStyle("A6:{$lastCol}{$lastRow}")
-            ->getAlignment()->setWrapText(true);
+            ->getFont()->setSize(11);
         $sheet->getStyle("A6:{$lastCol}{$lastRow}")
-            ->getFont()->setSize(10);
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
+        $sheet->getStyle("A6:A{$lastRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+        // --- Row height data (agar tidak terlalu rapat) ---
+        for ($r = 6; $r <= $lastRow; $r++) {
+            $sheet->getRowDimension($r)->setRowHeight(20);
+        }
+
+        // --- Page setup: LANDSCAPE, fit 1 halaman lebar ---
         $sheet->getPageSetup()
-            ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
+            ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
             ->setFitToHeight(0);
         $sheet->getPageMargins()
-            ->setTop(0.4)->setRight(0.2)->setLeft(0.2)->setBottom(0.4);
+            ->setTop(0.5)->setRight(0.3)->setLeft(0.3)->setBottom(0.5);
         $sheet->getPageSetup()->setHorizontalCentered(true);
+        $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$lastRow}");
 
-        $highestRow = $sheet->getHighestRow();
-        $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$highestRow}");
-        $sheet->getSheetView()->setView('pageBreakPreview');
-        for ($r = $highestRow - 6; $r <= $highestRow; $r++) {
+        // --- Summary rows (bawah) ---
+        $summaryStart = $lastRow - 7;
+        for ($r = $summaryStart; $r <= $lastRow; $r++) {
+            if ($r < 6) continue;
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("C{$r}:D{$r}");
         }
-        $sheet->getStyle("A" . ($highestRow - 6) . ":D{$highestRow}")
+        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getFont()->setBold(true);
+        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
+            ->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('F2F2F2');
 
-        // Pewarnaan: weekend & libur nasional dari data row
+        // --- Pewarnaan: weekend/libur & cuti ---
         $dataStart = 6;
         $rowIndex = 0;
         foreach ($this->data['rows'] as $row) {
             $r = $dataStart + $rowIndex;
-            if ($r > $highestRow - 8) break;
+            if ($r > $summaryStart - 2) break;
 
-            if (!empty($row['is_weekend'])) {
+            if (!empty($row['is_cuti'])) {
                 $sheet->getStyle("A{$r}:{$lastCol}{$r}")
-                    ->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setRGB('FFCCCC');
+                    ->getFill()->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('E8DAEF');
+            } elseif (!empty($row['is_weekend'])) {
+                $sheet->getStyle("A{$r}:{$lastCol}{$r}")
+                    ->getFill()->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('FCE4E4');
             }
 
             $rowIndex++;
