@@ -121,11 +121,8 @@
                         </td>
 
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <div class="flex justify-end space-x-2">
-                                <!-- All Action Buttons Visible -->
-                                <button onclick="openDetailModal({{ $user->id }})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Detail">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
+                            <div class="flex justify-end gap-1">
+                                <button onclick="openDetailModal({{ $user->id }})" class="btn-detail" title="Detail"><i class="fas fa-eye"></i></button>
                             </div>
                         </td>
                     </tr>

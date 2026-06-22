@@ -41,16 +41,21 @@
     .p-card .p-excerpt { font-size: 12px; color: var(--dm-muted, #64748b); line-height: 1.4; max-height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .p-card .p-badge-inactive { display: inline-block; background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
     .p-card .p-actions { flex-shrink: 0; display: flex; gap: 4px; }
+    .p-card .p-actions { display:flex; gap:4px; }
     .p-card .p-actions button {
-        width: 36px; height: 36px; border-radius: 10px; border: none;
-        background: var(--dm-bg, #f8fafc); cursor: pointer; display: flex; align-items: center;
-        justify-content: center; font-size: 14px; transition: all 0.15s;
+        width: 34px; height: 34px; border-radius: 8px; border: none;
+        cursor: pointer; display: flex; align-items: center;
+        justify-content: center; font-size: 13px; transition: all 0.15s;
     }
-    .p-card .p-actions button:hover { background: #e2e8f0; }
-    .btn-toggle-on { color: #10b981; }
-    .btn-toggle-off { color: #ef4444; }
-    .btn-edit { color: #3b82f6; }
-    .btn-delete { color: #ef4444; }
+    .btn-toggle-on { background:rgba(16,185,129,0.1); color:#10b981; }
+    .btn-toggle-on:hover { background:#10b981; color:#fff; }
+    .btn-toggle-off { background:rgba(239,68,68,0.1); color:#ef4444; }
+    .btn-toggle-off:hover { background:#ef4444; color:#fff; }
+    [data-theme="dark"] .btn-toggle-on { background:rgba(16,185,129,0.15); color:#34d399; }
+    [data-theme="dark"] .btn-toggle-on:hover { background:#10b981; color:#fff; }
+    [data-theme="dark"] .btn-toggle-off { background:rgba(239,68,68,0.15); color:#f87171; }
+    [data-theme="dark"] .btn-toggle-off:hover { background:#ef4444; color:#fff; }
+    /* btn-edit, btn-delete inherited from layout */
 
     /* Form field */
     .form-label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 6px; }
@@ -140,12 +145,8 @@
                     <button onclick="toggleActive({{ $p->id }})" title="{{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}" class="{{ $p->is_active ? 'btn-toggle-on' : 'btn-toggle-off' }}" id="toggleBtn{{ $p->id }}">
                         <i class="fas {{ $p->is_active ? 'fa-eye' : 'fa-eye-slash' }}"></i>
                     </button>
-                    <button onclick="editPengumuman({{ $p->id }})" title="Edit" class="btn-edit">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <button onclick="hapusPengumuman({{ $p->id }})" title="Hapus" class="btn-delete">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                    <button onclick="editPengumuman({{ $p->id }})" title="Edit" class="btn-edit"><i class="fas fa-pen"></i></button>
+                    <button onclick="hapusPengumuman({{ $p->id }})" title="Hapus" class="btn-delete"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         </div>

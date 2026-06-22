@@ -113,12 +113,10 @@
                     Tampilkan
                 </button>
                 <a href="#" id="btnPdf" class="btn-danger" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    PDF
+                    <i class="fas fa-file-pdf"></i> Download PDF
                 </a>
                 <a href="#" id="btnExcel" class="btn-success" style="flex:1; height:42px; opacity:0.4; pointer-events:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    Excel
+                    <i class="fas fa-file-excel"></i> Download Excel
                 </a>
             </div>
         </form>
