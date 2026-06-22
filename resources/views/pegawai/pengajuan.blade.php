@@ -294,6 +294,11 @@
 
             <!-- Tab Cuti / DL -->
             <div id="tabCuti" style="display:none;">
+            </div>
+        </div>
+
+        <!-- Cuti form OUTSIDE the scrollable area to avoid display:none blocking -->
+        <div id="cutiFormWrapper" style="display:none; flex:1; overflow-y:auto; padding:20px;">
                 <form action="{{ route('pegawai.cuti.store') }}" method="POST" enctype="multipart/form-data" data-turbo="false" id="cutiForm">
                     @csrf
                     <div style="margin-bottom:14px;">
@@ -331,7 +336,6 @@
                         </div>
                     </div>
                 </form>
-            </div>
         </div>
     </div>
 </div>
@@ -401,12 +405,11 @@
     var _activeTab = 'presensi';
     function switchPengajuanTab(tab) {
         _activeTab = tab;
-        document.getElementById('tabPresensi').style.display = tab === 'presensi' ? 'block' : 'none';
-        document.getElementById('tabCuti').style.display = tab === 'cuti' ? 'block' : 'none';
-
-        // Toggle required agar hidden form tidak block submit
-        document.querySelectorAll('#tabPresensi [required]').forEach(function(el) { el.required = (tab === 'presensi'); });
-        document.querySelectorAll('#tabCuti [required]').forEach(function(el) { el.required = (tab === 'cuti'); });
+        // Presensi body (contains tabPresensi inside scrollable div)
+        var presensiBody = document.getElementById('tabPresensi').parentElement;
+        presensiBody.style.display = tab === 'presensi' ? '' : 'none';
+        // Cuti form wrapper (separate scrollable div)
+        document.getElementById('cutiFormWrapper').style.display = tab === 'cuti' ? '' : 'none';
 
         document.querySelectorAll('.pengajuan-tab').forEach(function(btn) {
             if (btn.dataset.tab === tab) {
