@@ -110,9 +110,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->mergeCells("A3:{$lastCol}3");
 
         // Kiri: judul + instansi + periode
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle('A3')->getFont()->setSize(10);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9);
+        $sheet->getStyle('A3')->getFont()->setSize(9);
         $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         // Kanan: nama + nip
@@ -121,7 +121,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle('H1:H2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
         // --- Kolom header (baris 5) ---
-        $sheet->getStyle("A5:{$lastCol}5")->getFont()->setBold(true)->setSize(10);
+        $sheet->getStyle("A5:{$lastCol}5")->getFont()->setBold(true)->setSize(9);
         $sheet->getStyle("A5:{$lastCol}5")->getFill()->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setRGB('D9E2F3');
         $sheet->getStyle("A5:{$lastCol}5")->getAlignment()
@@ -140,7 +140,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         // --- Font dan alignment data ---
         $sheet->getStyle("A6:{$lastCol}{$lastRow}")
-            ->getFont()->setSize(11);
+            ->getFont()->setSize(9);
         $sheet->getStyle("A6:{$lastCol}{$lastRow}")
             ->getAlignment()
             ->setVertical(Alignment::VERTICAL_CENTER)
@@ -148,10 +148,13 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A6:A{$lastRow}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // --- Row height data (agar tidak terlalu rapat) ---
-        for ($r = 6; $r <= $lastRow; $r++) {
-            $sheet->getRowDimension($r)->setRowHeight(20);
+        // --- Row height data (compact agar muat 1 halaman) ---
+        for ($r = 1; $r <= $lastRow; $r++) {
+            $sheet->getRowDimension($r)->setRowHeight(14);
         }
+        $sheet->getRowDimension(1)->setRowHeight(16);
+        $sheet->getRowDimension(4)->setRowHeight(4);
+        $sheet->getRowDimension(5)->setRowHeight(16);
 
         // --- Page setup: LANDSCAPE, fit 1 halaman lebar ---
         $sheet->getPageSetup()

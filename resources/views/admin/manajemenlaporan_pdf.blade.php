@@ -41,19 +41,15 @@
 
     @foreach($laporan as $item)
     <div @if(!$loop->last) class="page-break" @endif>
-        <table style="width:100%; margin-bottom:8px; border:none;">
+        <table style="width:100%; margin-bottom:4px; border:1px solid #333;">
             <tr>
-                <td style="border:none; text-align:left; vertical-align:top;">
-                    <strong style="font-size:12px;">LAPORAN KEHADIRAN PEGAWAI</strong><br>
-                    <span style="font-size:10px;">BKK KELAS I TARAKAN</span><br>
+                <td style="border:none; text-align:left; vertical-align:top; padding:3px 6px;">
+                    <strong style="font-size:11px;">LAPORAN KEHADIRAN PEGAWAI BKK KELAS I TARAKAN</strong><br>
                     <span style="font-size:9px;">Periode: {{ $item['bulan'] ?? \Carbon\Carbon::createFromFormat('Y-m', request('bulan'))->translatedFormat('F Y') }}</span>
                 </td>
-                <td style="border:none; text-align:right; vertical-align:top;">
-                    <strong style="font-size:11px;">{{ $item['user']->name }}</strong>
-                    @if($item['is_shift'] ?? false) <span style="font-size:9px;">| {{ $item['shift_nama'] }}</span> @endif
-                    <br>
-                    <span style="font-size:9px;">NIP: {{ $item['user']->nip }}</span><br>
-                    <span style="font-size:9px;">{{ $item['user']->jabatan ?? '-' }}</span>
+                <td style="border:none; text-align:right; vertical-align:top; padding:3px 6px;">
+                    <strong style="font-size:10px;">Nama: {{ $item['user']->name }}</strong>@if($item['is_shift'] ?? false) <span style="font-size:8px;">| {{ $item['shift_nama'] }}</span>@endif<br>
+                    <span style="font-size:9px;">NIP: {{ $item['user']->nip }}</span>
                 </td>
             </tr>
         </table>
@@ -89,25 +85,25 @@
             </tbody>
         </table>
 
-        <table class="summary-table">
-            <tr><td colspan="9" style="font-weight:bold; padding:3px 4px;">Ringkasan:</td></tr>
+        <table style="width:100%; border-collapse:collapse; margin-top:2px; border:none;">
+            <tr><td colspan="4" style="border:none; font-weight:bold; font-size:9px; padding:2px 2px;">Ringkasan:</td></tr>
             <tr>
-                <td class="label" colspan="2">Total Hari Kerja</td>
-                <td colspan="2"><strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
-                <td class="label" colspan="2">Total Jam Kerja</td>
-                <td colspan="3"><strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 2px; width:20%;">Total Hari Kerja</td>
+                <td style="border:none; font-size:9px; padding:1px 2px; width:22%;"><strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 2px; width:22%;">Total Jam Kerja</td>
+                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
             </tr>
             <tr>
-                <td class="label" colspan="2">Total Hari Cuti/DL</td>
-                <td colspan="2"><strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
-                <td class="label" colspan="2">Total Waktu Kurang</td>
-                <td colspan="3"><strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 2px;">Total Hari Cuti/DL</td>
+                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 2px;">Total Waktu Kurang</td>
+                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
             </tr>
             <tr>
-                <td class="label" colspan="2">Total Keterlambatan</td>
-                <td colspan="2"><strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
-                <td class="label" colspan="2">Total Hari Lembur</td>
-                <td colspan="3"><strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 2px;">Total Keterlambatan</td>
+                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 2px;">Total Hari Lembur</td>
+                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
             </tr>
         </table>
     </div>
