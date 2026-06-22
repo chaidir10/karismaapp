@@ -854,22 +854,29 @@
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
-            <div class="card-content">
+            <div style="display:flex; gap:4px; padding:12px 16px 0; background:var(--dm-card,#fff);">
+                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:8px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--primary);color:#fff;">
+                    <i class="fas fa-clock"></i> Presensi ({{ count($pengajuanPending ?? []) }})
+                </button>
+                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:8px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--dm-bg,#f1f5f9);color:var(--dm-muted,#64748b);">
+                    <i class="fas fa-calendar-minus"></i> Cuti/DL ({{ count($cutiPending ?? []) }})
+                </button>
+            </div>
+            {{-- Tab Presensi --}}
+            <div class="card-content" id="adminTabPresensi">
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Pegawai</th>
+                                <th data-sort="date">Tanggal</th>
+                                <th data-sort="text">Jenis</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="pengajuanPendingTable" data-paginate="5">
-                            @php $rowNum = 0; @endphp
-                            @foreach($pengajuanPending ?? [] as $peng)
-                            @php $rowNum++; @endphp
+                            @forelse($pengajuanPending ?? [] as $index => $peng)
                             <tr class="clickable-row"
                                 data-user-name="{{ $peng->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
@@ -878,12 +885,10 @@
                                 data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="/admin/pengajuan/{{ $peng->id }}/approve"
                                 data-reject-url="/admin/pengajuan/{{ $peng->id }}/reject">
-                                <td class="text-center text-xs">{{ $rowNum }}</td>
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}</td>
-                                <td>
-                                    <span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span>
-                                </td>
+                                <td><span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span></td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
                                         <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/approve', this)"><i class="fas fa-check"></i></button>
@@ -891,36 +896,105 @@
                                     </div>
                                 </td>
                             </tr>
-                            @endforeach
-                            @foreach($cutiPending ?? [] as $cp)
-                            @php $rowNum++; @endphp
-                            <tr id="cutiRow{{ $cp->id }}">
-                                <td class="text-center text-xs">{{ $rowNum }}</td>
+                            @empty
+                            <tr><td colspan="5" class="empty-state"><div class="empty-content"><i class="fas fa-inbox"></i><p>Tidak ada pengajuan presensi pending</p></div></td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{-- Tab Cuti/DL --}}
+            <div class="card-content" id="adminTabCuti" style="display:none;">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Pegawai</th>
+                                <th>Jenis</th>
+                                <th>Tanggal</th>
+                                <th>Hari</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($cutiPending ?? [] as $idx => $cp)
+                            <tr style="cursor:pointer;" onclick="openCutiModal({{ $cp->id }})" id="cutiRow{{ $cp->id }}"
+                                data-cuti-id="{{ $cp->id }}"
+                                data-cuti-user="{{ $cp->user->name ?? 'N/A' }}"
+                                data-cuti-jenis="{{ $cp->jenis === 'dinas_luar' ? 'Dinas Luar' : \App\Models\Cuti::jenisOptions()[$cp->jenis] ?? $cp->jenis }}"
+                                data-cuti-mulai="{{ $cp->tanggal_mulai->format('d M Y') }}"
+                                data-cuti-selesai="{{ $cp->tanggal_selesai->format('d M Y') }}"
+                                data-cuti-hari="{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}"
+                                data-cuti-keterangan="{{ $cp->keterangan ?? '-' }}"
+                                data-cuti-bukti="{{ $cp->bukti_surat ? asset('public/storage/' . $cp->bukti_surat) : '' }}"
+                                data-cuti-approve="/admin/cuti/{{ $cp->id }}/approve"
+                                data-cuti-reject="/admin/cuti/{{ $cp->id }}/reject">
+                                <td class="text-center text-xs">{{ $idx + 1 }}</td>
                                 <td class="user-name">{{ $cp->user->name ?? 'N/A' }}</td>
+                                <td><span class="badge" style="background:rgba(139,92,246,0.1);color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;">{{ $cp->jenis === 'dinas_luar' ? 'Dinas Luar' : \App\Models\Cuti::jenisOptions()[$cp->jenis] ?? $cp->jenis }}</span></td>
                                 <td class="date-cell">{{ $cp->tanggal_mulai->format('d M') }}@if($cp->tanggal_mulai != $cp->tanggal_selesai) - {{ $cp->tanggal_selesai->format('d M') }}@endif</td>
+                                <td class="text-center">{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}</td>
                                 <td>
-                                    <span class="badge" style="background:rgba(139,92,246,0.1);color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;">{{ $cp->jenis === 'dinas_luar' ? 'Dinas Luar' : \App\Models\Cuti::jenisOptions()[$cp->jenis] ?? $cp->jenis }}</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
+                                    <div class="action-buttons" onclick="event.stopPropagation()">
                                         <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i></button>
                                         <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
-                            @endforeach
-                            @if($rowNum === 0)
-                            <tr>
-                                <td colspan="5" class="empty-state">
-                                    <div class="empty-content">
-                                        <i class="fas fa-inbox"></i>
-                                        <p>Tidak ada pengajuan pending</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endif
+                            @empty
+                            <tr><td colspan="6" class="empty-state"><div class="empty-content"><i class="fas fa-calendar-minus"></i><p>Tidak ada pengajuan cuti/DL pending</p></div></td></tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal Detail Cuti/DL --}}
+        <div id="modalCutiDetail" class="modal-overlay" style="display:none;">
+            <div class="modal-container" style="max-width:520px;">
+                <div class="modal-header" style="border-bottom:1px solid var(--dm-border,#e2e8f0);">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:16px;">
+                            <i class="fas fa-calendar-minus"></i>
+                        </div>
+                        <h3 class="modal-title" style="margin:0;" id="cutiModalTitle">Detail Cuti/DL</h3>
+                    </div>
+                    <button class="modal-close" onclick="closeModal('modalCutiDetail')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-content" style="padding:20px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Pegawai</div>
+                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalUser">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Jenis</div>
+                            <div id="cutiModalJenis" style="font-size:14px;font-weight:600;color:#7c3aed;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Periode</div>
+                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalPeriode">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Durasi</div>
+                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalHari">-</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Keterangan</div>
+                        <div style="font-size:13px;color:var(--dm-text,#1e293b);line-height:1.5;" id="cutiModalKeterangan">-</div>
+                    </div>
+                    <div id="cutiModalBuktiSection" style="margin-bottom:16px;">
+                        <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:8px;">Bukti Surat</div>
+                        <div id="cutiModalBukti"></div>
+                    </div>
+                </div>
+                <div class="modal-actions" style="padding:16px 20px;border-top:1px solid var(--dm-border,#e2e8f0);display:flex;gap:8px;">
+                    <button type="button" class="btn-success" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#10b981;" id="cutiModalApprove"><i class="fas fa-check"></i> Setujui</button>
+                    <button type="button" class="btn-danger" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#ef4444;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
+                    <button type="button" class="btn-secondary" style="padding:10px 16px;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);background:var(--dm-card,#fff);color:var(--dm-text,#64748b);font-weight:600;font-size:13px;cursor:pointer;" onclick="closeModal('modalCutiDetail')">Tutup</button>
                 </div>
             </div>
         </div>
@@ -1278,6 +1352,55 @@
 
 <script>
     // ─── AJAX Approve/Reject (no page reload) ──────────────────────────────
+    // Tab switch pengajuan pending
+    function switchAdminPendTab(tab) {
+        document.getElementById('adminTabPresensi').style.display = tab === 'presensi' ? '' : 'none';
+        document.getElementById('adminTabCuti').style.display = tab === 'cuti' ? '' : 'none';
+        document.querySelectorAll('.admin-pend-tab').forEach(function(btn) {
+            if (btn.dataset.pend === tab) {
+                btn.style.background = 'var(--primary)'; btn.style.color = '#fff';
+            } else {
+                btn.style.background = 'var(--dm-bg,#f1f5f9)'; btn.style.color = 'var(--dm-muted,#64748b)';
+            }
+        });
+    }
+
+    // Cuti detail modal
+    function openCutiModal(id) {
+        var row = document.getElementById('cutiRow' + id);
+        if (!row) return;
+        document.getElementById('cutiModalUser').textContent = row.dataset.cutiUser;
+        document.getElementById('cutiModalJenis').textContent = row.dataset.cutiJenis;
+        document.getElementById('cutiModalHari').textContent = row.dataset.cutiHari + ' hari';
+        document.getElementById('cutiModalKeterangan').textContent = row.dataset.cutiKeterangan || '-';
+        var mulai = row.dataset.cutiMulai, selesai = row.dataset.cutiSelesai;
+        document.getElementById('cutiModalPeriode').textContent = mulai === selesai ? mulai : mulai + ' - ' + selesai;
+
+        var buktiEl = document.getElementById('cutiModalBukti');
+        var buktiUrl = row.dataset.cutiBukti;
+        if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
+            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:360px;border:1px solid var(--dm-border,#e2e8f0);border-radius:10px;" frameborder="0"></iframe>' +
+                '<a href="' + buktiUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:600;color:var(--primary);text-decoration:none;"><i class="fas fa-external-link-alt"></i> Buka di tab baru</a>';
+        } else if (buktiUrl) {
+            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);" onerror="this.style.display=\'none\'">';
+        } else {
+            buktiEl.innerHTML = '<span style="font-size:12px;color:var(--dm-muted,#94a3b8);">Tidak ada bukti</span>';
+        }
+
+        var approveUrl = row.dataset.cutiApprove;
+        var rejectUrl = row.dataset.cutiReject;
+        document.getElementById('cutiModalApprove').onclick = function() {
+            ajaxAction(approveUrl, row);
+            closeModal('modalCutiDetail');
+        };
+        document.getElementById('cutiModalReject').onclick = function() {
+            ajaxAction(rejectUrl, row);
+            closeModal('modalCutiDetail');
+        };
+
+        openModal('modalCutiDetail');
+    }
+
     function ajaxAction(url, btnEl) {
         fetch(url, {
             method: 'POST',

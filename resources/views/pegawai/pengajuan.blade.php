@@ -105,7 +105,19 @@
         <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
     </div>
     @endif
-    <div class="pengajuan-list">
+
+    <!-- Tabs -->
+    <div style="display:flex; gap:4px; margin-bottom:14px; background:var(--light); border-radius:12px; padding:4px;">
+        <button type="button" class="list-tab active" data-list="presensi" onclick="switchListTab('presensi')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--primary-soft); color:var(--primary-dark);">
+            <i class="fas fa-clock"></i> Presensi <span style="font-size:11px; opacity:0.7;">({{ $pengajuan->count() }})</span>
+        </button>
+        <button type="button" class="list-tab" data-list="cuti" onclick="switchListTab('cuti')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray);">
+            <i class="fas fa-calendar-minus"></i> Cuti/DL <span style="font-size:11px; opacity:0.7;">({{ ($cutiList ?? collect())->count() }})</span>
+        </button>
+    </div>
+
+    <!-- Tab Presensi -->
+    <div id="listPresensi" class="pengajuan-list">
         @forelse($pengajuan as $p)
         @php
             $isMasuk = $p->jenis == 'masuk';
@@ -139,9 +151,8 @@
         @endforelse
     </div>
 
-    <!-- Cuti / DL Section -->
-    <div style="font-size:14px; font-weight:700; color:var(--dark); margin:20px 0 10px;">Cuti / Dinas Luar</div>
-    <div class="pengajuan-list">
+    <!-- Tab Cuti / DL -->
+    <div id="listCuti" class="pengajuan-list" style="display:none;">
         @forelse(($cutiList ?? collect()) as $c)
         @php
             $cIcon = $c->jenis === 'dinas_luar'
@@ -153,20 +164,15 @@
         @endphp
         <div class="p-card" style="cursor:default;">
             <div class="p-icon" style="background:{{ $cIcon['bg'] }}; color:{{ $cIcon['color'] }};"><i class="fas {{ $cIcon['cls'] }}"></i></div>
-            <div style="flex:1; min-width:0;">
-                <div style="font-size:14px; font-weight:700; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $c->label }}</div>
-                <div style="font-size:11px; color:var(--gray); margin-top:2px;">
-                    {{ $c->tanggal_mulai->format('d M Y') }}
-                    @if($c->tanggal_mulai != $c->tanggal_selesai)
-                     - {{ $c->tanggal_selesai->format('d M Y') }}
-                    @endif
-                    <span style="margin-left:4px; font-weight:600;">({{ $c->jumlah_hari }} hari)</span>
-                </div>
-                @if($c->keterangan)
-                <div style="font-size:11px; color:var(--gray); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $c->keterangan }}</div>
-                @endif
+            <div class="p-body">
+                <div class="p-title">{{ $c->label }}</div>
+                <div class="p-date">{{ $c->tanggal_mulai->format('d M Y') }}@if($c->tanggal_mulai != $c->tanggal_selesai) - {{ $c->tanggal_selesai->format('d M Y') }}@endif <span style="font-weight:600;">({{ $c->jumlah_hari }} hari)</span></div>
+                @if($c->keterangan)<div class="p-alasan">{{ $c->keterangan }}</div>@endif
             </div>
-            <span style="background:{{ $cStatus['bg'] }}; color:{{ $cStatus['color'] }}; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:700; flex-shrink:0;">{{ $cStatus['text'] }}</span>
+            <div class="p-status">
+                <span class="s-dot s-dot-{{ $c->status }}"></span>
+                <span class="s-text">{{ $cStatus['text'] }}</span>
+            </div>
         </div>
         @empty
         <div class="empty-box">
@@ -410,6 +416,21 @@
     }
 
     function closeDetailModal() { document.getElementById('pengajuanDetailModal').style.display = 'none'; }
+
+    // List tabs
+    function switchListTab(tab) {
+        document.getElementById('listPresensi').style.display = tab === 'presensi' ? '' : 'none';
+        document.getElementById('listCuti').style.display = tab === 'cuti' ? '' : 'none';
+        document.querySelectorAll('.list-tab').forEach(function(btn) {
+            if (btn.dataset.list === tab) {
+                btn.style.background = 'var(--primary-soft)';
+                btn.style.color = 'var(--primary-dark)';
+            } else {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--gray)';
+            }
+        });
+    }
     function openModal() {
         document.getElementById('pengajuanModal').style.display = 'block';
         document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
