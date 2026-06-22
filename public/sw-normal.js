@@ -1,19 +1,4 @@
-// Force kill: hapus semua cache, unregister diri sendiri
-self.addEventListener('install', function() { self.skipWaiting(); });
-self.addEventListener('activate', function(event) {
-    event.waitUntil(
-        caches.keys().then(function(names) {
-            return Promise.all(names.map(function(n) { return caches.delete(n); }));
-        }).then(function() {
-            return self.clients.matchAll();
-        }).then(function(clients) {
-            clients.forEach(function(client) { client.navigate(client.url); });
-            return self.registration.unregister();
-        })
-    );
-});
-
-const CACHE_NAME = "karisma-pwa-v7";
+const CACHE_NAME = "karisma-pwa-v8";
 
 const urlsToCache = [
     "/public/pwa/icons/icon-192x192.png",
@@ -30,16 +15,12 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys().then(names =>
-            Promise.all(names.map(n => caches.delete(n)))
-        ).then(() => caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)))
+            Promise.all(names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n)))
+        )
     );
     self.clients.claim();
-    self.clients.matchAll().then(clients => {
-        clients.forEach(client => client.navigate(client.url));
-    });
 });
 
-// Network-first: always fetch fresh, cache for offline only
 self.addEventListener("fetch", event => {
     if (event.request.method !== 'GET') return;
     if (!event.request.url.startsWith(self.location.origin)) return;
