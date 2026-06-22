@@ -289,6 +289,7 @@
                             <div id="buktiInfo" style="display:none; margin-top:10px; font-size:11px; color:var(--gray);"></div>
                         </div>
                     </div>
+                    <button type="submit" id="createFormSubmit" style="display:none;"></button>
                 </form>
             </div>
 
@@ -335,6 +336,7 @@
                             <input type="file" name="bukti_surat" accept=".pdf,.jpg,.jpeg,.png" required style="font-size:12px; color:var(--dark); width:100%;">
                         </div>
                     </div>
+                    <button type="submit" id="cutiFormSubmit" style="display:none;"></button>
                 </form>
         </div>
     </div>
@@ -422,11 +424,10 @@
         });
     }
     function submitActiveForm() {
-        var form = _activeTab === 'presensi' ? document.getElementById('createForm') : document.getElementById('cutiForm');
-        if (form.requestSubmit) {
-            form.requestSubmit();
+        if (_activeTab === 'presensi') {
+            document.getElementById('createFormSubmit').click();
         } else {
-            form.submit();
+            document.getElementById('cutiFormSubmit').click();
         }
     }
 
