@@ -162,7 +162,16 @@
                 : ($c->status === 'rejected' ? ['bg' => 'var(--danger-light)', 'color' => 'var(--danger)', 'text' => 'Ditolak']
                 : ['bg' => '#fef3c7', 'color' => '#d97706', 'text' => 'Menunggu']);
         @endphp
-        <div class="p-card" style="cursor:default;">
+        <div class="p-card" onclick="openCutiDetail(this)"
+            data-cuti-label="{{ $c->label }}"
+            data-cuti-jenis="{{ $c->jenis }}"
+            data-cuti-mulai="{{ $c->tanggal_mulai->translatedFormat('d F Y') }}"
+            data-cuti-selesai="{{ $c->tanggal_selesai->translatedFormat('d F Y') }}"
+            data-cuti-hari="{{ $c->jumlah_hari }}"
+            data-cuti-keterangan="{{ $c->keterangan ?? '' }}"
+            data-cuti-status="{{ $c->status }}"
+            data-cuti-status-text="{{ $cStatus['text'] }}"
+            data-cuti-bukti="{{ $c->bukti_surat ? asset('public/storage/' . $c->bukti_surat) : '' }}">
             <div class="p-icon" style="background:{{ $cIcon['bg'] }}; color:{{ $cIcon['color'] }};"><i class="fas {{ $cIcon['cls'] }}"></i></div>
             <div class="p-body">
                 <div class="p-title">{{ $c->label }}</div>
@@ -180,6 +189,55 @@
             <p>Belum ada pengajuan cuti/DL</p>
         </div>
         @endforelse
+    </div>
+</div>
+
+<!-- Detail Cuti Modal — Fullscreen -->
+<div id="cutiDetailModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
+    <div style="display:flex; flex-direction:column; height:100%;">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="document.getElementById('cutiDetailModal').style.display='none'" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
+                <i class="fas fa-chevron-left"></i> Kembali
+            </button>
+            <span style="font-size:15px; font-weight:700; color:var(--dark);" id="cdmTitle">Detail Cuti</span>
+            <div id="cdmStatusBadge" style="font-size:11px; font-weight:700; padding:4px 12px; border-radius:8px;">-</div>
+        </div>
+        <!-- Body -->
+        <div style="flex:1; overflow-y:auto; padding:20px;">
+            <!-- Icon + Label -->
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+                <div id="cdmIcon" style="width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;"></div>
+                <div>
+                    <div id="cdmLabel" style="font-size:18px; font-weight:700; color:var(--dark);"></div>
+                    <div id="cdmHari" style="font-size:13px; color:var(--gray); margin-top:2px;"></div>
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+                <div style="background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">
+                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Mulai</div>
+                    <div id="cdmMulai" style="font-size:14px; font-weight:600; color:var(--dark);"></div>
+                </div>
+                <div style="background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">
+                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Selesai</div>
+                    <div id="cdmSelesai" style="font-size:14px; font-weight:600; color:var(--dark);"></div>
+                </div>
+            </div>
+
+            <!-- Keterangan -->
+            <div id="cdmKeteranganSection" style="margin-bottom:16px;">
+                <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:6px;">Keterangan</div>
+                <div id="cdmKeterangan" style="font-size:14px; color:var(--dark); line-height:1.6; background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);"></div>
+            </div>
+
+            <!-- Bukti Surat -->
+            <div id="cdmBuktiSection">
+                <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:6px;">Bukti Surat</div>
+                <div id="cdmBukti"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -416,6 +474,58 @@
     }
 
     function closeDetailModal() { document.getElementById('pengajuanDetailModal').style.display = 'none'; }
+
+    // Cuti detail modal
+    function openCutiDetail(el) {
+        var d = el.dataset;
+        var isDL = d.cutiJenis === 'dinas_luar';
+        var iconBg = isDL ? 'var(--primary-soft)' : '#fef3c7';
+        var iconColor = isDL ? 'var(--primary-dark)' : '#f59e0b';
+        var iconCls = isDL ? 'fa-briefcase' : 'fa-calendar-minus';
+
+        document.getElementById('cdmIcon').style.background = iconBg;
+        document.getElementById('cdmIcon').style.color = iconColor;
+        document.getElementById('cdmIcon').innerHTML = '<i class="fas ' + iconCls + '"></i>';
+        document.getElementById('cdmLabel').textContent = d.cutiLabel;
+        document.getElementById('cdmTitle').textContent = d.cutiLabel;
+        document.getElementById('cdmHari').textContent = d.cutiHari + ' hari';
+        document.getElementById('cdmMulai').textContent = d.cutiMulai;
+        document.getElementById('cdmSelesai').textContent = d.cutiSelesai;
+
+        var ket = d.cutiKeterangan;
+        var ketSection = document.getElementById('cdmKeteranganSection');
+        if (ket) {
+            document.getElementById('cdmKeterangan').textContent = ket;
+            ketSection.style.display = '';
+        } else {
+            ketSection.style.display = 'none';
+        }
+
+        var status = d.cutiStatus;
+        var badge = document.getElementById('cdmStatusBadge');
+        if (status === 'approved') { badge.style.background = 'var(--success-light)'; badge.style.color = 'var(--success)'; }
+        else if (status === 'rejected') { badge.style.background = 'var(--danger-light)'; badge.style.color = 'var(--danger)'; }
+        else { badge.style.background = '#fef3c7'; badge.style.color = '#d97706'; }
+        badge.textContent = d.cutiStatusText;
+
+        var buktiEl = document.getElementById('cdmBukti');
+        var buktiSection = document.getElementById('cdmBuktiSection');
+        var buktiUrl = d.cutiBukti;
+        if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
+            buktiEl.innerHTML = '<a href="' + buktiUrl + '" target="_blank" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--light); border-radius:14px; border:1px solid var(--card-border); text-decoration:none; color:var(--dark);">' +
+                '<div style="width:44px;height:44px;border-radius:12px;background:var(--danger-light);color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="fas fa-file-pdf"></i></div>' +
+                '<div><div style="font-size:14px;font-weight:600;">Lihat Surat (PDF)</div><div style="font-size:11px;color:var(--gray);">Ketuk untuk membuka</div></div>' +
+                '<i class="fas fa-external-link-alt" style="margin-left:auto;color:var(--gray);font-size:12px;"></i></a>';
+            buktiSection.style.display = '';
+        } else if (buktiUrl) {
+            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;border-radius:14px;border:1px solid var(--card-border);" onerror="this.parentElement.parentElement.style.display=\'none\'">';
+            buktiSection.style.display = '';
+        } else {
+            buktiSection.style.display = 'none';
+        }
+
+        document.getElementById('cutiDetailModal').style.display = 'block';
+    }
 
     // List tabs
     function switchListTab(tab) {
