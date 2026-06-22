@@ -349,6 +349,12 @@
     .status-badge.late { background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
     .status-badge.neutral { background:rgba(100,116,139,0.08); color:var(--gray-500); border:1px solid rgba(100,116,139,0.12); }
     .status-badge.pending { background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.15); }
+    [data-theme="dark"] .status-badge.on-time { background:rgba(16,185,129,0.12); color:#6ee7b7; border-color:rgba(16,185,129,0.3); }
+    [data-theme="dark"] .status-badge.late { background:rgba(239,68,68,0.12); color:#fca5a5; border-color:rgba(239,68,68,0.3); }
+    [data-theme="dark"] .status-badge.pending { background:rgba(245,158,11,0.12); color:#fde68a; border-color:rgba(245,158,11,0.3); }
+    [data-theme="dark"] .status-badge.neutral { background:rgba(100,116,139,0.12); color:#94a3b8; border-color:rgba(100,116,139,0.2); }
+    [data-theme="dark"] .jenis-badge { background:rgba(90,182,234,0.12); color:#7dd3fc; border-color:rgba(90,182,234,0.3); }
+    [data-theme="dark"] .jenis-pulang { background:rgba(254,170,43,0.12); color:#fde68a; border-color:rgba(254,170,43,0.3); }
 
     .date-cell {
         font-size: 13px;
@@ -436,37 +442,36 @@
     }
 
     .modal-large { max-width: 900px; }
-    .modal-wide { max-width: 860px; }
+    .modal-wide { max-width: 920px; }
     .modal-split {
-        display:grid; grid-template-columns:1fr 1fr; gap:0; min-height:380px;
+        display:flex; flex-direction:column; gap:0;
     }
-    .modal-split-left {
-        display:flex; flex-direction:column; gap:8px; padding:16px 20px;
-        border-right:1px solid var(--gray-200);
+    .modal-media-row {
+        display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px 20px;
+        border-bottom:1px solid var(--gray-200);
     }
-    [data-theme="dark"] .modal-split-left { border-color:rgba(255,255,255,0.06); }
-    .modal-split-right {
+    [data-theme="dark"] .modal-media-row { border-color:rgba(255,255,255,0.06); }
+    .modal-info-section {
         display:flex; flex-direction:column; padding:16px 20px;
     }
-    .modal-split-right .info-grid {
+    .modal-info-section .info-grid {
         display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;
     }
-    .modal-split-right .info-item {
+    .modal-info-section .info-item {
         background:var(--gray-100); border-radius:8px; padding:8px 10px;
     }
-    [data-theme="dark"] .modal-split-right .info-item { background:rgba(255,255,255,0.04); }
-    .modal-split-right .info-item label {
+    [data-theme="dark"] .modal-info-section .info-item { background:rgba(255,255,255,0.04); }
+    .modal-info-section .info-item label {
         font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase;
         letter-spacing:0.3px; display:block; margin:0 0 2px;
     }
-    .modal-split-right .info-item label::after { content:''; }
-    .modal-split-right .info-item span {
+    .modal-info-section .info-item label::after { content:''; }
+    .modal-info-section .info-item span {
         font-size:13px; font-weight:500; color:var(--dark); word-break:break-word;
     }
-    .modal-split-right .info-item.full { grid-column:1/-1; }
-    @media (max-width:768px) {
-        .modal-split { grid-template-columns:1fr; }
-        .modal-split-left { border-right:none; border-bottom:1px solid var(--gray-200); }
+    .modal-info-section .info-item.full { grid-column:1/-1; }
+    @media (max-width:640px) {
+        .modal-media-row { grid-template-columns:1fr; }
     }
 
     .modal-header {
@@ -971,48 +976,39 @@
 
         {{-- Modal Detail Cuti/DL --}}
         <div id="modalCutiDetail" class="modal-overlay" style="display:none;">
-            <div class="modal-container" style="max-width:520px;">
-                <div class="modal-header" style="border-bottom:1px solid var(--dm-border,#e2e8f0);">
+            <div class="modal-container modal-wide">
+                <div class="modal-header">
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:16px;">
+                        <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:14px;">
                             <i class="fas fa-calendar-minus"></i>
                         </div>
                         <h3 class="modal-title" style="margin:0;" id="cutiModalTitle">Detail Cuti/DL</h3>
                     </div>
                     <button class="modal-close" onclick="closeModal('modalCutiDetail')"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="modal-content" style="padding:20px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-                        <div>
-                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Pegawai</div>
-                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalUser">-</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Jenis</div>
-                            <div id="cutiModalJenis" style="font-size:14px;font-weight:600;color:#7c3aed;">-</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Periode</div>
-                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalPeriode">-</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Durasi</div>
-                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalHari">-</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
+                    {{-- Left: Bukti --}}
+                    <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
+                        <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Surat</div>
+                        <div id="cutiModalBukti" style="flex:1; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
+                            <span style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
                         </div>
                     </div>
-                    <div style="margin-bottom:16px;">
-                        <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Keterangan</div>
-                        <div style="font-size:13px;color:var(--dm-text,#1e293b);line-height:1.5;" id="cutiModalKeterangan">-</div>
+                    {{-- Right: Info --}}
+                    <div style="padding:16px 20px; display:flex; flex-direction:column;">
+                        <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+                            <div class="info-item"><label>Pegawai</label><span id="cutiModalUser">-</span></div>
+                            <div class="info-item"><label>Jenis</label><span id="cutiModalJenis" style="color:#7c3aed;">-</span></div>
+                            <div class="info-item"><label>Periode</label><span id="cutiModalPeriode">-</span></div>
+                            <div class="info-item"><label>Durasi</label><span id="cutiModalHari">-</span></div>
+                            <div class="info-item full" style="grid-column:1/-1;"><label>Keterangan</label><span id="cutiModalKeterangan">-</span></div>
+                        </div>
+                        <div style="margin-top:auto; display:flex; gap:8px;">
+                            <button type="button" class="btn-success" style="flex:1;padding:10px;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
+                            <button type="button" class="btn-danger" style="flex:1;padding:10px;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
+                            <button type="button" class="btn-secondary" style="padding:10px 16px;" onclick="closeModal('modalCutiDetail')">Tutup</button>
+                        </div>
                     </div>
-                    <div id="cutiModalBuktiSection" style="margin-bottom:16px;">
-                        <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:8px;">Bukti Surat</div>
-                        <div id="cutiModalBukti"></div>
-                    </div>
-                </div>
-                <div class="modal-actions" style="padding:16px 20px;border-top:1px solid var(--dm-border,#e2e8f0);display:flex;gap:8px;">
-                    <button type="button" class="btn-success" style="flex:1;padding:10px;display:flex;align-items:center;justify-content:center;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
-                    <button type="button" class="btn-danger" style="flex:1;padding:10px;display:flex;align-items:center;justify-content:center;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
-                    <button type="button" class="btn-secondary" style="padding:10px 16px;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);background:var(--dm-card,#fff);color:var(--dm-text,#64748b);font-weight:600;font-size:13px;cursor:pointer;" onclick="closeModal('modalCutiDetail')">Tutup</button>
                 </div>
             </div>
         </div>
@@ -1198,24 +1194,24 @@
             <button class="modal-close" onclick="closeModal('modalPresensiPending')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-split">
-            <div class="modal-split-left">
-                <div class="map-container" style="flex:1; min-height:180px;">
+            <div class="modal-media-row">
+                <div class="map-container" style="height:220px; border-radius:10px; overflow:hidden;">
                     <div id="presensiMap" style="width:100%;height:100%;"></div>
                     <div id="mapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
                     <div id="mapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="foto-wrapper" style="flex:1; min-height:140px;" id="detailFotoPresensi"><span class="text-muted">Tidak ada foto</span></div>
+                <div class="foto-wrapper" style="height:220px; border-radius:10px;" id="detailFotoPresensi"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-split-right">
+            <div class="modal-info-section">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPresensi">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPresensi">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPresensi">-</span></div>
                     <div class="info-item"><label>Jam</label><span id="detailJamPresensi">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi" style="font-size:11px;">-</span></div>
-                    <div class="info-item"><label>Status</label><span class="status-badge pending">Pending</span></div>
+                    <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="display:flex; gap:8px; margin-top:8px;">
                     <button type="button" class="btn-success" id="modalBtnApprovePresensi" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
                     <button type="button" class="btn-danger" id="modalBtnRejectPresensi" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
                     <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')" style="padding:10px 16px;">Tutup</button>
@@ -1234,20 +1230,20 @@
             <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-split">
-            <div class="modal-split-left">
-                <div id="detailBuktiPengajuan" style="flex:1; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:8px; overflow:hidden;">
+            <div class="modal-media-row">
+                <div id="detailBuktiPengajuan" style="height:220px; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; grid-column:1/-1;">
                     <span class="text-muted" style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
                 </div>
             </div>
-            <div class="modal-split-right">
+            <div class="modal-info-section">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
-                    <div class="info-item"><label>Status</label><span class="status-badge pending">Pending</span></div>
+                    <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
                     <div class="info-item full"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="display:flex; gap:8px; margin-top:8px;">
                     <button type="button" class="btn-success" id="modalBtnApprove" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
                     <button type="button" class="btn-danger" id="modalBtnReject" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
                     <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')" style="padding:10px 16px;">Tutup</button>
@@ -1266,15 +1262,15 @@
             <button class="modal-close" onclick="closeModal('modalDetailHariIni')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-split">
-            <div class="modal-split-left">
-                <div class="map-container" style="flex:1; min-height:180px;">
+            <div class="modal-media-row">
+                <div class="map-container" style="height:220px; border-radius:10px; overflow:hidden;">
                     <div id="hariIniMap" style="width:100%;height:100%;"></div>
                     <div id="hariIniMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
                     <div id="hariIniMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="foto-wrapper" style="flex:1; min-height:140px;" id="detailFotoHariIni"><span class="text-muted">Tidak ada foto</span></div>
+                <div class="foto-wrapper" style="height:220px; border-radius:10px;" id="detailFotoHariIni"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-split-right">
+            <div class="modal-info-section">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailNamaHariIni">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalHariIni">-</span></div>
@@ -1284,7 +1280,7 @@
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="display:flex; gap:8px; margin-top:8px;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1300,15 +1296,15 @@
             <button class="modal-close" onclick="closeModal('modalDetailLembur')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-split">
-            <div class="modal-split-left">
-                <div class="map-container" style="flex:1; min-height:180px;">
+            <div class="modal-media-row">
+                <div class="map-container" style="height:220px; border-radius:10px; overflow:hidden;">
                     <div id="lemburMap" style="width:100%;height:100%;"></div>
                     <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
                     <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="foto-wrapper" style="flex:1; min-height:140px;" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div>
+                <div class="foto-wrapper" style="height:220px; border-radius:10px;" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-split-right">
+            <div class="modal-info-section">
                 <div class="info-grid">
                     <div class="info-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
@@ -1317,7 +1313,7 @@
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="display:flex; gap:8px; margin-top:8px;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1366,12 +1362,13 @@
         var buktiEl = document.getElementById('cutiModalBukti');
         var buktiUrl = row.dataset.cutiBukti;
         if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
-            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:360px;border:1px solid var(--dm-border,#e2e8f0);border-radius:10px;" frameborder="0"></iframe>' +
-                '<a href="' + buktiUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:600;color:var(--primary);text-decoration:none;"><i class="fas fa-external-link-alt"></i> Buka di tab baru</a>';
+            buktiEl.style.background = 'transparent';
+            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
         } else if (buktiUrl) {
-            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);" onerror="this.style.display=\'none\'">';
+            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<span style=font-size:13px;color:var(--gray-400)>Gagal memuat</span>\'">';
         } else {
-            buktiEl.innerHTML = '<span style="font-size:12px;color:var(--dm-muted,#94a3b8);">Tidak ada bukti</span>';
+            buktiEl.style.background = 'var(--gray-100)';
+            buktiEl.innerHTML = '<span style="font-size:13px;color:var(--gray-400);">Tidak ada bukti</span>';
         }
 
         var approveUrl = row.dataset.cutiApprove;
