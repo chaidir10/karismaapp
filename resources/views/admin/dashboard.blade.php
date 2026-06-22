@@ -459,7 +459,10 @@
     .modal-col-content {
         flex:1; border-radius:10px; overflow:hidden; display:flex;
         align-items:center; justify-content:center; background:var(--gray-100);
+        position:relative;
     }
+    .modal-col-content img { width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0; }
+    .modal-col-content iframe { position:absolute; inset:0; }
     [data-theme="dark"] .modal-col-content { background:rgba(255,255,255,0.03); }
     .modal-info-col {
         padding:16px; display:flex; flex-direction:column;
@@ -988,7 +991,7 @@
 
         {{-- Modal Detail Cuti/DL --}}
         <div id="modalCutiDetail" class="modal-overlay" style="display:none;">
-            <div class="modal-container modal-wide">
+            <div class="modal-container" style="max-width:900px;">
                 <div class="modal-header">
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:14px;">
@@ -998,22 +1001,25 @@
                     </div>
                     <button class="modal-close" onclick="closeModal('modalCutiDetail')"><i class="fas fa-times"></i></button>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
-                    {{-- Left: Bukti --}}
-                    <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
-                        <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Surat</div>
-                        <div id="cutiModalBukti" style="flex:1; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
-                            <span style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:420px;">
+                    <div class="modal-col">
+                        <div class="modal-col-label">Bukti Surat</div>
+                        <div class="modal-col-content" id="cutiModalBukti" style="flex-direction:column;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-file-pdf" style="font-size:18px;color:var(--gray-400);"></i>
+                                </div>
+                                <span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>
+                            </div>
                         </div>
                     </div>
-                    {{-- Right: Info --}}
-                    <div style="padding:16px 20px; display:flex; flex-direction:column;">
-                        <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+                    <div class="modal-info-col">
+                        <div class="info-grid">
                             <div class="info-item"><label>Pegawai</label><span id="cutiModalUser">-</span></div>
-                            <div class="info-item"><label>Jenis</label><span id="cutiModalJenis" style="color:#7c3aed;">-</span></div>
+                            <div class="info-item"><label>Jenis</label><span id="cutiModalJenis">-</span></div>
                             <div class="info-item"><label>Periode</label><span id="cutiModalPeriode">-</span></div>
                             <div class="info-item"><label>Durasi</label><span id="cutiModalHari">-</span></div>
-                            <div class="info-item full" style="grid-column:1/-1;"><label>Keterangan</label><span id="cutiModalKeterangan">-</span></div>
+                            <div class="info-item full"><label>Keterangan</label><span id="cutiModalKeterangan">-</span></div>
                         </div>
                         <div style="margin-top:auto; display:flex; gap:8px;">
                             <button type="button" class="btn-success" style="flex:1;padding:10px;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
@@ -1308,7 +1314,7 @@
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="margin-top:auto; display:flex; gap:8px; justify-content:flex-end;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1347,7 +1353,7 @@
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
                     <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="margin-top:auto; display:flex; gap:8px; justify-content:flex-end;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
                 </div>
             </div>
@@ -1395,14 +1401,16 @@
 
         var buktiEl = document.getElementById('cutiModalBukti');
         var buktiUrl = row.dataset.cutiBukti;
+        var emptyIcon = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-file-pdf" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span></div>';
         if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
-            buktiEl.style.background = 'transparent';
-            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
+            buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;';
+            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '#view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
         } else if (buktiUrl) {
-            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<span style=font-size:13px;color:var(--gray-400)>Gagal memuat</span>\'">';
+            buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
+            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
         } else {
-            buktiEl.style.background = 'var(--gray-100)';
-            buktiEl.innerHTML = '<span style="font-size:13px;color:var(--gray-400);">Tidak ada bukti</span>';
+            buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
+            buktiEl.innerHTML = emptyIcon;
         }
 
         var approveUrl = row.dataset.cutiApprove;
@@ -1668,7 +1676,7 @@
         // Foto
         var fotoEl = document.getElementById('detailFotoPresensi');
         fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
             : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         // Wire modal buttons
@@ -1747,7 +1755,7 @@
         // Foto
         var fotoEl = document.getElementById('detailFotoHariIni');
         fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
             : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         // Koordinat
@@ -1780,7 +1788,7 @@
 
         var fotoEl = document.getElementById('detailFotoLembur');
         fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" alt="Foto" class="foto-image" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
             : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
 
         var lat = NaN, lng = NaN;
