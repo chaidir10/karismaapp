@@ -1543,8 +1543,7 @@
 
     // Prevent scroll when clicking search
     document.querySelectorAll('.card-search input').forEach(function(inp) {
-        inp.addEventListener('focus', function(e) {
-            e.preventDefault();
+        inp.addEventListener('focus', function() {
             var y = window.scrollY;
             requestAnimationFrame(function() { window.scrollTo(0, y); });
         });
@@ -1555,52 +1554,76 @@
         var tbody = document.getElementById(tbodyId);
         if (!tbody) return;
         var inst = tableInstances[tbodyId];
-        var rows = inst ? inst.rows : Array.from(tbody.querySelectorAll('tr'));
-        rows.forEach(function(row) {
-            if (row.querySelector('.empty-state')) return;
-            var text = row.textContent.toLowerCase();
-            row.style.display = text.indexOf(query) !== -1 ? '' : 'none';
+        if (!inst) return;
+        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
+
+        // Filter rows by query
+        var filtered = inst.allRows.filter(function(row) {
+            if (row.querySelector('.empty-state')) return false;
+            return row.textContent.toLowerCase().indexOf(query) !== -1;
         });
-        // Hide pagination while searching
-        var pg = tbody.closest('table') ? tbody.closest('table').parentElement.querySelector('.table-pagination') : null;
-        if (pg) pg.style.display = query ? 'none' : '';
+
+        inst.rows = filtered;
+        inst.currentPage = 1;
+        inst._searchQuery = query;
+
+        // Render filtered with pagination
+        renderTable(inst, tbody, perPage);
+    }
+
+    function renderTable(inst, tbody, perPage) {
+        // Hide all original rows first
+        inst.allRows.forEach(function(r) { r.style.display = 'none'; });
+
+        var totalRows = inst.rows.length;
+        var totalPages = Math.max(1, Math.ceil(totalRows / perPage));
+        if (inst.currentPage > totalPages) inst.currentPage = totalPages;
+
+        var start = (inst.currentPage - 1) * perPage;
+        var end = Math.min(start + perPage, totalRows);
+
+        inst.rows.forEach(function(row, i) {
+            row.style.display = (i >= start && i < end) ? '' : 'none';
+            var noCell = row.querySelector('td:first-child');
+            if (noCell) noCell.textContent = i + 1;
+        });
+
+        // Update pagination
+        var pg = inst._paginationDiv;
+        if (!pg) return;
+        if (totalRows <= perPage) { pg.style.display = 'none'; return; }
+        pg.style.display = '';
+        var s = start + 1, e = end;
+        var html = '<span class="pagination-info">' + s + '-' + e + ' dari ' + totalRows + '</span><div class="pagination-buttons">';
+        html += '<button data-page="prev" ' + (inst.currentPage <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+        var sp = Math.max(1, inst.currentPage - 2);
+        var ep = Math.min(totalPages, sp + 4);
+        if (ep - sp < 4) sp = Math.max(1, ep - 4);
+        for (var p = sp; p <= ep; p++) {
+            html += '<button data-page="' + p + '" class="' + (p === inst.currentPage ? 'active' : '') + '">' + p + '</button>';
+        }
+        html += '<button data-page="next" ' + (inst.currentPage >= totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button></div>';
+        pg.innerHTML = html;
     }
 
     function refreshTablePagination(tbodyId) {
         var tbody = document.getElementById(tbodyId);
         if (!tbody || !tableInstances[tbodyId]) return;
         var inst = tableInstances[tbodyId];
-        inst.rows = Array.from(tbody.querySelectorAll('tr'));
+        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
+
+        // Rebuild allRows from current DOM
+        inst.allRows = Array.from(tbody.querySelectorAll('tr')).filter(function(r) { return !r.querySelector('.empty-state'); });
+        inst.rows = inst.allRows.slice();
+        inst._searchQuery = '';
+
         if (inst.rows.length === 0) {
             tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-circle-check"></i></div><p>Semua pengajuan telah diproses</p></div></td></tr>';
-            var pg = tbody.closest('table').parentElement.querySelector('.table-pagination');
-            if (pg) pg.style.display = 'none';
+            if (inst._paginationDiv) inst._paginationDiv.style.display = 'none';
             return;
         }
-        var totalPages = Math.ceil(inst.rows.length / (parseInt(tbody.getAttribute('data-paginate')) || 5));
-        if (inst.currentPage > totalPages) inst.currentPage = totalPages;
-        // Re-number rows
-        inst.rows.forEach(function(row, i) { var c = row.querySelector('td:first-child'); if (c) c.textContent = i + 1; });
-        // Trigger re-render by simulating pagination
-        var pg = tbody.closest('table').parentElement.querySelector('.table-pagination');
-        if (pg) {
-            var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
-            var start = (inst.currentPage - 1) * perPage;
-            var end = start + perPage;
-            inst.rows.forEach(function(row, i) { row.style.display = (i >= start && i < end) ? '' : 'none'; });
-            if (inst.rows.length <= perPage) { pg.style.display = 'none'; }
-            else {
-                pg.style.display = '';
-                var s = (inst.currentPage - 1) * perPage + 1;
-                var e = Math.min(inst.currentPage * perPage, inst.rows.length);
-                var tp = Math.ceil(inst.rows.length / perPage);
-                var html = '<span class="pagination-info">' + s + '-' + e + ' dari ' + inst.rows.length + '</span><div class="pagination-buttons">';
-                html += '<button data-page="prev" ' + (inst.currentPage === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
-                for (var p = 1; p <= tp; p++) html += '<button data-page="' + p + '" class="' + (p === inst.currentPage ? 'active' : '') + '">' + p + '</button>';
-                html += '<button data-page="next" ' + (inst.currentPage === tp ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button></div>';
-                pg.innerHTML = html;
-            }
-        }
+
+        renderTable(inst, tbody, perPage);
     }
 
     function ajaxAction(url, btnEl) {
@@ -1971,61 +1994,21 @@
         if (!tbody) return;
 
         var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
-        var rows = Array.from(tbody.querySelectorAll('tr'));
-        if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('.empty-state'))) return;
+        var allRows = Array.from(tbody.querySelectorAll('tr'));
+        if (allRows.length === 0 || (allRows.length === 1 && allRows[0].querySelector('.empty-state'))) return;
 
         var table = tbody.closest('table');
         var container = table.parentElement;
-        var currentPage = 1;
 
         var paginationDiv = document.createElement('div');
         paginationDiv.className = 'table-pagination';
         container.appendChild(paginationDiv);
 
-        var instance = { rows: rows, currentPage: 1 };
+        var instance = { allRows: allRows, rows: allRows.slice(), currentPage: 1, _paginationDiv: paginationDiv, _searchQuery: '' };
         tableInstances[tbodyId] = instance;
 
         function render() {
-            var totalRows = instance.rows.length;
-            var totalPages = Math.ceil(totalRows / perPage);
-            if (instance.currentPage > totalPages) instance.currentPage = 1;
-
-            instance.rows.forEach(function(row, i) {
-                var start = (instance.currentPage - 1) * perPage;
-                var end = start + perPage;
-                row.style.display = (i >= start && i < end) ? '' : 'none';
-            });
-
-            // Update nomor urut
-            instance.rows.forEach(function(row, i) {
-                var noCell = row.querySelector('td:first-child');
-                if (noCell) noCell.textContent = i + 1;
-            });
-
-            if (totalRows <= perPage) {
-                paginationDiv.style.display = 'none';
-                return;
-            }
-            paginationDiv.style.display = '';
-
-            var start = (instance.currentPage - 1) * perPage + 1;
-            var end = Math.min(instance.currentPage * perPage, totalRows);
-
-            var html = '<span class="pagination-info">' + start + '-' + end + ' dari ' + totalRows + '</span>';
-            html += '<div class="pagination-buttons">';
-            html += '<button data-page="prev" ' + (instance.currentPage === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
-
-            var sp = Math.max(1, instance.currentPage - 2);
-            var ep = Math.min(totalPages, sp + 4);
-            if (ep - sp < 4) sp = Math.max(1, ep - 4);
-
-            for (var p = sp; p <= ep; p++) {
-                html += '<button data-page="' + p + '" class="' + (p === instance.currentPage ? 'active' : '') + '">' + p + '</button>';
-            }
-
-            html += '<button data-page="next" ' + (instance.currentPage === totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
-            html += '</div>';
-            paginationDiv.innerHTML = html;
+            renderTable(instance, tbody, perPage);
         }
 
         paginationDiv.addEventListener('click', function(e) {
@@ -2070,9 +2053,17 @@
                 }
                 return dir === 'asc' ? aVal.localeCompare(bVal, 'id') : bVal.localeCompare(aVal, 'id');
             });
+            instance.allRows = instance.rows.slice();
             instance.rows.forEach(function(row) { tbody.appendChild(row); });
             instance.currentPage = 1;
             render();
+            // Re-apply search if active
+            if (instance._searchQuery) {
+                var q = instance._searchQuery;
+                instance.rows = instance.allRows.filter(function(r) { return r.textContent.toLowerCase().indexOf(q) !== -1; });
+                instance.currentPage = 1;
+                render();
+            }
 
             if (save) {
                 localStorage.setItem('sort_' + tbodyId, JSON.stringify({ col: colIndex, dir: dir, type: sortType }));
