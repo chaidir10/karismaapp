@@ -251,7 +251,10 @@
     <!-- Buttons -->
     @php
         $masukDisabled = $sudahPresensiMasuk || ($disablePresensiLibur ?? false);
-        $pulangDisabled = !$sudahPresensiMasuk || $sudahPresensiPulang || ($disablePresensiLibur ?? false);
+        $pulangDisabled = $sudahPresensiPulang || ($disablePresensiLibur ?? false);
+        if ($requireMasukBeforePulang && !$sudahPresensiMasuk) {
+            $pulangDisabled = true;
+        }
     @endphp
     <div style="display:flex; gap:10px; padding:16px 20px;">
         <button class="{{ !$masukDisabled ? 'absen-btn-active' : '' }}"
@@ -1178,6 +1181,8 @@
     let faceDetected = false;
     let mpFaceDetector = null;
 
+    window._enableFaceDetection = @json($enableFaceDetection);
+
     const sudahPresensiMasuk = @json($sudahPresensiMasuk);
     const sudahPresensiPulang = @json($sudahPresensiPulang);
 
@@ -1471,7 +1476,15 @@
             return video.play().catch(function(){});
         })
         .then(function() {
-            initFaceDetection();
+            if (window._enableFaceDetection) {
+                initFaceDetection();
+            } else {
+                var submitBtn = document.querySelector('.submit-btn-large');
+                if (submitBtn) submitBtn.disabled = false;
+                faceDetected = true;
+                var statusEl = document.getElementById('faceStatus');
+                if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.style.background = 'rgba(255,255,255,0.15)'; statusEl.style.color = 'rgba(255,255,255,0.7)'; statusEl.innerHTML = '<i class="fas fa-user"></i> Letakkan wajah di dalam lingkaran'; }
+            }
         })
         .catch(function(err) {
             console.error(err);

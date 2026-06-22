@@ -147,6 +147,8 @@ class DashboardController extends Controller
             ->get();
 
         $disablePresensiLibur = ($isLiburHariIni && AppSetting::getBool('disable_presensi_hari_libur', true));
+        $enableFaceDetection = AppSetting::getBool('enable_face_detection', true);
+        $requireMasukBeforePulang = AppSetting::getBool('require_masuk_before_pulang', true);
 
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
@@ -167,7 +169,9 @@ class DashboardController extends Controller
             'jadwalKerjaHariIni',
             'isLiburHariIni',
             'namaLibur',
-            'disablePresensiLibur'
+            'disablePresensiLibur',
+            'enableFaceDetection',
+            'requireMasukBeforePulang'
         ));
     }
 }
