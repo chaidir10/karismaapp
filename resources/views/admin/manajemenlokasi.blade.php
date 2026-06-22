@@ -100,50 +100,7 @@
         justify-content: flex-end;
     }
 
-    .btn-detail,
-    .btn-edit,
-    .btn-delete {
-        width: 30px;
-        height: 30px;
-        border: none;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 12px;
-    }
-
-    .btn-detail {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
-    }
-
-    .btn-detail:hover {
-        background: #10b981;
-        color: white;
-    }
-
-    .btn-edit {
-        background: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
-    }
-
-    .btn-edit:hover {
-        background: #3b82f6;
-        color: white;
-    }
-
-    .btn-delete {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-    }
-
-    .btn-delete:hover {
-        background: #ef4444;
-        color: white;
-    }
+    /* btn-detail, btn-edit, btn-delete inherited from layout */
 
 
     .radius-slider-container {
