@@ -2,6 +2,15 @@
 
 @section('title', 'Manajemen Pegawai')
 
+@push('styles')
+<style>
+    .modal-pg { opacity:0; transition:opacity 0.2s ease; }
+    .modal-pg.show { opacity:1; }
+    .modal-pg .modal-inner { transform:translateY(12px); opacity:0; transition:transform 0.2s ease, opacity 0.2s ease; }
+    .modal-pg.show .modal-inner { transform:translateY(0); opacity:1; }
+</style>
+@endpush
+
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <div class="page-header-glass">
@@ -129,8 +138,8 @@
 </div>
 
 <!-- Add Employee Modal -->
-<div id="modalAdd" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50   overflow-y-auto py-8">
-    <div class="w-full max-w-2xl p-6 relative mx-4  my-auto" id="modalAddContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+<div id="modalAdd" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-8">
+    <div class="modal-inner w-full max-w-2xl p-6 relative mx-4 my-auto" id="modalAddContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <button onclick="closeModal('modalAdd')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl transition-colors duration-200 z-10">
             <i class="fas fa-times"></i>
         </button>
@@ -233,8 +242,8 @@
 </div>
 
 <!-- Detail Employee Modal -->
-<div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto py-8">
-    <div class="w-full max-w-3xl relative mx-4 my-auto" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
+<div id="modalDetail" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-8">
+    <div class="modal-inner w-full max-w-3xl relative mx-4 my-auto" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
             <h2 style="font-size:16px; font-weight:700; color:var(--dm-text,#1e293b); margin:0;">Detail Pegawai</h2>
@@ -303,8 +312,8 @@
 </div>
 
 <!-- Edit Employee Modal -->
-<div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto py-4">
-    <div class="w-full max-w-4xl relative mx-4 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
+<div id="modalEdit" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-4">
+    <div class="modal-inner w-full max-w-4xl relative mx-4 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
             <h2 style="font-size:16px; font-weight:700; color:var(--dm-text,#1e293b); margin:0;">Edit Data Pegawai</h2>
@@ -389,8 +398,8 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="modalDeleteConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  ">
-    <div class="w-full max-w-md p-6 relative mx-4 " style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+<div id="modalDeleteConfirmation" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="modal-inner w-full max-w-md p-6 relative mx-4" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                 <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
@@ -413,8 +422,8 @@
 </div>
 
 <!-- Reset Password Confirmation Modal -->
-<div id="modalResetPasswordConfirmation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  ">
-    <div class="w-full max-w-md p-6 relative mx-4 " style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+<div id="modalResetPasswordConfirmation" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="modal-inner w-full max-w-md p-6 relative mx-4" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                 <i class="fas fa-key text-green-600 text-xl"></i>
@@ -529,31 +538,23 @@
 
     // Modal functions with animations
     function openModal(id) {
-        const modal = document.getElementById(id);
-        const modalContent = document.getElementById(id + 'Content') || modal.querySelector('div');
-
+        var modal = document.getElementById(id);
+        if (!modal) return;
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        setTimeout(() => {
-            if (modalContent) {
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }
-        }, 10);
+        requestAnimationFrame(function() {
+            modal.classList.add('show');
+        });
     }
 
     function closeModal(id) {
-        const modal = document.getElementById(id);
-        const modalContent = document.getElementById(id + 'Content') || modal.querySelector('div');
-
-        if (modalContent) {
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-        }
-        setTimeout(() => {
+        var modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.remove('show');
+        setTimeout(function() {
             modal.classList.add('hidden');
             document.body.style.overflow = '';
-        }, 300);
+        }, 200);
     }
 
     // Close modals when clicking outside
