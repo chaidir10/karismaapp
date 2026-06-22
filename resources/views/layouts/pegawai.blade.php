@@ -1161,6 +1161,24 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8/dist/turbo.es2017-esm.js"></script>
     <script>
+        // Force update: jika versi berubah, clear cache dan reload
+        (function() {
+            var APP_VERSION = '2026062201';
+            var storedVer = localStorage.getItem('karisma-app-version');
+            if (storedVer && storedVer !== APP_VERSION) {
+                localStorage.setItem('karisma-app-version', APP_VERSION);
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        names.forEach(function(n) { caches.delete(n); });
+                    }).then(function() { location.reload(true); });
+                } else {
+                    location.reload(true);
+                }
+                return;
+            }
+            localStorage.setItem('karisma-app-version', APP_VERSION);
+        })();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register("/sw.js")
