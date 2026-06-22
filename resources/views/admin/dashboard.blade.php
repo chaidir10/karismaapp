@@ -1685,11 +1685,7 @@
         document.getElementById('detailJamPresensi').textContent      = data.jam      || '-';
         resolveAddress(data.lokasi, document.getElementById('detailLokasiPresensi'));
 
-        // Foto
-        var fotoEl = document.getElementById('detailFotoPresensi');
-        fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
-            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+        setZoomableFoto(document.getElementById('detailFotoPresensi'), data.foto_url, emptyFotoHtml);
 
         // Wire modal buttons
         document.getElementById('modalBtnApprovePresensi').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPresensiPending'); };
@@ -1730,13 +1726,26 @@
             buktiEl.style.cssText = baseStyle + 'background:#fff;';
             buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#toolbar=0&navpanes=0&view=FitH" style="position:absolute;inset:0;width:100%;height:100%;border:none;" frameborder="0"></iframe>';
         } else if (data.bukti_url) {
-            buktiEl.style.cssText = baseStyle + 'background:#000;';
+            buktiEl.style.cssText = baseStyle + 'background:#000;cursor:zoom-in;';
             var img = document.createElement('img');
             img.src = data.bukti_url;
-            img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;position:absolute;inset:0;';
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;position:absolute;inset:0;transition:transform 0.15s ease;transform-origin:center center;';
             img.onerror = function() { buktiEl.innerHTML = emptyBukti; buktiEl.style.cssText = baseStyle + 'background:var(--gray-100);'; };
             buktiEl.innerHTML = '';
             buktiEl.appendChild(img);
+            var zoom = 1;
+            buktiEl.onwheel = function(e) {
+                e.preventDefault();
+                var rect = buktiEl.getBoundingClientRect();
+                var ox = ((e.clientX - rect.left) / rect.width) * 100;
+                var oy = ((e.clientY - rect.top) / rect.height) * 100;
+                zoom += e.deltaY < 0 ? 0.2 : -0.2;
+                zoom = Math.max(1, Math.min(5, zoom));
+                img.style.transformOrigin = ox + '% ' + oy + '%';
+                img.style.transform = 'scale(' + zoom + ')';
+                buktiEl.style.cursor = zoom > 1 ? 'zoom-out' : 'zoom-in';
+            };
+            buktiEl.ondblclick = function() { zoom = 1; img.style.transform = 'scale(1)'; buktiEl.style.cursor = 'zoom-in'; };
         } else {
             buktiEl.style.cssText = baseStyle + 'background:var(--gray-100);flex-direction:column;';
             buktiEl.innerHTML = emptyBukti;
@@ -1771,11 +1780,7 @@
         var verifLabel = st === 'approved' ? 'Disetujui' : st === 'rejected' ? 'Ditolak' : 'Menunggu';
         verifEl.innerHTML = '<span class="badge ' + verifCls + '">' + verifLabel + '</span>';
 
-        // Foto
-        var fotoEl = document.getElementById('detailFotoHariIni');
-        fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
-            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+        setZoomableFoto(document.getElementById('detailFotoHariIni'), data.foto_url, emptyFotoHtml);
 
         // Koordinat
         var lat = NaN, lng = NaN;
@@ -1805,10 +1810,7 @@
         var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
         document.getElementById('detailVerifikasiLembur').innerHTML = '<span class="status-badge ' + verifCls + '">' + capitalize(st) + '</span>';
 
-        var fotoEl = document.getElementById('detailFotoLembur');
-        fotoEl.innerHTML = data.foto_url
-            ? '<img src="' + data.foto_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
-            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+        setZoomableFoto(document.getElementById('detailFotoLembur'), data.foto_url, emptyFotoHtml);
 
         var lat = NaN, lng = NaN;
         if (data.lokasi) {
@@ -1921,6 +1923,33 @@
     }
 
     // ─── Utilities ────────────────────────────────────────────────────────────
+    function setZoomableFoto(container, url, emptyHtml) {
+        if (!url) { container.innerHTML = emptyHtml; container.onwheel = null; return; }
+        container.style.cursor = 'zoom-in';
+        container.style.overflow = 'hidden';
+        var img = document.createElement('img');
+        img.src = url;
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;transition:transform 0.15s ease;';
+        img.onerror = function() { container.innerHTML = emptyHtml; container.onwheel = null; };
+        container.innerHTML = '';
+        container.appendChild(img);
+        var z = 1;
+        container.onwheel = function(e) {
+            e.preventDefault();
+            var r = container.getBoundingClientRect();
+            var ox = ((e.clientX - r.left) / r.width) * 100;
+            var oy = ((e.clientY - r.top) / r.height) * 100;
+            z += e.deltaY < 0 ? 0.25 : -0.25;
+            z = Math.max(1, Math.min(5, z));
+            img.style.transformOrigin = ox + '% ' + oy + '%';
+            img.style.transform = 'scale(' + z + ')';
+            container.style.cursor = z > 1 ? 'zoom-out' : 'zoom-in';
+        };
+        container.ondblclick = function() { z = 1; img.style.transform = 'scale(1)'; container.style.cursor = 'zoom-in'; };
+    }
+
+    var emptyFotoHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+
     function resolveAddress(lokasi, el) {
         if (!lokasi || !el) { el.textContent = 'Tidak ada lokasi'; return; }
         var parts = lokasi.split(',');
