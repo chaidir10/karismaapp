@@ -866,7 +866,7 @@
         <div class="content-card" id="pengajuanPendingSection">
             <div class="card-header">
                 <h2 class="card-title">Pengajuan Pending</h2>
-                <span class="card-badge">{{ count($pengajuanPending ?? []) }} menunggu</span>
+                <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
             <div class="card-content">
                 <div class="table-container">
@@ -881,7 +881,9 @@
                             </tr>
                         </thead>
                         <tbody id="pengajuanPendingTable" data-paginate="5">
-                            @forelse($pengajuanPending ?? [] as $index => $peng)
+                            @php $rowNum = 0; @endphp
+                            @foreach($pengajuanPending ?? [] as $peng)
+                            @php $rowNum++; @endphp
                             <tr class="clickable-row"
                                 data-user-name="{{ $peng->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
@@ -890,7 +892,7 @@
                                 data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
                                 data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                                <td class="text-center text-xs">{{ $rowNum }}</td>
                                 <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}</td>
                                 <td>
@@ -898,26 +900,30 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        @if(Auth::user()->can_approve_pengajuan)
-                                        <form action="{{ route('admin.pengajuan.approve', $peng->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-success" title="Setujui">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.pengajuan.reject', $peng->id) }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <button type="submit" class="btn-danger" title="Tolak">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                        @else
-                                        <span class="text-gray-400 text-xs">Tidak memiliki hak akses</span>
-                                        @endif
+                                        <button type="button" onclick="actionPengajuan({{ $peng->id }}, 'approve')" class="btn-success" title="Setujui"><i class="fas fa-check"></i></button>
+                                        <button type="button" onclick="actionPengajuan({{ $peng->id }}, 'reject')" class="btn-danger" title="Tolak"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @foreach($cutiPending ?? [] as $cp)
+                            @php $rowNum++; @endphp
+                            <tr id="cutiRow{{ $cp->id }}">
+                                <td class="text-center text-xs">{{ $rowNum }}</td>
+                                <td class="user-name">{{ $cp->user->name ?? 'N/A' }}</td>
+                                <td class="date-cell">{{ $cp->tanggal_mulai->format('d M') }}@if($cp->tanggal_mulai != $cp->tanggal_selesai) - {{ $cp->tanggal_selesai->format('d M') }}@endif</td>
+                                <td>
+                                    <span class="badge" style="background:rgba(139,92,246,0.1);color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;">{{ $cp->jenis === 'dinas_luar' ? 'Dinas Luar' : \App\Models\Cuti::jenisOptions()[$cp->jenis] ?? $cp->jenis }}</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button onclick="actionCuti({{ $cp->id }}, 'approve')" class="btn-success" title="Setujui"><i class="fas fa-check"></i></button>
+                                        <button onclick="actionCuti({{ $cp->id }}, 'reject')" class="btn-danger" title="Tolak"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                            @if($rowNum === 0)
                             <tr>
                                 <td colspan="5" class="empty-state">
                                     <div class="empty-content">
@@ -926,7 +932,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -1001,47 +1007,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- Cuti / DL Pending --}}
-        @if(isset($cutiPending) && $cutiPending->count() > 0)
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="card-title">Cuti / Dinas Luar Pending</h2>
-                <span class="card-badge" style="background:rgba(139,92,246,0.1);color:#7c3aed;">{{ $cutiPending->count() }} pengajuan</span>
-            </div>
-            <div class="card-content" style="padding:0;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px;">NO</th>
-                            <th>PEGAWAI</th>
-                            <th>JENIS</th>
-                            <th>TANGGAL</th>
-                            <th>HARI</th>
-                            <th style="width:120px;">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($cutiPending as $idx => $cp)
-                        <tr id="cutiRow{{ $cp->id }}">
-                            <td>{{ $idx + 1 }}</td>
-                            <td style="font-weight:600;">{{ $cp->user->name }}</td>
-                            <td><span style="background:rgba(139,92,246,0.1);color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;">{{ $cp->jenis === 'dinas_luar' ? 'DL' : str_replace('cuti_', 'C. ', $cp->jenis) }}</span></td>
-                            <td>{{ $cp->tanggal_mulai->format('d/m') }}@if($cp->tanggal_mulai != $cp->tanggal_selesai) - {{ $cp->tanggal_selesai->format('d/m') }}@endif</td>
-                            <td>{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}</td>
-                            <td>
-                                <div style="display:flex; gap:6px;">
-                                    <button onclick="actionCuti({{ $cp->id }}, 'approve')" class="btn-approve" title="Setujui"><i class="fas fa-check"></i></button>
-                                    <button onclick="actionCuti({{ $cp->id }}, 'reject')" class="btn-reject" title="Tolak"><i class="fas fa-xmark"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        @endif
 
         {{-- Lembur Hari Ini --}}
         <div class="content-card" id="lemburHariIniSection">
@@ -1217,19 +1182,12 @@
                 </div>
             </div>
             <div class="modal-actions">
-                @if(Auth::user()->can_approve_pengajuan)
-                <form id="formApprovePengajuan" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-success" title="Setujui">
-                        <i class="fas fa-check"></i> 
-                </form>
-                <form id="formRejectPengajuan" method="POST" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-danger" title="Tolak">
-                        <i class="fas fa-times"></i> 
-                    </button>
-                </form>
-                @endif
+                <button type="button" class="btn-success" id="modalBtnApprovePengajuan" title="Setujui">
+                    <i class="fas fa-check"></i> Setujui
+                </button>
+                <button type="button" class="btn-danger" id="modalBtnRejectPengajuan" title="Tolak">
+                    <i class="fas fa-times"></i> Tolak
+                </button>
                 <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">
                     Tutup
                 </button>
@@ -1353,18 +1311,40 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    // ─── Cuti Approve/Reject ─────────────────────────────────────────────────
-    function actionCuti(id, action) {
-        var url = '/admin/cuti/' + id + '/' + action;
-        fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'} })
-            .then(r => r.json())
-            .then(data => {
+    // ─── AJAX Approve/Reject ─────────────────────────────────────────────────
+    var _csrfToken = '{{ csrf_token() }}';
+    function actionPengajuan(id, action) {
+        var url = '/admin/pengajuan/' + id + '/' + action;
+        fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':_csrfToken,'Accept':'application/json'} })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
                 if (data.success) {
-                    var row = document.getElementById('cutiRow' + id);
-                    if (row) { row.style.transition='opacity 0.3s'; row.style.opacity='0'; setTimeout(()=>row.remove(),300); }
+                    // Remove row from table
+                    var rows = document.querySelectorAll('#pengajuanPendingTable tr');
+                    rows.forEach(function(row) {
+                        if (row.dataset.approveUrl && row.dataset.approveUrl.indexOf('/' + id + '/') !== -1) {
+                            row.style.transition='opacity 0.3s'; row.style.opacity='0';
+                            setTimeout(function(){ row.remove(); }, 300);
+                        }
+                    });
+                    closeModal('modalPengajuanPending');
                 }
             });
     }
+
+    function actionCuti(id, action) {
+        var url = '/admin/cuti/' + id + '/' + action;
+        fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':_csrfToken,'Accept':'application/json'} })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var row = document.getElementById('cutiRow' + id);
+                    if (row) { row.style.transition='opacity 0.3s'; row.style.opacity='0'; setTimeout(function(){ row.remove(); },300); }
+                }
+            });
+    }
+
+    var _currentPengajuanId = null;
 
     // ─── State ───────────────────────────────────────────────────────────────
     let presensiMap    = null;
@@ -1515,8 +1495,12 @@
             ? '<a href="' + data.bukti_url + '" target="_blank"><img src="' + data.bukti_url + '" class="bukti-image" onerror="this.style.display=\'none\'"></a>'
             : '<span class="text-muted">Tidak ada bukti</span>';
 
-        setFormAction('formApprovePengajuan', data.approve_url);
-        setFormAction('formRejectPengajuan',  data.reject_url);
+        // Extract ID from approve URL
+        var match = data.approve_url ? data.approve_url.match(/pengajuan\/(\d+)\//) : null;
+        _currentPengajuanId = match ? match[1] : null;
+
+        document.getElementById('modalBtnApprovePengajuan').onclick = function() { if (_currentPengajuanId) actionPengajuan(_currentPengajuanId, 'approve'); };
+        document.getElementById('modalBtnRejectPengajuan').onclick = function() { if (_currentPengajuanId) actionPengajuan(_currentPengajuanId, 'reject'); };
 
         openModal('modalPengajuanPending');
     }

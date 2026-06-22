@@ -16,22 +16,27 @@ class CutiController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'keterangan' => 'nullable|string|max:255',
-            'bukti_surat' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+            'bukti_surat' => 'required|file|max:2048',
         ]);
 
-        $path = $request->file('bukti_surat')->store('bukti_cuti', 'public');
+        try {
+            $path = $request->file('bukti_surat')->store('bukti_cuti', 'public');
 
-        Cuti::create([
-            'user_id' => Auth::id(),
-            'jenis' => $request->jenis_cuti,
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_selesai' => $request->tanggal_selesai,
-            'keterangan' => $request->keterangan,
-            'bukti_surat' => $path,
-            'status' => 'pending',
-        ]);
+            Cuti::create([
+                'user_id' => Auth::id(),
+                'jenis' => $request->jenis_cuti,
+                'tanggal_mulai' => $request->tanggal_mulai,
+                'tanggal_selesai' => $request->tanggal_selesai,
+                'keterangan' => $request->keterangan,
+                'bukti_surat' => $path,
+                'status' => 'pending',
+            ]);
 
-        return redirect()->route('pegawai.pengajuan.index')
-            ->with('success', 'Pengajuan cuti/DL berhasil diajukan');
+            return redirect()->route('pegawai.pengajuan.index')
+                ->with('success', 'Pengajuan cuti/DL berhasil diajukan');
+        } catch (\Exception $e) {
+            return redirect()->route('pegawai.pengajuan.index')
+                ->with('error', 'Gagal mengajukan: ' . $e->getMessage());
+        }
     }
 }

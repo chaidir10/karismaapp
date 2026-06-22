@@ -320,39 +320,45 @@ class DashboardAdminController extends Controller
         try {
             $pengajuan = PengajuanPresensi::findOrFail($id);
 
-            DB::transaction(function () use ($pengajuan) {
-                $jam = $pengajuan->waktu ? $pengajuan->waktu . ':00' : null;
+            // Tentukan jam
+            $jam = null;
+            try { $jam = $pengajuan->waktu; } catch (\Exception $e) {}
+            if ($jam) $jam = $jam . ':00';
+            if (!$jam) {
+                $hari = Carbon::parse($pengajuan->tanggal)->format('l');
+                $jam = $pengajuan->jenis === 'masuk' ? '07:30:00'
+                    : ($hari === 'Friday' ? '16:30:00' : '16:00:00');
+            }
 
-                if (!$jam) {
-                    $hari = Carbon::parse($pengajuan->tanggal)->format('l');
-                    $jam = $pengajuan->jenis === 'masuk' ? '07:30:00'
-                        : ($hari === 'Friday' ? '16:30:00' : '16:00:00');
-                }
+            Presensi::updateOrCreate(
+                [
+                    'user_id' => $pengajuan->user_id,
+                    'tanggal' => $pengajuan->tanggal,
+                    'jenis' => $pengajuan->jenis,
+                ],
+                [
+                    'jam' => $jam,
+                    'status' => 'approved',
+                    'foto' => $pengajuan->bukti ?? null,
+                    'lokasi' => $pengajuan->lokasi ?? null,
+                ]
+            );
 
-                Presensi::updateOrCreate(
-                    [
-                        'user_id' => $pengajuan->user_id,
-                        'tanggal' => $pengajuan->tanggal,
-                        'jenis' => $pengajuan->jenis,
-                    ],
-                    [
-                        'jam' => $jam,
-                        'status' => 'approved',
-                        'foto' => $pengajuan->bukti ?? null,
-                        'lokasi' => $pengajuan->lokasi ?? null,
-                    ]
-                );
+            // Update status pengajuan
+            $pengajuan->status = 'approved';
+            $pengajuan->approved_by = auth()->id();
+            $pengajuan->approved_at = now();
+            $pengajuan->save();
 
-                // Simpan status pengajuan
-                $pengajuan->status = 'approved';
-                $pengajuan->approved_by = auth()->id();
-                $pengajuan->approved_at = now();
-                $pengajuan->save();
-            });
-
+            if (request()->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Pengajuan disetujui']);
+            }
             return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return redirect()->back()->with('error', 'Gagal approve: ' . $e->getMessage());
         }
     }
 
@@ -366,8 +372,14 @@ class DashboardAdminController extends Controller
             $pengajuan->approved_at = now();
             $pengajuan->save();
 
+            if (request()->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Pengajuan ditolak']);
+            }
             return redirect()->back()->with('success', 'Pengajuan ditolak.');
         } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }

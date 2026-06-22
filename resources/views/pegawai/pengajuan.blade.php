@@ -90,6 +90,21 @@
 </style>
 
 <div class="pengajuan-page">
+    @if(session('success'))
+    <div style="background:var(--success-light); border:1px solid var(--success); color:var(--success); padding:12px 16px; border-radius:12px; margin-bottom:14px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px;">
+        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    </div>
+    @endif
+    @if(session('error'))
+    <div style="background:var(--danger-light); border:1px solid var(--danger); color:var(--danger); padding:12px 16px; border-radius:12px; margin-bottom:14px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px;">
+        <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+    </div>
+    @endif
+    @if($errors->any())
+    <div style="background:var(--danger-light); border:1px solid var(--danger); color:var(--danger); padding:12px 16px; border-radius:12px; margin-bottom:14px; font-size:13px; font-weight:500;">
+        <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+    </div>
+    @endif
     <div class="pengajuan-list">
         @forelse($pengajuan as $p)
         @php
