@@ -95,6 +95,83 @@
             }
         }
 
+        /* Global Buttons */
+        .btn-primary, .btn-submit {
+            padding:8px 18px; border:none; border-radius:10px;
+            font-size:13px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; gap:6px;
+            background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff;
+            box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2);
+            -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+        }
+        .btn-primary:active, .btn-submit:active { transform:scale(0.96); }
+        .btn-primary:hover, .btn-submit:hover { box-shadow:0 4px 12px rgba(90,182,234,0.35); }
+
+        .btn-success {
+            padding:6px 12px; border:none; border-radius:8px;
+            font-size:11px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; gap:5px;
+            background:rgba(16,185,129,0.12); color:#10b981;
+            border:1px solid rgba(16,185,129,0.2);
+            -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+        }
+        .btn-success:hover { background:rgba(16,185,129,0.2); }
+        .btn-success:active { transform:scale(0.95); }
+        [data-theme="dark"] .btn-success { background:rgba(16,185,129,0.15); color:#34d399; border-color:rgba(16,185,129,0.25); }
+
+        .btn-danger {
+            padding:6px 12px; border:none; border-radius:8px;
+            font-size:11px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; gap:5px;
+            background:rgba(239,68,68,0.12); color:#ef4444;
+            border:1px solid rgba(239,68,68,0.2);
+            -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+        }
+        .btn-danger:hover { background:rgba(239,68,68,0.2); }
+        .btn-danger:active { transform:scale(0.95); }
+        [data-theme="dark"] .btn-danger { background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.25); }
+
+        .btn-warning {
+            padding:6px 12px; border:none; border-radius:8px;
+            font-size:11px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; gap:5px;
+            background:rgba(245,158,11,0.12); color:#d97706;
+            border:1px solid rgba(245,158,11,0.2);
+            -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+        }
+        .btn-warning:hover { background:rgba(245,158,11,0.2); }
+        [data-theme="dark"] .btn-warning { background:rgba(245,158,11,0.15); color:#fbbf24; border-color:rgba(245,158,11,0.25); }
+
+        .btn-secondary {
+            padding:8px 18px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px;
+            font-size:13px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--dm-card,#fff); color:var(--dm-text,#64748b);
+            -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+        }
+        .btn-secondary:hover { background:var(--dm-bg,#f1f5f9); }
+        .btn-secondary:active { transform:scale(0.96); }
+
+        /* Global Badges */
+        .badge {
+            padding:4px 10px; border-radius:8px;
+            font-size:11px; font-weight:600;
+            display:inline-flex; align-items:center; gap:4px;
+            letter-spacing:0.1px;
+        }
+        .badge-primary { background:rgba(90,182,234,0.12); color:#2E97D4; border:1px solid rgba(90,182,234,0.2); }
+        .badge-success { background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.15); }
+        .badge-danger { background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
+        .badge-warning { background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.15); }
+        .badge-info { background:rgba(139,92,246,0.1); color:#7c3aed; border:1px solid rgba(139,92,246,0.15); }
+        .badge-neutral { background:rgba(100,116,139,0.08); color:#64748b; border:1px solid rgba(100,116,139,0.12); }
+
+        [data-theme="dark"] .badge-primary { background:rgba(90,182,234,0.15); color:#7dd3fc; }
+        [data-theme="dark"] .badge-success { background:rgba(16,185,129,0.15); color:#34d399; }
+        [data-theme="dark"] .badge-danger { background:rgba(239,68,68,0.15); color:#fca5a5; }
+        [data-theme="dark"] .badge-warning { background:rgba(245,158,11,0.15); color:#fbbf24; }
+        [data-theme="dark"] .badge-info { background:rgba(139,92,246,0.15); color:#c4b5fd; }
+
         /* Layout utama */
         .main-container {
             display: flex;

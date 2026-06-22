@@ -332,48 +332,13 @@
     }
 
     /* Badges */
-    .badge, .status-badge {
-        padding: 4px 10px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        letter-spacing: 0.1px;
-    }
-
-    .jenis-badge, .jenis-masuk {
-        background: rgba(90,182,234,0.12);
-        color: #2E97D4;
-        border: 1px solid rgba(90,182,234,0.2);
-    }
-    .jenis-pulang {
-        background: rgba(254,170,43,0.12);
-        color: #d97706;
-        border: 1px solid rgba(254,170,43,0.2);
-    }
-
-    .status-badge.on-time {
-        background: rgba(16,185,129,0.1);
-        color: #10b981;
-        border: 1px solid rgba(16,185,129,0.15);
-    }
-    .status-badge.late {
-        background: rgba(239,68,68,0.1);
-        color: #ef4444;
-        border: 1px solid rgba(239,68,68,0.15);
-    }
-    .status-badge.neutral {
-        background: rgba(100,116,139,0.08);
-        color: var(--gray-500);
-        border: 1px solid rgba(100,116,139,0.12);
-    }
-    .status-badge.pending {
-        background: rgba(245,158,11,0.1);
-        color: #d97706;
-        border: 1px solid rgba(245,158,11,0.15);
-    }
+    .status-badge { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:4px; }
+    .jenis-badge { background:rgba(90,182,234,0.12); color:#2E97D4; border:1px solid rgba(90,182,234,0.2); padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; }
+    .jenis-pulang { background:rgba(254,170,43,0.12); color:#d97706; border:1px solid rgba(254,170,43,0.2); }
+    .status-badge.on-time { background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.15); }
+    .status-badge.late { background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
+    .status-badge.neutral { background:rgba(100,116,139,0.08); color:var(--gray-500); border:1px solid rgba(100,116,139,0.12); }
+    .status-badge.pending { background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.15); }
 
     .date-cell {
         font-size: 13px;
@@ -393,50 +358,7 @@
         justify-content: center;
     }
 
-    .btn-success,
-    .btn-danger {
-        border: none;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 6px 12px;
-        -webkit-tap-highlight-color: transparent;
-        letter-spacing: 0.2px;
-        transition: all 0.15s ease;
-    }
-    .btn-success:active, .btn-danger:active { transform:scale(0.95); }
-
-    .btn-success {
-        background: rgba(16,185,129,0.12);
-        color: #10b981;
-        border: 1px solid rgba(16,185,129,0.2);
-    }
-    .btn-success:hover { background: rgba(16,185,129,0.2); }
-
-    .btn-danger {
-        background: rgba(239,68,68,0.12);
-        color: #ef4444;
-        border: 1px solid rgba(239,68,68,0.2);
-    }
-    .btn-danger:hover { background: rgba(239,68,68,0.2); }
-
-    [data-theme="dark"] .btn-success {
-        background: rgba(16,185,129,0.15);
-        color: #34d399;
-        border-color: rgba(16,185,129,0.25);
-    }
-    [data-theme="dark"] .btn-success:hover { background: rgba(16,185,129,0.25); }
-
-    [data-theme="dark"] .btn-danger {
-        background: rgba(239,68,68,0.15);
-        color: #fca5a5;
-        border-color: rgba(239,68,68,0.25);
-    }
-    [data-theme="dark"] .btn-danger:hover { background: rgba(239,68,68,0.25); }
+    /* btn-success, btn-danger inherited from layout */
 
     /* Empty State */
     .empty-state {
