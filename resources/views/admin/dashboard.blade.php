@@ -899,9 +899,15 @@
                                     <span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span>
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <button type="button" onclick="actionPengajuan({{ $peng->id }}, 'approve')" class="btn-success" title="Setujui"><i class="fas fa-check"></i></button>
-                                        <button type="button" onclick="actionPengajuan({{ $peng->id }}, 'reject')" class="btn-danger" title="Tolak"><i class="fas fa-times"></i></button>
+                                    <div class="action-buttons" onclick="event.stopPropagation()">
+                                        <form action="{{ route('admin.pengajuan.approve', $peng->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="btn-success" title="Setujui"><i class="fas fa-check"></i></button>
+                                        </form>
+                                        <form action="{{ route('admin.pengajuan.reject', $peng->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="btn-danger" title="Tolak"><i class="fas fa-times"></i></button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -1182,15 +1188,15 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn-success" id="modalBtnApprovePengajuan" title="Setujui">
-                    <i class="fas fa-check"></i> Setujui
-                </button>
-                <button type="button" class="btn-danger" id="modalBtnRejectPengajuan" title="Tolak">
-                    <i class="fas fa-times"></i> Tolak
-                </button>
-                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">
-                    Tutup
-                </button>
+                <form id="formApprovePengajuan" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn-success"><i class="fas fa-check"></i> Setujui</button>
+                </form>
+                <form id="formRejectPengajuan" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn-danger"><i class="fas fa-times"></i> Tolak</button>
+                </form>
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">Tutup</button>
             </div>
         </div>
     </div>
@@ -1495,12 +1501,8 @@
             ? '<a href="' + data.bukti_url + '" target="_blank"><img src="' + data.bukti_url + '" class="bukti-image" onerror="this.style.display=\'none\'"></a>'
             : '<span class="text-muted">Tidak ada bukti</span>';
 
-        // Extract ID from approve URL
-        var match = data.approve_url ? data.approve_url.match(/pengajuan\/(\d+)\//) : null;
-        _currentPengajuanId = match ? match[1] : null;
-
-        document.getElementById('modalBtnApprovePengajuan').onclick = function() { if (_currentPengajuanId) actionPengajuan(_currentPengajuanId, 'approve'); };
-        document.getElementById('modalBtnRejectPengajuan').onclick = function() { if (_currentPengajuanId) actionPengajuan(_currentPengajuanId, 'reject'); };
+        setFormAction('formApprovePengajuan', data.approve_url);
+        setFormAction('formRejectPengajuan', data.reject_url);
 
         openModal('modalPengajuanPending');
     }
