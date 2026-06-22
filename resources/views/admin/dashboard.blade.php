@@ -163,20 +163,23 @@
     }
 
     .card-search {
-        position:relative; padding:0 16px 12px;
+        position:relative; padding:0 16px 10px;
     }
     .card-search input {
-        width:100%; padding:9px 14px 9px 36px; border:1px solid var(--gray-200);
-        border-radius:10px; font-size:12px; background:var(--white); color:var(--dark); outline:none;
+        width:100%; padding:10px 14px 10px 38px; border:1px solid var(--gray-200);
+        border-radius:12px; font-size:13px; background:var(--white); color:var(--dark); outline:none;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
     }
-    .card-search input:focus { border-color:var(--primary); }
+    .card-search input:focus { border-color:var(--primary); box-shadow: 0 0 0 3px rgba(90,182,234,0.1); }
     .card-search i {
-        position:absolute; left:28px; top:50%; transform:translateY(-50%);
-        color:var(--gray-400); font-size:12px; pointer-events:none;
+        position:absolute; left:30px; top:50%; transform:translateY(-50%);
+        color:var(--gray-400); font-size:13px; pointer-events:none;
     }
     [data-theme="dark"] .card-search input {
         background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.08); color:var(--dm-text);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
     }
+    [data-theme="dark"] .card-search input:focus { box-shadow: 0 0 0 3px rgba(90,182,234,0.15); }
 
     .card-header {
         display: flex;
@@ -848,7 +851,7 @@
                 <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
             </div>
             <div class="card-content">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')"></div>
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -916,7 +919,7 @@
             </div>
             {{-- Tab Presensi --}}
             <div class="card-content" id="adminTabPresensi">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'pengajuanPendingTable')"></div>
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'pengajuanPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -958,7 +961,7 @@
             </div>
             {{-- Tab Cuti/DL --}}
             <div class="card-content" id="adminTabCuti" style="display:none;">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'cutiPendingTable')"></div>
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'cutiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1073,7 +1076,7 @@
             </div>
             {{-- Tab Masuk --}}
             <div class="card-content" id="hiTabMasuk">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiMasukTable')"></div>
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1117,7 +1120,7 @@
             </div>
             {{-- Tab Pulang --}}
             <div class="card-content" id="hiTabPulang" style="display:none;">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPulangTable')"></div>
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1162,47 +1165,58 @@
         </div>
 
         {{-- Lembur Hari Ini --}}
+        @php
+            $lemburMasukHI = $lemburHariIni->where('jenis','masuk');
+            $lemburPulangHI = $lemburHariIni->where('jenis','pulang');
+        @endphp
         <div class="content-card" id="lemburHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Lembur Hari Ini</h2>
-                <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburHariIni->where('jenis','masuk')->count() }} pegawai</span>
+                <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburMasukHI->count() }} pegawai</span>
             </div>
-            <div class="card-content">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburHariIniTable')"></div>
+            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
+                <button type="button" class="lb-tab active" data-lbtab="masuk" onclick="switchLbTab('masuk')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $lemburMasukHI->count() }})
+                </button>
+                <button type="button" class="lb-tab" data-lbtab="pulang" onclick="switchLbTab('pulang')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                    <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $lemburPulangHI->count() }})
+                </button>
+            </div>
+            {{-- Tab Lembur Masuk --}}
+            <div class="card-content" id="lbTabMasuk">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody id="lemburHariIniTable" data-paginate="5">
-                            @forelse($lemburHariIni as $index => $l)
-                            <tr class="clickable-row"
-                                data-user-name="{{ $l->user->name ?? 'N/A' }}"
-                                data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}"
-                                data-jenis="Lembur {{ ucfirst($l->jenis) }}"
-                                data-jam="{{ $l->jam ?? '-' }}"
-                                data-lokasi="{{ $l->lokasi ?? '' }}"
-                                data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}"
-                                data-status="{{ $l->status ?? '' }}">
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
+                        <tbody id="lemburMasukTable" data-paginate="5">
+                            @forelse($lemburMasukHI as $l)
+                            <tr class="clickable-row" data-user-name="{{ $l->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="Lembur Masuk" data-jam="{{ $l->jam ?? '-' }}" data-lokasi="{{ $l->lokasi ?? '' }}" data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}" data-status="{{ $l->status ?? '' }}">
+                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
                                 <td class="user-name">{{ $l->user->name ?? 'N/A' }}</td>
-                                <td><span class="badge" style="background:rgba(245,158,11,0.1);color:#d97706;border:1px solid rgba(245,158,11,0.2);">Lembur {{ ucfirst($l->jenis) }}</span></td>
                                 <td class="time-cell">{{ $l->jam ?? '-' }}</td>
                             </tr>
                             @empty
-                            <tr>
-                                <td colspan="4" class="empty-state">
-                                    <div class="empty-content">
-                                        <div class="empty-icon"><i class="fas fa-bolt-lightning"></i></div>
-                                        <p>Tidak ada lembur hari ini</p>
-                                    </div>
-                                </td>
+                            <tr><td colspan="3" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-bolt-lightning"></i></div><p>Belum ada lembur masuk</p></div></td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{-- Tab Lembur Pulang --}}
+            <div class="card-content" id="lbTabPulang" style="display:none;">
+                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
+                        <tbody id="lemburPulangTable" data-paginate="5">
+                            @forelse($lemburPulangHI as $l)
+                            <tr class="clickable-row" data-user-name="{{ $l->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="Lembur Pulang" data-jam="{{ $l->jam ?? '-' }}" data-lokasi="{{ $l->lokasi ?? '' }}" data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}" data-status="{{ $l->status ?? '' }}">
+                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
+                                <td class="user-name">{{ $l->user->name ?? 'N/A' }}</td>
+                                <td class="time-cell">{{ $l->jam ?? '-' }}</td>
                             </tr>
+                            @empty
+                            <tr><td colspan="3" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-bolt-lightning"></i></div><p>Belum ada lembur pulang</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1499,16 +1513,48 @@
         openModal('modalCutiDetail');
     }
 
+    // Tab switch — Presensi Hari Ini (Masuk/Pulang)
+    function switchHiTab(tab) {
+        document.getElementById('hiTabMasuk').style.display = tab === 'masuk' ? '' : 'none';
+        document.getElementById('hiTabPulang').style.display = tab === 'pulang' ? '' : 'none';
+        document.querySelectorAll('.hi-tab').forEach(function(btn) {
+            if (btn.dataset.hitab === tab) {
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)'; btn.style.color = '#fff';
+                btn.style.boxShadow = '0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2)';
+            } else {
+                btn.style.background = 'transparent'; btn.style.color = 'var(--dm-muted,#64748b)'; btn.style.boxShadow = 'none';
+            }
+        });
+    }
+
+    // Tab switch — Lembur Hari Ini (Masuk/Pulang)
+    function switchLbTab(tab) {
+        document.getElementById('lbTabMasuk').style.display = tab === 'masuk' ? '' : 'none';
+        document.getElementById('lbTabPulang').style.display = tab === 'pulang' ? '' : 'none';
+        document.querySelectorAll('.lb-tab').forEach(function(btn) {
+            if (btn.dataset.lbtab === tab) {
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)'; btn.style.color = '#fff';
+                btn.style.boxShadow = '0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2)';
+            } else {
+                btn.style.background = 'transparent'; btn.style.color = 'var(--dm-muted,#64748b)'; btn.style.boxShadow = 'none';
+            }
+        });
+    }
+
     function searchTable(input, tbodyId) {
         var query = input.value.toLowerCase().trim();
         var tbody = document.getElementById(tbodyId);
         if (!tbody) return;
-        var rows = tbody.querySelectorAll('tr:not(.empty-row)');
+        var inst = tableInstances[tbodyId];
+        var rows = inst ? inst.rows : Array.from(tbody.querySelectorAll('tr'));
         rows.forEach(function(row) {
             if (row.querySelector('.empty-state')) return;
             var text = row.textContent.toLowerCase();
             row.style.display = text.indexOf(query) !== -1 ? '' : 'none';
         });
+        // Hide pagination while searching
+        var pg = tbody.closest('table') ? tbody.closest('table').parentElement.querySelector('.table-pagination') : null;
+        if (pg) pg.style.display = query ? 'none' : '';
     }
 
     function refreshTablePagination(tbodyId) {
@@ -1624,7 +1670,7 @@
         });
 
         // Klik baris presensi hari ini
-        document.querySelectorAll('#presensiHariIniTable .clickable-row').forEach(function (row) {
+        document.querySelectorAll('#presensiMasukTable .clickable-row, #presensiPulangTable .clickable-row').forEach(function (row) {
             row.addEventListener('click', function () {
                 openHariIniModal({
                     user_name    : this.dataset.userName,
@@ -1640,7 +1686,7 @@
         });
 
         // Klik baris lembur hari ini
-        document.querySelectorAll('#lemburHariIniTable .clickable-row').forEach(function (row) {
+        document.querySelectorAll('#lemburMasukTable .clickable-row, #lemburPulangTable .clickable-row').forEach(function (row) {
             row.addEventListener('click', function () {
                 openLemburModal({
                     user_name : this.dataset.userName,
@@ -2047,8 +2093,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         initTable('presensiPendingTable');
         initTable('pengajuanPendingTable');
-        initTable('presensiHariIniTable');
-        initTable('lemburHariIniTable');
+        initTable('cutiPendingTable');
+        initTable('presensiMasukTable');
+        initTable('presensiPulangTable');
+        initTable('lemburMasukTable');
+        initTable('lemburPulangTable');
 
         // AJAX approve/reject — no page reload
         document.querySelectorAll('.inline-form').forEach(function(form) {
