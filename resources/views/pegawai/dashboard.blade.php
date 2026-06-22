@@ -252,9 +252,6 @@
     @php
         $masukDisabled = $sudahPresensiMasuk || ($disablePresensiLibur ?? false);
         $pulangDisabled = $sudahPresensiPulang || ($disablePresensiLibur ?? false);
-        if ($requireMasukBeforePulang && !$sudahPresensiMasuk) {
-            $pulangDisabled = true;
-        }
     @endphp
     <div style="display:flex; gap:10px; padding:16px 20px;">
         <button class="{{ !$masukDisabled ? 'absen-btn-active' : '' }}"

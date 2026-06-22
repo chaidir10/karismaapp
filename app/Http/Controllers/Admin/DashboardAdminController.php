@@ -336,12 +336,11 @@ class DashboardAdminController extends Controller
                     'user_id' => $pengajuan->user_id,
                     'tanggal' => $pengajuan->tanggal,
                     'jenis' => $pengajuan->jenis,
+                    'is_lembur' => false,
                 ],
                 [
                     'jam' => $jam,
                     'status' => 'approved',
-                    'foto' => $pengajuan->bukti ?? null,
-                    'lokasi' => $pengajuan->lokasi ?? null,
                 ]
             );
 
