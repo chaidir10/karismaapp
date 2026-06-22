@@ -41,10 +41,22 @@
 
     @foreach($laporan as $item)
     <div @if(!$loop->last) class="page-break" @endif>
-        <h3>{{ $item['user']->name }} (NIP. {{ $item['user']->nip }})</h3>
-        <h4>{{ $item['user']->jabatan ?? '-' }}
-            @if($item['is_shift'] ?? false) | {{ $item['shift_nama'] }} @endif
-        </h4>
+        <table style="width:100%; margin-bottom:8px; border:none;">
+            <tr>
+                <td style="border:none; text-align:left; vertical-align:top;">
+                    <strong style="font-size:12px;">LAPORAN KEHADIRAN PEGAWAI</strong><br>
+                    <span style="font-size:10px;">BKK KELAS I TARAKAN</span><br>
+                    <span style="font-size:9px;">Periode: {{ $item['bulan'] ?? \Carbon\Carbon::createFromFormat('Y-m', request('bulan'))->translatedFormat('F Y') }}</span>
+                </td>
+                <td style="border:none; text-align:right; vertical-align:top;">
+                    <strong style="font-size:11px;">{{ $item['user']->name }}</strong>
+                    @if($item['is_shift'] ?? false) <span style="font-size:9px;">| {{ $item['shift_nama'] }}</span> @endif
+                    <br>
+                    <span style="font-size:9px;">NIP: {{ $item['user']->nip }}</span><br>
+                    <span style="font-size:9px;">{{ $item['user']->jabatan ?? '-' }}</span>
+                </td>
+            </tr>
+        </table>
 
         <table>
             <thead>

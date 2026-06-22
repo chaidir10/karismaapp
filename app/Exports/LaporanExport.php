@@ -46,10 +46,11 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
     public function headings(): array
     {
         $shiftInfo = ($this->data['is_shift'] ?? false) ? ' | ' . $this->data['shift_nama'] : '';
+        $bulan = $this->data['bulan'] ?? now()->format('F Y');
         return [
-            ['LAPORAN PRESENSI PEGAWAI'],
-            ['Nama: ' . $this->data['user']->name . $shiftInfo],
-            ['NIP: ' . $this->data['user']->nip],
+            ['LAPORAN KEHADIRAN PEGAWAI', '', '', '', '', '', '', 'Nama: ' . $this->data['user']->name . $shiftInfo],
+            ['BKK KELAS I TARAKAN', '', '', '', '', '', '', 'NIP: ' . $this->data['user']->nip],
+            ['Periode: ' . $bulan],
             [],
             ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur', 'Status'],
         ];
@@ -107,14 +108,23 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $lastCol = 'I';
         $lastRow = $sheet->getHighestRow();
 
-        // --- Header (baris 1-3) ---
-        $sheet->mergeCells("A1:{$lastCol}1");
-        $sheet->mergeCells("A2:{$lastCol}2");
+        // --- Header (baris 1-3): kiri = judul, kanan = nama/nip ---
+        $sheet->mergeCells("A1:G1");
+        $sheet->mergeCells("H1:I1");
+        $sheet->mergeCells("A2:G2");
+        $sheet->mergeCells("H2:I2");
         $sheet->mergeCells("A3:{$lastCol}3");
+
+        // Kiri: judul + instansi + periode
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle("A1:{$lastCol}4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3')->getFont()->setSize(10);
+        $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Kanan: nama + nip
+        $sheet->getStyle('H1')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('H2')->getFont()->setSize(10);
+        $sheet->getStyle('H1:H2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
         // --- Kolom header (baris 5) ---
         $sheet->getStyle("A5:{$lastCol}5")->getFont()->setBold(true)->setSize(10);
@@ -128,8 +138,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A5:{$lastCol}{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // --- Lebar kolom (landscape A4 = ~277mm usable) ---
-        $widths = [13, 10, 10, 13, 13, 14, 13, 13, 18];
+        // --- Lebar kolom (landscape A4 ~39cm usable / 9 cols) ---
+        $widths = [16, 14, 14, 16, 16, 18, 16, 16, 22];
         foreach (range('A', $lastCol) as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
@@ -154,7 +164,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
             ->setFitToWidth(1)
-            ->setFitToHeight(1);
+            ->setFitToHeight(0);
         $sheet->getPageMargins()
             ->setTop(0.15)->setRight(0.15)->setLeft(0.15)->setBottom(0.15)
             ->setHeader(0.1)->setFooter(0.1);

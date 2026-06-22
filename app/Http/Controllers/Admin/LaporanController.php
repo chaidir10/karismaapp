@@ -209,6 +209,7 @@ class LaporanController extends Controller
 
             $laporan[] = [
                 'user'             => $user,
+                'bulan'            => $startDate->translatedFormat('F Y'),
                 'total_hari_kerja'   => $totalHariKerja - $totalHariCuti,
                 'total_hari_telat'   => $totalHariTelat,
                 'total_hari_lembur'  => $totalHariLembur,
