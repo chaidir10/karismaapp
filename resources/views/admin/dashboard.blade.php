@@ -817,8 +817,8 @@
                                 data-jam="{{ $p->jam ?? '-' }}"
                                 data-lokasi="{{ $p->lokasi ?? '' }}"
                                 data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
-                                data-approve-url="{{ route('admin.presensi.approve', $p->id) }}"
-                                data-reject-url="{{ route('admin.presensi.reject', $p->id) }}">
+                                data-approve-url="/admin/presensi/{{ $p->id }}/approve"
+                                data-reject-url="/admin/presensi/{{ $p->id }}/reject">
                                 <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}</td>
@@ -890,8 +890,8 @@
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
                                 data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
-                                data-approve-url="{{ route('admin.pengajuan.approve', $peng->id) }}"
-                                data-reject-url="{{ route('admin.pengajuan.reject', $peng->id) }}">
+                                data-approve-url="/admin/pengajuan/{{ $peng->id }}/approve"
+                                data-reject-url="/admin/pengajuan/{{ $peng->id }}/reject">
                                 <td class="text-center text-xs">{{ $rowNum }}</td>
                                 <td class="user-name">{{ $peng->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}</td>
@@ -900,8 +900,8 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('{{ route('admin.pengajuan.approve', $peng->id) }}', this)"><i class="fas fa-check"></i></button>
-                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('{{ route('admin.pengajuan.reject', $peng->id) }}', this)"><i class="fas fa-times"></i></button>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/approve', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -917,8 +917,8 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('{{ route('admin.cuti.approve', $cp->id) }}', this)"><i class="fas fa-check"></i></button>
-                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('{{ route('admin.cuti.reject', $cp->id) }}', this)"><i class="fas fa-times"></i></button>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
