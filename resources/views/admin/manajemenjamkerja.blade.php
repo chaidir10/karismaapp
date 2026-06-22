@@ -3,7 +3,7 @@
 @section('title', 'Manajemen Jam Kerja & Shift')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div>
     <div class="page-header-glass">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>

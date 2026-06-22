@@ -608,7 +608,7 @@
         [data-theme="dark"] body { background-color: var(--dm-bg) !important; color: var(--dm-text) !important; }
         /* sidebar dark mode handled in .sidebar CSS above */
         /* topbar dark mode handled in .topbar CSS above */
-        [data-theme="dark"] .main-content { background: var(--dm-bg) !important; }
+        /* main-content dark mode handled in .main-content CSS above */
         [data-theme="dark"] .mobile-sidebar-content { background: var(--dm-sidebar) !important; border-color: var(--dm-border) !important; }
         [data-theme="dark"] .logout-modal-content { background: var(--dm-card) !important; color: var(--dm-text) !important; }
         [data-theme="dark"] .logout-modal h3 { color: var(--dm-text) !important; }
@@ -827,7 +827,7 @@
             </div>
 
             <!-- Main Content -->
-            <main class="main-content p-2 sm:p-4">
+            <main class="main-content" style="padding:20px 24px;">
                 @yield('content')
             </main>
         </div>

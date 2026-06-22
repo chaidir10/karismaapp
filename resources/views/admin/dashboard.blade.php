@@ -41,7 +41,6 @@
     }
 
     .admin-dashboard {
-        padding: 0;
         background: transparent;
     }
 

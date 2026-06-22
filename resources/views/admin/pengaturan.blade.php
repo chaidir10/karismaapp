@@ -2,7 +2,7 @@
 @section('title', 'Pengaturan')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div>
     <div class="page-header-glass">
         <h1>Pengaturan</h1>
         <p>Konfigurasi sistem aplikasi</p>
