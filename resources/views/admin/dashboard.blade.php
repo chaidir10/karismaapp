@@ -163,23 +163,23 @@
     }
 
     .card-search {
-        position:relative; padding:0 16px 10px;
+        position:relative; padding:12px 16px;
     }
     .card-search input {
-        width:100%; padding:10px 14px 10px 38px; border:1px solid var(--gray-200);
-        border-radius:12px; font-size:13px; background:var(--white); color:var(--dark); outline:none;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+        width:100%; padding:8px 12px 8px 34px; border:none;
+        border-radius:8px; font-size:12px; color:var(--dark); outline:none;
+        background:var(--gray-100);
     }
-    .card-search input:focus { border-color:var(--primary); box-shadow: 0 0 0 3px rgba(90,182,234,0.1); }
+    .card-search input::placeholder { color:var(--gray-400); }
+    .card-search input:focus { background:var(--gray-200); }
     .card-search i {
-        position:absolute; left:30px; top:50%; transform:translateY(-50%);
-        color:var(--gray-400); font-size:13px; pointer-events:none;
+        position:absolute; left:28px; top:50%; transform:translateY(-50%);
+        color:var(--gray-400); font-size:11px; pointer-events:none;
     }
     [data-theme="dark"] .card-search input {
-        background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.08); color:var(--dm-text);
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        background:rgba(255,255,255,0.06); color:var(--dm-text);
     }
-    [data-theme="dark"] .card-search input:focus { box-shadow: 0 0 0 3px rgba(90,182,234,0.15); }
+    [data-theme="dark"] .card-search input:focus { background:rgba(255,255,255,0.1); }
 
     .card-header {
         display: flex;
@@ -851,7 +851,7 @@
                 <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
             </div>
             <div class="card-content">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -919,7 +919,7 @@
             </div>
             {{-- Tab Presensi --}}
             <div class="card-content" id="adminTabPresensi">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'pengajuanPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'pengajuanPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -961,7 +961,7 @@
             </div>
             {{-- Tab Cuti/DL --}}
             <div class="card-content" id="adminTabCuti" style="display:none;">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'cutiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'cutiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1076,7 +1076,7 @@
             </div>
             {{-- Tab Masuk --}}
             <div class="card-content" id="hiTabMasuk">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1120,7 +1120,7 @@
             </div>
             {{-- Tab Pulang --}}
             <div class="card-content" id="hiTabPulang" style="display:none;">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1184,7 +1184,7 @@
             </div>
             {{-- Tab Lembur Masuk --}}
             <div class="card-content" id="lbTabMasuk">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
@@ -1204,7 +1204,7 @@
             </div>
             {{-- Tab Lembur Pulang --}}
             <div class="card-content" id="lbTabPulang" style="display:none;">
-                <div class="card-search"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
@@ -1540,6 +1540,15 @@
             }
         });
     }
+
+    // Prevent scroll when clicking search
+    document.querySelectorAll('.card-search input').forEach(function(inp) {
+        inp.addEventListener('focus', function(e) {
+            e.preventDefault();
+            var y = window.scrollY;
+            requestAnimationFrame(function() { window.scrollTo(0, y); });
+        });
+    });
 
     function searchTable(input, tbodyId) {
         var query = input.value.toLowerCase().trim();
