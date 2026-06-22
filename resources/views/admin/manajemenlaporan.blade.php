@@ -93,33 +93,41 @@
     <!-- Filter Section -->
     <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:20px; margin-bottom:20px;">
         <h2 class="text-lg font-semibold mb-4" style="color:var(--dm-text,#1e293b);">Filter Laporan</h2>
-        <form id="formFilter">
-            <div style="display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
-                <div style="flex:1; min-width:200px;">
-                    <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Pilih Pegawai</label>
-                    <select name="user_id" id="user_id">
-                        <option value="">Semua Pegawai</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div style="flex:0 0 180px;">
-                    <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Bulan</label>
-                    <input type="month" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}" style="width:100%; height:42px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; padding:0 14px; font-size:13px; outline:none; background:var(--dm-card,#fff); color:var(--dm-text);">
-                </div>
+        <form id="formFilter" style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
+            <div style="flex:2; min-width:160px;">
+                <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Pilih Pegawai</label>
+                <select name="user_id" id="user_id">
+                    <option value="">Semua Pegawai</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->nip }})</option>
+                    @endforeach
+                </select>
             </div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button type="submit" id="btnTampilkan" disabled class="btn-primary" style="height:40px; flex:1; min-width:120px;">
-                    <i class="fas fa-search"></i> Tampilkan
+            <div style="flex:1; min-width:140px; position:relative;">
+                <label style="font-size:13px; font-weight:500; display:block; margin-bottom:6px; color:var(--dm-text,#374151);">Bulan</label>
+                <input type="hidden" name="bulan" id="bulan" value="{{ now()->format('Y-m') }}">
+                <button type="button" id="monthPickerBtn" onclick="toggleMonthPicker()" style="width:100%; height:42px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px; padding:0 14px; font-size:13px; outline:none; background:var(--dm-card,#fff); color:var(--dm-text); cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                    <span id="monthPickerLabel">{{ now()->translatedFormat('F Y') }}</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; color:var(--dm-muted,#94a3b8);"></i>
                 </button>
-                <a href="#" id="btnPdf" class="btn-danger" style="height:40px; flex:1; min-width:140px; opacity:0.4; pointer-events:none;">
-                    <i class="fas fa-file-pdf"></i> Download PDF
-                </a>
-                <a href="#" id="btnExcel" class="btn-success" style="height:40px; flex:1; min-width:140px; opacity:0.4; pointer-events:none;">
-                    <i class="fas fa-file-excel"></i> Download Excel
-                </a>
+                <div id="monthPickerDropdown" style="display:none; position:absolute; top:100%; left:0; right:0; margin-top:6px; z-index:50; background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+                        <button type="button" onclick="mpChangeYear(-1)" style="background:none; border:none; cursor:pointer; color:var(--dm-text,#374151); font-size:14px; padding:4px 8px;"><i class="fas fa-chevron-left"></i></button>
+                        <span id="mpYear" style="font-size:14px; font-weight:700; color:var(--dm-text,#1e293b);"></span>
+                        <button type="button" onclick="mpChangeYear(1)" style="background:none; border:none; cursor:pointer; color:var(--dm-text,#374151); font-size:14px; padding:4px 8px;"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div id="mpGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; padding:10px;"></div>
+                </div>
             </div>
+            <button type="submit" id="btnTampilkan" disabled class="btn-primary" style="height:42px; padding:0 20px; white-space:nowrap;">
+                <i class="fas fa-search"></i> Tampilkan
+            </button>
+            <a href="#" id="btnPdf" class="btn-danger" style="height:42px; padding:0 16px; opacity:0.4; pointer-events:none; white-space:nowrap;">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+            <a href="#" id="btnExcel" class="btn-success" style="height:42px; padding:0 16px; opacity:0.4; pointer-events:none; white-space:nowrap;">
+                <i class="fas fa-file-excel"></i> Download Excel
+            </a>
         </form>
     </div>
 
@@ -164,6 +172,52 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
+    // Custom Month Picker
+    var _mpMonths = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    var _mpFullMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    var _mpYear = {{ now()->year }};
+    var _mpMonth = {{ (int)now()->format('m') }};
+    var _mpOpen = false;
+
+    function toggleMonthPicker() {
+        _mpOpen = !_mpOpen;
+        document.getElementById('monthPickerDropdown').style.display = _mpOpen ? '' : 'none';
+        if (_mpOpen) renderMpGrid();
+    }
+
+    function mpChangeYear(d) {
+        _mpYear += d;
+        renderMpGrid();
+    }
+
+    function renderMpGrid() {
+        document.getElementById('mpYear').textContent = _mpYear;
+        var grid = document.getElementById('mpGrid');
+        var html = '';
+        for (var i = 0; i < 12; i++) {
+            var isActive = (_mpYear === parseInt(document.getElementById('bulan').value.split('-')[0])) && (i + 1 === parseInt(document.getElementById('bulan').value.split('-')[1]));
+            html += '<button type="button" onclick="mpSelect(' + (i + 1) + ')" style="padding:8px 4px; border-radius:8px; border:none; font-size:12px; font-weight:' + (isActive ? '700' : '500') + '; cursor:pointer; background:' + (isActive ? 'rgba(90,182,234,0.15)' : 'transparent') + '; color:' + (isActive ? '#5AB6EA' : 'var(--dm-text,#374151)') + '; border:1px solid ' + (isActive ? 'rgba(90,182,234,0.4)' : 'transparent') + ';">' + _mpMonths[i] + '</button>';
+        }
+        grid.innerHTML = html;
+    }
+
+    function mpSelect(m) {
+        _mpMonth = m;
+        var val = _mpYear + '-' + String(m).padStart(2, '0');
+        document.getElementById('bulan').value = val;
+        document.getElementById('monthPickerLabel').textContent = _mpFullMonths[m - 1] + ' ' + _mpYear;
+        _mpOpen = false;
+        document.getElementById('monthPickerDropdown').style.display = 'none';
+    }
+
+    // Close picker on outside click
+    document.addEventListener('click', function(e) {
+        if (_mpOpen && !e.target.closest('#monthPickerBtn') && !e.target.closest('#monthPickerDropdown')) {
+            _mpOpen = false;
+            document.getElementById('monthPickerDropdown').style.display = 'none';
+        }
+    });
+
     var ts = new TomSelect('#user_id', {
         placeholder: 'Ketik nama atau NIP...',
         allowEmptyOption: true,
