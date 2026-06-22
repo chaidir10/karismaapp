@@ -354,46 +354,33 @@
     /* Action Buttons */
     .action-buttons {
         display: flex;
-        gap: 5px;
+        gap: 6px;
         justify-content: center;
-    }
-
-    .inline-form {
-        display: inline;
     }
 
     .btn-success,
     .btn-danger {
-        width: 30px;
-        height: 30px;
         border: none;
-        border-radius: 6px;
-        display: flex;
+        border-radius: 8px;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
+        gap: 5px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 6px 12px;
+        -webkit-tap-highlight-color: transparent;
     }
+    .btn-success:active, .btn-danger:active { opacity: 0.8; }
 
     .btn-success {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .btn-success:hover {
-        background: var(--success);
-        color: var(--white);
+        background: #10b981;
+        color: #fff;
     }
 
     .btn-danger {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-
-    .btn-danger:hover {
-        background: var(--danger);
-        color: var(--white);
+        background: #ef4444;
+        color: #fff;
     }
 
     /* Empty State */
@@ -827,8 +814,8 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i></button>
-                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/reject', this)"><i class="fas fa-times"></i></button>
+                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
+                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
                                     </div>
                                 </td>
                             </tr>
@@ -891,8 +878,8 @@
                                 <td><span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span></td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/approve', this)"><i class="fas fa-check"></i></button>
-                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/reject', this)"><i class="fas fa-times"></i></button>
+                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
+                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
                                     </div>
                                 </td>
                             </tr>
@@ -937,8 +924,8 @@
                                 <td class="text-center">{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}</td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i></button>
-                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/reject', this)"><i class="fas fa-times"></i></button>
+                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
+                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
                                     </div>
                                 </td>
                             </tr>
@@ -992,7 +979,7 @@
                     </div>
                 </div>
                 <div class="modal-actions" style="padding:16px 20px;border-top:1px solid var(--dm-border,#e2e8f0);display:flex;gap:8px;">
-                    <button type="button" class="btn-success" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#10b981;" id="cutiModalApprove"><i class="fas fa-check"></i> Setujui</button>
+                    <button type="button" class="btn-success" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#10b981;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
                     <button type="button" class="btn-danger" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#ef4444;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
                     <button type="button" class="btn-secondary" style="padding:10px 16px;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);background:var(--dm-card,#fff);color:var(--dm-text,#64748b);font-weight:600;font-size:13px;cursor:pointer;" onclick="closeModal('modalCutiDetail')">Tutup</button>
                 </div>
@@ -1180,7 +1167,7 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn-success" id="modalBtnApprovePresensi"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="btn-success" id="modalBtnApprovePresensi"><i class="fas fa-check"></i> Setuju</button>
                 <button type="button" class="btn-danger" id="modalBtnRejectPresensi"><i class="fas fa-times"></i> Tolak</button>
                 <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">Tutup</button>
             </div>
@@ -1228,7 +1215,7 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn-success" id="modalBtnApprove"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="btn-success" id="modalBtnApprove"><i class="fas fa-check"></i> Setuju</button>
                 <button type="button" class="btn-danger" id="modalBtnReject"><i class="fas fa-times"></i> Tolak</button>
                 <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">Tutup</button>
             </div>
