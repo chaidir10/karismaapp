@@ -4,17 +4,15 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <!-- Header Section with Gradient -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg">
+    <div class="page-header-glass">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Pegawai</h1>
-                <p class="text-blue-100 mt-1">Kelola data seluruh pegawai</p>
+                <h1>Manajemen Pegawai</h1>
+                <p>Kelola data seluruh pegawai</p>
             </div>
-            <button onclick="openModal('modalAdd')" class="btn-primary">
-                <i class="fas fa-user-plus mr-2"></i>
-                <span class="font-medium">Tambah Pegawai</span>
-            </button>
+            <div class="header-actions">
+                <button onclick="openModal('modalAdd')" class="btn-header"><i class="fas fa-user-plus"></i> Tambah Pegawai</button>
+            </div>
         </div>
     </div>
 

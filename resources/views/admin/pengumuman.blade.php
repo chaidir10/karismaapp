@@ -80,15 +80,15 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="page-header-glass">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-white">Pengumuman</h1>
-                <p class="text-blue-100 mt-1">Kelola pengumuman dan informasi untuk pegawai</p>
+                <h1>Pengumuman</h1>
+                <p>Kelola pengumuman dan informasi untuk pegawai</p>
             </div>
-            <button onclick="openModal()" class="btn-primary">
-                <i class="fas fa-plus"></i> Tambah Pengumuman
-            </button>
+            <div class="header-actions">
+                <button onclick="openModal()" class="btn-header"><i class="fas fa-plus"></i> Tambah Pengumuman</button>
+            </div>
         </div>
     </div>
 

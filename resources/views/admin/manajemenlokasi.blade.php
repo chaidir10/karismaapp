@@ -249,18 +249,15 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="page-header-glass">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Titik Presensi</h1>
-                <p class="text-indigo-100 mt-1">Kelola titik lokasi presensi dengan mudah</p>
+                <h1>Manajemen Titik Presensi</h1>
+                <p>Kelola titik lokasi presensi dengan mudah</p>
             </div>
-            <button id="btnTambah"
-                class="btn-primary">
-                <i class="fas fa-plus mr-2"></i>
-                <span class="font-medium">Tambah Titik</span>
-            </button>
+            <div class="header-actions">
+                <button id="btnTambah" class="btn-header"><i class="fas fa-plus"></i> Tambah Titik</button>
+            </div>
         </div>
     </div>
 

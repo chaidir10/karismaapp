@@ -3,9 +3,9 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-gradient-to-r from-gray-600 to-gray-800 rounded-xl p-6 mb-8 shadow-lg">
-        <h1 class="text-2xl font-bold text-white">Pengaturan</h1>
-        <p class="text-gray-300 mt-1">Konfigurasi sistem aplikasi</p>
+    <div class="page-header-glass">
+        <h1>Pengaturan</h1>
+        <p>Konfigurasi sistem aplikasi</p>
     </div>
 
     @if(session('success'))

@@ -172,6 +172,53 @@
         [data-theme="dark"] .badge-warning { background:rgba(245,158,11,0.15); color:#fbbf24; }
         [data-theme="dark"] .badge-info { background:rgba(139,92,246,0.15); color:#c4b5fd; }
 
+        /* Page Header Glass */
+        .page-header-glass {
+            background: linear-gradient(135deg, rgba(90,182,234,0.15), rgba(46,151,212,0.08));
+            border: 1px solid rgba(90,182,234,0.15);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header-glass::before {
+            content:''; position:absolute; top:-50%; right:-20%;
+            width:300px; height:300px; border-radius:50%;
+            background:radial-gradient(circle, rgba(90,182,234,0.1), transparent 70%);
+            pointer-events:none;
+        }
+        .page-header-glass h1 {
+            font-size:22px; font-weight:700; color:var(--dark); margin:0 0 4px; position:relative; z-index:1;
+        }
+        .page-header-glass p {
+            font-size:13px; color:var(--gray-500); margin:0; position:relative; z-index:1;
+        }
+        .page-header-glass .header-actions {
+            position:relative; z-index:1; display:flex; gap:8px; align-items:center;
+        }
+        .page-header-glass .btn-header {
+            padding:9px 18px; border:1px solid rgba(90,182,234,0.25); border-radius:10px;
+            font-size:13px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; gap:7px;
+            background:rgba(90,182,234,0.1); color:#2E97D4;
+            backdrop-filter:blur(4px);
+            -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+        }
+        .page-header-glass .btn-header:hover { background:rgba(90,182,234,0.18); }
+        .page-header-glass .btn-header:active { transform:scale(0.96); }
+
+        [data-theme="dark"] .page-header-glass {
+            background: linear-gradient(135deg, rgba(90,182,234,0.08), rgba(46,151,212,0.04));
+            border-color: rgba(90,182,234,0.1);
+        }
+        [data-theme="dark"] .page-header-glass h1 { color:var(--dm-text); }
+        [data-theme="dark"] .page-header-glass p { color:var(--dm-muted); }
+        [data-theme="dark"] .page-header-glass .btn-header {
+            background:rgba(90,182,234,0.12); color:#7dd3fc; border-color:rgba(90,182,234,0.2);
+        }
+
         /* Layout utama */
         .main-container {
             display: flex;

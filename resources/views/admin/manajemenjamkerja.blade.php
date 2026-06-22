@@ -4,24 +4,15 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg">
+    <div class="page-header-glass">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-white">Manajemen Jam Kerja & Shift</h1>
-                <p class="text-blue-100 mt-1">Kelola jam kerja dan shift pegawai</p>
+                <h1>Manajemen Jam Kerja & Shift</h1>
+                <p>Kelola jam kerja dan shift pegawai</p>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <button onclick="openModal('modalAddJam')" 
-                        class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i>
-                    Tambah Jam Kerja
-                </button>
-                <button onclick="openModal('modalAddShift')" 
-                        class="btn-success">
-                    <i class="fas fa-plus mr-2"></i>
-                    Tambah Jam Shift
-                </button>
+            <div class="header-actions">
+                <button onclick="openModal('modalAddJam')" class="btn-header"><i class="fas fa-plus"></i> Tambah Jam Kerja</button>
+                <button onclick="openModal('modalAddShift')" class="btn-header"><i class="fas fa-plus"></i> Tambah Shift</button>
             </div>
         </div>
     </div>

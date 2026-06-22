@@ -32,13 +32,9 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-6 mb-8 shadow-lg">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-white">Performa Pegawai</h1>
-                <p class="text-amber-100 mt-1">Penilaian kedisiplinan berdasarkan ketepatan waktu masuk & pulang</p>
-            </div>
-        </div>
+    <div class="page-header-glass">
+        <h1>Performa Pegawai</h1>
+        <p>Penilaian kedisiplinan berdasarkan ketepatan waktu masuk & pulang</p>
     </div>
 
     <!-- Filter -->
