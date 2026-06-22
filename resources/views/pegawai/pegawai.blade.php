@@ -56,6 +56,7 @@
     .s-dot-belum { background:var(--gray); }
     .s-dot-aktif { background:#10b981; }
     .s-dot-lembur { background:var(--accent); }
+    .s-dot-warning { background:#f59e0b; }
     .s-text { font-size:11px; font-weight:500; color:var(--gray); }
 
     .empty-box { text-align:center; padding:60px 20px; color:var(--gray); background:var(--card-bg); border-radius:16px; }
@@ -100,7 +101,8 @@
             data-employee-email="{{ $p->email }}"
             data-employee-phone="{{ $p->no_hp ?? '-' }}"
             data-employee-address="{{ $p->alamat ?? '-' }}"
-            data-employee-status="{{ $p->status ?? 'Aktif' }}"
+            data-employee-status="{{ isset($kehadiranHariIni[$p->id]) ? $kehadiranHariIni[$p->id]['text'] : 'Belum Masuk' }}"
+            data-employee-status-type="{{ isset($kehadiranHariIni[$p->id]) ? $kehadiranHariIni[$p->id]['status'] : 'belum' }}"
             data-employee-dept="{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}"
             data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
 
@@ -118,16 +120,18 @@
                 <span class="e-dept">{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}</span>
             </div>
 
+            @if(in_array(strtolower($userRole), ['admin', 'superadmin']))
             <div class="e-status">
                 @if(!empty($kehadiranHariIni) && isset($kehadiranHariIni[$p->id]))
                     @php $kh = $kehadiranHariIni[$p->id]; @endphp
                     <span class="s-dot s-dot-{{ $kh['status'] }}"></span>
                     <span class="s-text">{{ $kh['text'] }}</span>
                 @else
-                    <span class="s-dot s-dot-aktif"></span>
-                    <span class="s-text">Aktif</span>
+                    <span class="s-dot s-dot-belum"></span>
+                    <span class="s-text">Belum Masuk</span>
                 @endif
             </div>
+            @endif
         </div>
         @empty
         <div class="empty-box">
@@ -273,6 +277,10 @@
                 document.getElementById('modalEmployeePosition').textContent = position;
                 document.getElementById('modalEmployeeDeptBadge').textContent = this.dataset.employeeDept;
                 document.getElementById('modalEmployeeStatus').textContent = this.dataset.employeeStatus;
+                var statusDot = document.getElementById('modalEmployeeStatus').previousElementSibling;
+                var sType = this.dataset.employeeStatusType || 'belum';
+                var dotColors = { tepat:'#10b981', telat:'#ef4444', belum:'#94a3b8', lembur:'#f59e0b', warning:'#f59e0b' };
+                if (statusDot) statusDot.style.background = dotColors[sType] || '#94a3b8';
                 document.getElementById('modalEmployeeNip').textContent = this.dataset.employeeNip || '-';
                 document.getElementById('modalEmployeeEmail').textContent = this.dataset.employeeEmail || '-';
                 document.getElementById('modalEmployeePhone').textContent = this.dataset.employeePhone || '-';

@@ -31,21 +31,47 @@ class PegawaiController extends Controller
 
             foreach ($pegawai as $p) {
                 $userPresensi = $presensiByUser->get($p->id, collect());
-                $masukReguler = $userPresensi->where('jenis', 'masuk')->where('is_lembur', false)->first();
-                $masukLembur = $userPresensi->where('jenis', 'masuk')->where('is_lembur', true)->first();
+                $lastActivity = $userPresensi->sortByDesc('jam')->first();
 
-                if ($masukLembur && !$masukReguler) {
-                    $kehadiranHariIni[$p->id] = ['status' => 'lembur', 'text' => 'Lembur'];
-                } elseif ($masukReguler) {
-                    $jadwal = $p->getJadwalKerja($today);
-                    $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-                    if ($masukReguler->jam > $batas) {
-                        $kehadiranHariIni[$p->id] = ['status' => 'telat', 'text' => 'Terlambat'];
-                    } else {
-                        $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Masuk'];
-                    }
-                } else {
+                if (!$lastActivity) {
                     $kehadiranHariIni[$p->id] = ['status' => 'belum', 'text' => 'Belum Masuk'];
+                } else {
+                    $jadwal = $p->getJadwalKerja($today);
+                    $isLembur = $lastActivity->is_lembur;
+                    $jenis = $lastActivity->jenis;
+
+                    if ($isLembur) {
+                        if ($jenis === 'pulang') {
+                            $lemburMasuk = $userPresensi->where('is_lembur', true)->where('jenis', 'masuk')->first();
+                            if ($lemburMasuk) {
+                                $durasi = (strtotime($lastActivity->jam) - strtotime($lemburMasuk->jam)) / 60;
+                                $isLibur = in_array(Carbon::today()->dayOfWeek, [0, 6]) || \App\Helpers\HolidayHelper::isHoliday($today);
+                                $min = $isLibur ? 300 : 180;
+                                $kehadiranHariIni[$p->id] = $durasi < $min
+                                    ? ['status' => 'warning', 'text' => 'Lembur Pulang Cepat']
+                                    : ['status' => 'tepat', 'text' => 'Selesai Lembur'];
+                            } else {
+                                $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Selesai Lembur'];
+                            }
+                        } else {
+                            $kehadiranHariIni[$p->id] = ['status' => 'lembur', 'text' => 'Lembur'];
+                        }
+                    } else {
+                        if ($jenis === 'pulang') {
+                            if ($lastActivity->jam < $jadwal['jam_pulang']) {
+                                $kehadiranHariIni[$p->id] = ['status' => 'warning', 'text' => 'Pulang Cepat'];
+                            } else {
+                                $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Sudah Pulang'];
+                            }
+                        } else {
+                            $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
+                            if ($lastActivity->jam > $batas) {
+                                $kehadiranHariIni[$p->id] = ['status' => 'telat', 'text' => 'Terlambat'];
+                            } else {
+                                $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Masuk'];
+                            }
+                        }
+                    }
                 }
 
                 $riwayatHariIni[$p->id] = $semuaPresensi->where('user_id', $p->id)->values();
