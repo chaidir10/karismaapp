@@ -72,12 +72,12 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Jabatan</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Unit</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Shift</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="pegawaiTableBody" class="divide-y" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
                     @foreach($users as $i => $user)
-                    <tr class="pegawai-row transition-colors duration-150"
+                    <tr class="pegawai-row transition-colors duration-150" style="cursor:pointer;"
+                        onclick="openDetailModal({{ $user->id }})"
                         data-name="{{ strtolower($user->name) }}"
                         data-nip="{{ $user->nip }}"
                         data-unit="{{ $user->unit_id ?? '' }}"
@@ -120,11 +120,6 @@
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 text-right text-sm font-medium">
-                            <div class="flex justify-end gap-1">
-                                <button onclick="openDetailModal({{ $user->id }})" class="btn-detail" title="Detail"><i class="fas fa-eye"></i></button>
-                            </div>
-                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -262,15 +257,15 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="mt-4 space-y-3">
-                    <button onclick="openEditModalFromDetail()" class="btn-warning w-full justify-center">
-                        <i class="fas fa-edit mr-2"></i> Edit Data
+                <div style="display:flex; gap:8px; margin-top:16px;">
+                    <button onclick="openEditModalFromDetail()" class="btn-warning" style="flex:1; padding:10px; justify-content:center;">
+                        <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button onclick="showResetPasswordConfirmation()" class="btn-warning w-full justify-center">
-                        <i class="fas fa-key mr-2"></i> Reset Password
+                    <button onclick="showResetPasswordConfirmation()" class="btn-primary" style="flex:1; padding:10px; justify-content:center;">
+                        <i class="fas fa-key"></i> Reset Password
                     </button>
-                    <button onclick="showDeleteConfirmation()" class="btn-danger w-full justify-center">
-                        <i class="fas fa-trash-alt mr-2"></i> Hapus Pegawai
+                    <button onclick="showDeleteConfirmation()" class="btn-danger" style="flex:1; padding:10px; justify-content:center;">
+                        <i class="fas fa-trash-alt"></i> Hapus
                     </button>
                 </div>
             </div>
@@ -332,8 +327,8 @@
             </div>
         </div>
 
-        <div class="flex justify-end space-x-4 pt-6 mt-6" style="border-top:1px solid var(--dm-border,#e2e8f0);">
-            <button onclick="closeModal('modalDetail')" class="btn-secondary">
+        <div style="display:flex; justify-content:flex-end; gap:8px; padding-top:16px; margin-top:16px; border-top:1px solid var(--dm-border,#e2e8f0);">
+            <button onclick="closeModal('modalDetail')" class="btn-secondary" style="padding:10px 20px;">
                 Tutup
             </button>
         </div>
