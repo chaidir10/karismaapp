@@ -1426,6 +1426,43 @@
         openModal('modalCutiDetail');
     }
 
+    function refreshTablePagination(tbodyId) {
+        var tbody = document.getElementById(tbodyId);
+        if (!tbody || !tableInstances[tbodyId]) return;
+        var inst = tableInstances[tbodyId];
+        inst.rows = Array.from(tbody.querySelectorAll('tr'));
+        if (inst.rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="empty-content"><i class="fas fa-inbox"></i><p>Tidak ada data</p></div></td></tr>';
+            var pg = tbody.closest('table').parentElement.querySelector('.table-pagination');
+            if (pg) pg.style.display = 'none';
+            return;
+        }
+        var totalPages = Math.ceil(inst.rows.length / (parseInt(tbody.getAttribute('data-paginate')) || 5));
+        if (inst.currentPage > totalPages) inst.currentPage = totalPages;
+        // Re-number rows
+        inst.rows.forEach(function(row, i) { var c = row.querySelector('td:first-child'); if (c) c.textContent = i + 1; });
+        // Trigger re-render by simulating pagination
+        var pg = tbody.closest('table').parentElement.querySelector('.table-pagination');
+        if (pg) {
+            var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
+            var start = (inst.currentPage - 1) * perPage;
+            var end = start + perPage;
+            inst.rows.forEach(function(row, i) { row.style.display = (i >= start && i < end) ? '' : 'none'; });
+            if (inst.rows.length <= perPage) { pg.style.display = 'none'; }
+            else {
+                pg.style.display = '';
+                var s = (inst.currentPage - 1) * perPage + 1;
+                var e = Math.min(inst.currentPage * perPage, inst.rows.length);
+                var tp = Math.ceil(inst.rows.length / perPage);
+                var html = '<span class="pagination-info">' + s + '-' + e + ' dari ' + inst.rows.length + '</span><div class="pagination-buttons">';
+                html += '<button data-page="prev" ' + (inst.currentPage === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+                for (var p = 1; p <= tp; p++) html += '<button data-page="' + p + '" class="' + (p === inst.currentPage ? 'active' : '') + '">' + p + '</button>';
+                html += '<button data-page="next" ' + (inst.currentPage === tp ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button></div>';
+                pg.innerHTML = html;
+            }
+        }
+    }
+
     function ajaxAction(url, btnEl) {
         fetch(url, {
             method: 'POST',
@@ -1439,10 +1476,14 @@
         .then(function(data) {
             if (data.success) {
                 var row = btnEl ? btnEl.closest('tr') : null;
+                var tbodyId = row ? (row.closest('tbody') ? row.closest('tbody').id : null) : null;
                 if (row) {
                     row.style.transition = 'opacity 0.3s';
                     row.style.opacity = '0';
-                    setTimeout(function() { row.remove(); }, 300);
+                    setTimeout(function() {
+                        row.remove();
+                        if (tbodyId) refreshTablePagination(tbodyId);
+                    }, 300);
                 }
             }
         })
