@@ -76,16 +76,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        $rows[] = [];
-
-        $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja']];
-        $rows[] = ['Total Hari Cuti/DL', '', $this->data['total_hari_cuti'] ?? 0];
-        $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit'];
-        $rows[] = ['Total Pulang Cepat', '', $this->data['summary']['total_pulang_cepat'] . ' menit'];
-        $rows[] = ['Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Hari Lembur', '', $this->data['total_hari_lembur'] ?? 0];
-        $rows[] = ['Total Lembur', '', $this->formatMenit($this->data['summary']['total_lembur'])];
+        $rows[] = ['Ringkasan:'];
+        $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja'] . ' Hari', '', 'Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Hari Cuti/DL', '', ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', 'Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit', '', 'Total Hari Lembur', '', ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
 
         return $rows;
     }
@@ -171,25 +165,26 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getPageSetup()->setHorizontalCentered(true);
         $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$lastRow}");
 
-        // --- Summary rows (bawah) ---
-        $summaryStart = $lastRow - 7;
-        for ($r = $summaryStart; $r <= $lastRow; $r++) {
-            if ($r < 6) continue;
+        // --- Summary rows (4 rows: ringkasan header + 3 data rows) ---
+        $summaryStart = $lastRow - 3;
+        // Ringkasan header
+        $sheet->mergeCells("A" . ($summaryStart) . ":{$lastCol}" . ($summaryStart));
+        // Data rows: merge label pairs
+        for ($r = $summaryStart + 1; $r <= $lastRow; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
-            $sheet->mergeCells("C{$r}:D{$r}");
+            $sheet->mergeCells("E{$r}:F{$r}");
         }
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getFont()->setBold(true);
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
-            ->getFill()->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()->setRGB('F2F2F2');
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         // --- Pewarnaan: weekend/libur & cuti ---
         $dataStart = 6;
         $rowIndex = 0;
         foreach ($this->data['rows'] as $row) {
             $r = $dataStart + $rowIndex;
-            if ($r > $summaryStart - 2) break;
+            if ($r >= $summaryStart) break;
 
             if (!empty($row['is_cuti'])) {
                 $sheet->getStyle("A{$r}:{$lastCol}{$r}")

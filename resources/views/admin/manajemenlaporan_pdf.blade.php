@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Laporan Kehadiran</title>
     <style>
-        @page { size: A4 landscape; margin: 10mm 8mm; }
+        @page { size: A4 landscape; margin: 4mm 6mm; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 9px; margin: 0; }
         h3 { text-align: center; margin: 0 0 4px; font-size: 12px; }
         h4 { text-align: center; margin: 0 0 6px; font-size: 9px; font-weight: normal; color: #555; }
@@ -90,17 +90,24 @@
         </table>
 
         <table class="summary-table">
+            <tr><td colspan="9" style="font-weight:bold; padding:3px 4px;">Ringkasan:</td></tr>
             <tr>
-                <td class="label">Hari Kerja: {{ $item['total_hari_kerja'] }}</td>
-                <td class="label">Hari Telat: {{ $item['total_hari_telat'] }}</td>
-                <td class="label">Hari Lembur: {{ $item['total_hari_lembur'] ?? 0 }}</td>
-                <td class="label">Keterlambatan: {{ fmtM($item['summary']['total_keterlambatan']) }}</td>
+                <td class="label" colspan="2">Total Hari Kerja</td>
+                <td colspan="2"><strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
+                <td class="label" colspan="2">Total Jam Kerja</td>
+                <td colspan="3"><strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
             </tr>
             <tr>
-                <td class="label">Pulang Cepat: {{ fmtM($item['summary']['total_pulang_cepat']) }}</td>
-                <td class="label">Jam Kerja: {{ fmtJM($item['summary']['total_jam_kerja']) }}</td>
-                <td class="label">Waktu Kurang: {{ fmtM($item['summary']['total_kekurangan']) }}</td>
-                <td class="label">Lembur: {{ fmtJM($item['summary']['total_lembur']) }}</td>
+                <td class="label" colspan="2">Total Hari Cuti/DL</td>
+                <td colspan="2"><strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
+                <td class="label" colspan="2">Total Waktu Kurang</td>
+                <td colspan="3"><strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
+            </tr>
+            <tr>
+                <td class="label" colspan="2">Total Keterlambatan</td>
+                <td colspan="2"><strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
+                <td class="label" colspan="2">Total Hari Lembur</td>
+                <td colspan="3"><strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
             </tr>
         </table>
     </div>
