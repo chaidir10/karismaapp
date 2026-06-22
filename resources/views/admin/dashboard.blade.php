@@ -1405,7 +1405,7 @@
         var emptyIcon = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-file-pdf" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span></div>';
         if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
             buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;';
-            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '#view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
+            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '#toolbar=0&navpanes=0&view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
         } else if (buktiUrl) {
             buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
             buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
@@ -1719,7 +1719,7 @@
         var emptyBukti = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400)"></i></div><span style="font-size:12px;color:var(--gray-400)">Tidak ada bukti</span></div>';
         if (data.bukti_url && data.bukti_url.match(/\.pdf$/i)) {
             buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;position:relative;';
-            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
+            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#toolbar=0&navpanes=0&view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
         } else if (data.bukti_url) {
             buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;position:relative;';
             var img = document.createElement('img');
