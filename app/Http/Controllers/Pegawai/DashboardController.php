@@ -149,8 +149,11 @@ class DashboardController extends Controller
         $disablePresensiLibur = ($isLiburHariIni && AppSetting::getBool('disable_presensi_hari_libur', true));
         $enableFaceDetection = AppSetting::getBool('enable_face_detection', true);
         if ($enableFaceDetection) {
+            $faceMode = AppSetting::getValue('face_detection_mode', 'all');
             $faceUserIds = json_decode(AppSetting::getValue('face_detection_users', '[]'), true) ?: [];
-            if (!empty($faceUserIds) && !in_array($user->id, $faceUserIds)) {
+            if ($faceMode === 'except' && !empty($faceUserIds) && in_array($user->id, $faceUserIds)) {
+                $enableFaceDetection = false;
+            } elseif ($faceMode === 'only' && !empty($faceUserIds) && !in_array($user->id, $faceUserIds)) {
                 $enableFaceDetection = false;
             }
         }

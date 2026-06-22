@@ -23,8 +23,11 @@ class PresensiController extends Controller
 
         $user = Auth::user();
 
-        $allowedIds = json_decode(\App\Models\AppSetting::getValue('absen_darurat_users', '[]'), true) ?: [];
-        if (!empty($allowedIds) && !in_array($user->id, $allowedIds)) {
+        $daruratMode = \App\Models\AppSetting::getValue('absen_darurat_mode', 'all');
+        $daruratUserIds = json_decode(\App\Models\AppSetting::getValue('absen_darurat_users', '[]'), true) ?: [];
+        if ($daruratMode === 'except' && !empty($daruratUserIds) && in_array($user->id, $daruratUserIds)) {
+            return redirect()->route('pegawai.dashboard')->with('error', 'Anda tidak memiliki akses absen darurat.');
+        } elseif ($daruratMode === 'only' && !empty($daruratUserIds) && !in_array($user->id, $daruratUserIds)) {
             return redirect()->route('pegawai.dashboard')->with('error', 'Anda tidak memiliki akses absen darurat.');
         }
         $wilayahList = $user->wilayahKerjaList;
