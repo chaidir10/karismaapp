@@ -398,33 +398,86 @@
         /* Untuk desktop, beri margin kiri sesuai lebar sidebar */
         @media (min-width: 640px) {
             .content-area {
-                margin-left: 250px;
+                margin-left: 230px;
             }
         }
 
         /* Topbar styling */
         .topbar {
-            background: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 1rem 1.5rem;
+            background: var(--dm-card, #fff);
+            border-bottom: 1px solid var(--dm-border, #e2e8f0);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 30;
         }
+        [data-theme="dark"] .topbar { background: #0d1117; border-color: rgba(255,255,255,0.06); }
+
+        .topbar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dm-text, #1e293b);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px; border: none;
+            background: var(--dm-bg, #f1f5f9);
+            color: var(--dm-muted, #64748b);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+            transition: all 0.15s;
+        }
+        .topbar-btn:hover { background: var(--dm-border, #e2e8f0); color: var(--dm-text, #1e293b); }
+        [data-theme="dark"] .topbar-btn { background: rgba(255,255,255,0.06); color: #94a3b8; }
+        [data-theme="dark"] .topbar-btn:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 4px 4px;
+            border-radius: 12px;
+            background: var(--dm-bg, #f8fafc);
+            border: 1px solid var(--dm-border, #e2e8f0);
+        }
+        [data-theme="dark"] .topbar-user { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); }
 
         .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .topbar-user-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dm-text, #1e293b);
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Main content area */
         .main-content {
             flex: 1;
-            overflow-y: auto; /* Scroll sendiri untuk konten */
-            background: #f9fafb;
+            overflow-y: auto;
+            background: var(--dm-bg, #f9fafb);
         }
+        [data-theme="dark"] .main-content { background: #0b0f19; }
 
         /* Modal Konfirmasi Logout */
         .logout-modal {
@@ -554,7 +607,7 @@
         /* ─── Dark Mode ─── */
         [data-theme="dark"] body { background-color: var(--dm-bg) !important; color: var(--dm-text) !important; }
         /* sidebar dark mode handled in .sidebar CSS above */
-        [data-theme="dark"] .topbar { background: var(--dm-topbar) !important; box-shadow: none !important; border-bottom: 1px solid var(--dm-border) !important; }
+        /* topbar dark mode handled in .topbar CSS above */
         [data-theme="dark"] .main-content { background: var(--dm-bg) !important; }
         [data-theme="dark"] .mobile-sidebar-content { background: var(--dm-sidebar) !important; border-color: var(--dm-border) !important; }
         [data-theme="dark"] .logout-modal-content { background: var(--dm-card) !important; color: var(--dm-text) !important; }
@@ -753,23 +806,23 @@
         <!-- Content Area -->
         <div class="content-area">
             <!-- Topbar -->
-            <div class="topbar flex justify-between items-center">
-                <div class="flex items-center">
-                    <span class="font-semibold">@yield('title')</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button type="button" class="admin-theme-btn" onclick="toggleAdminTheme()" title="Ubah tema">
+            <div class="topbar">
+                <div class="topbar-title">@yield('title')</div>
+                <div class="topbar-actions">
+                    <button type="button" class="topbar-btn" onclick="toggleAdminTheme()" title="Ubah tema">
                         <i class="fas fa-sun" id="admin-sun"></i>
                         <i class="fas fa-moon" id="admin-moon" style="display:none;"></i>
                     </button>
-                    <div class="text-sm text-gray-600">{{ Auth::user()->name }}</div>
-                    @if(Auth::user()->foto_profil)
-                    <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
-                    @else
-                    <div class="user-avatar bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold">
-                        {{ substr(Auth::user()->name,0,1) }}
+                    <div class="topbar-user">
+                        @if(Auth::user()->foto_profil)
+                        <img src="{{ asset('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar">
+                        @else
+                        <div class="user-avatar" style="background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">
+                            {{ substr(Auth::user()->name,0,1) }}
+                        </div>
+                        @endif
+                        <span class="topbar-user-name">{{ Auth::user()->name }}</span>
                     </div>
-                    @endif
                 </div>
             </div>
 
