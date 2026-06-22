@@ -76,7 +76,7 @@
     .stat-card {
         background: var(--white);
         padding: 20px;
-        border-radius: 14px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         gap: 16px;
@@ -84,17 +84,8 @@
         text-decoration: none;
         border: 1px solid var(--gray-200);
         -webkit-tap-highlight-color: transparent;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        transition: all 0.2s;
     }
-    .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform:translateY(-1px); }
-    .stat-card:active { transform:scale(0.97); }
-    [data-theme="dark"] .stat-card {
-        background: var(--dm-card, rgba(20,27,45,0.8));
-        border: 1px solid rgba(255,255,255,0.06);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    [data-theme="dark"] .stat-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+    .stat-card:active { opacity: 0.85; }
 
     .stat-icon {
         width: 48px;
@@ -152,67 +143,33 @@
 
     .content-card {
         background: var(--white);
-        border-radius: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         overflow: hidden;
-        border: 1px solid var(--gray-200);
-        transition: box-shadow 0.2s;
     }
-    .content-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-    [data-theme="dark"] .content-card {
-        background: var(--dm-card, rgba(20,27,45,0.8));
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        border: 1px solid rgba(255,255,255,0.06);
-    }
-    [data-theme="dark"] .content-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-
-    .card-search {
-        position:relative; padding:12px 16px;
-    }
-    .card-search input {
-        width:100%; padding:8px 12px 8px 34px; border:none;
-        border-radius:8px; font-size:12px; color:var(--dark); outline:none;
-        background:var(--gray-100);
-    }
-    .card-search input::placeholder { color:var(--gray-400); }
-    .card-search input:focus { background:var(--gray-200); }
-    .card-search i {
-        position:absolute; left:28px; top:50%; transform:translateY(-50%);
-        color:var(--gray-400); font-size:11px; pointer-events:none;
-    }
-    [data-theme="dark"] .card-search input {
-        background:rgba(255,255,255,0.06); color:var(--dm-text);
-    }
-    [data-theme="dark"] .card-search input:focus { background:rgba(255,255,255,0.1); }
 
     .card-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 16px 20px;
+        padding: 15px 20px;
         border-bottom: 1px solid var(--gray-200);
     }
 
     .card-title {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 600;
         color: var(--dark);
         margin: 0;
     }
 
     .card-badge {
-        padding: 4px 12px;
-        background: rgba(90,182,234,0.1);
-        color: #2E97D4;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        border: 1px solid rgba(90,182,234,0.15);
-    }
-    [data-theme="dark"] .card-badge {
-        background: rgba(90,182,234,0.12);
-        color: #7dd3fc;
-        border-color: rgba(90,182,234,0.2);
+        padding: 4px 10px;
+        background: var(--gray-300);
+        color: var(--gray-700);
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
     }
 
     .card-content {
@@ -342,19 +299,46 @@
     }
 
     /* Badges */
-    .status-badge { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:4px; }
-    .jenis-badge { background:rgba(90,182,234,0.12); color:#2E97D4; border:1px solid rgba(90,182,234,0.2); padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; }
-    .jenis-pulang { background:rgba(254,170,43,0.12); color:#d97706; border:1px solid rgba(254,170,43,0.2); }
-    .status-badge.on-time { background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.15); }
-    .status-badge.late { background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
-    .status-badge.neutral { background:rgba(100,116,139,0.08); color:var(--gray-500); border:1px solid rgba(100,116,139,0.12); }
-    .status-badge.pending { background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.15); }
-    [data-theme="dark"] .status-badge.on-time { background:rgba(16,185,129,0.12); color:#6ee7b7; border-color:rgba(16,185,129,0.3); }
-    [data-theme="dark"] .status-badge.late { background:rgba(239,68,68,0.12); color:#fca5a5; border-color:rgba(239,68,68,0.3); }
-    [data-theme="dark"] .status-badge.pending { background:rgba(245,158,11,0.12); color:#fde68a; border-color:rgba(245,158,11,0.3); }
-    [data-theme="dark"] .status-badge.neutral { background:rgba(100,116,139,0.12); color:#94a3b8; border-color:rgba(100,116,139,0.2); }
-    [data-theme="dark"] .jenis-badge { background:rgba(90,182,234,0.12); color:#7dd3fc; border-color:rgba(90,182,234,0.3); }
-    [data-theme="dark"] .jenis-pulang { background:rgba(254,170,43,0.12); color:#fde68a; border-color:rgba(254,170,43,0.3); }
+    .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+
+    .jenis-badge {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .status-badge.on-time {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-badge.late {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .status-badge.neutral {
+        background: rgba(100, 116, 139, 0.1);
+        color: var(--gray-500);
+    }
+
+    .status-badge.pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
 
     .date-cell {
         font-size: 13px;
@@ -370,54 +354,80 @@
     /* Action Buttons */
     .action-buttons {
         display: flex;
-        gap: 6px;
+        gap: 5px;
         justify-content: center;
     }
 
-    /* btn-success, btn-danger inherited from layout */
+    .inline-form {
+        display: inline;
+    }
+
+    .btn-success,
+    .btn-danger {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 12px;
+    }
+
+    .btn-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .btn-success:hover {
+        background: var(--success);
+        color: var(--white);
+    }
+
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .btn-danger:hover {
+        background: var(--danger);
+        color: var(--white);
+    }
 
     /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 40px 20px;
-        height: 220px;
-        vertical-align: middle;
+        padding: 30px 20px;
     }
 
     .empty-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         color: var(--gray-400);
     }
 
-    .empty-content .empty-icon {
-        width: 56px; height: 56px; border-radius: 16px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 22px;
-        background: rgba(148,163,184,0.08);
-        color: var(--gray-300);
-        margin-bottom: 4px;
-    }
-    [data-theme="dark"] .empty-content .empty-icon {
-        background: rgba(148,163,184,0.06);
-        color: var(--gray-500);
+    .empty-content i {
+        font-size: 32px;
     }
 
     .empty-content p {
         margin: 0;
         font-size: 13px;
-        font-weight: 500;
     }
 
     /* Modal Styles */
     .modal-overlay {
         display: none;
         position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(4px);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
         z-index: 9999;
         align-items: center;
         justify-content: center;
@@ -425,131 +435,89 @@
 
     .modal-container {
         background: var(--white);
-        border-radius: 16px;
+        border-radius: 12px;
         width: 90%;
         max-width: 500px;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        border: 1px solid var(--gray-200);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         z-index: 10000;
         position: relative;
     }
-    [data-theme="dark"] .modal-container {
-        background: var(--dm-card);
-        border-color: rgba(255,255,255,0.06);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    }
 
-    .modal-large { max-width: 900px; }
-    .modal-wide { max-width: 1000px; }
-    .modal-3col {
-        display:grid; grid-template-columns:1fr 1fr 1.2fr; min-height:380px;
-    }
-    .modal-col {
-        padding:16px; display:flex; flex-direction:column;
-        border-right:1px solid var(--gray-200);
-    }
-    .modal-col:last-child { border-right:none; }
-    [data-theme="dark"] .modal-col { border-color:rgba(255,255,255,0.06); }
-    .modal-col-label {
-        font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase;
-        letter-spacing:0.3px; margin-bottom:8px;
-    }
-    .modal-col-content {
-        flex:1; border-radius:10px; overflow:hidden; display:flex;
-        align-items:center; justify-content:center; background:var(--gray-100);
-    }
-    [data-theme="dark"] .modal-col-content { background:rgba(255,255,255,0.03); }
-    .modal-info-col {
-        padding:16px; display:flex; flex-direction:column;
-    }
-    .modal-info-col .info-grid {
-        display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;
-    }
-    .modal-info-col .info-item {
-        background:var(--gray-100); border-radius:8px; padding:8px 10px;
-    }
-    [data-theme="dark"] .modal-info-col .info-item { background:rgba(255,255,255,0.04); }
-    .modal-info-col .info-item label {
-        font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase;
-        letter-spacing:0.3px; display:block; margin:0 0 2px;
-    }
-    .modal-info-col .info-item label::after { content:''; }
-    .modal-info-col .info-item span {
-        font-size:13px; font-weight:500; color:var(--dark); word-break:break-word;
-    }
-    .modal-info-col .info-item.full { grid-column:1/-1; }
-    @media (max-width:768px) {
-        .modal-3col { grid-template-columns:1fr; }
-        .modal-col { border-right:none; border-bottom:1px solid var(--gray-200); }
-        .modal-col-content { min-height:180px; }
+    .modal-large {
+        max-width: 700px;
     }
 
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 18px 20px;
+        padding: 20px;
         border-bottom: 1px solid var(--gray-200);
     }
 
     .modal-title {
-        font-size: 16px;
-        font-weight: 700;
+        font-size: 18px;
+        font-weight: 600;
         color: var(--dark);
         margin: 0;
     }
 
     .modal-close {
-        width: 32px; height: 32px;
-        background: var(--gray-100);
+        background: none;
         border: none;
-        font-size: 14px;
+        font-size: 18px;
         color: var(--gray-500);
         cursor: pointer;
-        border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.15s;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
     }
-    .modal-close:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
-    [data-theme="dark"] .modal-close { background: rgba(255,255,255,0.06); }
+
+    .modal-close:hover {
+        background: var(--gray-100);
+        color: var(--danger);
+    }
 
     .modal-content {
-        padding: 16px 20px;
+        padding: 15px 20px;
     }
 
     .detail-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 14px;
+        gap: 8px 15px;
+        margin-bottom: 12px;
     }
 
     .detail-item {
-        background: var(--gray-100);
-        border-radius: 10px;
-        padding: 10px 12px;
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
     }
-    [data-theme="dark"] .detail-item { background: rgba(255,255,255,0.04); }
 
-    .detail-item.full-width { grid-column: 1 / -1; }
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+    }
 
     .detail-item label {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 600;
         color: var(--gray-500);
         text-transform: uppercase;
-        letter-spacing: 0.4px;
-        display: block;
-        margin: 0 0 3px;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        min-width: fit-content;
+        margin: 0;
     }
 
-    .detail-item label::after { content: ''; }
+    .detail-item label::after {
+        content: ':';
+    }
 
     .detail-item span {
         font-size: 13px;
-        font-weight: 500;
         color: var(--dark);
         word-break: break-word;
     }
@@ -560,7 +528,7 @@
         justify-content: flex-end;
         flex-wrap: wrap;
         border-top: 1px solid var(--gray-200);
-        padding: 16px 20px;
+        padding-top: 20px;
     }
 
     .btn-secondary {
@@ -647,8 +615,8 @@
 
     .foto-wrapper .foto-image {
         width: 100%;
-        height: 100%;
-        object-fit: contain;
+        height: auto;
+        max-height: none;
         display: block;
         border: none;
         border-radius: 0;
@@ -829,7 +797,6 @@
                 <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
             </div>
             <div class="card-content">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -860,8 +827,8 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
-                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -869,7 +836,7 @@
                             <tr>
                                 <td colspan="5" class="empty-state">
                                     <div class="empty-content">
-                                        <div class="empty-icon"><i class="fas fa-shield-check"></i></div>
+                                        <i class="fas fa-inbox"></i>
                                         <p>Tidak ada presensi pending</p>
                                     </div>
                                 </td>
@@ -887,17 +854,16 @@
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
-            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
-                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+            <div style="display:flex; gap:4px; padding:12px 16px 0; background:var(--dm-card,#fff);">
+                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:8px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--primary);color:#fff;">
                     <i class="fas fa-clock"></i> Presensi ({{ count($pengajuanPending ?? []) }})
                 </button>
-                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:8px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--dm-bg,#f1f5f9);color:var(--dm-muted,#64748b);">
                     <i class="fas fa-calendar-minus"></i> Cuti/DL ({{ count($cutiPending ?? []) }})
                 </button>
             </div>
             {{-- Tab Presensi --}}
             <div class="card-content" id="adminTabPresensi">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'pengajuanPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -925,13 +891,13 @@
                                 <td><span class="badge jenis-badge">{{ ucfirst($peng->jenis ?? '') }}</span></td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
-                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/approve', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/pengajuan/{{ $peng->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="5" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-paper-plane"></i></div><p>Tidak ada pengajuan presensi pending</p></div></td></tr>
+                            <tr><td colspan="5" class="empty-state"><div class="empty-content"><i class="fas fa-inbox"></i><p>Tidak ada pengajuan presensi pending</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -939,7 +905,6 @@
             </div>
             {{-- Tab Cuti/DL --}}
             <div class="card-content" id="adminTabCuti" style="display:none;">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'cutiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -952,7 +917,7 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="cutiPendingTable">
+                        <tbody>
                             @forelse($cutiPending ?? [] as $idx => $cp)
                             <tr style="cursor:pointer;" onclick="openCutiModal({{ $cp->id }})" id="cutiRow{{ $cp->id }}"
                                 data-cuti-id="{{ $cp->id }}"
@@ -972,13 +937,13 @@
                                 <td class="text-center">{{ $cp->tanggal_mulai->diffInDays($cp->tanggal_selesai) + 1 }}</td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
-                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
+                                        <button type="button" class="btn-success" title="Setujui" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/approve', this)"><i class="fas fa-check"></i></button>
+                                        <button type="button" class="btn-danger" title="Tolak" onclick="ajaxAction('/admin/cuti/{{ $cp->id }}/reject', this)"><i class="fas fa-times"></i></button>
                                     </div>
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="6" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-calendar-xmark"></i></div><p>Tidak ada pengajuan cuti/DL pending</p></div></td></tr>
+                            <tr><td colspan="6" class="empty-state"><div class="empty-content"><i class="fas fa-calendar-minus"></i><p>Tidak ada pengajuan cuti/DL pending</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -988,76 +953,72 @@
 
         {{-- Modal Detail Cuti/DL --}}
         <div id="modalCutiDetail" class="modal-overlay" style="display:none;">
-            <div class="modal-container modal-wide">
-                <div class="modal-header">
+            <div class="modal-container" style="max-width:520px;">
+                <div class="modal-header" style="border-bottom:1px solid var(--dm-border,#e2e8f0);">
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:14px;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:16px;">
                             <i class="fas fa-calendar-minus"></i>
                         </div>
                         <h3 class="modal-title" style="margin:0;" id="cutiModalTitle">Detail Cuti/DL</h3>
                     </div>
                     <button class="modal-close" onclick="closeModal('modalCutiDetail')"><i class="fas fa-times"></i></button>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
-                    {{-- Left: Bukti --}}
-                    <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
-                        <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Surat</div>
-                        <div id="cutiModalBukti" style="flex:1; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
-                            <span style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
+                <div class="modal-content" style="padding:20px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Pegawai</div>
+                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalUser">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Jenis</div>
+                            <div id="cutiModalJenis" style="font-size:14px;font-weight:600;color:#7c3aed;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Periode</div>
+                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalPeriode">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Durasi</div>
+                            <div style="font-size:14px;font-weight:600;color:var(--dm-text,#1e293b);" id="cutiModalHari">-</div>
                         </div>
                     </div>
-                    {{-- Right: Info --}}
-                    <div style="padding:16px 20px; display:flex; flex-direction:column;">
-                        <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-                            <div class="info-item"><label>Pegawai</label><span id="cutiModalUser">-</span></div>
-                            <div class="info-item"><label>Jenis</label><span id="cutiModalJenis" style="color:#7c3aed;">-</span></div>
-                            <div class="info-item"><label>Periode</label><span id="cutiModalPeriode">-</span></div>
-                            <div class="info-item"><label>Durasi</label><span id="cutiModalHari">-</span></div>
-                            <div class="info-item full" style="grid-column:1/-1;"><label>Keterangan</label><span id="cutiModalKeterangan">-</span></div>
-                        </div>
-                        <div style="margin-top:auto; display:flex; gap:8px;">
-                            <button type="button" class="btn-success" style="flex:1;padding:10px;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
-                            <button type="button" class="btn-danger" style="flex:1;padding:10px;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
-                            <button type="button" class="btn-secondary" style="padding:10px 16px;" onclick="closeModal('modalCutiDetail')">Tutup</button>
-                        </div>
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:3px;">Keterangan</div>
+                        <div style="font-size:13px;color:var(--dm-text,#1e293b);line-height:1.5;" id="cutiModalKeterangan">-</div>
                     </div>
+                    <div id="cutiModalBuktiSection" style="margin-bottom:16px;">
+                        <div style="font-size:10px;color:var(--dm-muted,#64748b);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:8px;">Bukti Surat</div>
+                        <div id="cutiModalBukti"></div>
+                    </div>
+                </div>
+                <div class="modal-actions" style="padding:16px 20px;border-top:1px solid var(--dm-border,#e2e8f0);display:flex;gap:8px;">
+                    <button type="button" class="btn-success" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#10b981;" id="cutiModalApprove"><i class="fas fa-check"></i> Setujui</button>
+                    <button type="button" class="btn-danger" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#ef4444;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
+                    <button type="button" class="btn-secondary" style="padding:10px 16px;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);background:var(--dm-card,#fff);color:var(--dm-text,#64748b);font-weight:600;font-size:13px;cursor:pointer;" onclick="closeModal('modalCutiDetail')">Tutup</button>
                 </div>
             </div>
         </div>
 
         {{-- Presensi Hari Ini --}}
-        @php
-            $presensiMasuk = collect($presensiHariIni ?? [])->where('jenis','masuk');
-            $presensiPulangHI = collect($presensiHariIni ?? [])->where('jenis','pulang');
-        @endphp
         <div class="content-card" id="presensiHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Daftar Presensi Hari Ini</h2>
                 <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
             </div>
-            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
-                <button type="button" class="hi-tab active" data-hitab="masuk" onclick="switchHiTab('masuk')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
-                    <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $presensiMasuk->count() }})
-                </button>
-                <button type="button" class="hi-tab" data-hitab="pulang" onclick="switchHiTab('pulang')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
-                    <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $presensiPulangHI->count() }})
-                </button>
-            </div>
-            {{-- Tab Masuk --}}
-            <div class="card-content" id="hiTabMasuk">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+            <div class="card-content">
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th data-sort="text">Nama Pegawai</th>
-                                <th data-sort="text">Jam</th>
-                                <th data-sort="text">Status</th>
+                                <th data-sort="text">Nama Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Status <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
-                        <tbody id="presensiMasukTable" data-paginate="5">
-                            @forelse($presensiMasuk as $index => $p)
+                        <tbody id="presensiHariIniTable" data-paginate="5">
+                            @forelse($presensiHariIni ?? [] as $index => $p)
                             <tr class="clickable-row"
                                 data-user-name="{{ $p->user->name ?? 'N/A' }}"
                                 data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
@@ -1066,66 +1027,40 @@
                                 data-lokasi="{{ $p->lokasi ?? '' }}"
                                 data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
                                 data-status="{{ $p->status ?? '' }}"
-                                data-status-label="{{ $p->terlambat ? 'Terlambat' : 'Tepat Waktu' }}"
-                                data-approve-url="/admin/presensi/{{ $p->id }}/approve"
-                                data-reject-url="/admin/presensi/{{ $p->id }}/reject">
-                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
+                                data-status-label="@if(($p->jenis ?? '') === 'masuk'){{ $p->terlambat ? 'Terlambat' : 'Tepat Waktu' }}@elseif(($p->jenis ?? '') === 'pulang'){{ ($p->waktu_kurang_menit ?? 0) > 0 ? 'Waktu Kurang' : 'Tepat Waktu' }}@else -@endif">
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
+                                </td>
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
-                                    @if($p->terlambat)
-                                        <span class="status-badge late"><i class="fas fa-clock" style="font-size:9px;"></i> Terlambat</span>
+                                    @if(($p->jenis ?? '') === 'masuk')
+                                        @if($p->terlambat)
+                                            <span class="status-badge late">Terlambat</span>
+                                        @else
+                                            <span class="status-badge on-time">Tepat Waktu</span>
+                                        @endif
+                                    @elseif(($p->jenis ?? '') === 'pulang')
+                                        @if($p->waktu_kurang_menit > 0)
+                                            <span class="status-badge late">Waktu Kurang</span>
+                                        @else
+                                            <span class="status-badge on-time">Tepat Waktu</span>
+                                        @endif
                                     @else
-                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
+                                        <span class="status-badge neutral">-</span>
                                     @endif
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-fingerprint"></i></div><p>Belum ada presensi masuk</p></div></td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {{-- Tab Pulang --}}
-            <div class="card-content" id="hiTabPulang" style="display:none;">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
                             <tr>
-                                <th class="text-center">No</th>
-                                <th data-sort="text">Nama Pegawai</th>
-                                <th data-sort="text">Jam</th>
-                                <th data-sort="text">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="presensiPulangTable" data-paginate="5">
-                            @forelse($presensiPulangHI as $index => $p)
-                            <tr class="clickable-row"
-                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
-                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
-                                data-jenis="{{ $p->jenis ?? '' }}"
-                                data-jam="{{ $p->jam ?? '-' }}"
-                                data-lokasi="{{ $p->lokasi ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
-                                data-status="{{ $p->status ?? '' }}"
-                                data-status-label="{{ ($p->waktu_kurang_menit ?? 0) > 0 ? 'Pulang Cepat' : 'Tepat Waktu' }}"
-                                data-approve-url="/admin/presensi/{{ $p->id }}/approve"
-                                data-reject-url="/admin/presensi/{{ $p->id }}/reject">
-                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
-                                <td class="time-cell">{{ $p->jam ?? '-' }}</td>
-                                <td>
-                                    @if(($p->waktu_kurang_menit ?? 0) > 0)
-                                        <span class="status-badge pending"><i class="fas fa-clock" style="font-size:9px;"></i> Pulang Cepat</span>
-                                    @else
-                                        <span class="status-badge on-time"><i class="fas fa-check" style="font-size:9px;"></i> Tepat Waktu</span>
-                                    @endif
+                                <td colspan="5" class="empty-state">
+                                    <div class="empty-content">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        <p>Belum ada presensi hari ini</p>
+                                    </div>
                                 </td>
                             </tr>
-                            @empty
-                            <tr><td colspan="4" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-arrow-right-from-bracket"></i></div><p>Belum ada presensi pulang</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1134,58 +1069,46 @@
         </div>
 
         {{-- Lembur Hari Ini --}}
-        @php
-            $lemburMasukHI = $lemburHariIni->where('jenis','masuk');
-            $lemburPulangHI = $lemburHariIni->where('jenis','pulang');
-        @endphp
         <div class="content-card" id="lemburHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Lembur Hari Ini</h2>
-                <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburMasukHI->count() }} pegawai</span>
+                <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburHariIni->where('jenis','masuk')->count() }} pegawai</span>
             </div>
-            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
-                <button type="button" class="lb-tab active" data-lbtab="masuk" onclick="switchLbTab('masuk')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
-                    <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $lemburMasukHI->count() }})
-                </button>
-                <button type="button" class="lb-tab" data-lbtab="pulang" onclick="switchLbTab('pulang')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
-                    <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $lemburPulangHI->count() }})
-                </button>
-            </div>
-            {{-- Tab Lembur Masuk --}}
-            <div class="card-content" id="lbTabMasuk">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+            <div class="card-content">
                 <div class="table-container">
                     <table class="data-table">
-                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
-                        <tbody id="lemburMasukTable" data-paginate="5">
-                            @forelse($lemburMasukHI as $l)
-                            <tr class="clickable-row" data-user-name="{{ $l->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="Lembur Masuk" data-jam="{{ $l->jam ?? '-' }}" data-lokasi="{{ $l->lokasi ?? '' }}" data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}" data-status="{{ $l->status ?? '' }}">
-                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="lemburHariIniTable" data-paginate="5">
+                            @forelse($lemburHariIni as $index => $l)
+                            <tr class="clickable-row"
+                                data-user-name="{{ $l->user->name ?? 'N/A' }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}"
+                                data-jenis="Lembur {{ ucfirst($l->jenis) }}"
+                                data-jam="{{ $l->jam ?? '-' }}"
+                                data-lokasi="{{ $l->lokasi ?? '' }}"
+                                data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}"
+                                data-status="{{ $l->status ?? '' }}">
+                                <td class="text-center text-xs">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $l->user->name ?? 'N/A' }}</td>
+                                <td><span class="badge" style="background:rgba(245,158,11,0.1);color:#d97706;border:1px solid rgba(245,158,11,0.2);">Lembur {{ ucfirst($l->jenis) }}</span></td>
                                 <td class="time-cell">{{ $l->jam ?? '-' }}</td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-bolt-lightning"></i></div><p>Belum ada lembur masuk</p></div></td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {{-- Tab Lembur Pulang --}}
-            <div class="card-content" id="lbTabPulang" style="display:none;">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
-                        <tbody id="lemburPulangTable" data-paginate="5">
-                            @forelse($lemburPulangHI as $l)
-                            <tr class="clickable-row" data-user-name="{{ $l->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="Lembur Pulang" data-jam="{{ $l->jam ?? '-' }}" data-lokasi="{{ $l->lokasi ?? '' }}" data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}" data-status="{{ $l->status ?? '' }}">
-                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
-                                <td class="user-name">{{ $l->user->name ?? 'N/A' }}</td>
-                                <td class="time-cell">{{ $l->jam ?? '-' }}</td>
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    <div class="empty-content">
+                                        <i class="fas fa-moon"></i>
+                                        <p>Tidak ada lembur hari ini</p>
+                                    </div>
+                                </td>
                             </tr>
-                            @empty
-                            <tr><td colspan="3" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-bolt-lightning"></i></div><p>Belum ada lembur pulang</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1200,40 +1123,66 @@
 
 {{-- ========== MODAL PRESENSI PENDING ========== --}}
 <div id="modalPresensiPending" class="modal-overlay">
-    <div class="modal-container modal-wide">
+    <div class="modal-container modal-large">
         <div class="modal-header">
             <h3 class="modal-title">Detail Presensi Pending</h3>
-            <button class="modal-close" onclick="closeModal('modalPresensiPending')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="closeModal('modalPresensiPending')">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div class="modal-3col">
-            <div class="modal-col">
-                <div class="modal-col-label">Peta Lokasi</div>
-                <div class="modal-col-content map-container">
-                    <div id="presensiMap" style="width:100%;height:100%;"></div>
-                    <div id="mapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
-                    <div id="mapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Pegawai</label>
+                    <span id="detailPegawaiPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis</label>
+                    <span id="detailJenisPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jam</label>
+                    <span id="detailJamPresensi">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Lokasi</label>
+                    <span id="detailLokasiPresensi" style="font-size:11px">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Status</label>
+                    <span class="status-badge pending">Pending</span>
                 </div>
             </div>
-            <div class="modal-col">
-                <div class="modal-col-label">Foto</div>
-                <div class="modal-col-content foto-wrapper" id="detailFotoPresensi">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>
+            <div class="media-row">
+                <div class="media-col">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="presensiMap"></div>
+                        <div id="mapLoading" class="map-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat peta...</span>
+                        </div>
+                        <div id="mapError" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Koordinat tidak tersedia</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-col">
+                    <label>Foto</label>
+                    <div class="foto-wrapper" id="detailFotoPresensi">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
                 </div>
             </div>
-            <div class="modal-info-col">
-                <div class="info-grid">
-                    <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPresensi">-</span></div>
-                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalPresensi">-</span></div>
-                    <div class="info-item"><label>Jenis</label><span id="detailJenisPresensi">-</span></div>
-                    <div class="info-item"><label>Jam</label><span id="detailJamPresensi">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi" style="font-size:11px;">-</span></div>
-                    <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
-                </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
-                    <button type="button" class="btn-success" id="modalBtnApprovePresensi" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
-                    <button type="button" class="btn-danger" id="modalBtnRejectPresensi" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')" style="padding:10px 16px;">Tutup</button>
-                </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-success" id="modalBtnApprovePresensi"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="btn-danger" id="modalBtnRejectPresensi"><i class="fas fa-times"></i> Tolak</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">Tutup</button>
             </div>
         </div>
     </div>
@@ -1242,34 +1191,46 @@
 
 {{-- ========== MODAL PENGAJUAN PENDING ========== --}}
 <div id="modalPengajuanPending" class="modal-overlay">
-    <div class="modal-container modal-wide">
+    <div class="modal-container">
         <div class="modal-header">
             <h3 class="modal-title">Detail Pengajuan Pending</h3>
-            <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="closeModal('modalPengajuanPending')">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:340px;">
-            {{-- Left: Bukti --}}
-            <div style="padding:16px 20px; border-right:1px solid var(--gray-200); display:flex; flex-direction:column;">
-                <div style="font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Bukti Pengajuan</div>
-                <div id="detailBuktiPengajuan" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--gray-100); border-radius:10px; overflow:hidden; min-height:260px;">
-                    <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
-                    <span style="font-size:12px; color:var(--gray-400);">Tidak ada bukti</span>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Pegawai</label>
+                    <span id="detailPegawaiPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis</label>
+                    <span id="detailJenisPengajuan">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Status</label>
+                    <span class="status-badge pending">Pending</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Alasan</label>
+                    <span id="detailAlasanPengajuan">-</span>
                 </div>
             </div>
-            {{-- Right: Info --}}
-            <div style="padding:16px 20px; display:flex; flex-direction:column;">
-                <div class="info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-                    <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
-                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
-                    <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
-                    <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
-                    <div class="info-item full" style="grid-column:1/-1;"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
+            <div style="margin-bottom:12px">
+                <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;margin-bottom:6px">Bukti</label>
+                <div id="detailBuktiPengajuan">
+                    <span class="text-muted">Tidak ada bukti</span>
                 </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
-                    <button type="button" class="btn-success" id="modalBtnApprove" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
-                    <button type="button" class="btn-danger" id="modalBtnReject" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')" style="padding:10px 16px;">Tutup</button>
-                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-success" id="modalBtnApprove"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="btn-danger" id="modalBtnReject"><i class="fas fa-times"></i> Tolak</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">Tutup</button>
             </div>
         </div>
     </div>
@@ -1278,39 +1239,70 @@
 
 {{-- ========== MODAL DETAIL PRESENSI HARI INI ========== --}}
 <div id="modalDetailHariIni" class="modal-overlay">
-    <div class="modal-container modal-wide">
+    <div class="modal-container modal-large">
         <div class="modal-header">
             <h3 class="modal-title">Detail Presensi</h3>
-            <button class="modal-close" onclick="closeModal('modalDetailHariIni')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="closeModal('modalDetailHariIni')">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div class="modal-3col">
-            <div class="modal-col">
-                <div class="modal-col-label">Peta Lokasi</div>
-                <div class="modal-col-content map-container">
-                    <div id="hariIniMap" style="width:100%;height:100%;"></div>
-                    <div id="hariIniMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
-                    <div id="hariIniMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Pegawai</label>
+                    <span id="detailNamaHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Tanggal</label>
+                    <span id="detailTanggalHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jenis</label>
+                    <span id="detailJenisHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Jam</label>
+                    <span id="detailJamHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Kehadiran</label>
+                    <span id="detailStatusHariIni">-</span>
+                </div>
+                <div class="detail-item">
+                    <label>Verifikasi</label>
+                    <span id="detailVerifikasiHariIni">-</span>
+                </div>
+                <div class="detail-item full-width">
+                    <label>Lokasi</label>
+                    <span id="detailLokasiHariIni" style="font-size:11px">-</span>
                 </div>
             </div>
-            <div class="modal-col">
-                <div class="modal-col-label">Foto</div>
-                <div class="modal-col-content foto-wrapper" id="detailFotoHariIni">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>
+            <div class="media-row">
+                <div class="media-col">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="hariIniMap"></div>
+                        <div id="hariIniMapLoading" class="map-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat peta...</span>
+                        </div>
+                        <div id="hariIniMapError" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Koordinat tidak tersedia</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-col">
+                    <label>Foto</label>
+                    <div class="foto-wrapper" id="detailFotoHariIni">
+                        <span class="text-muted">Tidak ada foto</span>
+                    </div>
                 </div>
             </div>
-            <div class="modal-info-col">
-                <div class="info-grid">
-                    <div class="info-item"><label>Pegawai</label><span id="detailNamaHariIni">-</span></div>
-                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalHariIni">-</span></div>
-                    <div class="info-item"><label>Jenis</label><span id="detailJenisHariIni">-</span></div>
-                    <div class="info-item"><label>Jam</label><span id="detailJamHariIni">-</span></div>
-                    <div class="info-item"><label>Kehadiran</label><span id="detailStatusHariIni">-</span></div>
-                    <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
-                </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
-                    <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
-                </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
@@ -1318,38 +1310,33 @@
 
 {{-- Modal Detail Lembur --}}
 <div id="modalDetailLembur" class="modal-overlay">
-    <div class="modal-container modal-wide">
+    <div class="modal-container modal-large">
         <div class="modal-header">
             <h3 class="modal-title">Detail Lembur</h3>
             <button class="modal-close" onclick="closeModal('modalDetailLembur')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-3col">
-            <div class="modal-col">
-                <div class="modal-col-label">Peta Lokasi</div>
-                <div class="modal-col-content map-container">
-                    <div id="lemburMap" style="width:100%;height:100%;"></div>
-                    <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
-                    <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
-                </div>
+        <div class="modal-content">
+            <div class="detail-grid">
+                <div class="detail-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
+                <div class="detail-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
+                <div class="detail-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
+                <div class="detail-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
+                <div class="detail-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
+                <div class="detail-item full-width"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px">-</span></div>
             </div>
-            <div class="modal-col">
-                <div class="modal-col-label">Foto</div>
-                <div class="modal-col-content foto-wrapper" id="detailFotoLembur">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>
+            <div class="media-row">
+                <div class="media-col">
+                    <label>Peta Lokasi</label>
+                    <div class="map-container">
+                        <div id="lemburMap"></div>
+                        <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
+                        <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
+                    </div>
                 </div>
+                <div class="media-col"><label>Foto</label><div class="foto-wrapper" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div></div>
             </div>
-            <div class="modal-info-col">
-                <div class="info-grid">
-                    <div class="info-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
-                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
-                    <div class="info-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
-                    <div class="info-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
-                    <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
-                </div>
-                <div style="margin-top:auto; display:flex; gap:8px;">
-                    <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
-                </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')">Tutup</button>
             </div>
         </div>
     </div>
@@ -1371,13 +1358,9 @@
         document.getElementById('adminTabCuti').style.display = tab === 'cuti' ? '' : 'none';
         document.querySelectorAll('.admin-pend-tab').forEach(function(btn) {
             if (btn.dataset.pend === tab) {
-                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)';
-                btn.style.color = '#fff';
-                btn.style.boxShadow = '0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2)';
+                btn.style.background = 'var(--primary)'; btn.style.color = '#fff';
             } else {
-                btn.style.background = 'rgba(255,255,255,0.06)';
-                btn.style.color = 'var(--dm-muted,#64748b)';
-                btn.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.04)';
+                btn.style.background = 'var(--dm-bg,#f1f5f9)'; btn.style.color = 'var(--dm-muted,#64748b)';
             }
         });
     }
@@ -1396,13 +1379,12 @@
         var buktiEl = document.getElementById('cutiModalBukti');
         var buktiUrl = row.dataset.cutiBukti;
         if (buktiUrl && buktiUrl.match(/\.pdf$/i)) {
-            buktiEl.style.background = 'transparent';
-            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
+            buktiEl.innerHTML = '<iframe src="' + buktiUrl + '" style="width:100%;height:360px;border:1px solid var(--dm-border,#e2e8f0);border-radius:10px;" frameborder="0"></iframe>' +
+                '<a href="' + buktiUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:600;color:var(--primary);text-decoration:none;"><i class="fas fa-external-link-alt"></i> Buka di tab baru</a>';
         } else if (buktiUrl) {
-            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<span style=font-size:13px;color:var(--gray-400)>Gagal memuat</span>\'">';
+            buktiEl.innerHTML = '<img src="' + buktiUrl + '" style="width:100%;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);" onerror="this.style.display=\'none\'">';
         } else {
-            buktiEl.style.background = 'var(--gray-100)';
-            buktiEl.innerHTML = '<span style="font-size:13px;color:var(--gray-400);">Tidak ada bukti</span>';
+            buktiEl.innerHTML = '<span style="font-size:12px;color:var(--dm-muted,#94a3b8);">Tidak ada bukti</span>';
         }
 
         var approveUrl = row.dataset.cutiApprove;
@@ -1419,119 +1401,6 @@
         openModal('modalCutiDetail');
     }
 
-    // Tab switch — Presensi Hari Ini (Masuk/Pulang)
-    function switchHiTab(tab) {
-        document.getElementById('hiTabMasuk').style.display = tab === 'masuk' ? '' : 'none';
-        document.getElementById('hiTabPulang').style.display = tab === 'pulang' ? '' : 'none';
-        document.querySelectorAll('.hi-tab').forEach(function(btn) {
-            if (btn.dataset.hitab === tab) {
-                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)'; btn.style.color = '#fff';
-                btn.style.boxShadow = '0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2)';
-            } else {
-                btn.style.background = 'transparent'; btn.style.color = 'var(--dm-muted,#64748b)'; btn.style.boxShadow = 'none';
-            }
-        });
-    }
-
-    // Tab switch — Lembur Hari Ini (Masuk/Pulang)
-    function switchLbTab(tab) {
-        document.getElementById('lbTabMasuk').style.display = tab === 'masuk' ? '' : 'none';
-        document.getElementById('lbTabPulang').style.display = tab === 'pulang' ? '' : 'none';
-        document.querySelectorAll('.lb-tab').forEach(function(btn) {
-            if (btn.dataset.lbtab === tab) {
-                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)'; btn.style.color = '#fff';
-                btn.style.boxShadow = '0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2)';
-            } else {
-                btn.style.background = 'transparent'; btn.style.color = 'var(--dm-muted,#64748b)'; btn.style.boxShadow = 'none';
-            }
-        });
-    }
-
-    // Prevent scroll when clicking search
-    document.querySelectorAll('.card-search input').forEach(function(inp) {
-        inp.addEventListener('focus', function() {
-            var y = window.scrollY;
-            requestAnimationFrame(function() { window.scrollTo(0, y); });
-        });
-    });
-
-    function searchTable(input, tbodyId) {
-        var query = input.value.toLowerCase().trim();
-        var tbody = document.getElementById(tbodyId);
-        if (!tbody) return;
-        var inst = tableInstances[tbodyId];
-        if (!inst) return;
-        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
-
-        // Filter rows by query
-        var filtered = inst.allRows.filter(function(row) {
-            if (row.querySelector('.empty-state')) return false;
-            return row.textContent.toLowerCase().indexOf(query) !== -1;
-        });
-
-        inst.rows = filtered;
-        inst.currentPage = 1;
-        inst._searchQuery = query;
-
-        // Render filtered with pagination
-        renderTable(inst, tbody, perPage);
-    }
-
-    function renderTable(inst, tbody, perPage) {
-        // Hide all original rows first
-        inst.allRows.forEach(function(r) { r.style.display = 'none'; });
-
-        var totalRows = inst.rows.length;
-        var totalPages = Math.max(1, Math.ceil(totalRows / perPage));
-        if (inst.currentPage > totalPages) inst.currentPage = totalPages;
-
-        var start = (inst.currentPage - 1) * perPage;
-        var end = Math.min(start + perPage, totalRows);
-
-        inst.rows.forEach(function(row, i) {
-            row.style.display = (i >= start && i < end) ? '' : 'none';
-            var noCell = row.querySelector('td:first-child');
-            if (noCell) noCell.textContent = i + 1;
-        });
-
-        // Update pagination
-        var pg = inst._paginationDiv;
-        if (!pg) return;
-        if (totalRows <= perPage) { pg.style.display = 'none'; return; }
-        pg.style.display = '';
-        var s = start + 1, e = end;
-        var html = '<span class="pagination-info">' + s + '-' + e + ' dari ' + totalRows + '</span><div class="pagination-buttons">';
-        html += '<button data-page="prev" ' + (inst.currentPage <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
-        var sp = Math.max(1, inst.currentPage - 2);
-        var ep = Math.min(totalPages, sp + 4);
-        if (ep - sp < 4) sp = Math.max(1, ep - 4);
-        for (var p = sp; p <= ep; p++) {
-            html += '<button data-page="' + p + '" class="' + (p === inst.currentPage ? 'active' : '') + '">' + p + '</button>';
-        }
-        html += '<button data-page="next" ' + (inst.currentPage >= totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button></div>';
-        pg.innerHTML = html;
-    }
-
-    function refreshTablePagination(tbodyId) {
-        var tbody = document.getElementById(tbodyId);
-        if (!tbody || !tableInstances[tbodyId]) return;
-        var inst = tableInstances[tbodyId];
-        var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
-
-        // Rebuild allRows from current DOM
-        inst.allRows = Array.from(tbody.querySelectorAll('tr')).filter(function(r) { return !r.querySelector('.empty-state'); });
-        inst.rows = inst.allRows.slice();
-        inst._searchQuery = '';
-
-        if (inst.rows.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-circle-check"></i></div><p>Semua pengajuan telah diproses</p></div></td></tr>';
-            if (inst._paginationDiv) inst._paginationDiv.style.display = 'none';
-            return;
-        }
-
-        renderTable(inst, tbody, perPage);
-    }
-
     function ajaxAction(url, btnEl) {
         fetch(url, {
             method: 'POST',
@@ -1545,14 +1414,10 @@
         .then(function(data) {
             if (data.success) {
                 var row = btnEl ? btnEl.closest('tr') : null;
-                var tbodyId = row ? (row.closest('tbody') ? row.closest('tbody').id : null) : null;
                 if (row) {
                     row.style.transition = 'opacity 0.3s';
                     row.style.opacity = '0';
-                    setTimeout(function() {
-                        row.remove();
-                        if (tbodyId) refreshTablePagination(tbodyId);
-                    }, 300);
+                    setTimeout(function() { row.remove(); }, 300);
                 }
             }
         })
@@ -1608,7 +1473,7 @@
         });
 
         // Klik baris presensi hari ini
-        document.querySelectorAll('#presensiMasukTable .clickable-row, #presensiPulangTable .clickable-row').forEach(function (row) {
+        document.querySelectorAll('#presensiHariIniTable .clickable-row').forEach(function (row) {
             row.addEventListener('click', function () {
                 openHariIniModal({
                     user_name    : this.dataset.userName,
@@ -1624,7 +1489,7 @@
         });
 
         // Klik baris lembur hari ini
-        document.querySelectorAll('#lemburMasukTable .clickable-row, #lemburPulangTable .clickable-row').forEach(function (row) {
+        document.querySelectorAll('#lemburHariIniTable .clickable-row').forEach(function (row) {
             row.addEventListener('click', function () {
                 openLemburModal({
                     user_name : this.dataset.userName,
@@ -1669,7 +1534,7 @@
         var fotoEl = document.getElementById('detailFotoPresensi');
         fotoEl.innerHTML = data.foto_url
             ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
-            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+            : '<span class="text-muted">Tidak ada foto</span>';
 
         // Wire modal buttons
         document.getElementById('modalBtnApprovePresensi').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPresensiPending'); };
@@ -1704,16 +1569,9 @@
         document.getElementById('detailAlasanPengajuan').textContent   = data.alasan   || 'Tidak ada alasan';
 
         var buktiEl = document.getElementById('detailBuktiPengajuan');
-        if (data.bukti_url && data.bukti_url.match(/\.pdf$/i)) {
-            buktiEl.style.background = 'transparent';
-            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '" style="width:100%;height:100%;border:none;border-radius:8px;" frameborder="0"></iframe>';
-        } else if (data.bukti_url) {
-            buktiEl.style.background = 'var(--gray-100)';
-            buktiEl.innerHTML = '<img src="' + data.bukti_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML=\'<div style=width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px><i class=fas&nbsp;fa-image style=font-size:18px;color:var(--gray-400)></i></div><span style=font-size:12px;color:var(--gray-400)>Gagal memuat</span>\'">';
-        } else {
-            buktiEl.style.background = 'var(--gray-100)';
-            buktiEl.innerHTML = '<div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>';
-        }
+        buktiEl.innerHTML = data.bukti_url
+            ? '<a href="' + data.bukti_url + '" target="_blank"><img src="' + data.bukti_url + '" class="bukti-image" onerror="this.style.display=\'none\'"></a>'
+            : '<span class="text-muted">Tidak ada bukti</span>';
 
         document.getElementById('modalBtnApprove').onclick = function() { ajaxAction(data.approve_url, null); closeModal('modalPengajuanPending'); };
         document.getElementById('modalBtnReject').onclick = function() { ajaxAction(data.reject_url, null); closeModal('modalPengajuanPending'); };
@@ -1747,7 +1605,7 @@
         var fotoEl = document.getElementById('detailFotoHariIni');
         fotoEl.innerHTML = data.foto_url
             ? '<img src="' + data.foto_url + '" alt="Foto Presensi" class="foto-image" onerror="this.style.display=\'none\'">'
-            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+            : '<span class="text-muted">Tidak ada foto</span>';
 
         // Koordinat
         var lat = NaN, lng = NaN;
@@ -1780,7 +1638,7 @@
         var fotoEl = document.getElementById('detailFotoLembur');
         fotoEl.innerHTML = data.foto_url
             ? '<img src="' + data.foto_url + '" alt="Foto" class="foto-image" onerror="this.style.display=\'none\'">'
-            : '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-camera" style="font-size:18px;color:var(--gray-400);"></i></div><span style="font-size:12px;color:var(--gray-400);">Tidak ada foto</span></div>';
+            : '<span class="text-muted">Tidak ada foto</span>';
 
         var lat = NaN, lng = NaN;
         if (data.lokasi) {
@@ -1907,21 +1765,61 @@
         if (!tbody) return;
 
         var perPage = parseInt(tbody.getAttribute('data-paginate')) || 5;
-        var allRows = Array.from(tbody.querySelectorAll('tr'));
-        if (allRows.length === 0 || (allRows.length === 1 && allRows[0].querySelector('.empty-state'))) return;
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+        if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('.empty-state'))) return;
 
         var table = tbody.closest('table');
         var container = table.parentElement;
+        var currentPage = 1;
 
         var paginationDiv = document.createElement('div');
         paginationDiv.className = 'table-pagination';
         container.appendChild(paginationDiv);
 
-        var instance = { allRows: allRows, rows: allRows.slice(), currentPage: 1, _paginationDiv: paginationDiv, _searchQuery: '' };
+        var instance = { rows: rows, currentPage: 1 };
         tableInstances[tbodyId] = instance;
 
         function render() {
-            renderTable(instance, tbody, perPage);
+            var totalRows = instance.rows.length;
+            var totalPages = Math.ceil(totalRows / perPage);
+            if (instance.currentPage > totalPages) instance.currentPage = 1;
+
+            instance.rows.forEach(function(row, i) {
+                var start = (instance.currentPage - 1) * perPage;
+                var end = start + perPage;
+                row.style.display = (i >= start && i < end) ? '' : 'none';
+            });
+
+            // Update nomor urut
+            instance.rows.forEach(function(row, i) {
+                var noCell = row.querySelector('td:first-child');
+                if (noCell) noCell.textContent = i + 1;
+            });
+
+            if (totalRows <= perPage) {
+                paginationDiv.style.display = 'none';
+                return;
+            }
+            paginationDiv.style.display = '';
+
+            var start = (instance.currentPage - 1) * perPage + 1;
+            var end = Math.min(instance.currentPage * perPage, totalRows);
+
+            var html = '<span class="pagination-info">' + start + '-' + end + ' dari ' + totalRows + '</span>';
+            html += '<div class="pagination-buttons">';
+            html += '<button data-page="prev" ' + (instance.currentPage === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+
+            var sp = Math.max(1, instance.currentPage - 2);
+            var ep = Math.min(totalPages, sp + 4);
+            if (ep - sp < 4) sp = Math.max(1, ep - 4);
+
+            for (var p = sp; p <= ep; p++) {
+                html += '<button data-page="' + p + '" class="' + (p === instance.currentPage ? 'active' : '') + '">' + p + '</button>';
+            }
+
+            html += '<button data-page="next" ' + (instance.currentPage === totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+            html += '</div>';
+            paginationDiv.innerHTML = html;
         }
 
         paginationDiv.addEventListener('click', function(e) {
@@ -1966,17 +1864,9 @@
                 }
                 return dir === 'asc' ? aVal.localeCompare(bVal, 'id') : bVal.localeCompare(aVal, 'id');
             });
-            instance.allRows = instance.rows.slice();
             instance.rows.forEach(function(row) { tbody.appendChild(row); });
             instance.currentPage = 1;
             render();
-            // Re-apply search if active
-            if (instance._searchQuery) {
-                var q = instance._searchQuery;
-                instance.rows = instance.allRows.filter(function(r) { return r.textContent.toLowerCase().indexOf(q) !== -1; });
-                instance.currentPage = 1;
-                render();
-            }
 
             if (save) {
                 localStorage.setItem('sort_' + tbodyId, JSON.stringify({ col: colIndex, dir: dir, type: sortType }));
@@ -2006,11 +1896,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         initTable('presensiPendingTable');
         initTable('pengajuanPendingTable');
-        initTable('cutiPendingTable');
-        initTable('presensiMasukTable');
-        initTable('presensiPulangTable');
-        initTable('lemburMasukTable');
-        initTable('lemburPulangTable');
+        initTable('presensiHariIniTable');
+        initTable('lemburHariIniTable');
 
         // AJAX approve/reject — no page reload
         document.querySelectorAll('.inline-form').forEach(function(form) {
@@ -2082,7 +1969,7 @@
     });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var ctx = document.getElementById('attendanceChart');
