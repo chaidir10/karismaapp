@@ -17,9 +17,13 @@ class PengajuanController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $cutiList = Cuti::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $cutiList = Cuti::where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            $cutiList = collect();
+        }
 
         return view('pegawai.pengajuan', compact('pengajuan', 'cutiList'));
     }

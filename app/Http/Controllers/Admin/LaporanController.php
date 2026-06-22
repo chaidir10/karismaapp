@@ -42,11 +42,15 @@ class LaporanController extends Controller
             $presensiLembur  = $allPresensi->where('is_lembur', true)->groupBy('tanggal');
 
             // Cuti/DL approved untuk user ini di bulan ini
-            $cutiList = Cuti::where('user_id', $user->id)
-                ->where('status', 'approved')
-                ->where('tanggal_mulai', '<=', $endDate)
-                ->where('tanggal_selesai', '>=', $startDate)
-                ->get();
+            try {
+                $cutiList = Cuti::where('user_id', $user->id)
+                    ->where('status', 'approved')
+                    ->where('tanggal_mulai', '<=', $endDate)
+                    ->where('tanggal_selesai', '>=', $startDate)
+                    ->get();
+            } catch (\Exception $e) {
+                $cutiList = collect();
+            }
             $cutiDates = [];
             foreach ($cutiList as $c) {
                 $cStart = $c->tanggal_mulai->max($startDate);

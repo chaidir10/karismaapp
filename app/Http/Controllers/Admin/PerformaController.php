@@ -85,11 +85,15 @@ class PerformaController extends Controller
                 ->groupBy('tanggal');
 
             // Cuti/DL dates for this user
-            $userCuti = Cuti::where('user_id', $user->id)
-                ->where('status', 'approved')
-                ->where('tanggal_mulai', '<=', $endDate)
-                ->where('tanggal_selesai', '>=', $startDate)
-                ->get();
+            try {
+                $userCuti = Cuti::where('user_id', $user->id)
+                    ->where('status', 'approved')
+                    ->where('tanggal_mulai', '<=', $endDate)
+                    ->where('tanggal_selesai', '>=', $startDate)
+                    ->get();
+            } catch (\Exception $e) {
+                $userCuti = collect();
+            }
             $cutiDates = [];
             foreach ($userCuti as $c) {
                 $cS = $c->tanggal_mulai->max($startDate);

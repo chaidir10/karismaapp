@@ -84,10 +84,14 @@ class DashboardAdminController extends Controller
             ->get();
 
         // Cuti/DL pending
-        $cutiPending = Cuti::with('user')
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'asc')
-            ->get();
+        try {
+            $cutiPending = Cuti::with('user')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'asc')
+                ->get();
+        } catch (\Exception $e) {
+            $cutiPending = collect();
+        }
 
         // Jika request AJAX, return JSON response untuk auto-refresh
         if (request()->ajax()) {
