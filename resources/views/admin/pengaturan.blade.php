@@ -63,6 +63,18 @@
                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                         </div>
                     </label>
+                <div class="pt-4" style="border-top:1px solid var(--dm-border,#e2e8f0);">
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <div>
+                            <div class="font-medium text-sm" style="color:var(--dm-text,#1e293b);">Aktifkan Absen Darurat</div>
+                            <div class="text-xs mt-1" style="color:var(--dm-muted,#64748b);">Halaman absen alternatif tanpa cache dan face detection. Aktifkan jika sistem utama mengalami gangguan.</div>
+                        </div>
+                        <div class="relative ml-4 flex-shrink-0">
+                            <input type="checkbox" name="enable_absen_darurat" value="1" class="sr-only peer" {{ ($settings['enable_absen_darurat'] ?? '0') === '1' ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                        </div>
+                    </label>
+                </div>
                 </div>
             </div>
         </div>

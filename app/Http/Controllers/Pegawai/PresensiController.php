@@ -17,6 +17,10 @@ class PresensiController extends Controller
 {
     public function darurat()
     {
+        if (!\App\Models\AppSetting::getBool('enable_absen_darurat', false)) {
+            return redirect()->route('pegawai.dashboard')->with('error', 'Absen darurat tidak aktif.');
+        }
+
         $user = Auth::user();
         $wilayahList = $user->wilayahKerjaList;
         if ($wilayahList->isEmpty() && $user->wilayahKerja) {

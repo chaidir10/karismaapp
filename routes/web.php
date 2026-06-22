@@ -214,6 +214,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             \App\Models\AppSetting::setValue('disable_presensi_hari_libur', $request->boolean('disable_presensi_hari_libur') ? '1' : '0');
             \App\Models\AppSetting::setValue('enable_face_detection', $request->boolean('enable_face_detection') ? '1' : '0');
             \App\Models\AppSetting::setValue('require_masuk_before_pulang', $request->boolean('require_masuk_before_pulang') ? '1' : '0');
+            \App\Models\AppSetting::setValue('enable_absen_darurat', $request->boolean('enable_absen_darurat') ? '1' : '0');
             return redirect()->route('admin.pengaturan.index')->with('success', 'Pengaturan berhasil disimpan');
         })->name('pengaturan.update');
     });
