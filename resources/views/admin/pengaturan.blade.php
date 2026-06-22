@@ -202,26 +202,12 @@
     var currentTarget = '';
     var currentMode = '';
     var tempSelected = [];
-    // Store selections per key: face_except, face_only, darurat_except, darurat_only
-    var savedSelections = {};
-
-    function initSavedSelections() {
-        ['face','darurat'].forEach(function(t) {
-            ['except','only'].forEach(function(m) {
-                var container = document.getElementById(t === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs');
-                var key = t + '_' + m;
-                savedSelections[key] = Array.from(container.querySelectorAll('input[data-mode="' + m + '"]')).map(function(i) { return parseInt(i.value); });
-            });
-        });
-    }
-    initSavedSelections();
-
     function openUserModal(target) {
         currentTarget = target;
         var modeEl = document.getElementById(target === 'face' ? 'faceDetectMode' : 'daruratMode');
         currentMode = modeEl.value;
-        var key = target + '_' + currentMode;
-        tempSelected = (savedSelections[key] || []).slice();
+        var container = document.getElementById(target === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs');
+        tempSelected = Array.from(container.querySelectorAll('input')).map(function(i) { return parseInt(i.value); });
 
         var modeLabel = currentMode === 'except' ? 'Kecuali' : 'Hanya Untuk';
         var targetLabel = target === 'face' ? 'Face Detection' : 'Absen Darurat';
