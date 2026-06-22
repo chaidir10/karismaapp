@@ -56,6 +56,7 @@ class LaporanController extends Controller
                 $cStart = $c->tanggal_mulai->max($startDate);
                 $cEnd = $c->tanggal_selesai->min($endDate);
                 for ($d = $cStart->copy(); $d->lte($cEnd); $d->addDay()) {
+                    if ($d->dayOfWeek == 0 || $d->dayOfWeek == 6 || isset($holidays[$d->format('Y-m-d')])) continue;
                     $cutiDates[$d->format('Y-m-d')] = $c->label;
                 }
             }

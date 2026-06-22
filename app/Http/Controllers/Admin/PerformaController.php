@@ -99,6 +99,7 @@ class PerformaController extends Controller
                 $cS = $c->tanggal_mulai->max($startDate);
                 $cE = $c->tanggal_selesai->min($endDate);
                 for ($cd = $cS->copy(); $cd->lte($cE); $cd->addDay()) {
+                    if ($cd->dayOfWeek == 0 || $cd->dayOfWeek == 6 || in_array($cd->format('Y-m-d'), $holidays)) continue;
                     $cutiDates[] = $cd->format('Y-m-d');
                 }
             }

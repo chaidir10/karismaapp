@@ -41,7 +41,14 @@ class Cuti extends Model
 
     public function getJumlahHariAttribute()
     {
-        return $this->tanggal_mulai->diffInDays($this->tanggal_selesai) + 1;
+        $holidays = \App\Helpers\HolidayHelper::getDates($this->tanggal_mulai->year);
+        $count = 0;
+        for ($d = $this->tanggal_mulai->copy(); $d->lte($this->tanggal_selesai); $d->addDay()) {
+            if ($d->dayOfWeek == 0 || $d->dayOfWeek == 6) continue;
+            if (in_array($d->format('Y-m-d'), $holidays)) continue;
+            $count++;
+        }
+        return $count;
     }
 
     public function getLabelAttribute()
