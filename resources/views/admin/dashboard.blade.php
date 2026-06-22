@@ -1265,14 +1265,11 @@
             <h3 class="modal-title">Detail Pengajuan Pending</h3>
             <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; min-height:420px;">
-            <div class="modal-col">
-                <div class="modal-col-label">Bukti Pengajuan</div>
-                <div class="modal-col-content" id="detailBuktiPengajuan" style="position:relative;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                        <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
-                        <span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>
-                    </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; height:420px;">
+            <div style="position:relative; overflow:hidden; background:var(--gray-100); display:flex; align-items:center; justify-content:center;" id="detailBuktiPengajuan">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                    <div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center;"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400);"></i></div>
+                    <span style="font-size:12px;color:var(--gray-400);">Tidak ada bukti</span>
                 </div>
             </div>
             <div class="modal-info-col">
@@ -1728,19 +1725,20 @@
 
         var buktiEl = document.getElementById('detailBuktiPengajuan');
         var emptyBukti = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:48px;height:48px;border-radius:14px;background:var(--gray-200);display:flex;align-items:center;justify-content:center"><i class="fas fa-image" style="font-size:18px;color:var(--gray-400)"></i></div><span style="font-size:12px;color:var(--gray-400)">Tidak ada bukti</span></div>';
+        var baseStyle = 'position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;';
         if (data.bukti_url && data.bukti_url.match(/\.pdf$/i)) {
-            buktiEl.style.cssText = 'flex:1;display:flex;border-radius:10px;overflow:hidden;background:#fff;position:relative;';
-            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#toolbar=0&navpanes=0&view=FitH" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>';
+            buktiEl.style.cssText = baseStyle + 'background:#fff;';
+            buktiEl.innerHTML = '<iframe src="' + data.bukti_url + '#toolbar=0&navpanes=0&view=FitH" style="position:absolute;inset:0;width:100%;height:100%;border:none;" frameborder="0"></iframe>';
         } else if (data.bukti_url) {
-            buktiEl.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;position:relative;';
+            buktiEl.style.cssText = baseStyle + 'background:#000;';
             var img = document.createElement('img');
             img.src = data.bukti_url;
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;';
-            img.onerror = function() { buktiEl.innerHTML = emptyBukti; buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;'; };
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;position:absolute;inset:0;';
+            img.onerror = function() { buktiEl.innerHTML = emptyBukti; buktiEl.style.cssText = baseStyle + 'background:var(--gray-100);'; };
             buktiEl.innerHTML = '';
             buktiEl.appendChild(img);
         } else {
-            buktiEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-100);border-radius:10px;overflow:hidden;';
+            buktiEl.style.cssText = baseStyle + 'background:var(--gray-100);flex-direction:column;';
             buktiEl.innerHTML = emptyBukti;
         }
 
