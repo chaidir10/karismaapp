@@ -648,7 +648,7 @@
     .foto-wrapper .foto-image {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
         display: block;
         border: none;
         border-radius: 0;
