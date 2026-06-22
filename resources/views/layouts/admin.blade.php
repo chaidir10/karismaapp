@@ -107,9 +107,9 @@
         .btn-primary:active, .btn-submit:active { transform:scale(0.96); }
         .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
         [data-theme="dark"] .btn-primary, [data-theme="dark"] .btn-submit {
-            background:rgba(90,182,234,0.25); color:#93c5fd; border-width:1.5px; border-color:rgba(90,182,234,0.6);
+            background:rgba(90,182,234,0.08); color:#93c5fd; border-width:1.5px; border-color:#5AB6EA;
         }
-        [data-theme="dark"] .btn-primary:hover, [data-theme="dark"] .btn-submit:hover { background:rgba(90,182,234,0.35); }
+        [data-theme="dark"] .btn-primary:hover, [data-theme="dark"] .btn-submit:hover { background:rgba(90,182,234,0.2); }
 
         .btn-success {
             padding:6px 12px; border-radius:8px;
@@ -120,8 +120,8 @@
         }
         .btn-success:hover { background:#059669; border-color:#059669; }
         .btn-success:active { transform:scale(0.95); }
-        [data-theme="dark"] .btn-success { background:rgba(16,185,129,0.25); color:#6ee7b7; border-width:1.5px; border-color:rgba(16,185,129,0.6); }
-        [data-theme="dark"] .btn-success:hover { background:rgba(16,185,129,0.35); }
+        [data-theme="dark"] .btn-success { background:rgba(16,185,129,0.08); color:#6ee7b7; border-width:1.5px; border-color:#34d399; }
+        [data-theme="dark"] .btn-success:hover { background:rgba(16,185,129,0.2); }
 
         .btn-danger {
             padding:6px 12px; border-radius:8px;
@@ -132,8 +132,8 @@
         }
         .btn-danger:hover { background:#dc2626; border-color:#dc2626; }
         .btn-danger:active { transform:scale(0.95); }
-        [data-theme="dark"] .btn-danger { background:rgba(239,68,68,0.25); color:#fca5a5; border-width:1.5px; border-color:rgba(239,68,68,0.6); }
-        [data-theme="dark"] .btn-danger:hover { background:rgba(239,68,68,0.35); }
+        [data-theme="dark"] .btn-danger { background:rgba(239,68,68,0.08); color:#fca5a5; border-width:1.5px; border-color:#f87171; }
+        [data-theme="dark"] .btn-danger:hover { background:rgba(239,68,68,0.2); }
 
         .btn-warning {
             padding:6px 12px; border-radius:8px;
@@ -143,8 +143,8 @@
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
         .btn-warning:hover { background:#d97706; border-color:#d97706; }
-        [data-theme="dark"] .btn-warning { background:rgba(245,158,11,0.25); color:#fde68a; border-width:1.5px; border-color:rgba(245,158,11,0.6); }
-        [data-theme="dark"] .btn-warning:hover { background:rgba(245,158,11,0.35); }
+        [data-theme="dark"] .btn-warning { background:rgba(245,158,11,0.08); color:#fde68a; border-width:1.5px; border-color:#fbbf24; }
+        [data-theme="dark"] .btn-warning:hover { background:rgba(245,158,11,0.2); }
 
         .btn-secondary {
             padding:8px 18px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px;
@@ -155,8 +155,8 @@
         }
         .btn-secondary:hover { background:var(--dm-bg,#f1f5f9); }
         .btn-secondary:active { transform:scale(0.96); }
-        [data-theme="dark"] .btn-secondary { background:rgba(255,255,255,0.08); color:#e2e8f0; border-width:1.5px; border-color:rgba(255,255,255,0.25); }
-        [data-theme="dark"] .btn-secondary:hover { background:rgba(255,255,255,0.14); }
+        [data-theme="dark"] .btn-secondary { background:rgba(255,255,255,0.04); color:#e2e8f0; border-width:1.5px; border-color:rgba(255,255,255,0.25); }
+        [data-theme="dark"] .btn-secondary:hover { background:rgba(255,255,255,0.08); }
 
         /* Global Badges */
         .badge {
@@ -222,9 +222,9 @@
         [data-theme="dark"] .page-header-glass h1 { color:var(--dm-text); }
         [data-theme="dark"] .page-header-glass p { color:var(--dm-muted); }
         [data-theme="dark"] .page-header-glass .btn-header {
-            background:rgba(90,182,234,0.2); color:#93c5fd; border-color:rgba(90,182,234,0.35);
+            background:rgba(90,182,234,0.1); color:#93c5fd; border-color:rgba(90,182,234,0.5);
         }
-        [data-theme="dark"] .page-header-glass .btn-header:hover { background:rgba(90,182,234,0.3); }
+        [data-theme="dark"] .page-header-glass .btn-header:hover { background:rgba(90,182,234,0.18); }
 
         /* Table icon action buttons */
         .btn-detail, .btn-edit, .btn-delete {
