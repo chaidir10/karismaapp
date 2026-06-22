@@ -417,10 +417,21 @@
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(4px);
         z-index: 9999;
         align-items: center;
         justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    .modal-overlay.show { opacity: 1; }
+    .modal-overlay .modal-container {
+        transform: translateY(12px);
+        opacity: 0;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .modal-overlay.show .modal-container {
+        transform: translateY(0);
+        opacity: 1;
     }
 
     .modal-container {
@@ -1815,8 +1826,9 @@
         var modal = document.getElementById(id);
         if (!modal) return;
 
-        modal.style.display    = 'flex';
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        requestAnimationFrame(function() { modal.classList.add('show'); });
 
         if (id === 'modalPresensiPending') renderMap('presensiMap', 'mapLoading', 'mapError', pendingCoords, 'pending');
         if (id === 'modalDetailHariIni')   renderMap('hariIniMap', 'hariIniMapLoading', 'hariIniMapError', hariIniCoords, 'hariIni');
@@ -1827,8 +1839,11 @@
         var modal = document.getElementById(id);
         if (!modal) return;
 
-        modal.style.display          = 'none';
-        document.body.style.overflow = 'auto';
+        modal.classList.remove('show');
+        setTimeout(function() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 200);
 
         if (id === 'modalPresensiPending') destroyMap('pending');
         if (id === 'modalDetailHariIni')   destroyMap('hariIni');
