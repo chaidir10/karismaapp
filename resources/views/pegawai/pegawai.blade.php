@@ -142,70 +142,70 @@
 <div id="employeeDetailModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
     <div style="display:flex; flex-direction:column; height:100%;">
         <!-- Header -->
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div id="modalEmployeeAvatarContainer" style="width:36px; height:36px; border-radius:50%; overflow:hidden; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;"></div>
-                <div>
-                    <div id="modalEmployeeName" style="font-size:14px; font-weight:700; color:var(--dark);">-</div>
-                    <div id="modalEmployeePosition" style="font-size:11px; color:var(--gray);">-</div>
-                </div>
-            </div>
-            <button onclick="closeEmployeeModal()" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
-                <i class="fas fa-xmark"></i>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeEmployeeModal()" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
+                <i class="fas fa-chevron-left"></i> Kembali
             </button>
+            <span style="font-size:15px; font-weight:700; color:var(--dark);">Detail Pegawai</span>
+            <div style="width:70px;"></div>
         </div>
         <!-- Body -->
         <div style="flex:1; overflow-y:auto; padding:16px;">
-            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
-                <div class="detail-grid">
-                    <div>
-                        <div class="detail-label">Unit Kerja</div>
-                        <div class="detail-value" id="modalEmployeeDepartment">-</div>
+            <!-- Profile Card -->
+            <div style="text-align:center; margin-bottom:16px;">
+                <div id="modalEmployeeAvatarContainer" style="width:72px; height:72px; border-radius:50%; overflow:hidden; margin:0 auto 12px; border:3px solid var(--primary); background:var(--primary-soft); display:flex; align-items:center; justify-content:center;"></div>
+                <div id="modalEmployeeName" style="font-size:18px; font-weight:700; color:var(--dark); margin-bottom:4px;">-</div>
+                <div id="modalEmployeePosition" style="font-size:12px; color:var(--gray); margin-bottom:8px;">-</div>
+                <span id="modalEmployeeDeptBadge" style="display:inline-block; padding:4px 14px; border-radius:8px; font-size:11px; font-weight:600; background:var(--primary-soft); color:var(--primary-dark);">-</span>
+            </div>
+
+            <!-- Info Cards -->
+            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border); margin-bottom:16px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                        <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">NIP</div>
+                        <div style="font-size:13px; font-weight:600; color:var(--dark);" id="modalEmployeeNip">-</div>
                     </div>
-                    <div>
-                        <div class="detail-label">Status</div>
-                        <div class="detail-value" id="modalEmployeeStatus">-</div>
-                    </div>
-                    <div>
-                        <div class="detail-label">NIP</div>
-                        <div class="detail-value" id="modalEmployeeNip">-</div>
-                    </div>
-                    <div>
-                        <div class="detail-label">No. Telepon</div>
-                        <div class="detail-value" style="display:flex; align-items:center; justify-content:space-between;">
-                            <span id="modalEmployeePhone">-</span>
-                            <a href="#" id="whatsappLink" target="_blank" style="text-decoration:none;">
-                                <i class="fab fa-whatsapp" style="color:#25D366; font-size:18px;"></i>
-                            </a>
+                    <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                        <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Status</div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+                            <span style="font-size:13px; font-weight:600; color:var(--dark);" id="modalEmployeeStatus">Aktif</span>
                         </div>
                     </div>
-                    <div class="full">
-                        <div class="detail-label">Email</div>
-                        <div class="detail-value" id="modalEmployeeEmail">-</div>
+                </div>
+
+                <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border); margin-top:10px;">
+                    <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">No. Telepon</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-size:13px; font-weight:600; color:var(--dark);" id="modalEmployeePhone">-</span>
+                        <a href="#" id="whatsappLink" target="_blank" style="text-decoration:none; width:32px; height:32px; border-radius:8px; background:#dcfce7; display:flex; align-items:center; justify-content:center;">
+                            <i class="fab fa-whatsapp" style="color:#25D366; font-size:16px;"></i>
+                        </a>
                     </div>
-                    <div class="full">
-                        <div class="detail-label">Alamat</div>
-                        <div class="detail-value" id="modalEmployeeAddress">-</div>
-                    </div>
+                </div>
+
+                <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border); margin-top:10px;">
+                    <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Email</div>
+                    <div style="font-size:13px; font-weight:600; color:var(--dark);" id="modalEmployeeEmail">-</div>
+                </div>
+
+                <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border); margin-top:10px;">
+                    <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Alamat</div>
+                    <div style="font-size:12px; color:var(--dark); line-height:1.4;" id="modalEmployeeAddress">-</div>
                 </div>
             </div>
 
             <!-- Riwayat Presensi Hari Ini -->
             @if(!empty($riwayatHariIni))
-            <div id="modalRiwayatSection" style="margin-top:16px; display:none;">
-                <div style="font-size:12px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Presensi Hari Ini</div>
+            <div id="modalRiwayatSection" style="display:none;">
+                <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:8px;">Presensi Hari Ini</div>
                 <div id="modalRiwayatList"></div>
                 <div id="modalRiwayatEmpty" style="text-align:center; padding:20px; color:var(--gray); font-size:12px; display:none;">
                     Belum ada presensi hari ini
                 </div>
             </div>
             @endif
-        </div>
-        <!-- Footer -->
-        <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
-            <button onclick="closeEmployeeModal()" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
-            </button>
         </div>
     </div>
 </div>
@@ -266,12 +266,12 @@
                 if (avatar && avatar.trim()) {
                     avatarBox.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
                 } else {
-                    avatarBox.innerHTML = '<div class="e-avatar-placeholder" style="width:100%;height:100%;font-size:14px;">' + initials(name) + '</div>';
+                    avatarBox.innerHTML = '<div class="e-avatar-placeholder" style="width:100%;height:100%;font-size:22px;">' + initials(name) + '</div>';
                 }
 
                 document.getElementById('modalEmployeeName').textContent = name;
                 document.getElementById('modalEmployeePosition').textContent = position;
-                document.getElementById('modalEmployeeDepartment').textContent = this.dataset.employeeDept;
+                document.getElementById('modalEmployeeDeptBadge').textContent = this.dataset.employeeDept;
                 document.getElementById('modalEmployeeStatus').textContent = this.dataset.employeeStatus;
                 document.getElementById('modalEmployeeNip').textContent = this.dataset.employeeNip || '-';
                 document.getElementById('modalEmployeeEmail').textContent = this.dataset.employeeEmail || '-';

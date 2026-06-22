@@ -174,7 +174,7 @@
                     $label = 'Lembur ' . ($isMasuk ? 'Masuk' : 'Pulang');
                 @endphp
                 <div class="presensi-card" onclick="document.getElementById('detailModal{{ $p->id }}').style.display='block'" style="cursor:pointer;">
-                    <div class="card-icon" style="background:rgba(139,92,246,0.1); color:#7c3aed;"><i class="fas fa-bolt"></i></div>
+                    <div class="card-icon {{ $isMasuk ? 'icon-lembur-masuk' : 'icon-lembur-pulang' }}"><i class="fas fa-bolt"></i></div>
                     <div class="card-body">
                         <div class="card-title">{{ $label }}</div>
                         <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
@@ -245,7 +245,7 @@
                 <!-- Info Card -->
                 <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-                        <div style="width:44px; height:44px; border-radius:12px; background:{{ $dIsLembur ? 'rgba(139,92,246,0.1)' : $dIconBg }}; display:flex; align-items:center; justify-content:center; color:{{ $dIsLembur ? '#7c3aed' : $dIconColor }}; font-size:18px; flex-shrink:0;">
+                        <div style="width:44px; height:44px; border-radius:12px; background:{{ $dIconBg }}; display:flex; align-items:center; justify-content:center; color:{{ $dIconColor }}; font-size:18px; flex-shrink:0;">
                             <i class="fas {{ $dIconName }}"></i>
                         </div>
                         <div style="flex:1;">
