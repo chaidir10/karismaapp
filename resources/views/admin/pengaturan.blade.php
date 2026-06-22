@@ -157,6 +157,11 @@
         </div>
     </div>
 </div>
+@push('styles')
+<style>
+    .sr-only { position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; border:0 !important; padding:0 !important; margin:-1px !important; top:auto !important; left:auto !important; }
+</style>
+@endpush
 @push('scripts')
 <script>
     // Scroll persistence — save continuously, restore on load
@@ -187,6 +192,15 @@
         requestAnimationFrame(function() { setScroll(pos); });
         setTimeout(function() { setScroll(pos); }, 100);
     }
+
+    // Prevent sr-only inputs from scrolling page on focus
+    document.querySelectorAll('.sr-only').forEach(function(el) {
+        el.addEventListener('focus', function(e) {
+            e.preventDefault();
+            var pos = getScroll();
+            requestAnimationFrame(function() { setScroll(pos); });
+        });
+    });
 
     function keepScroll(fn) {
         var pos = getScroll();
