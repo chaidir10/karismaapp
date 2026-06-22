@@ -860,7 +860,7 @@
                 <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'prPendMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Tanggal</th><th class="text-center">Aksi</th></tr></thead>
+                        <thead><tr><th class="text-center">No</th><th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th><th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th><th class="text-center">Aksi</th></tr></thead>
                         <tbody id="prPendMasukTable" data-paginate="5">
                             @forelse($prPendMasuk as $p)
                             <tr class="clickable-row" data-user-name="{{ $p->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="{{ $p->jenis ?? '' }}" data-jam="{{ $p->jam ?? '-' }}" data-lokasi="{{ $p->lokasi ?? '' }}" data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}" data-approve-url="/admin/presensi/{{ $p->id }}/approve" data-reject-url="/admin/presensi/{{ $p->id }}/reject">
@@ -886,7 +886,7 @@
                 <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'prPendPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Tanggal</th><th class="text-center">Aksi</th></tr></thead>
+                        <thead><tr><th class="text-center">No</th><th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th><th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th><th class="text-center">Aksi</th></tr></thead>
                         <tbody id="prPendPulangTable" data-paginate="5">
                             @forelse($prPendPulang as $p)
                             <tr class="clickable-row" data-user-name="{{ $p->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="{{ $p->jenis ?? '' }}" data-jam="{{ $p->jam ?? '-' }}" data-lokasi="{{ $p->lokasi ?? '' }}" data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}" data-approve-url="/admin/presensi/{{ $p->id }}/approve" data-reject-url="/admin/presensi/{{ $p->id }}/reject">
@@ -1082,9 +1082,9 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th data-sort="text">Nama Pegawai</th>
-                                <th data-sort="text">Jam</th>
-                                <th data-sort="text">Status</th>
+                                <th data-sort="text">Nama Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Status <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
                         <tbody id="presensiMasukTable" data-paginate="5">
@@ -1126,9 +1126,9 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th data-sort="text">Nama Pegawai</th>
-                                <th data-sort="text">Jam</th>
-                                <th data-sort="text">Status</th>
+                                <th data-sort="text">Nama Pegawai <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th>
+                                <th data-sort="text">Status <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
                         <tbody id="presensiPulangTable" data-paginate="5">
@@ -1187,7 +1187,7 @@
                 <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
+                        <thead><tr><th class="text-center">No</th><th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th><th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th></tr></thead>
                         <tbody id="lemburMasukTable" data-paginate="5">
                             @forelse($lemburMasukHI as $l)
                             <tr class="clickable-row" data-user-name="{{ $l->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="Lembur Masuk" data-jam="{{ $l->jam ?? '-' }}" data-lokasi="{{ $l->lokasi ?? '' }}" data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}" data-status="{{ $l->status ?? '' }}">
@@ -1207,7 +1207,7 @@
                 <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'lemburPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Jam</th></tr></thead>
+                        <thead><tr><th class="text-center">No</th><th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th><th data-sort="text">Jam <i class="fas fa-sort sort-icon"></i></th></tr></thead>
                         <tbody id="lemburPulangTable" data-paginate="5">
                             @forelse($lemburPulangHI as $l)
                             <tr class="clickable-row" data-user-name="{{ $l->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($l->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="Lembur Pulang" data-jam="{{ $l->jam ?? '-' }}" data-lokasi="{{ $l->lokasi ?? '' }}" data-foto-url="{{ $l->foto ? asset('public/storage/' . $l->foto) : '' }}" data-status="{{ $l->status ?? '' }}">
