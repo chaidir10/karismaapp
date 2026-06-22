@@ -12,7 +12,7 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
         .camera-area { flex:1; position:relative; overflow:hidden; background:#111; }
-        #video { width:100%; height:100%; object-fit:cover; display:block; }
+        #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:12px 16px; background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
@@ -81,7 +81,7 @@
         (function() {
             var video = document.getElementById('video');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-            navigator.mediaDevices.getUserMedia({ video: { facingMode:'user', width:{ideal:640}, height:{ideal:480} }, audio:false })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode:'user', width:{ideal:480}, height:{ideal:360} }, audio:false })
                 .then(function(stream) { video.srcObject = stream; video.play(); })
                 .catch(function() { showToast('Kamera tidak dapat diakses', 'error'); });
         })();
@@ -138,13 +138,15 @@
             processing = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-            // Capture foto
+            // Capture foto (tidak mirror — gambar asli)
             var video = document.getElementById('video');
             var canvas = document.getElementById('captureCanvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            var fotoData = canvas.toDataURL('image/jpeg', 0.7);
+            var w = video.videoWidth || 480;
+            var h = video.videoHeight || 360;
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+            var fotoData = canvas.toDataURL('image/jpeg', 0.5);
 
             // Submit
             var form = new FormData();
