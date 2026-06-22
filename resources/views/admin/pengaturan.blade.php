@@ -169,7 +169,8 @@
     });
 
     // User picker modal
-    var allUsers = @json(\App\Models\User::where('role','!=','superadmin')->orderBy('name')->get(['id','name','nip']));
+    @php $allPegawai = \App\Models\User::where('role','!=','superadmin')->orderBy('name')->get(['id','name','nip']); @endphp
+    var allUsers = @json($allPegawai);
     var currentTarget = '';
     var tempSelected = [];
 
