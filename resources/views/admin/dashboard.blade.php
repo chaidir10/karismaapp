@@ -838,41 +838,35 @@
     <div class="content-grid">
 
         {{-- Presensi Diluar Radius --}}
+        @php
+            $prPendMasuk = collect($presensiPending ?? [])->where('jenis','masuk');
+            $prPendPulang = collect($presensiPending ?? [])->where('jenis','pulang');
+        @endphp
         <div class="content-card">
             <div class="card-header">
                 <h2 class="card-title">Presensi Diluar Radius</h2>
                 <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
             </div>
-            <div class="card-content">
-                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'presensiPendingTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+            <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
+                <button type="button" class="pr-tab active" data-prtab="masuk" onclick="switchPrTab('masuk')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $prPendMasuk->count() }})
+                </button>
+                <button type="button" class="pr-tab" data-prtab="pulang" onclick="switchPrTab('pulang')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                    <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $prPendPulang->count() }})
+                </button>
+            </div>
+            {{-- Tab Masuk --}}
+            <div class="card-content" id="prTabMasuk">
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'prPendMasukTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th data-sort="text">Pegawai <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="date">Tanggal <i class="fas fa-sort sort-icon"></i></th>
-                                <th data-sort="text">Jenis <i class="fas fa-sort sort-icon"></i></th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="presensiPendingTable" data-paginate="5">
-                            @forelse($presensiPending ?? [] as $index => $p)
-                            <tr class="clickable-row"
-                                data-user-name="{{ $p->user->name ?? 'N/A' }}"
-                                data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}"
-                                data-jenis="{{ $p->jenis ?? '' }}"
-                                data-jam="{{ $p->jam ?? '-' }}"
-                                data-lokasi="{{ $p->lokasi ?? '' }}"
-                                data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}"
-                                data-approve-url="/admin/presensi/{{ $p->id }}/approve"
-                                data-reject-url="/admin/presensi/{{ $p->id }}/reject">
-                                <td class="text-center text-xs">{{ $index + 1 }}</td>
+                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Tanggal</th><th class="text-center">Aksi</th></tr></thead>
+                        <tbody id="prPendMasukTable" data-paginate="5">
+                            @forelse($prPendMasuk as $p)
+                            <tr class="clickable-row" data-user-name="{{ $p->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="{{ $p->jenis ?? '' }}" data-jam="{{ $p->jam ?? '-' }}" data-lokasi="{{ $p->lokasi ?? '' }}" data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}" data-approve-url="/admin/presensi/{{ $p->id }}/approve" data-reject-url="/admin/presensi/{{ $p->id }}/reject">
+                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
                                 <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}</td>
-                                <td>
-                                    <span class="badge jenis-badge">{{ ucfirst($p->jenis ?? '') }}</span>
-                                </td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
                                         <button type="button" class="btn-success" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
@@ -881,14 +875,33 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr>
-                                <td colspan="5" class="empty-state">
-                                    <div class="empty-content">
-                                        <div class="empty-icon"><i class="fas fa-shield-check"></i></div>
-                                        <p>Tidak ada presensi pending</p>
+                            <tr><td colspan="4" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-shield-check"></i></div><p>Tidak ada presensi masuk pending</p></div></td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{-- Tab Pulang --}}
+            <div class="card-content" id="prTabPulang" style="display:none;">
+                <div class="card-search" onclick="event.stopPropagation()"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Cari pegawai..." onkeyup="searchTable(this,'prPendPulangTable')" onkeydown="if(event.key==='Enter')event.preventDefault()"></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th class="text-center">No</th><th>Pegawai</th><th>Tanggal</th><th class="text-center">Aksi</th></tr></thead>
+                        <tbody id="prPendPulangTable" data-paginate="5">
+                            @forelse($prPendPulang as $p)
+                            <tr class="clickable-row" data-user-name="{{ $p->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="{{ $p->jenis ?? '' }}" data-jam="{{ $p->jam ?? '-' }}" data-lokasi="{{ $p->lokasi ?? '' }}" data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}" data-approve-url="/admin/presensi/{{ $p->id }}/approve" data-reject-url="/admin/presensi/{{ $p->id }}/reject">
+                                <td class="text-center text-xs">{{ $loop->iteration }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="date-cell">{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}</td>
+                                <td>
+                                    <div class="action-buttons" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn-success" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/approve', this)"><i class="fas fa-check"></i> Setuju</button>
+                                        <button type="button" class="btn-danger" onclick="ajaxAction('/admin/presensi/{{ $p->id }}/reject', this)"><i class="fas fa-times"></i> Tolak</button>
                                     </div>
                                 </td>
                             </tr>
+                            @empty
+                            <tr><td colspan="4" class="empty-state"><div class="empty-content"><div class="empty-icon"><i class="fas fa-shield-check"></i></div><p>Tidak ada presensi pulang pending</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -902,11 +915,11 @@
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
-            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
-                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+            <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
+                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-clock"></i> Presensi ({{ count($pengajuanPending ?? []) }})
                 </button>
-                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-calendar-minus"></i> Cuti/DL ({{ count($cutiPending ?? []) }})
                 </button>
             </div>
@@ -1053,11 +1066,11 @@
                 <h2 class="card-title">Daftar Presensi Hari Ini</h2>
                 <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
             </div>
-            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
-                <button type="button" class="hi-tab active" data-hitab="masuk" onclick="switchHiTab('masuk')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+            <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
+                <button type="button" class="hi-tab active" data-hitab="masuk" onclick="switchHiTab('masuk')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $presensiMasuk->count() }})
                 </button>
-                <button type="button" class="hi-tab" data-hitab="pulang" onclick="switchHiTab('pulang')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                <button type="button" class="hi-tab" data-hitab="pulang" onclick="switchHiTab('pulang')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $presensiPulangHI->count() }})
                 </button>
             </div>
@@ -1161,11 +1174,11 @@
                 <h2 class="card-title">Lembur Hari Ini</h2>
                 <span class="card-badge" style="background:rgba(245,158,11,0.1);color:#d97706;">{{ $lemburMasukHI->count() }} pegawai</span>
             </div>
-            <div style="display:flex; gap:6px; margin:14px 16px; padding:4px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--gray-200);">
-                <button type="button" class="lb-tab active" data-lbtab="masuk" onclick="switchLbTab('masuk')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
+            <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
+                <button type="button" class="lb-tab active" data-lbtab="masuk" onclick="switchLbTab('masuk')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-arrow-right-to-bracket"></i> Masuk ({{ $lemburMasukHI->count() }})
                 </button>
-                <button type="button" class="lb-tab" data-lbtab="pulang" onclick="switchLbTab('pulang')" style="flex:1; padding:10px 14px; border:none; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
+                <button type="button" class="lb-tab" data-lbtab="pulang" onclick="switchLbTab('pulang')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--dm-muted,#64748b); box-shadow:none; -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-arrow-right-from-bracket"></i> Pulang ({{ $lemburPulangHI->count() }})
                 </button>
             </div>
@@ -1437,6 +1450,20 @@
     }
 
     // Tab switch — Presensi Hari Ini (Masuk/Pulang)
+    // Tab switch — Presensi Diluar Radius (Masuk/Pulang)
+    function switchPrTab(tab) {
+        document.getElementById('prTabMasuk').style.display = tab === 'masuk' ? '' : 'none';
+        document.getElementById('prTabPulang').style.display = tab === 'pulang' ? '' : 'none';
+        document.querySelectorAll('.pr-tab').forEach(function(btn) {
+            if (btn.dataset.prtab === tab) {
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)'; btn.style.color = '#fff';
+                btn.style.boxShadow = '0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2)';
+            } else {
+                btn.style.background = 'transparent'; btn.style.color = 'var(--dm-muted,#64748b)'; btn.style.boxShadow = 'none';
+            }
+        });
+    }
+
     function switchHiTab(tab) {
         document.getElementById('hiTabMasuk').style.display = tab === 'masuk' ? '' : 'none';
         document.getElementById('hiTabPulang').style.display = tab === 'pulang' ? '' : 'none';
@@ -1594,7 +1621,7 @@
     document.addEventListener('DOMContentLoaded', function () {
 
         // Klik baris presensi pending
-        document.querySelectorAll('#presensiPendingTable .clickable-row').forEach(function (row) {
+        document.querySelectorAll('#prPendMasukTable .clickable-row, #prPendPulangTable .clickable-row').forEach(function (row) {
             row.addEventListener('click', function (e) {
                 // Abaikan klik pada tombol aksi
                 if (e.target.closest('.action-buttons')) return;
@@ -2082,7 +2109,8 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         try { initSearchScroll(); } catch(e) { console.error('initSearchScroll:', e); }
-        initTable('presensiPendingTable');
+        initTable('prPendMasukTable');
+        initTable('prPendPulangTable');
         initTable('pengajuanPendingTable');
         initTable('cutiPendingTable');
         initTable('presensiMasukTable');
