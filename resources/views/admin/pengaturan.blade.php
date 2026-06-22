@@ -193,10 +193,19 @@
         setTimeout(function() { setScroll(pos); }, 100);
     }
 
-    // Prevent focus from scrolling page — only for main page elements, not modals
-    document.addEventListener('focus', function(e) {
-        if (e.target.closest('#userPickerModal')) return;
-        var pos = getScroll();
+    // Prevent scroll jump on interact — only when modal is NOT open
+    function isModalOpen() {
+        return document.getElementById('userPickerModal').style.display === 'flex';
+    }
+    var _lockPos = null;
+    document.addEventListener('mousedown', function() {
+        if (isModalOpen()) return;
+        _lockPos = getScroll();
+    }, true);
+    document.addEventListener('focus', function() {
+        if (isModalOpen()) return;
+        var pos = _lockPos !== null ? _lockPos : getScroll();
+        _lockPos = null;
         requestAnimationFrame(function() { setScroll(pos); });
     }, true);
 
