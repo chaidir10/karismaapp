@@ -375,32 +375,47 @@
     .btn-success,
     .btn-danger {
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         cursor: pointer;
         font-size: 11px;
         font-weight: 600;
-        padding: 7px 14px;
+        padding: 6px 12px;
         -webkit-tap-highlight-color: transparent;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.25);
-        backdrop-filter: blur(4px);
         letter-spacing: 0.2px;
+        transition: all 0.15s ease;
     }
-    .btn-success:active, .btn-danger:active { transform:scale(0.95); box-shadow:inset 0 2px 4px rgba(0,0,0,0.15); }
+    .btn-success:active, .btn-danger:active { transform:scale(0.95); }
 
     .btn-success {
-        background: linear-gradient(135deg, #34d399, #10b981);
-        color: #fff;
-        text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        background: rgba(16,185,129,0.12);
+        color: #10b981;
+        border: 1px solid rgba(16,185,129,0.2);
     }
+    .btn-success:hover { background: rgba(16,185,129,0.2); }
 
     .btn-danger {
-        background: linear-gradient(135deg, #fca5a5, #ef4444);
-        color: #fff;
-        text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        background: rgba(239,68,68,0.12);
+        color: #ef4444;
+        border: 1px solid rgba(239,68,68,0.2);
     }
+    .btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+    [data-theme="dark"] .btn-success {
+        background: rgba(16,185,129,0.15);
+        color: #34d399;
+        border-color: rgba(16,185,129,0.25);
+    }
+    [data-theme="dark"] .btn-success:hover { background: rgba(16,185,129,0.25); }
+
+    [data-theme="dark"] .btn-danger {
+        background: rgba(239,68,68,0.15);
+        color: #fca5a5;
+        border-color: rgba(239,68,68,0.25);
+    }
+    [data-theme="dark"] .btn-danger:hover { background: rgba(239,68,68,0.25); }
 
     /* Empty State */
     .empty-state {
@@ -998,8 +1013,8 @@
                     </div>
                 </div>
                 <div class="modal-actions" style="padding:16px 20px;border-top:1px solid var(--dm-border,#e2e8f0);display:flex;gap:8px;">
-                    <button type="button" class="btn-success" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#10b981;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
-                    <button type="button" class="btn-danger" style="flex:1;padding:10px;border-radius:10px;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;background:#ef4444;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
+                    <button type="button" class="btn-success" style="flex:1;padding:10px;display:flex;align-items:center;justify-content:center;" id="cutiModalApprove"><i class="fas fa-check"></i> Setuju</button>
+                    <button type="button" class="btn-danger" style="flex:1;padding:10px;display:flex;align-items:center;justify-content:center;" id="cutiModalReject"><i class="fas fa-times"></i> Tolak</button>
                     <button type="button" class="btn-secondary" style="padding:10px 16px;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);background:var(--dm-card,#fff);color:var(--dm-text,#64748b);font-weight:600;font-size:13px;cursor:pointer;" onclick="closeModal('modalCutiDetail')">Tutup</button>
                 </div>
             </div>
