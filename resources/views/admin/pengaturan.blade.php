@@ -193,8 +193,9 @@
         setTimeout(function() { setScroll(pos); }, 100);
     }
 
-    // Prevent ANY focus from scrolling page
+    // Prevent focus from scrolling page — only for main page elements, not modals
     document.addEventListener('focus', function(e) {
+        if (e.target.closest('#userPickerModal')) return;
         var pos = getScroll();
         requestAnimationFrame(function() { setScroll(pos); });
     }, true);
