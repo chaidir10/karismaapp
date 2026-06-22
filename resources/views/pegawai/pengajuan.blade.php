@@ -247,60 +247,66 @@
     <div class="fab-buat-text">Buat Pengajuan</div>
 </button>
 
-<!-- Detail Modal — Fullscreen -->
+<!-- Detail Modal Presensi — Fullscreen Modern -->
 <div id="pengajuanDetailModal" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
     <div style="display:flex; flex-direction:column; height:100%;">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div class="detail-icon-box" id="modalPengajuanIconBox"></div>
-                <div>
-                    <div class="detail-title" id="modalPengajuanJenis">-</div>
-                    <div class="detail-subtitle"><span class="detail-status-badge" id="modalPengajuanStatus" style="background:var(--primary-soft); color:var(--primary-dark);">-</span></div>
-                </div>
-            </div>
-            <button onclick="closeDetailModal()" style="background:none; border:none; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gray); cursor:pointer;">
-                <i class="fas fa-xmark"></i>
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
+            <button onclick="closeDetailModal()" style="background:none; border:none; color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:500; -webkit-tap-highlight-color:transparent;">
+                <i class="fas fa-chevron-left"></i> Kembali
             </button>
+            <span style="font-size:15px; font-weight:700; color:var(--dark);" id="modalPengajuanJenis">Detail Pengajuan</span>
+            <div id="modalPengajuanStatus" style="font-size:11px; font-weight:700; padding:4px 12px; border-radius:8px;">-</div>
         </div>
-        <div style="flex:1; overflow-y:auto; padding:16px;">
-            <!-- Bukti Preview -->
-            <div id="modalBuktiPreview" style="display:none; border-radius:16px; overflow:hidden; margin-bottom:12px; background:var(--gray-light);">
-                <img id="modalBuktiImg" src="" style="width:100%; display:block; object-fit:contain; max-height:300px;" alt="Bukti">
-            </div>
-            <div id="modalBuktiPdf" style="display:none; margin-bottom:12px;">
-                <a id="modalBuktiPdfLink" href="#" target="_blank" style="display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--light); border-radius:14px; border:1px solid var(--card-border); text-decoration:none; color:var(--dark);">
-                    <div style="width:44px; height:44px; border-radius:12px; background:var(--danger-light); color:var(--danger); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
-                        <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:14px; font-weight:600;">Lihat Bukti PDF</div>
-                        <div style="font-size:11px; color:var(--gray);">Ketuk untuk membuka</div>
-                    </div>
-                </a>
+        <!-- Body -->
+        <div style="flex:1; overflow-y:auto; padding:20px;">
+            <!-- Icon + Label -->
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+                <div id="modalPengajuanIconBox" style="width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;"></div>
+                <div>
+                    <div id="modalPengajuanJenisLabel" style="font-size:18px; font-weight:700; color:var(--dark);"></div>
+                    <div id="modalPengajuanTanggalSub" style="font-size:13px; color:var(--gray); margin-top:2px;"></div>
+                </div>
             </div>
 
-            <!-- Info Card -->
-            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
-                <div class="detail-grid">
-                    <div>
-                        <div class="detail-label">Tanggal</div>
-                        <div class="detail-value" id="modalPengajuanTanggal">-</div>
-                    </div>
-                    <div>
-                        <div class="detail-label">Jenis</div>
-                        <div class="detail-value" id="modalPengajuanJenisDetail">-</div>
-                    </div>
-                    <div class="full">
-                        <div class="detail-label">Alasan</div>
-                        <div class="detail-value" id="modalPengajuanAlasan">-</div>
-                    </div>
+            <!-- Info Cards -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+                <div style="background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">
+                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Tanggal</div>
+                    <div id="modalPengajuanTanggal" style="font-size:14px; font-weight:600; color:var(--dark);">-</div>
+                </div>
+                <div style="background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">
+                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Jenis</div>
+                    <div id="modalPengajuanJenisDetail" style="font-size:14px; font-weight:600; color:var(--dark);">-</div>
                 </div>
             </div>
-        </div>
-        <div style="padding:12px 16px; border-top:1px solid var(--card-border); flex-shrink:0;">
-            <button onclick="closeDetailModal()" style="width:100%; padding:14px; background:var(--gray-light); color:var(--dark); border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                <i class="fas fa-chevron-left" style="font-size:12px;"></i> Kembali
-            </button>
+
+            <!-- Alasan -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:6px;">Alasan</div>
+                <div id="modalPengajuanAlasan" style="font-size:14px; color:var(--dark); line-height:1.6; background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">-</div>
+            </div>
+
+            <!-- Bukti -->
+            <div id="modalBuktiSection">
+                <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:6px;">Bukti</div>
+                <div id="modalBuktiPreview" style="display:none; border-radius:14px; overflow:hidden; border:1px solid var(--card-border);">
+                    <img id="modalBuktiImg" src="" style="width:100%; display:block; object-fit:contain; max-height:300px;" alt="Bukti">
+                </div>
+                <div id="modalBuktiPdf" style="display:none;">
+                    <a id="modalBuktiPdfLink" href="#" target="_blank" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--light); border-radius:14px; border:1px solid var(--card-border); text-decoration:none; color:var(--dark);">
+                        <div style="width:44px; height:44px; border-radius:12px; background:var(--danger-light); color:var(--danger); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:14px; font-weight:600;">Lihat Bukti (PDF)</div>
+                            <div style="font-size:11px; color:var(--gray);">Ketuk untuk membuka</div>
+                        </div>
+                        <i class="fas fa-external-link-alt" style="margin-left:auto; color:var(--gray); font-size:12px;"></i>
+                    </a>
+                </div>
+                <div id="modalBuktiNone" style="display:none; font-size:12px; color:var(--gray); padding:12px 14px; background:var(--light); border-radius:14px; border:1px solid var(--card-border); text-align:center;">Tidak ada bukti</div>
+            </div>
         </div>
     </div>
 </div>
@@ -358,10 +364,13 @@
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Upload Bukti <span style="color:var(--danger);">*</span></label>
-                        <div id="buktiDropZone" style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
-                            <i class="fas fa-cloud-arrow-up" style="font-size:24px; color:var(--gray); margin-bottom:8px; display:block;"></i>
-                            <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">Foto otomatis dikompresi. PDF maks 2MB</div>
-                            <input type="file" id="buktiOriginal" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.heic,.heif,.pdf" required style="font-size:12px; color:var(--dark); width:100%;">
+                        <div id="buktiDropZone" onclick="document.getElementById('buktiOriginal').click()" style="border:1px dashed var(--card-border); border-radius:14px; padding:20px 16px; text-align:center; background:var(--light); cursor:pointer; -webkit-tap-highlight-color:transparent;">
+                            <div style="width:48px; height:48px; border-radius:14px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
+                                <i class="fas fa-cloud-arrow-up" style="font-size:20px; color:var(--primary);"></i>
+                            </div>
+                            <div id="buktiFileName" style="font-size:13px; font-weight:600; color:var(--dark); margin-bottom:4px;">Ketuk untuk pilih file</div>
+                            <div style="font-size:11px; color:var(--gray);">Foto otomatis dikompresi &middot; PDF maks 2MB</div>
+                            <input type="file" id="buktiOriginal" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.heic,.heif,.pdf" required style="display:none;" onchange="updateFileName(this, 'buktiFileName')">
                             <input type="file" name="bukti" id="buktiCompressed" style="display:none;">
                             <div id="buktiInfo" style="display:none; margin-top:10px; font-size:11px; color:var(--gray);"></div>
                         </div>
@@ -407,10 +416,13 @@
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Surat Cuti / Surat Tugas <span style="color:var(--danger);">*</span></label>
-                        <div style="border:1px dashed var(--card-border); border-radius:12px; padding:16px; text-align:center; background:var(--light);">
-                            <i class="fas fa-file-pdf" style="font-size:24px; color:var(--danger); margin-bottom:8px; display:block;"></i>
-                            <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">PDF, JPG, PNG (maks 2MB)</div>
-                            <input type="file" name="bukti_surat" accept=".pdf,.jpg,.jpeg,.png" required style="font-size:12px; color:var(--dark); width:100%;">
+                        <div onclick="document.getElementById('cutiFileInput').click()" style="border:1px dashed var(--card-border); border-radius:14px; padding:20px 16px; text-align:center; background:var(--light); cursor:pointer; -webkit-tap-highlight-color:transparent;">
+                            <div style="width:48px; height:48px; border-radius:14px; background:var(--danger-light); display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
+                                <i class="fas fa-file-arrow-up" style="font-size:20px; color:var(--danger);"></i>
+                            </div>
+                            <div id="cutiFileName" style="font-size:13px; font-weight:600; color:var(--dark); margin-bottom:4px;">Ketuk untuk pilih file</div>
+                            <div style="font-size:11px; color:var(--gray);">PDF, JPG, PNG &middot; Maks 2MB</div>
+                            <input type="file" name="bukti_surat" id="cutiFileInput" accept=".pdf,.jpg,.jpeg,.png" required style="display:none;" onchange="updateFileName(this, 'cutiFileName')">
                         </div>
                     </div>
                     <button type="submit" id="cutiFormSubmit" style="display:none;"></button>
@@ -439,25 +451,40 @@
                 var status = this.dataset.pengajuanStatus;
                 var icon = getIcon(jenis);
                 var ss = getStatusStyle(status);
-                var iconBox = document.getElementById('modalPengajuanIconBox');
-                var statusBadge = document.getElementById('modalPengajuanStatus');
 
+                // Icon + label
+                var iconBox = document.getElementById('modalPengajuanIconBox');
                 iconBox.style.background = icon.bg;
-                iconBox.innerHTML = '<i class="fas ' + icon.cls + '" style="color:' + icon.color + '"></i>';
+                iconBox.style.color = icon.color;
+                iconBox.innerHTML = '<i class="fas ' + icon.cls + '"></i>';
+
+                var jenisLabel = jenis.charAt(0).toUpperCase() + jenis.slice(1);
+                document.getElementById('modalPengajuanJenis').textContent = 'Pengajuan ' + jenisLabel;
+                document.getElementById('modalPengajuanJenisLabel').textContent = 'Pengajuan ' + jenisLabel;
+                document.getElementById('modalPengajuanJenisDetail').textContent = jenisLabel;
+
+                // Status badge
+                var statusBadge = document.getElementById('modalPengajuanStatus');
                 statusBadge.style.background = ss.bg;
                 statusBadge.style.color = ss.color;
                 statusBadge.textContent = status === 'approved' ? 'Disetujui' : (status === 'rejected' ? 'Ditolak' : 'Menunggu');
 
-                document.getElementById('modalPengajuanJenis').textContent = 'Pengajuan ' + jenis.charAt(0).toUpperCase() + jenis.slice(1);
-                document.getElementById('modalPengajuanTanggal').textContent = new Date(this.dataset.pengajuanTanggal).toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-                document.getElementById('modalPengajuanJenisDetail').textContent = jenis.charAt(0).toUpperCase() + jenis.slice(1);
+                // Tanggal
+                var tgl = new Date(this.dataset.pengajuanTanggal).toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+                document.getElementById('modalPengajuanTanggal').textContent = tgl;
+                document.getElementById('modalPengajuanTanggalSub').textContent = tgl;
+
+                // Alasan
                 document.getElementById('modalPengajuanAlasan').textContent = this.dataset.pengajuanAlasan;
 
+                // Bukti
                 var bukti = this.dataset.pengajuanBukti;
                 var imgPreview = document.getElementById('modalBuktiPreview');
                 var pdfPreview = document.getElementById('modalBuktiPdf');
+                var nonePreview = document.getElementById('modalBuktiNone');
                 imgPreview.style.display = 'none';
                 pdfPreview.style.display = 'none';
+                nonePreview.style.display = 'none';
                 if (bukti && bukti.trim()) {
                     if (bukti.match(/\.(pdf)$/i)) {
                         document.getElementById('modalBuktiPdfLink').href = bukti;
@@ -466,6 +493,8 @@
                         document.getElementById('modalBuktiImg').src = bukti;
                         imgPreview.style.display = 'block';
                     }
+                } else {
+                    nonePreview.style.display = 'block';
                 }
 
                 document.getElementById('pengajuanDetailModal').style.display = 'block';
@@ -474,6 +503,19 @@
     }
 
     function closeDetailModal() { document.getElementById('pengajuanDetailModal').style.display = 'none'; }
+
+    function updateFileName(input, labelId) {
+        var label = document.getElementById(labelId);
+        if (input.files && input.files[0]) {
+            var name = input.files[0].name;
+            if (name.length > 30) name = name.substring(0, 27) + '...';
+            label.textContent = name;
+            label.style.color = 'var(--primary-dark)';
+        } else {
+            label.textContent = 'Ketuk untuk pilih file';
+            label.style.color = 'var(--dark)';
+        }
+    }
 
     // Cuti detail modal
     function openCutiDetail(el) {
@@ -527,7 +569,7 @@
         document.getElementById('cutiDetailModal').style.display = 'block';
     }
 
-    // List tabs
+    // List tabs with persistence
     function switchListTab(tab) {
         document.getElementById('listPresensi').style.display = tab === 'presensi' ? '' : 'none';
         document.getElementById('listCuti').style.display = tab === 'cuti' ? '' : 'none';
@@ -540,7 +582,14 @@
                 btn.style.color = 'var(--gray)';
             }
         });
+        localStorage.setItem('pengajuan-active-tab', tab);
     }
+
+    // Restore tab on load
+    (function() {
+        var saved = localStorage.getItem('pengajuan-active-tab');
+        if (saved === 'cuti') switchListTab('cuti');
+    })();
     function openModal() {
         document.getElementById('pengajuanModal').style.display = 'block';
         document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
