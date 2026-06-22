@@ -111,11 +111,11 @@
         $regulerCount = 0; $lemburCount = 0;
         foreach ($riwayat as $items) { foreach ($items as $p) { $p->is_lembur ? $lemburCount++ : $regulerCount++; } }
     @endphp
-    <div style="display:flex; gap:4px; margin-bottom:14px; background:var(--light); border-radius:12px; padding:4px;">
-        <button type="button" class="riwayat-tab active" data-rtab="reguler" onclick="switchRiwayatTab('reguler')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--primary-soft); color:var(--primary-dark);">
-            <i class="fas fa-clock"></i> Reguler <span style="font-size:11px; opacity:0.7;">({{ $regulerCount }})</span>
+    <div style="display:flex; gap:6px; margin-bottom:16px; background:rgba(0,0,0,0.03); border-radius:14px; padding:5px; border:1px solid var(--card-border); backdrop-filter:blur(10px);">
+        <button type="button" class="riwayat-tab active" data-rtab="reguler" onclick="switchRiwayatTab('reguler')" style="flex:1; padding:11px 14px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2);">
+            <i class="fas fa-clock"></i> Reguler <span style="font-size:11px; opacity:0.8;">({{ $regulerCount }})</span>
         </button>
-        <button type="button" class="riwayat-tab" data-rtab="lembur" onclick="switchRiwayatTab('lembur')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray);">
+        <button type="button" class="riwayat-tab" data-rtab="lembur" onclick="switchRiwayatTab('lembur')" style="flex:1; padding:11px 14px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray); box-shadow:none;">
             <i class="fas fa-bolt"></i> Lembur <span style="font-size:11px; opacity:0.7;">({{ $lemburCount }})</span>
         </button>
     </div>
@@ -294,11 +294,13 @@
         document.getElementById('riwayatLembur').style.display = tab === 'lembur' ? '' : 'none';
         document.querySelectorAll('.riwayat-tab').forEach(function(btn) {
             if (btn.dataset.rtab === tab) {
-                btn.style.background = 'var(--primary-soft)';
-                btn.style.color = 'var(--primary-dark)';
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)';
+                btn.style.color = '#fff';
+                btn.style.boxShadow = '0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2)';
             } else {
                 btn.style.background = 'transparent';
                 btn.style.color = 'var(--gray)';
+                btn.style.boxShadow = 'none';
             }
         });
         localStorage.setItem('riwayat-active-tab', tab);

@@ -82,10 +82,17 @@
         gap: 16px;
         cursor: pointer;
         text-decoration: none;
-        border: 1px solid var(--gray-200);
+        border: 1px solid rgba(255,255,255,0.15);
         -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.6);
+        backdrop-filter: blur(10px);
     }
-    .stat-card:active { opacity: 0.85; }
+    .stat-card:active { transform:scale(0.97); }
+    [data-theme="dark"] .stat-card {
+        background: rgba(20,27,45,0.7);
+        border: 1px solid rgba(255,255,255,0.06);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.04);
+    }
 
     .stat-icon {
         width: 48px;
@@ -143,9 +150,16 @@
 
     .content-card {
         background: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255,255,255,0.6);
         overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+    }
+    [data-theme="dark"] .content-card {
+        background: rgba(20,27,45,0.7);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.06);
     }
 
     .card-header {
@@ -361,26 +375,31 @@
     .btn-success,
     .btn-danger {
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
         cursor: pointer;
         font-size: 11px;
         font-weight: 600;
-        padding: 6px 12px;
+        padding: 7px 14px;
         -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.25);
+        backdrop-filter: blur(4px);
+        letter-spacing: 0.2px;
     }
-    .btn-success:active, .btn-danger:active { opacity: 0.8; }
+    .btn-success:active, .btn-danger:active { transform:scale(0.95); box-shadow:inset 0 2px 4px rgba(0,0,0,0.15); }
 
     .btn-success {
-        background: #10b981;
+        background: linear-gradient(135deg, #34d399, #10b981);
         color: #fff;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.1);
     }
 
     .btn-danger {
-        background: #ef4444;
+        background: linear-gradient(135deg, #fca5a5, #ef4444);
         color: #fff;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.1);
     }
 
     /* Empty State */
@@ -841,11 +860,11 @@
                 <h2 class="card-title">Pengajuan Pending</h2>
                 <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
-            <div style="display:flex; gap:4px; padding:12px 16px 0; background:var(--dm-card,#fff);">
-                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:8px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--primary);color:#fff;">
+            <div style="display:flex; gap:6px; padding:14px 16px 0; background:var(--dm-card,#fff);">
+                <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:10px 14px; border:none; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-clock"></i> Presensi ({{ count($pengajuanPending ?? []) }})
                 </button>
-                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:8px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--dm-bg,#f1f5f9);color:var(--dm-muted,#64748b);">
+                <button type="button" class="admin-pend-tab" data-pend="cuti" onclick="switchAdminPendTab('cuti')" style="flex:1; padding:10px 14px; border:none; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.06); color:var(--dm-muted,#64748b); box-shadow:inset 0 1px 2px rgba(0,0,0,0.04); backdrop-filter:blur(4px); -webkit-tap-highlight-color:transparent;">
                     <i class="fas fa-calendar-minus"></i> Cuti/DL ({{ count($cutiPending ?? []) }})
                 </button>
             </div>
@@ -1345,9 +1364,13 @@
         document.getElementById('adminTabCuti').style.display = tab === 'cuti' ? '' : 'none';
         document.querySelectorAll('.admin-pend-tab').forEach(function(btn) {
             if (btn.dataset.pend === tab) {
-                btn.style.background = 'var(--primary)'; btn.style.color = '#fff';
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)';
+                btn.style.color = '#fff';
+                btn.style.boxShadow = '0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2)';
             } else {
-                btn.style.background = 'var(--dm-bg,#f1f5f9)'; btn.style.color = 'var(--dm-muted,#64748b)';
+                btn.style.background = 'rgba(255,255,255,0.06)';
+                btn.style.color = 'var(--dm-muted,#64748b)';
+                btn.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.04)';
             }
         });
     }

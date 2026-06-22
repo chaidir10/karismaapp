@@ -107,11 +107,11 @@
     @endif
 
     <!-- Tabs -->
-    <div style="display:flex; gap:4px; margin-bottom:14px; background:var(--light); border-radius:12px; padding:4px;">
-        <button type="button" class="list-tab active" data-list="presensi" onclick="switchListTab('presensi')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--primary-soft); color:var(--primary-dark);">
-            <i class="fas fa-clock"></i> Presensi <span style="font-size:11px; opacity:0.7;">({{ $pengajuan->count() }})</span>
+    <div style="display:flex; gap:6px; margin-bottom:16px; background:rgba(0,0,0,0.03); border-radius:14px; padding:5px; border:1px solid var(--card-border); backdrop-filter:blur(10px);">
+        <button type="button" class="list-tab active" data-list="presensi" onclick="switchListTab('presensi')" style="flex:1; padding:11px 14px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2);">
+            <i class="fas fa-clock"></i> Presensi <span style="font-size:11px; opacity:0.8;">({{ $pengajuan->count() }})</span>
         </button>
-        <button type="button" class="list-tab" data-list="cuti" onclick="switchListTab('cuti')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray);">
+        <button type="button" class="list-tab" data-list="cuti" onclick="switchListTab('cuti')" style="flex:1; padding:11px 14px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray); box-shadow:none;">
             <i class="fas fa-calendar-minus"></i> Cuti/DL <span style="font-size:11px; opacity:0.7;">({{ ($cutiList ?? collect())->count() }})</span>
         </button>
     </div>
@@ -326,11 +326,11 @@
         </div>
 
         <!-- Tabs -->
-        <div style="display:flex; gap:4px; padding:12px 16px 0; flex-shrink:0;">
-            <button type="button" class="pengajuan-tab active" data-tab="presensi" onclick="switchPengajuanTab('presensi')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--primary-soft); color:var(--primary-dark);">
+        <div style="display:flex; gap:6px; padding:14px 16px 0; flex-shrink:0;">
+            <button type="button" class="pengajuan-tab active" data-tab="presensi" onclick="switchPengajuanTab('presensi')" style="flex:1; padding:11px 14px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2);">
                 <i class="fas fa-clock"></i> Presensi
             </button>
-            <button type="button" class="pengajuan-tab" data-tab="cuti" onclick="switchPengajuanTab('cuti')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--light); color:var(--gray);">
+            <button type="button" class="pengajuan-tab" data-tab="cuti" onclick="switchPengajuanTab('cuti')" style="flex:1; padding:11px 14px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray); box-shadow:none;">
                 <i class="fas fa-calendar-minus"></i> Cuti / DL
             </button>
         </div>
@@ -575,11 +575,13 @@
         document.getElementById('listCuti').style.display = tab === 'cuti' ? '' : 'none';
         document.querySelectorAll('.list-tab').forEach(function(btn) {
             if (btn.dataset.list === tab) {
-                btn.style.background = 'var(--primary-soft)';
-                btn.style.color = 'var(--primary-dark)';
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)';
+                btn.style.color = '#fff';
+                btn.style.boxShadow = '0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2)';
             } else {
                 btn.style.background = 'transparent';
                 btn.style.color = 'var(--gray)';
+                btn.style.boxShadow = 'none';
             }
         });
         localStorage.setItem('pengajuan-active-tab', tab);
@@ -608,11 +610,14 @@
 
         document.querySelectorAll('.pengajuan-tab').forEach(function(btn) {
             if (btn.dataset.tab === tab) {
-                btn.style.background = 'var(--primary-soft)';
-                btn.style.color = 'var(--primary-dark)';
+                btn.style.background = 'linear-gradient(135deg,#5AB6EA,#2E97D4)';
+                btn.style.color = '#fff';
+                btn.style.boxShadow = '0 3px 10px rgba(90,182,234,0.3), inset 0 1px 1px rgba(255,255,255,0.2)';
             } else {
                 btn.style.background = 'var(--light)';
                 btn.style.color = 'var(--gray)';
+                btn.style.boxShadow = 'none';
+                btn.style.background = 'transparent';
             }
         });
     }
