@@ -435,7 +435,39 @@
         box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
 
-    .modal-large { max-width: 700px; }
+    .modal-large { max-width: 900px; }
+    .modal-wide { max-width: 860px; }
+    .modal-split {
+        display:grid; grid-template-columns:1fr 1fr; gap:0; min-height:380px;
+    }
+    .modal-split-left {
+        display:flex; flex-direction:column; gap:8px; padding:16px 20px;
+        border-right:1px solid var(--gray-200);
+    }
+    [data-theme="dark"] .modal-split-left { border-color:rgba(255,255,255,0.06); }
+    .modal-split-right {
+        display:flex; flex-direction:column; padding:16px 20px;
+    }
+    .modal-split-right .info-grid {
+        display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;
+    }
+    .modal-split-right .info-item {
+        background:var(--gray-100); border-radius:8px; padding:8px 10px;
+    }
+    [data-theme="dark"] .modal-split-right .info-item { background:rgba(255,255,255,0.04); }
+    .modal-split-right .info-item label {
+        font-size:9px; font-weight:600; color:var(--gray-500); text-transform:uppercase;
+        letter-spacing:0.3px; display:block; margin:0 0 2px;
+    }
+    .modal-split-right .info-item label::after { content:''; }
+    .modal-split-right .info-item span {
+        font-size:13px; font-weight:500; color:var(--dark); word-break:break-word;
+    }
+    .modal-split-right .info-item.full { grid-column:1/-1; }
+    @media (max-width:768px) {
+        .modal-split { grid-template-columns:1fr; }
+        .modal-split-left { border-right:none; border-bottom:1px solid var(--gray-200); }
+    }
 
     .modal-header {
         display: flex;
@@ -1160,66 +1192,34 @@
 
 {{-- ========== MODAL PRESENSI PENDING ========== --}}
 <div id="modalPresensiPending" class="modal-overlay">
-    <div class="modal-container modal-large">
+    <div class="modal-container modal-wide">
         <div class="modal-header">
             <h3 class="modal-title">Detail Presensi Pending</h3>
-            <button class="modal-close" onclick="closeModal('modalPresensiPending')">
-                <i class="fas fa-times"></i>
-            </button>
+            <button class="modal-close" onclick="closeModal('modalPresensiPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-content">
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <label>Pegawai</label>
-                    <span id="detailPegawaiPresensi">-</span>
+        <div class="modal-split">
+            <div class="modal-split-left">
+                <div class="map-container" style="flex:1; min-height:180px;">
+                    <div id="presensiMap" style="width:100%;height:100%;"></div>
+                    <div id="mapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
+                    <div id="mapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="detail-item">
-                    <label>Tanggal</label>
-                    <span id="detailTanggalPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jenis</label>
-                    <span id="detailJenisPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jam</label>
-                    <span id="detailJamPresensi">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Lokasi</label>
-                    <span id="detailLokasiPresensi" style="font-size:11px">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Status</label>
-                    <span class="status-badge pending">Pending</span>
-                </div>
+                <div class="foto-wrapper" style="flex:1; min-height:140px;" id="detailFotoPresensi"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="media-row">
-                <div class="media-col">
-                    <label>Peta Lokasi</label>
-                    <div class="map-container">
-                        <div id="presensiMap"></div>
-                        <div id="mapLoading" class="map-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Memuat peta...</span>
-                        </div>
-                        <div id="mapError" class="map-error" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Koordinat tidak tersedia</span>
-                        </div>
-                    </div>
+            <div class="modal-split-right">
+                <div class="info-grid">
+                    <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPresensi">-</span></div>
+                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalPresensi">-</span></div>
+                    <div class="info-item"><label>Jenis</label><span id="detailJenisPresensi">-</span></div>
+                    <div class="info-item"><label>Jam</label><span id="detailJamPresensi">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi" style="font-size:11px;">-</span></div>
+                    <div class="info-item"><label>Status</label><span class="status-badge pending">Pending</span></div>
                 </div>
-                <div class="media-col">
-                    <label>Foto</label>
-                    <div class="foto-wrapper" id="detailFotoPresensi">
-                        <span class="text-muted">Tidak ada foto</span>
-                    </div>
+                <div style="margin-top:auto; display:flex; gap:8px;">
+                    <button type="button" class="btn-success" id="modalBtnApprovePresensi" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
+                    <button type="button" class="btn-danger" id="modalBtnRejectPresensi" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')" style="padding:10px 16px;">Tutup</button>
                 </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-success" id="modalBtnApprovePresensi"><i class="fas fa-check"></i> Setuju</button>
-                <button type="button" class="btn-danger" id="modalBtnRejectPresensi"><i class="fas fa-times"></i> Tolak</button>
-                <button type="button" class="btn-secondary" onclick="closeModal('modalPresensiPending')">Tutup</button>
             </div>
         </div>
     </div>
@@ -1228,46 +1228,30 @@
 
 {{-- ========== MODAL PENGAJUAN PENDING ========== --}}
 <div id="modalPengajuanPending" class="modal-overlay">
-    <div class="modal-container">
+    <div class="modal-container modal-wide">
         <div class="modal-header">
             <h3 class="modal-title">Detail Pengajuan Pending</h3>
-            <button class="modal-close" onclick="closeModal('modalPengajuanPending')">
-                <i class="fas fa-times"></i>
-            </button>
+            <button class="modal-close" onclick="closeModal('modalPengajuanPending')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-content">
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <label>Pegawai</label>
-                    <span id="detailPegawaiPengajuan">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Tanggal</label>
-                    <span id="detailTanggalPengajuan">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jenis</label>
-                    <span id="detailJenisPengajuan">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Status</label>
-                    <span class="status-badge pending">Pending</span>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Alasan</label>
-                    <span id="detailAlasanPengajuan">-</span>
+        <div class="modal-split">
+            <div class="modal-split-left">
+                <div id="detailBuktiPengajuan" style="flex:1; display:flex; align-items:center; justify-content:center; background:var(--gray-100); border-radius:8px; overflow:hidden;">
+                    <span class="text-muted" style="font-size:13px; color:var(--gray-400);">Tidak ada bukti</span>
                 </div>
             </div>
-            <div style="margin-bottom:12px">
-                <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;margin-bottom:6px">Bukti</label>
-                <div id="detailBuktiPengajuan">
-                    <span class="text-muted">Tidak ada bukti</span>
+            <div class="modal-split-right">
+                <div class="info-grid">
+                    <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
+                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
+                    <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
+                    <div class="info-item"><label>Status</label><span class="status-badge pending">Pending</span></div>
+                    <div class="info-item full"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
                 </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-success" id="modalBtnApprove"><i class="fas fa-check"></i> Setuju</button>
-                <button type="button" class="btn-danger" id="modalBtnReject"><i class="fas fa-times"></i> Tolak</button>
-                <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')">Tutup</button>
+                <div style="margin-top:auto; display:flex; gap:8px;">
+                    <button type="button" class="btn-success" id="modalBtnApprove" style="flex:1;padding:10px;"><i class="fas fa-check"></i> Setuju</button>
+                    <button type="button" class="btn-danger" id="modalBtnReject" style="flex:1;padding:10px;"><i class="fas fa-times"></i> Tolak</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalPengajuanPending')" style="padding:10px 16px;">Tutup</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1276,70 +1260,33 @@
 
 {{-- ========== MODAL DETAIL PRESENSI HARI INI ========== --}}
 <div id="modalDetailHariIni" class="modal-overlay">
-    <div class="modal-container modal-large">
+    <div class="modal-container modal-wide">
         <div class="modal-header">
             <h3 class="modal-title">Detail Presensi</h3>
-            <button class="modal-close" onclick="closeModal('modalDetailHariIni')">
-                <i class="fas fa-times"></i>
-            </button>
+            <button class="modal-close" onclick="closeModal('modalDetailHariIni')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-content">
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <label>Pegawai</label>
-                    <span id="detailNamaHariIni">-</span>
+        <div class="modal-split">
+            <div class="modal-split-left">
+                <div class="map-container" style="flex:1; min-height:180px;">
+                    <div id="hariIniMap" style="width:100%;height:100%;"></div>
+                    <div id="hariIniMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
+                    <div id="hariIniMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="detail-item">
-                    <label>Tanggal</label>
-                    <span id="detailTanggalHariIni">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jenis</label>
-                    <span id="detailJenisHariIni">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Jam</label>
-                    <span id="detailJamHariIni">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Kehadiran</label>
-                    <span id="detailStatusHariIni">-</span>
-                </div>
-                <div class="detail-item">
-                    <label>Verifikasi</label>
-                    <span id="detailVerifikasiHariIni">-</span>
-                </div>
-                <div class="detail-item full-width">
-                    <label>Lokasi</label>
-                    <span id="detailLokasiHariIni" style="font-size:11px">-</span>
-                </div>
+                <div class="foto-wrapper" style="flex:1; min-height:140px;" id="detailFotoHariIni"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="media-row">
-                <div class="media-col">
-                    <label>Peta Lokasi</label>
-                    <div class="map-container">
-                        <div id="hariIniMap"></div>
-                        <div id="hariIniMapLoading" class="map-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Memuat peta...</span>
-                        </div>
-                        <div id="hariIniMapError" class="map-error" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Koordinat tidak tersedia</span>
-                        </div>
-                    </div>
+            <div class="modal-split-right">
+                <div class="info-grid">
+                    <div class="info-item"><label>Pegawai</label><span id="detailNamaHariIni">-</span></div>
+                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalHariIni">-</span></div>
+                    <div class="info-item"><label>Jenis</label><span id="detailJenisHariIni">-</span></div>
+                    <div class="info-item"><label>Jam</label><span id="detailJamHariIni">-</span></div>
+                    <div class="info-item"><label>Kehadiran</label><span id="detailStatusHariIni">-</span></div>
+                    <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
                 </div>
-                <div class="media-col">
-                    <label>Foto</label>
-                    <div class="foto-wrapper" id="detailFotoHariIni">
-                        <span class="text-muted">Tidak ada foto</span>
-                    </div>
+                <div style="margin-top:auto; display:flex; gap:8px;">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
                 </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')">
-                    Tutup
-                </button>
             </div>
         </div>
     </div>
@@ -1347,33 +1294,32 @@
 
 {{-- Modal Detail Lembur --}}
 <div id="modalDetailLembur" class="modal-overlay">
-    <div class="modal-container modal-large">
+    <div class="modal-container modal-wide">
         <div class="modal-header">
             <h3 class="modal-title">Detail Lembur</h3>
             <button class="modal-close" onclick="closeModal('modalDetailLembur')"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-content">
-            <div class="detail-grid">
-                <div class="detail-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
-                <div class="detail-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
-                <div class="detail-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
-                <div class="detail-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
-                <div class="detail-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
-                <div class="detail-item full-width"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px">-</span></div>
-            </div>
-            <div class="media-row">
-                <div class="media-col">
-                    <label>Peta Lokasi</label>
-                    <div class="map-container">
-                        <div id="lemburMap"></div>
-                        <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
-                        <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
-                    </div>
+        <div class="modal-split">
+            <div class="modal-split-left">
+                <div class="map-container" style="flex:1; min-height:180px;">
+                    <div id="lemburMap" style="width:100%;height:100%;"></div>
+                    <div id="lemburMapLoading" class="map-loading"><i class="fas fa-spinner fa-spin"></i><span>Memuat peta...</span></div>
+                    <div id="lemburMapError" class="map-error" style="display:none;"><i class="fas fa-exclamation-triangle"></i><span>Koordinat tidak tersedia</span></div>
                 </div>
-                <div class="media-col"><label>Foto</label><div class="foto-wrapper" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div></div>
+                <div class="foto-wrapper" style="flex:1; min-height:140px;" id="detailFotoLembur"><span class="text-muted">Tidak ada foto</span></div>
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')">Tutup</button>
+            <div class="modal-split-right">
+                <div class="info-grid">
+                    <div class="info-item"><label>Pegawai</label><span id="detailNamaLembur">-</span></div>
+                    <div class="info-item"><label>Tanggal</label><span id="detailTanggalLembur">-</span></div>
+                    <div class="info-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
+                    <div class="info-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
+                    <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
+                </div>
+                <div style="margin-top:auto; display:flex; gap:8px;">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
+                </div>
             </div>
         </div>
     </div>
