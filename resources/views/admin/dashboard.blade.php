@@ -482,6 +482,7 @@
     .modal-info-col .info-item span {
         font-size:13px; font-weight:500; color:var(--dark); word-break:break-word;
     }
+    .modal-info-col .info-item span.badge { color:inherit; font-size:11px; }
     .modal-info-col .info-item.full { grid-column:1/-1; }
     @media (max-width:768px) {
         .modal-3col { grid-template-columns:1fr; }
@@ -556,6 +557,7 @@
         color: var(--dark);
         word-break: break-word;
     }
+    .detail-item span.badge, .info-item span.badge { color:inherit !important; font-size:11px; }
 
     .modal-actions {
         display: flex;
@@ -991,7 +993,7 @@
 
         {{-- Modal Detail Cuti/DL --}}
         <div id="modalCutiDetail" class="modal-overlay" style="display:none;">
-            <div class="modal-container" style="max-width:900px;">
+            <div class="modal-container" style="max-width:1100px;">
                 <div class="modal-header">
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:14px;">
@@ -1001,7 +1003,7 @@
                     </div>
                     <button class="modal-close" onclick="closeModal('modalCutiDetail')"><i class="fas fa-times"></i></button>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:420px;">
+                <div style="display:grid; grid-template-columns:3fr 2fr; min-height:520px;">
                     <div class="modal-col">
                         <div class="modal-col-label">Bukti Surat</div>
                         <div class="modal-col-content" id="cutiModalBukti" style="flex-direction:column;">
@@ -1232,7 +1234,7 @@
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPresensi">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPresensi">-</span></div>
                     <div class="info-item"><label>Jam</label><span id="detailJamPresensi">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi" style="font-size:11px;">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiPresensi">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
                 </div>
                 <div style="margin-top:auto; display:flex; gap:8px;">
@@ -1312,7 +1314,7 @@
                     <div class="info-item"><label>Jam</label><span id="detailJamHariIni">-</span></div>
                     <div class="info-item"><label>Kehadiran</label><span id="detailStatusHariIni">-</span></div>
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiHariIni">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni" style="font-size:11px;">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiHariIni">-</span></div>
                 </div>
                 <div style="margin-top:auto; display:flex; gap:8px; justify-content:flex-end;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailHariIni')" style="padding:10px 20px;">Tutup</button>
@@ -1351,7 +1353,7 @@
                     <div class="info-item"><label>Jenis</label><span id="detailJenisLembur">-</span></div>
                     <div class="info-item"><label>Jam</label><span id="detailJamLembur">-</span></div>
                     <div class="info-item"><label>Verifikasi</label><span id="detailVerifikasiLembur">-</span></div>
-                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur" style="font-size:11px;">-</span></div>
+                    <div class="info-item full"><label>Lokasi</label><span id="detailLokasiLembur">-</span></div>
                 </div>
                 <div style="margin-top:auto; display:flex; gap:8px; justify-content:flex-end;">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalDetailLembur')" style="padding:10px 20px;">Tutup</button>
@@ -1669,7 +1671,7 @@
         document.getElementById('detailTanggalPresensi').textContent  = data.tanggal  || '-';
         document.getElementById('detailJenisPresensi').textContent    = capitalize(data.jenis);
         document.getElementById('detailJamPresensi').textContent      = data.jam      || '-';
-        document.getElementById('detailLokasiPresensi').textContent   = data.lokasi
+        resolveAddress(data.lokasi, document.getElementById('detailLokasiPresensi'));
             ? data.lokasi
             : 'Tidak ada lokasi';
 
@@ -1735,7 +1737,7 @@
         document.getElementById('detailTanggalHariIni').textContent = data.tanggal   || '-';
         document.getElementById('detailJenisHariIni').textContent   = capitalize(data.jenis);
         document.getElementById('detailJamHariIni').textContent     = data.jam       || '-';
-        document.getElementById('detailLokasiHariIni').textContent  = data.lokasi    || 'Tidak ada lokasi';
+        resolveAddress(data.lokasi, document.getElementById('detailLokasiHariIni'));
 
         // Status kehadiran
         var statusEl = document.getElementById('detailStatusHariIni');
@@ -1780,7 +1782,7 @@
         document.getElementById('detailTanggalLembur').textContent = data.tanggal   || '-';
         document.getElementById('detailJenisLembur').textContent   = data.jenis     || '-';
         document.getElementById('detailJamLembur').textContent     = data.jam       || '-';
-        document.getElementById('detailLokasiLembur').textContent  = data.lokasi    || 'Tidak ada lokasi';
+        resolveAddress(data.lokasi, document.getElementById('detailLokasiLembur'));
 
         var st = (data.status || '').toLowerCase();
         var verifCls = st === 'approved' ? 'on-time' : st === 'rejected' ? 'late' : 'pending';
@@ -1898,6 +1900,24 @@
     }
 
     // ─── Utilities ────────────────────────────────────────────────────────────
+    function resolveAddress(lokasi, el) {
+        if (!lokasi || !el) { el.textContent = 'Tidak ada lokasi'; return; }
+        var parts = lokasi.split(',');
+        if (parts.length < 2) { el.textContent = lokasi; return; }
+        var lat = parts[0].trim(), lng = parts[1].trim();
+        el.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:10px;margin-right:4px;"></i> Mendeteksi...';
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data && data.display_name) {
+                    el.textContent = data.display_name;
+                } else {
+                    el.textContent = lat + ', ' + lng;
+                }
+            })
+            .catch(function() { el.textContent = lat + ', ' + lng; });
+    }
+
     function capitalize(str) {
         if (!str) return '-';
         return str.charAt(0).toUpperCase() + str.slice(1);
