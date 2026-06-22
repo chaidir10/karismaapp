@@ -217,52 +217,68 @@
             </div>
 
             <!-- Body -->
-            <div style="flex:1; overflow-y:auto; padding:20px;">
-                <!-- Icon + Label -->
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-                    <div style="width:52px; height:52px; border-radius:16px; background:{{ $dIsLembur ? 'rgba(139,92,246,0.1)' : $dIconBg }}; color:{{ $dIsLembur ? '#7c3aed' : $dIconColor }}; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">
-                        <i class="fas {{ $dIconName }}"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:18px; font-weight:700; color:var(--dark);">{{ $dIsLembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }}</div>
-                        <div style="font-size:13px; color:var(--gray); margin-top:2px;">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l, d F Y') }}</div>
-                    </div>
-                </div>
-
+            <div style="flex:1; overflow-y:auto; padding:16px;">
                 <!-- Foto -->
-                @if($p->foto)
-                <div style="border-radius:14px; overflow:hidden; margin-bottom:16px; border:1px solid var(--card-border);">
-                    <img src="{{ asset('public/storage/'.$p->foto) }}" style="width:100%; display:block; object-fit:cover; max-height:280px;" alt="Foto" loading="lazy">
-                </div>
-                @endif
-
-                <!-- Info Cards -->
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
-                    <div style="background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">
-                        <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Status</div>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <span style="width:8px; height:8px; border-radius:50%; background:{{ $p->status == 'approved' ? '#10b981' : ($p->status == 'pending' ? '#f59e0b' : '#ef4444') }};"></span>
-                            <span style="font-size:14px; font-weight:600; color:var(--dark);">{{ $p->status === 'approved' ? 'Disetujui' : ($p->status === 'rejected' ? 'Ditolak' : 'Menunggu') }}</span>
-                        </div>
+                <div style="border-radius:16px; overflow:hidden; margin-bottom:12px; aspect-ratio:4/3; background:var(--gray-light);">
+                    @if($p->foto)
+                    <img src="{{ asset('public/storage/'.$p->foto) }}" style="width:100%; height:100%; object-fit:cover; display:block;" alt="Foto" loading="lazy">
+                    @else
+                    <div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--gray); gap:8px;">
+                        <i class="fas fa-camera" style="font-size:28px; opacity:0.3;"></i>
+                        <span style="font-size:12px;">Tidak ada foto</span>
                     </div>
-                    <div style="background:var(--light); border-radius:14px; padding:12px 14px; border:1px solid var(--card-border);">
-                        <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Jenis</div>
-                        <div style="font-size:14px; font-weight:600; color:var(--dark);">{{ $dIsLembur ? 'Lembur' : 'Reguler' }}</div>
-                    </div>
+                    @endif
                 </div>
 
                 <!-- Maps -->
-                @if($p->lokasi)
-                <div style="margin-bottom:16px;">
-                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:6px;">Lokasi</div>
-                    <div style="border-radius:14px; overflow:hidden; height:180px; border:1px solid var(--card-border);">
-                        <div id="mapDetail{{ $p->id }}" style="width:100%; height:100%;"></div>
+                <div style="border-radius:16px; overflow:hidden; margin-bottom:12px; height:180px; background:var(--gray-light);">
+                    @if($p->lokasi)
+                    <div id="mapDetail{{ $p->id }}" style="width:100%; height:100%;"></div>
+                    @else
+                    <div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--gray); gap:8px;">
+                        <i class="fas fa-location-dot" style="font-size:28px; opacity:0.3;"></i>
+                        <span style="font-size:12px;">Lokasi tidak tersedia</span>
                     </div>
-                    <div style="font-size:12px; color:var(--gray); margin-top:6px; line-height:1.4;" id="locationAddress{{ $p->id }}">
-                        <div style="display:flex; align-items:center; gap:6px;"><i class="fas fa-spinner fa-spin" style="font-size:11px;"></i> <span>Mendeteksi alamat...</span></div>
+                    @endif
+                </div>
+
+                <!-- Info Card -->
+                <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border);">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                        <div style="width:44px; height:44px; border-radius:12px; background:{{ $dIsLembur ? 'rgba(139,92,246,0.1)' : $dIconBg }}; display:flex; align-items:center; justify-content:center; color:{{ $dIsLembur ? '#7c3aed' : $dIconColor }}; font-size:18px; flex-shrink:0;">
+                            <i class="fas {{ $dIconName }}"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:15px; font-weight:700; color:var(--dark);">{{ $dIsLembur ? 'Lembur ' : '' }}{{ ucfirst($p->jenis) }} - {{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
+                            <div style="font-size:12px; color:var(--gray);">{{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('l, d F Y') }}</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div style="flex:1; background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                            <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Status</div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span style="width:8px; height:8px; border-radius:50%; background:{{ $p->status == 'approved' ? '#10b981' : ($p->status == 'pending' ? '#f59e0b' : '#ef4444') }};"></span>
+                                <span style="font-size:13px; font-weight:600; color:var(--dark);">{{ $p->status === 'approved' ? 'Disetujui' : ($p->status === 'rejected' ? 'Ditolak' : 'Menunggu') }}</span>
+                            </div>
+                        </div>
+                        <div style="flex:1; background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                            <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Jenis</div>
+                            <div style="font-size:13px; font-weight:600; color:var(--dark);">{{ $dIsLembur ? 'Lembur' : 'Reguler' }}</div>
+                        </div>
+                    </div>
+
+                    <div style="background:var(--card-bg); border-radius:10px; padding:10px 12px; border:1px solid var(--card-border);">
+                        <div style="font-size:9px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:2px;">Lokasi</div>
+                        <div style="font-size:12px; color:var(--dark); line-height:1.4;" id="locationAddress{{ $p->id }}">
+                            @if($p->lokasi)
+                            <div style="display:flex; align-items:center; gap:6px; color:var(--gray);"><i class="fas fa-spinner fa-spin" style="font-size:11px;"></i> <span>Mendeteksi alamat...</span></div>
+                            @else
+                            <span style="color:var(--gray);">Tidak tersedia</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>
