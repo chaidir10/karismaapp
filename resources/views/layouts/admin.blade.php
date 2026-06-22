@@ -100,62 +100,63 @@
             padding:8px 18px; border-radius:10px;
             font-size:13px; font-weight:600; cursor:pointer;
             display:inline-flex; align-items:center; justify-content:center; gap:6px;
-            background:rgba(90,182,234,0.12); color:#2E97D4;
-            border:1px solid rgba(90,182,234,0.2);
+            background:#2E97D4; color:#fff; border:1px solid #2E97D4;
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
-        .btn-primary:hover, .btn-submit:hover { background:rgba(90,182,234,0.2); }
+        .btn-primary:hover, .btn-submit:hover { background:#2688bf; border-color:#2688bf; }
         .btn-primary:active, .btn-submit:active { transform:scale(0.96); }
         .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
         [data-theme="dark"] .btn-primary, [data-theme="dark"] .btn-submit {
-            background:rgba(90,182,234,0.15); color:#7dd3fc; border-color:rgba(90,182,234,0.25);
+            background:rgba(90,182,234,0.2); color:#7dd3fc; border-color:rgba(90,182,234,0.3);
         }
-        [data-theme="dark"] .btn-primary:hover, [data-theme="dark"] .btn-submit:hover { background:rgba(90,182,234,0.25); }
+        [data-theme="dark"] .btn-primary:hover, [data-theme="dark"] .btn-submit:hover { background:rgba(90,182,234,0.3); }
 
         .btn-success {
             padding:6px 12px; border-radius:8px;
             font-size:11px; font-weight:600; cursor:pointer;
             display:inline-flex; align-items:center; justify-content:center; gap:5px;
-            background:rgba(16,185,129,0.12); color:#10b981;
-            border:1px solid rgba(16,185,129,0.2);
+            background:#10b981; color:#fff; border:1px solid #10b981;
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
-        .btn-success:hover { background:rgba(16,185,129,0.2); }
+        .btn-success:hover { background:#059669; border-color:#059669; }
         .btn-success:active { transform:scale(0.95); }
-        [data-theme="dark"] .btn-success { background:rgba(16,185,129,0.15); color:#34d399; border-color:rgba(16,185,129,0.25); }
+        [data-theme="dark"] .btn-success { background:rgba(16,185,129,0.2); color:#34d399; border-color:rgba(16,185,129,0.3); }
+        [data-theme="dark"] .btn-success:hover { background:rgba(16,185,129,0.3); }
 
         .btn-danger {
             padding:6px 12px; border-radius:8px;
             font-size:11px; font-weight:600; cursor:pointer;
             display:inline-flex; align-items:center; justify-content:center; gap:5px;
-            background:rgba(239,68,68,0.12); color:#ef4444;
-            border:1px solid rgba(239,68,68,0.2);
+            background:#ef4444; color:#fff; border:1px solid #ef4444;
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
-        .btn-danger:hover { background:rgba(239,68,68,0.2); }
+        .btn-danger:hover { background:#dc2626; border-color:#dc2626; }
         .btn-danger:active { transform:scale(0.95); }
-        [data-theme="dark"] .btn-danger { background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.25); }
+        [data-theme="dark"] .btn-danger { background:rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.3); }
+        [data-theme="dark"] .btn-danger:hover { background:rgba(239,68,68,0.3); }
 
         .btn-warning {
             padding:6px 12px; border-radius:8px;
             font-size:11px; font-weight:600; cursor:pointer;
             display:inline-flex; align-items:center; justify-content:center; gap:5px;
-            background:rgba(245,158,11,0.12); color:#d97706;
-            border:1px solid rgba(245,158,11,0.2);
+            background:#f59e0b; color:#fff; border:1px solid #f59e0b;
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
-        .btn-warning:hover { background:rgba(245,158,11,0.2); }
-        [data-theme="dark"] .btn-warning { background:rgba(245,158,11,0.15); color:#fbbf24; border-color:rgba(245,158,11,0.25); }
+        .btn-warning:hover { background:#d97706; border-color:#d97706; }
+        [data-theme="dark"] .btn-warning { background:rgba(245,158,11,0.2); color:#fbbf24; border-color:rgba(245,158,11,0.3); }
+        [data-theme="dark"] .btn-warning:hover { background:rgba(245,158,11,0.3); }
 
         .btn-secondary {
-            padding:8px 18px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px;
+            padding:8px 18px; border:1px solid var(--dm-border,#d1d5db); border-radius:10px;
             font-size:13px; font-weight:600; cursor:pointer;
             display:inline-flex; align-items:center; gap:6px;
-            background:var(--dm-card,#fff); color:var(--dm-text,#64748b);
+            background:var(--dm-card,#fff); color:var(--dm-text,#374151);
             -webkit-tap-highlight-color:transparent; transition:all 0.15s;
         }
         .btn-secondary:hover { background:var(--dm-bg,#f1f5f9); }
         .btn-secondary:active { transform:scale(0.96); }
+        [data-theme="dark"] .btn-secondary { background:rgba(255,255,255,0.06); color:#cbd5e1; border-color:rgba(255,255,255,0.1); }
+        [data-theme="dark"] .btn-secondary:hover { background:rgba(255,255,255,0.1); }
 
         /* Global Badges */
         .badge {
