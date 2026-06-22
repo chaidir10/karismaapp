@@ -433,7 +433,7 @@
     }
 
     function initPengajuan() {
-        document.querySelectorAll('.p-card').forEach(function(item) {
+        document.querySelectorAll('#listPresensi .p-card').forEach(function(item) {
             item.onclick = function() {
                 var jenis = this.dataset.pengajuanJenis;
                 var status = this.dataset.pengajuanStatus;
