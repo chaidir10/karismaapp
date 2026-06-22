@@ -106,45 +106,92 @@
 </div>
 
 <div class="riwayat-page">
-    <!-- Content -->
-    <div class="riwayat-content">
-        @forelse($riwayat as $tanggal => $items)
-        <div class="date-group">
-            <div class="date-label">{{ $tanggal }}</div>
-            @foreach($items as $p)
-            @php
-                $isLembur = $p->is_lembur;
-                $isMasuk = $p->jenis === 'masuk';
-                $iconClass = $isLembur
-                    ? ($isMasuk ? 'icon-lembur-masuk' : 'icon-lembur-pulang')
-                    : ($isMasuk ? 'icon-masuk' : 'icon-pulang');
-                $iconName = $isLembur ? 'fa-bolt' : ($isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
-                $label = ($isLembur ? 'Lembur ' : '') . ($isMasuk ? 'Masuk' : 'Pulang');
-            @endphp
-            <div class="presensi-card" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
-                <div class="card-icon {{ $iconClass }}">
-                    <i class="fas {{ $iconName }}"></i>
+    <!-- Tabs -->
+    @php
+        $regulerCount = 0; $lemburCount = 0;
+        foreach ($riwayat as $items) { foreach ($items as $p) { $p->is_lembur ? $lemburCount++ : $regulerCount++; } }
+    @endphp
+    <div style="display:flex; gap:4px; margin-bottom:14px; background:var(--light); border-radius:12px; padding:4px;">
+        <button type="button" class="riwayat-tab active" data-rtab="reguler" onclick="switchRiwayatTab('reguler')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:var(--primary-soft); color:var(--primary-dark);">
+            <i class="fas fa-clock"></i> Reguler <span style="font-size:11px; opacity:0.7;">({{ $regulerCount }})</span>
+        </button>
+        <button type="button" class="riwayat-tab" data-rtab="lembur" onclick="switchRiwayatTab('lembur')" style="flex:1; padding:10px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; background:transparent; color:var(--gray);">
+            <i class="fas fa-bolt"></i> Lembur <span style="font-size:11px; opacity:0.7;">({{ $lemburCount }})</span>
+        </button>
+    </div>
+
+    <!-- Tab Reguler -->
+    <div id="riwayatReguler" class="riwayat-content">
+        @php $hasReguler = false; @endphp
+        @foreach($riwayat as $tanggal => $items)
+            @php $regulerItems = $items->where('is_lembur', false); @endphp
+            @if($regulerItems->count())
+            @php $hasReguler = true; @endphp
+            <div class="date-group">
+                <div class="date-label">{{ $tanggal }}</div>
+                @foreach($regulerItems as $p)
+                @php
+                    $isMasuk = $p->jenis === 'masuk';
+                    $iconClass = $isMasuk ? 'icon-masuk' : 'icon-pulang';
+                    $iconName = $isMasuk ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket';
+                    $label = $isMasuk ? 'Masuk' : 'Pulang';
+                @endphp
+                <div class="presensi-card" onclick="document.getElementById('detailModal{{ $p->id }}').style.display='block'" style="cursor:pointer;">
+                    <div class="card-icon {{ $iconClass }}"><i class="fas {{ $iconName }}"></i></div>
+                    <div class="card-body">
+                        <div class="card-title">{{ $label }}</div>
+                        <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
+                    </div>
+                    <div class="card-status">
+                        @if($p->status === 'pending')
+                            <span class="status-dot dot-pending"></span>
+                        @elseif($p->badge_text)
+                            <span class="card-tag tag-{{ $p->badge_type }}">{{ $p->badge_text }}</span>
+                        @endif
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="card-title">{{ $label }}</div>
-                    <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
-                </div>
-                <div class="card-status">
-                    @if($p->status === 'pending')
-                        <span class="status-dot dot-pending"></span>
-                    @elseif($p->badge_text)
-                        <span class="card-tag tag-{{ $p->badge_type }}">{{ $p->badge_text }}</span>
-                    @endif
-                </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
-        @empty
-        <div class="empty-box">
-            <i class="fas fa-calendar-times"></i>
-            <p>Belum ada riwayat presensi di bulan ini</p>
-        </div>
-        @endforelse
+            @endif
+        @endforeach
+        @if(!$hasReguler)
+        <div class="empty-box"><i class="fas fa-calendar-times"></i><p>Belum ada riwayat reguler di bulan ini</p></div>
+        @endif
+    </div>
+
+    <!-- Tab Lembur -->
+    <div id="riwayatLembur" class="riwayat-content" style="display:none;">
+        @php $hasLembur = false; @endphp
+        @foreach($riwayat as $tanggal => $items)
+            @php $lemburItems = $items->where('is_lembur', true); @endphp
+            @if($lemburItems->count())
+            @php $hasLembur = true; @endphp
+            <div class="date-group">
+                <div class="date-label">{{ $tanggal }}</div>
+                @foreach($lemburItems as $p)
+                @php
+                    $isMasuk = $p->jenis === 'masuk';
+                    $label = 'Lembur ' . ($isMasuk ? 'Masuk' : 'Pulang');
+                @endphp
+                <div class="presensi-card" onclick="document.getElementById('detailModal{{ $p->id }}').style.display='block'" style="cursor:pointer;">
+                    <div class="card-icon" style="background:rgba(139,92,246,0.1); color:#7c3aed;"><i class="fas fa-bolt"></i></div>
+                    <div class="card-body">
+                        <div class="card-title">{{ $label }}</div>
+                        <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
+                    </div>
+                    <div class="card-status">
+                        @if($p->badge_text)
+                            <span class="card-tag tag-{{ $p->badge_type }}">{{ $p->badge_text }}</span>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @endif
+        @endforeach
+        @if(!$hasLembur)
+        <div class="empty-box"><i class="fas fa-bolt"></i><p>Belum ada riwayat lembur di bulan ini</p></div>
+        @endif
     </div>
 </div>
 
@@ -256,6 +303,26 @@
 
 <script>
     const wilayahAlamat = @json($wilayahAlamat);
+
+    // Riwayat tabs with persistence
+    function switchRiwayatTab(tab) {
+        document.getElementById('riwayatReguler').style.display = tab === 'reguler' ? '' : 'none';
+        document.getElementById('riwayatLembur').style.display = tab === 'lembur' ? '' : 'none';
+        document.querySelectorAll('.riwayat-tab').forEach(function(btn) {
+            if (btn.dataset.rtab === tab) {
+                btn.style.background = 'var(--primary-soft)';
+                btn.style.color = 'var(--primary-dark)';
+            } else {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--gray)';
+            }
+        });
+        localStorage.setItem('riwayat-active-tab', tab);
+    }
+    (function() {
+        var saved = localStorage.getItem('riwayat-active-tab');
+        if (saved === 'lembur') switchRiwayatTab('lembur');
+    })();
 
     // Auto-filter on change
     function applyFilter() {
