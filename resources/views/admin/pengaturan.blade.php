@@ -193,14 +193,11 @@
         setTimeout(function() { setScroll(pos); }, 100);
     }
 
-    // Prevent sr-only inputs from scrolling page on focus
-    document.querySelectorAll('.sr-only').forEach(function(el) {
-        el.addEventListener('focus', function(e) {
-            e.preventDefault();
-            var pos = getScroll();
-            requestAnimationFrame(function() { setScroll(pos); });
-        });
-    });
+    // Prevent ANY focus from scrolling page
+    document.addEventListener('focus', function(e) {
+        var pos = getScroll();
+        requestAnimationFrame(function() { setScroll(pos); });
+    }, true);
 
     function keepScroll(fn) {
         var pos = getScroll();

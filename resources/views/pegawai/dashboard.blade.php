@@ -1007,6 +1007,46 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js" defer></script>
 <script>
+    // Network detection — disable presensi buttons when offline
+    (function() {
+        var offlineBanner = document.createElement('div');
+        offlineBanner.id = 'offlineBanner';
+        offlineBanner.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:#ef4444;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;';
+        offlineBanner.innerHTML = '<i class="fas fa-wifi" style="margin-right:6px;"></i> Tidak ada jaringan — presensi dinonaktifkan';
+        document.body.appendChild(offlineBanner);
+
+        var presensiButtons = ['clock-in-btn', 'clock-out-btn'];
+        var lemburFabs;
+        var savedStates = {};
+
+        function disablePresensi() {
+            offlineBanner.style.display = 'block';
+            presensiButtons.forEach(function(id) {
+                var btn = document.getElementById(id);
+                if (btn) { savedStates[id] = btn.disabled; btn.disabled = true; btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none'; }
+            });
+            lemburFabs = document.querySelectorAll('.lembur-fab');
+            lemburFabs.forEach(function(fab) { fab.style.opacity = '0.4'; fab.style.pointerEvents = 'none'; });
+        }
+
+        function enablePresensi() {
+            offlineBanner.style.display = 'none';
+            presensiButtons.forEach(function(id) {
+                var btn = document.getElementById(id);
+                if (btn) {
+                    btn.disabled = savedStates[id] || false;
+                    btn.style.opacity = btn.disabled ? '0.6' : '1';
+                    btn.style.pointerEvents = '';
+                }
+            });
+            if (lemburFabs) lemburFabs.forEach(function(fab) { fab.style.opacity = '1'; fab.style.pointerEvents = ''; });
+        }
+
+        if (!navigator.onLine) disablePresensi();
+        window.addEventListener('offline', disablePresensi);
+        window.addEventListener('online', enablePresensi);
+    })();
+
     // Carousel with live drag
     var currentSlide = 0;
     var track, totalSlides, autoSlideTimer, isDragging, dragStartX, dragCurrentX, dragBaseOffset;
