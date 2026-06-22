@@ -77,9 +77,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         }
 
         $rows[] = ['Ringkasan:'];
-        $rows[] = ['Total Hari Kerja', '', $this->data['total_hari_kerja'] . ' Hari', '', 'Total Jam Kerja', '', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Hari Cuti/DL', '', ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', 'Total Waktu Kurang', '', $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Keterlambatan', '', $this->data['summary']['total_keterlambatan'] . ' menit', '', 'Total Hari Lembur', '', ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
+        $rows[] = ['Total Hari Kerja:', $this->data['total_hari_kerja'] . ' Hari', '', '', 'Total Jam Kerja:', $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Hari Cuti/DL:', ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', '', 'Total Waktu Kurang:', $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Keterlambatan:', $this->data['summary']['total_keterlambatan'] . ' menit', '', '', 'Total Hari Lembur:', ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
 
         return $rows;
     }
@@ -170,17 +170,13 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         // --- Summary rows (4 rows: ringkasan header + 3 data rows) ---
         $summaryStart = $lastRow - 3;
-        // Ringkasan header
-        $sheet->mergeCells("A" . ($summaryStart) . ":{$lastCol}" . ($summaryStart));
-        // Data rows: merge label pairs
-        for ($r = $summaryStart + 1; $r <= $lastRow; $r++) {
-            $sheet->mergeCells("A{$r}:B{$r}");
-            $sheet->mergeCells("E{$r}:F{$r}");
-        }
+        $sheet->mergeCells("A{$summaryStart}:{$lastCol}{$summaryStart}");
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getFont()->setBold(true);
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
-            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
+            ->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
 
         // --- Pewarnaan: weekend/libur & cuti ---
         $dataStart = 6;

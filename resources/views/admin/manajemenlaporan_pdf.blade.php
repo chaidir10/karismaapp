@@ -85,25 +85,25 @@
             </tbody>
         </table>
 
-        <table style="width:100%; border-collapse:collapse; margin-top:2px; border:none;">
-            <tr><td colspan="4" style="border:none; font-weight:bold; font-size:9px; padding:2px 2px;">Ringkasan:</td></tr>
+        <table style="border-collapse:collapse; margin-top:2px; border:none;">
+            <tr><td colspan="4" style="border:none; font-weight:bold; font-size:9px; padding:1px 0;">Ringkasan:</td></tr>
             <tr>
-                <td style="border:none; font-size:9px; padding:1px 2px; width:20%;">Total Hari Kerja</td>
-                <td style="border:none; font-size:9px; padding:1px 2px; width:22%;"><strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
-                <td style="border:none; font-size:9px; padding:1px 2px; width:22%;">Total Jam Kerja</td>
-                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 0; white-space:nowrap;">Total Hari Kerja</td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 8px; white-space:nowrap;"><strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 20px; white-space:nowrap;">Total Jam Kerja</td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 8px; white-space:nowrap;"><strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
             </tr>
             <tr>
-                <td style="border:none; font-size:9px; padding:1px 2px;">Total Hari Cuti/DL</td>
-                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
-                <td style="border:none; font-size:9px; padding:1px 2px;">Total Waktu Kurang</td>
-                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 0; white-space:nowrap;">Total Hari Cuti/DL</td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 8px; white-space:nowrap;"><strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 20px; white-space:nowrap;">Total Waktu Kurang</td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 8px; white-space:nowrap;"><strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
             </tr>
             <tr>
-                <td style="border:none; font-size:9px; padding:1px 2px;">Total Keterlambatan</td>
-                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
-                <td style="border:none; font-size:9px; padding:1px 2px;">Total Hari Lembur</td>
-                <td style="border:none; font-size:9px; padding:1px 2px;"><strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 0; white-space:nowrap;">Total Keterlambatan</td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 8px; white-space:nowrap;"><strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 20px; white-space:nowrap;">Total Hari Lembur</td>
+                <td style="border:none; font-size:9px; padding:1px 0 1px 8px; white-space:nowrap;"><strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
             </tr>
         </table>
     </div>
