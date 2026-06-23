@@ -575,4 +575,45 @@ class DashboardAdminController extends Controller
         }
     }
 
+    public function getChartData(Request $request)
+    {
+        $days = (int) $request->input('days', 7);
+        $allowed = [7, 30, 90, 180, 365];
+        if (!in_array($days, $allowed)) $days = 7;
+
+        $labels = [];
+        $hadir = [];
+        $telat = [];
+        $lembur = [];
+
+        $format = $days <= 30 ? 'D d/m' : 'd/m';
+
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $labels[] = $date->translatedFormat($format);
+
+            $hadirCount = Presensi::whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_lembur', false)
+                ->where('status', 'approved')->distinct('user_id')->count('user_id');
+            $hadir[] = $hadirCount;
+
+            $telatCount = 0;
+            $masukRecords = Presensi::with('user')->whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_lembur', false)
+                ->where('status', 'approved')->get();
+            foreach ($masukRecords as $m) {
+                $jadwal = $m->user->getJadwalKerja($date);
+                $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
+                if ($m->jam > $batas) $telatCount++;
+            }
+            $telat[] = $telatCount;
+
+            $lemburCount = Presensi::whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_lembur', true)
+                ->where('status', 'approved')->distinct('user_id')->count('user_id');
+            $lembur[] = $lemburCount;
+        }
+
+        return response()->json(compact('labels', 'hadir', 'telat', 'lembur'));
+    }
 }

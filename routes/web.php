@@ -154,6 +154,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         // Dashboard & API untuk modal detail
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/data', [DashboardAdminController::class, 'getDashboardData'])->name('dashboard.data');
+        Route::get('/dashboard/chart', [DashboardAdminController::class, 'getChartData'])->name('dashboard.chart');
         Route::get('/presensi/{id}/detail', [DashboardAdminController::class, 'getPresensiDetail'])->name('presensi.detail');
         Route::get('/pengajuan/{id}/detail', [DashboardAdminController::class, 'getPengajuanDetail'])->name('pengajuan.detail');
 

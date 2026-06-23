@@ -791,7 +791,14 @@
     <div class="chart-performa-grid" style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px;">
         <div class="content-card" style="margin:0;">
             <div class="card-header">
-                <h2 class="card-title">Tren Kehadiran 7 Hari</h2>
+                <h2 class="card-title">Tren Kehadiran</h2>
+                <select id="chartPeriod" onchange="loadChartData(this.value)" style="padding:5px 28px 5px 10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:11px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 8px center;">
+                    <option value="7" selected>7 Hari</option>
+                    <option value="30">1 Bulan</option>
+                    <option value="90">3 Bulan</option>
+                    <option value="180">6 Bulan</option>
+                    <option value="365">1 Tahun</option>
+                </select>
             </div>
             <div class="card-content" style="padding:10px 15px 0;">
                 <div style="position:relative; height:280px;">
@@ -2189,56 +2196,47 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    var _attendanceChart = null;
+
+    function buildChart(labels, hadir, telat, lembur) {
         var ctx = document.getElementById('attendanceChart');
         if (!ctx) return;
 
-        new Chart(ctx, {
+        if (_attendanceChart) { _attendanceChart.destroy(); _attendanceChart = null; }
+
+        var showPoints = labels.length <= 31;
+
+        _attendanceChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: @json($chartLabels),
+                labels: labels,
                 datasets: [
                     {
-                        label: 'Hadir',
-                        data: @json($chartHadir),
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#10b981',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        label: 'Hadir', data: hadir,
+                        borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)',
+                        fill: true, tension: 0.4, borderWidth: 2.5,
+                        pointBackgroundColor: '#10b981', pointBorderColor: '#fff',
+                        pointBorderWidth: showPoints ? 2 : 0,
+                        pointRadius: showPoints ? 4 : 0,
+                        pointHoverRadius: 6
                     },
                     {
-                        label: 'Terlambat',
-                        data: @json($chartTelat),
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#ef4444',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        label: 'Terlambat', data: telat,
+                        borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)',
+                        fill: true, tension: 0.4, borderWidth: 2.5,
+                        pointBackgroundColor: '#ef4444', pointBorderColor: '#fff',
+                        pointBorderWidth: showPoints ? 2 : 0,
+                        pointRadius: showPoints ? 4 : 0,
+                        pointHoverRadius: 6
                     },
                     {
-                        label: 'Lembur',
-                        data: @json($chartLembur),
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.08)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#f59e0b',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        label: 'Lembur', data: lembur,
+                        borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)',
+                        fill: true, tension: 0.4, borderWidth: 2.5,
+                        pointBackgroundColor: '#f59e0b', pointBorderColor: '#fff',
+                        pointBorderWidth: showPoints ? 2 : 0,
+                        pointRadius: showPoints ? 4 : 0,
+                        pointHoverRadius: 6
                     }
                 ]
             },
@@ -2253,12 +2251,9 @@
                     },
                     tooltip: {
                         backgroundColor: 'rgba(30,41,59,0.9)',
-                        titleFont: { size: 12 },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        displayColors: true,
-                        boxWidth: 8, boxHeight: 8, boxPadding: 4
+                        titleFont: { size: 12 }, bodyFont: { size: 12 },
+                        padding: 10, cornerRadius: 8,
+                        displayColors: true, boxWidth: 8, boxHeight: 8, boxPadding: 4
                     }
                 },
                 scales: {
@@ -2269,13 +2264,28 @@
                         border: { display: false }
                     },
                     x: {
-                        ticks: { font: { size: 10 }, color: '#94a3b8' },
+                        ticks: {
+                            font: { size: 10 }, color: '#94a3b8',
+                            maxTicksLimit: labels.length <= 31 ? undefined : 15,
+                            maxRotation: labels.length > 31 ? 45 : 0
+                        },
                         grid: { display: false },
                         border: { display: false }
                     }
                 }
             }
         });
+    }
+
+    function loadChartData(days) {
+        fetch('/admin/dashboard/chart?days=' + days, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { buildChart(d.labels, d.hadir, d.telat, d.lembur); })
+            .catch(function() {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        buildChart(@json($chartLabels), @json($chartHadir), @json($chartTelat), @json($chartLembur));
     });
 </script>
 
