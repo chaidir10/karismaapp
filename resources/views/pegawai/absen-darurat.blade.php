@@ -10,33 +10,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-        .camera-area { flex:1; position:relative; overflow:hidden; background:#111; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; display:flex; flex-direction:column; overflow:hidden; }
+        .camera-area { flex:1; min-height:0; position:relative; overflow:hidden; background:#111; }
         #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
-        .overlay-top { position:absolute; top:0; left:0; right:0; padding:12px 16px; background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
+        .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
-        .bottom-panel { background:#111; padding:12px 16px 20px; z-index:2; }
-        .map-strip { height:80px; border-radius:12px; overflow:hidden; margin-bottom:10px; border:1px solid #333; }
+        .bottom-panel { flex-shrink:0; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; }
+        .map-location-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+        .map-strip { width:72px; height:48px; border-radius:10px; overflow:hidden; border:1px solid #333; flex-shrink:0; }
         #miniMap { width:100%; height:100%; }
-        .location-info { font-size:11px; color:#94a3b8; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-        .location-info i { color:#10b981; }
+        .location-info { font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:5px; flex:1; min-width:0; line-height:1.3; }
+        .location-info i { color:#10b981; flex-shrink:0; }
         .location-info.outside i { color:#ef4444; }
         .btn-row { display:flex; gap:10px; }
-        .btn-absen { flex:1; height:52px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; -webkit-tap-highlight-color:transparent; }
+        .btn-absen { flex:1; height:50px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-absen:active { opacity:0.85; transform:scale(0.97); }
         .btn-absen:disabled { opacity:0.4; cursor:not-allowed; }
         .btn-masuk { background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; }
         .btn-pulang { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; }
-        .shift-row { display:flex; gap:8px; margin-bottom:10px; }
-        .shift-btn { flex:1; padding:8px; border:1px solid #333; border-radius:10px; background:#1a1a2e; color:#94a3b8; font-size:11px; font-weight:600; cursor:pointer; text-align:center; }
+        .shift-row { display:flex; gap:6px; margin-bottom:8px; }
+        .shift-btn { flex:1; padding:7px 4px; border:1px solid #333; border-radius:10px; background:#1a1a2e; color:#94a3b8; font-size:11px; font-weight:600; cursor:pointer; text-align:center; }
         .shift-btn.active { border-color:#5AB6EA; color:#5AB6EA; background:rgba(90,182,234,0.1); }
         .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; display:none; }
         .toast-success { background:#10b981; color:#fff; }
         .toast-error { background:#ef4444; color:#fff; }
-        .guide-oval { position:absolute; top:50%; left:50%; transform:translate(-50%,-55%); width:200px; height:260px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; z-index:1; pointer-events:none; }
+        .guide-oval { position:absolute; top:50%; left:50%; transform:translate(-50%,-55%); width:180px; height:230px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; z-index:1; pointer-events:none; }
         canvas#captureCanvas { display:none; }
     </style>
 </head>
@@ -51,8 +52,10 @@
     </div>
 
     <div class="bottom-panel">
-        <div class="map-strip"><div id="miniMap"></div></div>
-        <div class="location-info" id="locationInfo"><i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...</div>
+        <div class="map-location-row">
+            <div class="map-strip"><div id="miniMap"></div></div>
+            <div class="location-info" id="locationInfo"><i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...</div>
+        </div>
 
         @if($shifts->count() > 0)
         <div class="shift-row">
