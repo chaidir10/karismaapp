@@ -75,12 +75,11 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
-        // Ringkasan — 9 kolom: A+B=label kiri, C=value kiri, D kosong, E+F=label kanan, G+H+I=value kanan
         $rows[] = ['Ringkasan:'];
         $rows[] = ['Total Hari Kerja', '', ': ' . $this->data['total_hari_kerja'] . ' Hari', '', 'Total Jam Kerja', '', ': ' . $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Hari Hadir', '', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', '', 'Total Waktu Kurang', '', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Hari Cuti/DL', '', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', 'Total Hari Lembur', '', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
-        $rows[] = ['Total Keterlambatan', '', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit'];
+        $rows[] = ['Total Hari Hadir', '', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', '', 'Total Keterlambatan', '', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit'];
+        $rows[] = ['Total Hari Lembur', '', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari', '', 'Total Waktu Kurang', '', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Hari Cuti/DL', '', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari'];
 
         return $rows;
     }
@@ -118,7 +117,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(11);
         $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        $sheet->getStyle('I1:I2')->getFont()->setSize(9);
+        $sheet->getStyle('I1:I2')->getFont()->setBold(true)->setSize(9);
         $sheet->getStyle('I1:I2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
         // --- Baris 3 = spacer ---
