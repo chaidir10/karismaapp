@@ -833,6 +833,52 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="adminToast" style="position:fixed; top:20px; right:20px; z-index:9999; transform:translateX(calc(100% + 30px)); transition:transform 0.3s ease; max-width:380px; pointer-events:none;">
+        <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; padding:14px 18px; box-shadow:0 8px 30px rgba(0,0,0,0.12); display:flex; align-items:center; gap:12px; pointer-events:auto;">
+            <div id="adminToastIcon" style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"></div>
+            <div style="flex:1;min-width:0;">
+                <div id="adminToastMsg" style="font-size:13px;font-weight:600;color:var(--dm-text,#1e293b);"></div>
+                <div style="margin-top:6px;height:3px;border-radius:2px;background:var(--dm-border,#e2e8f0);overflow:hidden;">
+                    <div id="adminToastTimer" style="height:100%;border-radius:2px;width:100%;"></div>
+                </div>
+            </div>
+            <button onclick="hideAdminToast()" style="background:none;border:none;color:var(--dm-muted,#94a3b8);font-size:14px;cursor:pointer;padding:4px;flex-shrink:0;"><i class="fas fa-xmark"></i></button>
+        </div>
+    </div>
+    <script>
+        var _toastTimer;
+        function showAdminToast(msg, type) {
+            var el = document.getElementById('adminToast');
+            var icon = document.getElementById('adminToastIcon');
+            var msgEl = document.getElementById('adminToastMsg');
+            var timer = document.getElementById('adminToastTimer');
+            msgEl.textContent = msg;
+            var color = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#5AB6EA';
+            icon.style.background = color + '15';
+            icon.style.color = color;
+            icon.innerHTML = type === 'success' ? '<i class="fas fa-check"></i>' : type === 'error' ? '<i class="fas fa-xmark"></i>' : '<i class="fas fa-info"></i>';
+            timer.style.background = color;
+            timer.style.width = '100%';
+            timer.style.transitionDuration = '0s';
+            el.style.transform = 'translateX(0)';
+            setTimeout(function() { timer.style.transitionDuration = '3s'; timer.style.width = '0%'; }, 50);
+            if (_toastTimer) clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(hideAdminToast, 3200);
+        }
+        function hideAdminToast() {
+            document.getElementById('adminToast').style.transform = 'translateX(calc(100% + 30px))';
+            if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+        }
+
+        @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function() { showAdminToast(@json(session('success')), 'success'); });
+        @endif
+        @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function() { showAdminToast(@json(session('error')), 'error'); });
+        @endif
+    </script>
+
     <!-- Mobile sidebar toggle -->
     <button id="sidebarToggle" class="sm:hidden fixed bottom-4 right-4 bg-indigo-600 text-white p-3 rounded-full shadow-lg z-50">
         <i class="fas fa-bars"></i>

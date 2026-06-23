@@ -8,11 +8,6 @@
         <p>Konfigurasi sistem aplikasi</p>
     </div>
 
-    @if(session('success'))
-    <div class="px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2" style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); color:var(--dm-text,#15803d);">
-        <i class="fas fa-check-circle"></i> {{ session('success') }}
-    </div>
-    @endif
 
     <form method="POST" action="{{ route('admin.pengaturan.update') }}">
         @csrf
