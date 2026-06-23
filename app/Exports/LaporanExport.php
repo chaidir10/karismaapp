@@ -97,7 +97,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $jam = floor($totalMenit / 60);
         $menit = $totalMenit % 60;
         if ($totalMenit <= 0) return '-';
-        return $menit === 0 ? "{$jam}j" : "{$jam}j{$menit}m";
+        return $menit === 0 ? "{$jam}j" : "{$jam}j {$menit}m";
     }
 
     public function title(): string

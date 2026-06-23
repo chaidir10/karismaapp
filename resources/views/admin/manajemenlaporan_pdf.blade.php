@@ -21,7 +21,7 @@
 </head>
 <body>
     @php
-    function fmtJM($m) { if (!is_numeric($m)) return $m ?: '-'; $j=floor($m/60); $s=$m%60; return ($j>0?$j.'j':'').($s>0?$s.'m':($j>0?'':'0m')); }
+    function fmtJM($m) { if (!is_numeric($m)) return $m ?: '-'; $j=floor($m/60); $s=$m%60; return ($j>0?$j.'j ':'').($s>0?$s.'m':($j>0?'':'0m')); }
     function fmtM($m) { if (!is_numeric($m)) return $m ?: '-'; return $m.'m'; }
     @endphp
 
