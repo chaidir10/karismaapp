@@ -14,7 +14,7 @@
 
     <!-- External CSS -->
     <!-- Manifest -->
-    <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,8 +22,8 @@
     <meta name="apple-mobile-web-app-title" content="KARISMA">
 
     <!-- iOS Icons -->
-    <link rel="apple-touch-icon" href="public/pwa/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="public/pwa/icons/icon-512x512.png">
+    <link rel="apple-touch-icon" href="{{ $appLogoUrl ?? asset('public/pwa/icons/icon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="512x512" href="{{ $appLogoUrl ?? asset('public/pwa/icons/icon-512x512.png') }}">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

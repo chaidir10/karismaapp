@@ -6,7 +6,7 @@
     <title>Download KARISMA - Aplikasi Presensi ASN</title>
 
     {{-- Manifest & PWA --}}
-    <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#5AB6EA">
     <link rel="icon" type="image/png" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}">
     <link rel="apple-touch-icon" href="{{ $appLogoUrl ?? asset('public/pwa/icons/icon-192x192.png') }}">

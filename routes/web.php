@@ -34,6 +34,47 @@ Route::get('/download', function () {
     return view('download');
 })->name('download');
 
+// PWA manifest — dynamic icons from app settings
+Route::get('/manifest.json', function () {
+    $logoPath = \App\Models\AppSetting::getValue('app_logo');
+    $hasCustom = $logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath);
+    $iconUrl = $hasCustom ? '/public/storage/' . $logoPath : '/public/pwa/icons/icon-512x512.png';
+    $icon192 = $hasCustom ? $iconUrl : '/public/pwa/icons/icon-192x192.png';
+
+    return response()->json([
+        'id' => '/pegawai/dashboard',
+        'name' => 'KARISMA - Presensi ASN',
+        'short_name' => 'KARISMA',
+        'description' => 'Aplikasi Presensi ASN Balai Kekarantinaan Kesehatan Kelas I Tarakan',
+        'start_url' => '/pegawai/dashboard',
+        'scope' => '/',
+        'display' => 'standalone',
+        'orientation' => 'portrait',
+        'lang' => 'id',
+        'dir' => 'ltr',
+        'background_color' => '#0b0f19',
+        'theme_color' => '#5AB6EA',
+        'categories' => ['business', 'productivity'],
+        'icons' => [
+            ['src' => $icon192, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $icon192, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+            ['src' => $iconUrl, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $iconUrl, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ],
+        'screenshots' => [
+            ['src' => $iconUrl, 'sizes' => '512x512', 'type' => 'image/png', 'form_factor' => 'narrow', 'label' => 'KARISMA Dashboard'],
+        ],
+        'shortcuts' => [
+            ['name' => 'Presensi', 'short_name' => 'Absen', 'url' => '/pegawai/dashboard', 'icons' => [['src' => $icon192, 'sizes' => '192x192']]],
+            ['name' => 'Riwayat', 'short_name' => 'Riwayat', 'url' => '/pegawai/riwayat', 'icons' => [['src' => $icon192, 'sizes' => '192x192']]],
+        ],
+        'display_override' => ['standalone', 'minimal-ui'],
+        'launch_handler' => ['client_mode' => 'navigate-existing'],
+        'prefer_related_applications' => false,
+    ])->header('Content-Type', 'application/manifest+json')
+      ->header('Cache-Control', 'no-cache, no-store, must-revalidate');
+});
+
 // PWA — serve SW from root scope
 Route::get('/sw.js', function () {
     return response(file_get_contents(public_path('sw.js')), 200)
