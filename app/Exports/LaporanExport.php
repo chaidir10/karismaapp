@@ -70,7 +70,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
                 $row['jam_kerja'] !== '-' ? $this->formatMenit($row['jam_kerja']) : '-',
                 $row['waktu_kurang'] !== '-' ? $row['waktu_kurang'] . ' mnt' : '-',
                 is_numeric($row['lembur']) && $row['lembur'] > 0
-                    ? $this->formatMenit($row['lembur']) . (!empty($row['lembur_waktu']) ? ' (' . $row['lembur_waktu'] . ')' : '')
+                    ? $this->formatMenitShort($row['lembur']) . (!empty($row['lembur_waktu']) ? ' (' . $row['lembur_waktu'] . ')' : '')
                     : '-',
                 $row['status_masuk'],
             ];
@@ -78,8 +78,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         $rows[] = ['Ringkasan:'];
         $rows[] = ['Total Hari Kerja', ': ' . $this->data['total_hari_kerja'] . ' Hari', '', '', 'Total Jam Kerja', ': ' . $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Hari Cuti/DL', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', '', 'Total Waktu Kurang', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Keterlambatan', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit', '', '', 'Total Hari Lembur', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
+        $rows[] = ['Total Hari Hadir', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', '', '', 'Total Waktu Kurang', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Hari Cuti/DL', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', '', 'Total Hari Lembur', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
+        $rows[] = ['Total Keterlambatan', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit', '', '', '', ''];
 
         return $rows;
     }
@@ -90,6 +91,14 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $menit = $totalMenit % 60;
         if ($totalMenit <= 0) return '-';
         return $menit === 0 ? "{$jam} jam" : "{$jam} jam {$menit} menit";
+    }
+
+    private function formatMenitShort($totalMenit)
+    {
+        $jam = floor($totalMenit / 60);
+        $menit = $totalMenit % 60;
+        if ($totalMenit <= 0) return '-';
+        return $menit === 0 ? "{$jam}j" : "{$jam}j{$menit}m";
     }
 
     public function title(): string
@@ -132,8 +141,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A5:{$lastCol}{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // --- Lebar kolom (landscape A4 ~39cm usable / 9 cols) ---
-        $widths = [16, 14, 14, 16, 16, 18, 16, 16, 22];
+        // --- Lebar kolom (landscape A4 ~148 chars) ---
+        //         A:Tgl  B:Masuk C:Plg  D:Telat E:PlgCpt F:JamKrj G:Kurang H:Lembur  I:Status
+        $widths = [12,    10,     10,    12,     12,      14,      12,      24,        22];
         foreach (range('A', $lastCol) as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
@@ -144,7 +154,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A6:{$lastCol}{$lastRow}")
             ->getAlignment()
             ->setVertical(Alignment::VERTICAL_CENTER)
-            ->setWrapText(true);
+            ->setWrapText(false);
         $sheet->getStyle("A6:A{$lastRow}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
@@ -168,8 +178,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getPageSetup()->setHorizontalCentered(true);
         $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$lastRow}");
 
-        // --- Summary rows (4 rows: ringkasan header + 3 data rows) ---
-        $summaryStart = $lastRow - 3;
+        // --- Summary rows (5 rows: ringkasan header + 4 data rows) ---
+        $summaryStart = $lastRow - 4;
         $sheet->mergeCells("A{$summaryStart}:{$lastCol}{$summaryStart}");
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getFont()->setBold(true);

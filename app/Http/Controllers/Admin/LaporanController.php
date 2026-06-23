@@ -61,12 +61,20 @@ class LaporanController extends Controller
                 }
             }
 
+            // Hitung total hari kerja efektif seluruh bulan (exclude weekend + libur)
+            $totalHariKerjaEfektif = 0;
+            for ($dd = $startDate->copy(); $dd->lte($endDate); $dd->addDay()) {
+                if ($dd->dayOfWeek != 0 && $dd->dayOfWeek != 6 && !isset($holidays[$dd->format('Y-m-d')])) {
+                    $totalHariKerjaEfektif++;
+                }
+            }
+
             $rows = [];
             $totalKeterlambatan = 0;
             $totalPulangCepat   = 0;
             $totalJamKerja      = 0;
             $totalKekurangan    = 0;
-            $totalHariKerja     = 0;
+            $totalHariHadir     = 0;
             $totalLembur        = 0;
             $totalHariLembur    = 0;
             $totalHariTelat     = 0;
@@ -170,11 +178,11 @@ class LaporanController extends Controller
                         $totalPulangCepat   += $pulangCepat;
                         $totalJamKerja      += $jamKerja;
                         $totalKekurangan    += $waktuKurang;
-                        $totalHariKerja++;
+                        $totalHariHadir++;
                     }
                 } elseif ($masuk || $pulang) {
                     if (!$isLibur) {
-                        $totalHariKerja++;
+                        $totalHariHadir++;
                         $row['masuk']  = $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-';
                         $row['pulang'] = $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-';
                     }
@@ -210,7 +218,8 @@ class LaporanController extends Controller
             $laporan[] = [
                 'user'             => $user,
                 'bulan'            => $startDate->translatedFormat('F Y'),
-                'total_hari_kerja'   => $totalHariKerja - $totalHariCuti,
+                'total_hari_kerja'   => $totalHariKerjaEfektif,
+                'total_hari_hadir'   => $totalHariHadir,
                 'total_hari_telat'   => $totalHariTelat,
                 'total_hari_lembur'  => $totalHariLembur,
                 'total_hari_cuti'    => $totalHariCuti,
