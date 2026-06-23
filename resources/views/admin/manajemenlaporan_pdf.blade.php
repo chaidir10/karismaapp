@@ -85,15 +85,15 @@
             <table style="border:none; width:auto;">
                 <tr>
                     <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Kerja: <strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
-                    <td style="border:none; padding:1px 0 1px 40px; white-space:nowrap;">Total Jam Kerja: <strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
+                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">Total Jam Kerja: <strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
                 </tr>
                 <tr>
                     <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Hadir: <strong>{{ $item['total_hari_hadir'] ?? 0 }} Hari</strong></td>
-                    <td style="border:none; padding:1px 0 1px 40px; white-space:nowrap;">Total Keterlambatan: <strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
+                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">Total Keterlambatan: <strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
                 </tr>
                 <tr>
                     <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Lembur: <strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
-                    <td style="border:none; padding:1px 0 1px 40px; white-space:nowrap;">Total Waktu Kurang: <strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
+                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">Total Waktu Kurang: <strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
                 </tr>
                 <tr>
                     <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Cuti/DL: <strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
