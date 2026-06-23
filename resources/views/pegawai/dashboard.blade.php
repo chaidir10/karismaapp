@@ -1833,11 +1833,13 @@
     function initializeLocation() {
         var addrEl = document.getElementById('location-address-mini');
 
+        // Langsung buat map default (seperti darurat) — jangan tunggu GPS
+        initializeMiniMapWithDefault();
+
         if (!navigator.geolocation) {
             if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Browser tidak mendukung geolokasi</span>';
             var infoEl = document.getElementById('locationRadiusInfo');
             if (infoEl) infoEl.innerHTML = '<button onclick="location.reload()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Refresh Halaman</button>';
-            initializeMiniMapWithDefault();
             return;
         }
 
@@ -1847,7 +1849,7 @@
             function(pos) {
                 currentPosition = pos;
                 updateLocationInfo(pos);
-                initializeMiniMap(pos);
+                updateMiniMapPosition(pos);
             },
             function(err) {
                 console.error(err);
@@ -1855,10 +1857,9 @@
                     if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Lokasi gagal dideteksi</span>';
                     var infoEl = document.getElementById('locationRadiusInfo');
                     if (infoEl) infoEl.innerHTML = '<button onclick="retryLocation()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Coba Lagi</button>';
-                    initializeMiniMapWithDefault();
                 }
             },
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000 }
         );
     }
 
@@ -1906,62 +1907,51 @@
         return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    function initializeMiniMap(position) {
-        const mapEl = document.getElementById('mini-map');
-        if (!mapEl) return;
+    function updateMiniMapPosition(position) {
+        if (!mapInstance || !window.L) return;
 
-        if (!window.L) {
-            setTimeout(function(){ initializeMiniMap(position); }, 500);
-            return;
-        }
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
 
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+        mapInstance.setView([lat, lng], 17);
 
-        if (!mapInstance) {
-            mapInstance = L.map(mapEl, {
-                zoomControl: false,
-                attributionControl: false
-            }).setView([lat, lng], 17);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19
-            }).addTo(mapInstance);
-
-            mapInstance._userMarker = L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
-
-            ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
-                .forEach(f => mapInstance[f] && mapInstance[f].disable());
+        if (mapInstance._userMarker) {
+            mapInstance._userMarker.setLatLng([lat, lng]);
         } else {
-            mapInstance.setView([lat, lng], 17);
-            if (mapInstance._userMarker) mapInstance._userMarker.setLatLng([lat, lng]);
+            mapInstance._userMarker = L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
         }
 
-        // penting: setelah modal tampil, map perlu invalidateSize
-        setTimeout(() => {
-            try { mapInstance.invalidateSize(); } catch (e) {}
-        }, 300);
+        setTimeout(function() { if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {} }, 100);
     }
 
     function initializeMiniMapWithDefault() {
-        const mapEl = document.getElementById('mini-map');
+        var mapEl = document.getElementById('mini-map');
         if (!mapEl) return;
 
         if (!window.L) { setTimeout(initializeMiniMapWithDefault, 500); return; }
 
+        if (mapEl.offsetWidth === 0 || mapEl.offsetHeight === 0) {
+            setTimeout(initializeMiniMapWithDefault, 300);
+            return;
+        }
+
         if (!mapInstance) {
+            var defaultLat = wilayahList.length > 0 ? wilayahList[0].lat : 3.3;
+            var defaultLng = wilayahList.length > 0 ? wilayahList[0].lng : 117.6;
             mapInstance = L.map(mapEl, {
                 zoomControl: false,
                 attributionControl: false
-            }).setView([-6.2088, 106.8456], 10);
+            }).setView([defaultLat, defaultLng], 15);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19
             }).addTo(mapInstance);
 
-            setTimeout(() => {
-                try { mapInstance.invalidateSize(); } catch (e) {}
-            }, 300);
+            ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
+                .forEach(function(f) { if (mapInstance[f]) mapInstance[f].disable(); });
+
+            setTimeout(function() { if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {} }, 100);
+            setTimeout(function() { if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {} }, 500);
         }
     }
 
