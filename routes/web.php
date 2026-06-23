@@ -144,6 +144,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         // Akun Pegawai
         Route::get('/akun', [AkunController::class, 'index'])->name('akun.index');
         Route::post('/akun', [AkunController::class, 'update'])->name('akun.update');
+        Route::post('/akun/toggle-darurat', [AkunController::class, 'toggleDarurat'])->name('akun.toggle-darurat');
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
     });
 

@@ -93,4 +93,15 @@ class AkunController extends Controller
         Auth::logout();
         return redirect()->route('login');
     }
+
+    public function toggleDarurat(Request $request)
+    {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'superadmin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        \App\Models\AppSetting::setValue('enable_absen_darurat', $request->input('enabled') ? '1' : '0');
+        return response()->json(['ok' => true]);
+    }
 }

@@ -251,6 +251,38 @@
             </button>
         </form>
     </div>
+
+    @if(in_array($user->role, ['admin', 'superadmin']))
+    @php
+        $daruratAktif = \App\Models\AppSetting::getBool('enable_absen_darurat', false);
+    @endphp
+    <div style="margin-bottom:20px;">
+        <div style="font-size:12px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; padding:0 4px;">Pengaturan Admin</div>
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <div style="width:44px; height:44px; border-radius:12px; background:rgba(239,68,68,0.08); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <p style="font-size:14px; font-weight:600; color:var(--dark); margin:0 0 2px;">Absen Darurat</p>
+                        <p style="font-size:12px; color:var(--gray); margin:0;">Aktifkan halaman absen alternatif</p>
+                    </div>
+                </div>
+                <label style="position:relative; display:inline-block; width:48px; height:28px; flex-shrink:0;">
+                    <input type="checkbox" id="toggleDaruratAkun" {{ $daruratAktif ? 'checked' : '' }} style="opacity:0; width:0; height:0; position:absolute;">
+                    <span style="position:absolute; cursor:pointer; inset:0; background:{{ $daruratAktif ? 'var(--primary)' : '#cbd5e1' }}; border-radius:28px; transition:0.2s;" id="toggleDaruratTrack">
+                        <span style="position:absolute; height:22px; width:22px; left:{{ $daruratAktif ? '23px' : '3px' }}; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="toggleDaruratThumb"></span>
+                    </span>
+                </label>
+            </div>
+            <div id="daruratStatus" style="margin-top:10px; font-size:11px; font-weight:600; color:{{ $daruratAktif ? '#10b981' : '#94a3b8' }}; display:flex; align-items:center; gap:6px;">
+                <i class="fas {{ $daruratAktif ? 'fa-circle-check' : 'fa-circle-xmark' }}"></i>
+                <span id="daruratStatusText">{{ $daruratAktif ? 'Absen darurat sedang aktif' : 'Absen darurat nonaktif' }}</span>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <!-- Photo Preview -->
@@ -566,5 +598,29 @@
         }
     }, { passive:true });
     document.addEventListener('touchend', function() { C.drag = false; });
+
+    // Toggle Absen Darurat (admin only)
+    var daruratToggle = document.getElementById('toggleDaruratAkun');
+    if (daruratToggle) {
+        daruratToggle.addEventListener('change', function() {
+            var on = this.checked;
+            var track = document.getElementById('toggleDaruratTrack');
+            var thumb = document.getElementById('toggleDaruratThumb');
+            var status = document.getElementById('daruratStatus');
+            var statusText = document.getElementById('daruratStatusText');
+
+            track.style.background = on ? 'var(--primary)' : '#cbd5e1';
+            thumb.style.left = on ? '23px' : '3px';
+            status.style.color = on ? '#10b981' : '#94a3b8';
+            status.querySelector('i').className = on ? 'fas fa-circle-check' : 'fas fa-circle-xmark';
+            statusText.textContent = on ? 'Absen darurat sedang aktif' : 'Absen darurat nonaktif';
+
+            fetch('/pegawai/akun/toggle-darurat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ enabled: on ? 1 : 0 })
+            }).catch(function() {});
+        });
+    }
 </script>
 @endsection
