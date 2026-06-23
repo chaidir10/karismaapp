@@ -1419,9 +1419,21 @@
         }
     });
 
+    // Bind SEKALI saja — tidak di dalam turbo:load agar tidak menumpuk
+    (function() {
+        var presensiModal = document.getElementById('presensiModal');
+        if (presensiModal && !presensiModal._boundPresensi) {
+            presensiModal._boundPresensi = true;
+            presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
+            presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
+        }
+    })();
+
     document.addEventListener('turbo:load', function() {
-        const presensiModal = document.getElementById('presensiModal');
-        if (presensiModal) {
+        // Re-bind jika DOM diganti oleh Turbo
+        var presensiModal = document.getElementById('presensiModal');
+        if (presensiModal && !presensiModal._boundPresensi) {
+            presensiModal._boundPresensi = true;
             presensiModal.addEventListener('shown.bs.modal', initializePresensiModal);
             presensiModal.addEventListener('hidden.bs.modal', cleanupPresensiModal);
         }
@@ -1501,9 +1513,12 @@
     var _faceDetectTimer = null;
     var _faceDetecting = false;
 
+    var _cameraInitId = 0;
     function initializeCamera() {
         var video = document.getElementById('video');
         if (!video) return;
+
+        var myId = ++_cameraInitId;
 
         // Full cleanup first — stop everything
         stopFaceDetection();
@@ -1524,11 +1539,13 @@
             audio: false
         })
         .then(function(stream) {
+            if (myId !== _cameraInitId) { stream.getTracks().forEach(function(t){t.stop();}); return Promise.reject('stale'); }
             videoStream = stream;
             video.srcObject = stream;
             return video.play().catch(function(){});
         })
         .then(function() {
+            if (myId !== _cameraInitId) return;
             if (window._enableFaceDetection) {
                 initFaceDetection();
             } else {
@@ -1540,6 +1557,7 @@
             }
         })
         .catch(function(err) {
+            if (err === 'stale') return;
             console.error(err);
             var statusEl = document.getElementById('faceStatus');
             if (statusEl) {
@@ -1734,8 +1752,15 @@
         initializeLocation();
     }
 
+    var _locInitId = 0;
     function initializeLocation() {
+        var myId = ++_locInitId;
         var addrEl = document.getElementById('location-address-mini');
+
+        if (mapInstance) {
+            try { mapInstance.remove(); } catch(e) {}
+            mapInstance = null;
+        }
 
         if (!navigator.geolocation) {
             if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Browser tidak mendukung geolokasi</span>';
@@ -1746,12 +1771,14 @@
         }
 
         navigator.geolocation.getCurrentPosition(
-            pos => {
+            function(pos) {
+                if (myId !== _locInitId) return;
                 currentPosition = pos;
                 updateLocationInfo(pos);
                 initializeMiniMap(pos);
             },
-            err => {
+            function(err) {
+                if (myId !== _locInitId) return;
                 console.error(err);
                 if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Lokasi gagal dideteksi</span>';
                 var infoEl = document.getElementById('locationRadiusInfo');
@@ -1811,7 +1838,7 @@
         if (!mapEl) return;
 
         if (!window.L) {
-            console.error('Leaflet belum dimuat. Pastikan leaflet.js ada di layout.');
+            setTimeout(function(){ initializeMiniMap(position); }, 500);
             return;
         }
 
@@ -1846,7 +1873,7 @@
         const mapEl = document.getElementById('mini-map');
         if (!mapEl) return;
 
-        if (!window.L) return;
+        if (!window.L) { setTimeout(initializeMiniMapWithDefault, 500); return; }
 
         if (!mapInstance) {
             mapInstance = L.map(mapEl, {
