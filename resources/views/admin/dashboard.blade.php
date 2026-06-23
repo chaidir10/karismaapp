@@ -792,13 +792,16 @@
         <div class="content-card" style="margin:0;">
             <div class="card-header">
                 <h2 class="card-title">Tren Kehadiran</h2>
-                <select id="chartPeriod" onchange="loadChartData(this.value)" style="padding:5px 28px 5px 10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:11px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 8px center;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button onclick="downloadChart()" class="btn-header" style="padding:5px 10px; font-size:11px;" title="Download PDF"><i class="fas fa-download"></i></button>
+                    <select id="chartPeriod" onchange="loadChartData(this.value)" style="padding:5px 28px 5px 10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:11px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 8px center;">
                     <option value="7" selected>7 Hari</option>
                     <option value="30">1 Bulan</option>
                     <option value="90">3 Bulan</option>
                     <option value="180">6 Bulan</option>
                     <option value="365">1 Tahun</option>
                 </select>
+                </div>
             </div>
             <div class="card-content" style="padding:10px 15px 0;">
                 <div style="position:relative; height:280px;">
@@ -2282,6 +2285,78 @@
             .then(function(r) { return r.json(); })
             .then(function(d) { buildChart(d.labels, d.hadir, d.telat, d.lembur); })
             .catch(function() {});
+    }
+
+    function downloadChart() {
+        if (!_attendanceChart) return;
+        var periodeText = document.getElementById('chartPeriod').selectedOptions[0].text;
+
+        // A4 landscape: 297mm x 210mm → 1123 x 794 px at 96dpi
+        var offscreen = document.createElement('canvas');
+        offscreen.width = 1123;
+        offscreen.height = 794;
+        var octx = offscreen.getContext('2d');
+
+        // Background putih
+        octx.fillStyle = '#ffffff';
+        octx.fillRect(0, 0, 1123, 794);
+
+        // Header
+        octx.fillStyle = '#1e293b';
+        octx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif';
+        octx.textAlign = 'left';
+        octx.fillText('Tren Kehadiran — ' + periodeText, 40, 50);
+
+        octx.font = '13px -apple-system, BlinkMacSystemFont, sans-serif';
+        octx.fillStyle = '#64748b';
+        var now = new Date();
+        octx.fillText('Diunduh: ' + now.toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) + ' ' + now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), 40, 72);
+
+        // Render chart besar ke offscreen
+        var tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 1043;
+        tempCanvas.height = 660;
+        var tempChart = new Chart(tempCanvas, {
+            type: 'line',
+            data: JSON.parse(JSON.stringify(_attendanceChart.data)),
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, boxHeight: 12, borderRadius: 6, useBorderRadius: true, padding: 24, font: { size: 14, weight: '500' }, color: '#1e293b' }
+                    },
+                    tooltip: { enabled: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, font: { size: 13 }, color: '#64748b' },
+                        grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false },
+                        border: { display: false }
+                    },
+                    x: {
+                        ticks: { font: { size: 11 }, color: '#64748b', maxTicksLimit: 20 },
+                        grid: { display: false },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+
+        setTimeout(function() {
+            octx.drawImage(tempCanvas, 40, 90, 1043, 660);
+            tempChart.destroy();
+
+            // Download as PNG
+            var link = document.createElement('a');
+            link.download = 'Tren Kehadiran - ' + periodeText + '.png';
+            link.href = offscreen.toDataURL('image/png', 1.0);
+            link.click();
+        }, 300);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
