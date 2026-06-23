@@ -89,7 +89,7 @@ class LaporanController extends Controller
 
                 $statusLibur = 'Tidak Hadir';
                 if ($isHoliday) {
-                    $statusLibur = $holidays[$tanggal];
+                    $statusLibur = $this->shortenHoliday($holidays[$tanggal]);
                 } elseif ($isWeekend) {
                     $statusLibur = 'Libur';
                 }
@@ -262,6 +262,14 @@ class LaporanController extends Controller
         }
         
         return $diffInMinutes;
+    }
+
+    private function shortenHoliday(string $name): string
+    {
+        $name = str_replace('Cuti Bersama ', 'Cutber ', $name);
+        $name = preg_replace('/\s+\d{4}\s*Hijriyah$/i', '', $name);
+        $name = preg_replace('/\s+\d{4}\s*Masehi$/i', '', $name);
+        return $name;
     }
 
     /**
