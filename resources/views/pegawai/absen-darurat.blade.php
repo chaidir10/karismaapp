@@ -19,11 +19,10 @@
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
         .bottom-panel { flex-shrink:0; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; }
-        .map-location-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
-        .map-strip { width:72px; height:48px; border-radius:10px; overflow:hidden; border:1px solid #333; flex-shrink:0; }
+        .map-strip { height:80px; border-radius:12px; overflow:hidden; margin-bottom:8px; border:1px solid #333; }
         #miniMap { width:100%; height:100%; }
-        .location-info { font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:5px; flex:1; min-width:0; line-height:1.3; }
-        .location-info i { color:#10b981; flex-shrink:0; }
+        .location-info { font-size:11px; color:#94a3b8; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+        .location-info i { color:#10b981; }
         .location-info.outside i { color:#ef4444; }
         .btn-row { display:flex; gap:10px; }
         .btn-absen { flex:1; height:50px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
@@ -52,10 +51,8 @@
     </div>
 
     <div class="bottom-panel">
-        <div class="map-location-row">
-            <div class="map-strip"><div id="miniMap"></div></div>
-            <div class="location-info" id="locationInfo"><i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...</div>
-        </div>
+        <div class="map-strip"><div id="miniMap"></div></div>
+        <div class="location-info" id="locationInfo"><i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...</div>
 
         @if($shifts->count() > 0)
         <div class="shift-row">
