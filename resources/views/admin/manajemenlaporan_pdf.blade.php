@@ -38,7 +38,7 @@
 
     @foreach($laporan as $item)
     <div @if(!$loop->last) class="page-break" @endif>
-        <table style="margin-bottom:2px; border:1px solid #333;">
+        <table style="margin-bottom:2px; border:none;">
             <tr>
                 <td style="border:none; text-align:left; padding:2px 4px;">
                     <strong style="font-size:11px;">LAPORAN KEHADIRAN PEGAWAI BKK KELAS I TARAKAN</strong><br>
