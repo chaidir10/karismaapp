@@ -97,30 +97,37 @@
             return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
         }
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                var lat = pos.coords.latitude, lng = pos.coords.longitude;
-                currentLokasi = lat + ',' + lng;
-                miniMap.setView([lat,lng], 16);
-                L.marker([lat,lng]).addTo(miniMap);
+        var locationMarker = null;
+        function updateLocation(pos) {
+            var lat = pos.coords.latitude, lng = pos.coords.longitude;
+            var acc = Math.round(pos.coords.accuracy);
+            currentLokasi = lat + ',' + lng;
+            miniMap.setView([lat,lng], 17);
+            if (locationMarker) miniMap.removeLayer(locationMarker);
+            locationMarker = L.marker([lat,lng]).addTo(miniMap);
 
-                var inRadius = false;
-                for (var i = 0; i < wilayahList.length; i++) {
-                    if (haversine(lat,lng,wilayahList[i].lat,wilayahList[i].lng) <= wilayahList[i].radius) {
-                        inRadius = true; break;
-                    }
-                }
-                var el = document.getElementById('locationInfo');
-                if (inRadius) {
-                    el.className = 'location-info';
-                    el.innerHTML = '<i class="fas fa-check-circle"></i> Di dalam wilayah kerja';
-                } else {
-                    el.className = 'location-info outside';
-                    el.innerHTML = '<i class="fas fa-exclamation-circle"></i> Di luar wilayah kerja (perlu approval admin)';
-                }
-            }, function() {
+            var inRadius = false;
+            var nearestDist = Infinity;
+            for (var i = 0; i < wilayahList.length; i++) {
+                var d = haversine(lat,lng,wilayahList[i].lat,wilayahList[i].lng);
+                if (d < nearestDist) nearestDist = d;
+                if (d <= wilayahList[i].radius) { inRadius = true; break; }
+            }
+            var el = document.getElementById('locationInfo');
+            if (inRadius) {
+                el.className = 'location-info';
+                el.innerHTML = '<i class="fas fa-check-circle"></i> Di dalam wilayah kerja <span style="opacity:0.6;">(akurasi: ' + acc + 'm)</span>';
+            } else {
+                el.className = 'location-info outside';
+                el.innerHTML = '<i class="fas fa-exclamation-circle"></i> Di luar radius (' + Math.round(nearestDist) + 'm dari titik terdekat, akurasi: ' + acc + 'm)';
+            }
+        }
+
+        if (navigator.geolocation) {
+            // Watch position — terus update lokasi untuk akurasi terbaik
+            navigator.geolocation.watchPosition(updateLocation, function() {
                 document.getElementById('locationInfo').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444;"></i> Gagal mendapatkan lokasi';
-            }, { enableHighAccuracy:true, timeout:15000 });
+            }, { enableHighAccuracy:true, timeout:30000, maximumAge:0 });
         }
 
         // Shift
