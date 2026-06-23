@@ -80,25 +80,29 @@
             </tbody>
         </table>
 
-        <div style="margin-top:2px; font-size:10px;">
+        @php
+            $ring = [
+                ['Total Hari Kerja', $item['total_hari_kerja'].' Hari', 'Total Jam Kerja', fmtJM($item['summary']['total_jam_kerja'])],
+                ['Total Hari Hadir', ($item['total_hari_hadir'] ?? 0).' Hari', 'Total Keterlambatan', $item['summary']['total_keterlambatan'].' menit'],
+                ['Total Hari Lembur', ($item['total_hari_lembur'] ?? 0).' Hari', 'Total Waktu Kurang', $item['summary']['total_kekurangan'].' menit'],
+                ['Total Hari Cuti/DL', ($item['total_hari_cuti'] ?? 0).' Hari', '', ''],
+            ];
+        @endphp
+        <div style="margin-top:2px; font-size:10px; text-align:left;">
             <div style="font-weight:bold; padding:2px 0;">Ringkasan:</div>
-            <table style="border:none; width:auto;">
+            <table style="border:none; width:auto; text-align:left;">
+                @foreach($ring as $r)
                 <tr>
-                    <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Kerja: <strong>{{ $item['total_hari_kerja'] }} Hari</strong></td>
-                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">Total Jam Kerja: <strong>{{ fmtJM($item['summary']['total_jam_kerja']) }}</strong></td>
+                    <td style="border:none; padding:1px 0; white-space:nowrap;">{{ $r[0] }}</td>
+                    <td style="border:none; padding:1px 0 1px 4px; white-space:nowrap;">: <strong>{{ $r[1] }}</strong></td>
+                    @if($r[2])
+                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">{{ $r[2] }}</td>
+                    <td style="border:none; padding:1px 0 1px 4px; white-space:nowrap;">: <strong>{{ $r[3] }}</strong></td>
+                    @else
+                    <td style="border:none;" colspan="2"></td>
+                    @endif
                 </tr>
-                <tr>
-                    <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Hadir: <strong>{{ $item['total_hari_hadir'] ?? 0 }} Hari</strong></td>
-                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">Total Keterlambatan: <strong>{{ $item['summary']['total_keterlambatan'] }} menit</strong></td>
-                </tr>
-                <tr>
-                    <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Lembur: <strong>{{ $item['total_hari_lembur'] ?? 0 }} Hari</strong></td>
-                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">Total Waktu Kurang: <strong>{{ $item['summary']['total_kekurangan'] }} menit</strong></td>
-                </tr>
-                <tr>
-                    <td style="border:none; padding:1px 0; white-space:nowrap;">Total Hari Cuti/DL: <strong>{{ $item['total_hari_cuti'] ?? 0 }} Hari</strong></td>
-                    <td style="border:none;"></td>
-                </tr>
+                @endforeach
             </table>
         </div>
     </div>
