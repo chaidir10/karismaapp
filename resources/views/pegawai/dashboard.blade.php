@@ -1155,7 +1155,9 @@
     }
 
     // Push Notification Reminders
-    (function() {
+    var _reminderInterval = null;
+    function startReminders() {
+        if (_reminderInterval) { clearInterval(_reminderInterval); _reminderInterval = null; }
         if (!('Notification' in window)) return;
 
         var jadwalMasuk = @json($jadwalKerjaHariIni['jam_masuk'] ?? '07:30:00');
@@ -1185,13 +1187,10 @@
             return d;
         }
 
-        var now = new Date();
         var masukTime = parseTime(jadwalMasuk);
         var pulangTime = parseTime(jadwalPulang);
         var reminderMasuk = new Date(masukTime.getTime() - 10 * 60000);
-        var reminderPulang = new Date(pulangTime.getTime() - 10 * 60000);
 
-        // Hitung jam pulang berdasarkan durasi kerja
         var durasiKerja = pulangTime.getTime() - masukTime.getTime();
         var jamPulangAktual = pulangTime;
         if (sudahMasuk && jamMasukUser) {
@@ -1219,8 +1218,9 @@
         }
 
         checkReminders();
-        setInterval(checkReminders, 30000);
-    })();
+        _reminderInterval = setInterval(checkReminders, 30000);
+    }
+    startReminders();
 
     let videoStream = null;
     let mapInstance = null;
@@ -1253,7 +1253,7 @@
         document.getElementById('jamShiftIdInput').value = shiftId;
         closeSimpleModal('shiftPickerModal');
         setTimeout(function() {
-            new bootstrap.Modal(document.getElementById('presensiModal')).show();
+            openPresensiModal();
         }, 300);
     }
 
@@ -1389,7 +1389,7 @@
             }
             openSimpleModal('earlyPulangModal');
         } else {
-            new bootstrap.Modal(document.getElementById('presensiModal')).show();
+            openPresensiModal();
         }
     }
 
@@ -1403,18 +1403,17 @@
     function proceedSelesaiLembur() {
         setJenis('pulang');
         setLembur(true);
+        if (!_presensiReady || !videoStream) { _presensiReady = true; initializeCamera(); }
+        if (!currentPosition) initializeLocation();
         closeLemburConfirm();
-
-        setTimeout(function() {
-            new bootstrap.Modal(document.getElementById('presensiModal')).show();
-        }, 300);
+        setTimeout(function() { var m = getPresensiModal(); if (m) m.show(); }, 300);
     }
 
     function proceedPulang() {
+        if (!_presensiReady || !videoStream) { _presensiReady = true; initializeCamera(); }
+        if (!currentPosition) initializeLocation();
         closeSimpleModal('earlyPulangModal');
-        setTimeout(function() {
-            new bootstrap.Modal(document.getElementById('presensiModal')).show();
-        }, 300);
+        setTimeout(function() { var m = getPresensiModal(); if (m) m.show(); }, 300);
     }
 
     function handlePulangClick() {
@@ -1429,6 +1428,7 @@
     // Full cleanup saat Turbo navigasi keluar halaman
     document.addEventListener('turbo:before-cache', function() {
         if (_workTimerInterval) { clearInterval(_workTimerInterval); _workTimerInterval = null; }
+        if (_reminderInterval) { clearInterval(_reminderInterval); _reminderInterval = null; }
         stopFaceDetection();
         if (videoStream) {
             videoStream.getTracks().forEach(function(t) { t.stop(); });
@@ -1443,6 +1443,7 @@
             mapInstance = null;
         }
         _presensiReady = false;
+        _presensiModalInstance = null;
         currentPosition = null;
         var video = document.getElementById('video');
         if (video) { video.srcObject = null; video.load(); }
@@ -1510,30 +1511,58 @@
     });
 
     var _presensiReady = false;
+    var _presensiModalInstance = null;
 
-    function initializePresensiModal() {
+    function getPresensiModal() {
+        if (!_presensiModalInstance) {
+            var el = document.getElementById('presensiModal');
+            if (el) _presensiModalInstance = new bootstrap.Modal(el);
+        }
+        return _presensiModalInstance;
+    }
+
+    function openPresensiModal() {
         if (!_presensiReady) {
             _presensiReady = true;
             initializeCamera();
             initializeLocation();
-        } else {
-            resumePresensiModal();
+        } else if (!videoStream) {
+            initializeCamera();
         }
-        setTimeout(function() {
-            if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {}
-        }, 300);
+        if (!currentPosition) initializeLocation();
+        var m = getPresensiModal();
+        if (m) m.show();
     }
 
-    function resumePresensiModal() {
+    function initializePresensiModal() {
         var video = document.getElementById('video');
         if (video && videoStream) {
             video.srcObject = videoStream;
             video.play().catch(function(){});
-            if (window._enableFaceDetection && !_faceDetectionActive) initFaceDetection();
-        } else {
-            initializeCamera();
         }
-        if (!currentPosition) initializeLocation();
+        if (window._enableFaceDetection && !_faceDetectionActive && videoStream) {
+            initFaceDetection();
+        } else if (!window._enableFaceDetection && videoStream) {
+            var submitBtn = document.querySelector('.submit-btn-large');
+            if (submitBtn) submitBtn.disabled = false;
+            faceDetected = true;
+        }
+        setTimeout(function() {
+            if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {}
+        }, 300);
+        verifyCameraHealth();
+    }
+
+    function verifyCameraHealth() {
+        setTimeout(function() {
+            var video = document.getElementById('video');
+            if (!video) return;
+            var modal = document.getElementById('presensiModal');
+            if (!modal || !modal.classList.contains('show')) return;
+            if (!videoStream || !video.srcObject || video.readyState < 2) {
+                initializeCamera();
+            }
+        }, 3000);
     }
 
     function cleanupPresensiModal() {
