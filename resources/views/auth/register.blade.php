@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - KARISMA</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
-    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
     <meta name="theme-color" content="#2E97D4">
@@ -258,7 +258,7 @@
         <div class="register-header">
             <div class="logo">
                 <div class="w-12 h-12 bg-white/600 flex items-center justify-center mr-3 overflow-hidden">
-                    <img src="{{ asset('public/images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
+                    <img src="{{ $appLogoUrl ?? asset('public/images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <div class="logo-text">KARISMA</div>
             </div>

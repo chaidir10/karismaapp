@@ -6,6 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Absen Darurat | KARISMA</title>
+    <link rel="icon" type="image/png" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>

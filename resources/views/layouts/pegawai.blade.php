@@ -9,8 +9,8 @@
     <meta http-equiv="Expires" content="0">
     <title>KARISMA | @yield('title')</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
-    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <!-- External CSS -->
     <!-- Manifest -->

@@ -9,6 +9,39 @@
     </div>
 
 
+    <!-- Logo Aplikasi -->
+    <div class="overflow-hidden mb-6" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+        <div class="px-6 py-4" style="border-bottom:1px solid var(--dm-border,#e2e8f0);">
+            <h2 class="text-base font-semibold" style="color:var(--dm-text,#1e293b);">Logo Aplikasi</h2>
+        </div>
+        <div class="px-6 py-4">
+            <div class="text-xs mb-3" style="color:var(--dm-muted,#64748b);">Logo akan tampil di sidebar, tab browser, halaman login, pendaftaran, dan download. Rekomendasi: gambar persegi, minimal 512x512px, format PNG.</div>
+            <form method="POST" action="{{ route('admin.pengaturan.upload-logo') }}" enctype="multipart/form-data" id="logoForm">
+                @csrf
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div id="logoPreviewBox" style="width:64px; height:64px; border-radius:14px; border:2px dashed var(--dm-border,#d1d5db); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; background:var(--dm-bg,#f9fafb);">
+                        @if($appLogoUrl)
+                            <img src="{{ $appLogoUrl }}" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
+                        @else
+                            <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#5AB6EA,#2E97D4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px;">K</div>
+                        @endif
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <input type="file" name="app_logo" id="logoInput" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="display:none;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button type="button" onclick="document.getElementById('logoInput').click()" class="btn-primary" style="padding:7px 14px; font-size:12px;"><i class="fas fa-upload" style="margin-right:4px;"></i> Pilih Logo</button>
+                            @if($appLogoUrl)
+                            <button type="button" onclick="removeLogo()" class="btn-danger" style="padding:7px 14px; font-size:12px;"><i class="fas fa-trash" style="margin-right:4px;"></i> Hapus</button>
+                            @endif
+                        </div>
+                        <div id="logoFileName" style="font-size:11px; color:var(--dm-muted,#94a3b8); margin-top:6px;"></div>
+                    </div>
+                </div>
+            </form>
+            <form method="POST" action="{{ route('admin.pengaturan.remove-logo') }}" id="removeLogoForm" style="display:none;">@csrf @method('DELETE')</form>
+        </div>
+    </div>
+
     <form method="POST" action="{{ route('admin.pengaturan.update') }}">
         @csrf
 
@@ -329,6 +362,30 @@
     // Bind modal buttons
     document.getElementById('modalBtnSimpan').addEventListener('click', confirmUserModal);
     document.getElementById('modalBtnBatal').addEventListener('click', closeUserModal);
+
+    // Logo upload
+    document.getElementById('logoInput').addEventListener('change', function() {
+        var file = this.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            if (typeof adminToast === 'function') adminToast('Ukuran file maksimal 2MB', 'error');
+            this.value = '';
+            return;
+        }
+        document.getElementById('logoFileName').textContent = file.name;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('logoPreviewBox').innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:contain;">';
+        };
+        reader.readAsDataURL(file);
+        document.getElementById('logoForm').submit();
+    });
+
+    function removeLogo() {
+        if (confirm('Hapus logo dan kembali ke default?')) {
+            document.getElementById('removeLogoForm').submit();
+        }
+    }
 </script>
 @endpush
 @endsection

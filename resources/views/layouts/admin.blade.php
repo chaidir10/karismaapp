@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('public/images/favicon-48x48.png') }}">
-    <link rel="shortcut icon" href="{{ asset('public/images/favicon-48x48.png') }}" type="image/png">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}">
+    <link rel="shortcut icon" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}" type="image/png">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -751,7 +751,11 @@
             <div class="sidebar-content">
                 <div style="height:56px; padding:0 16px; border-bottom:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center;">
                     <div style="display:flex; align-items:center; gap:10px;">
-                        <div style="width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,#5AB6EA,#2E97D4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px;">K</div>
+                        @if($appLogoUrl)
+                            <img src="{{ $appLogoUrl }}" alt="Logo" style="width:32px; height:32px; border-radius:10px; object-fit:contain;">
+                        @else
+                            <div style="width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,#5AB6EA,#2E97D4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px;">K</div>
+                        @endif
                         <div>
                             <div style="font-size:14px; font-weight:700; color:var(--dm-text,#1e293b);">KARISMA</div>
                             <div style="font-size:10px; color:var(--dm-muted,#94a3b8);">Admin Panel</div>

@@ -8,7 +8,8 @@
     {{-- Manifest & PWA --}}
     <link rel="manifest" href="{{ asset('public/pwa/manifest.json') }}">
     <meta name="theme-color" content="#5AB6EA">
-    <link rel="apple-touch-icon" href="{{ asset('public/pwa/icons/icon-192x192.png') }}">
+    <link rel="icon" type="image/png" href="{{ $appLogoUrl ?? asset('public/images/favicon-48x48.png') }}">
+    <link rel="apple-touch-icon" href="{{ $appLogoUrl ?? asset('public/pwa/icons/icon-192x192.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -195,7 +196,7 @@
 <body>
     <!-- Hero -->
     <div class="hero">
-        <img src="{{ asset('public/images/icon-512x512.png') }}" alt="KARISMA" class="app-icon">
+        <img src="{{ $appLogoUrl ?? asset('public/images/icon-512x512.png') }}" alt="KARISMA" class="app-icon">
         <h1>KARISMA</h1>
         <p>Aplikasi Presensi ASN</p>
         <span class="version">Balai Kekarantinaan Kesehatan Kelas I Tarakan</span>

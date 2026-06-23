@@ -210,6 +210,27 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             ]);
         })->name('pengaturan.index');
 
+        Route::post('/pengaturan/upload-logo', function (\Illuminate\Http\Request $request) {
+            $request->validate(['app_logo' => 'required|image|mimes:png,jpg,jpeg,webp,svg|max:2048']);
+            $file = $request->file('app_logo');
+            $path = $file->store('logo', 'public');
+            $old = \App\Models\AppSetting::getValue('app_logo');
+            if ($old && \Illuminate\Support\Facades\Storage::disk('public')->exists($old)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($old);
+            }
+            \App\Models\AppSetting::setValue('app_logo', $path);
+            return redirect()->route('admin.pengaturan.index')->with('success', 'Logo berhasil diperbarui');
+        })->name('pengaturan.upload-logo');
+
+        Route::delete('/pengaturan/remove-logo', function () {
+            $old = \App\Models\AppSetting::getValue('app_logo');
+            if ($old && \Illuminate\Support\Facades\Storage::disk('public')->exists($old)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($old);
+            }
+            \App\Models\AppSetting::setValue('app_logo', '');
+            return redirect()->route('admin.pengaturan.index')->with('success', 'Logo berhasil dihapus');
+        })->name('pengaturan.remove-logo');
+
         Route::post('/pengaturan', function (\Illuminate\Http\Request $request) {
             \App\Models\AppSetting::setValue('disable_presensi_hari_libur', $request->boolean('disable_presensi_hari_libur') ? '1' : '0');
             \App\Models\AppSetting::setValue('enable_face_detection', $request->boolean('enable_face_detection') ? '1' : '0');
