@@ -143,9 +143,6 @@
                         <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
                     </div>
                     <div class="card-status">
-                        @if($p->is_darurat)
-                            <span class="card-tag tag-danger" style="font-size:8px;">DARURAT</span>
-                        @endif
                         @if($p->status === 'pending')
                             <span class="status-dot dot-pending"></span>
                         @elseif($p->badge_text)
