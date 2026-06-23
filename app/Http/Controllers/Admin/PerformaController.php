@@ -52,22 +52,22 @@ class PerformaController extends Controller
         $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth();
 
         $today = Carbon::today();
-        if ($endDate->gt($today)) {
-            $endDate = $today;
-        }
-
         if ($startDate->gt($today)) {
             return ['performa' => [], 'hari_kerja' => 0];
         }
 
         $holidays = \App\Helpers\HolidayHelper::getDates($tahun);
 
+        // Hari kerja efektif = seluruh bulan (bukan sampai hari ini)
         $hariKerja = 0;
         for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
             if ($d->dayOfWeek != 0 && $d->dayOfWeek != 6 && !in_array($d->format('Y-m-d'), $holidays)) {
                 $hariKerja++;
             }
         }
+
+        // Batas data presensi = sampai hari ini (tidak bisa lihat masa depan)
+        $dataEndDate = $endDate->gt($today) ? $today : $endDate;
 
         if ($hariKerja === 0) {
             return ['performa' => [], 'hari_kerja' => 0];
@@ -78,7 +78,7 @@ class PerformaController extends Controller
 
         foreach ($users as $user) {
             $presensi = Presensi::where('user_id', $user->id)
-                ->whereBetween('tanggal', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->whereBetween('tanggal', [$startDate->format('Y-m-d'), $dataEndDate->format('Y-m-d')])
                 ->where('status', 'approved')
                 ->where('is_lembur', false)
                 ->get()
@@ -88,7 +88,7 @@ class PerformaController extends Controller
             try {
                 $userCuti = Cuti::where('user_id', $user->id)
                     ->where('status', 'approved')
-                    ->where('tanggal_mulai', '<=', $endDate)
+                    ->where('tanggal_mulai', '<=', $dataEndDate)
                     ->where('tanggal_selesai', '>=', $startDate)
                     ->get();
             } catch (\Exception $e) {
@@ -97,7 +97,7 @@ class PerformaController extends Controller
             $cutiDates = [];
             foreach ($userCuti as $c) {
                 $cS = $c->tanggal_mulai->max($startDate);
-                $cE = $c->tanggal_selesai->min($endDate);
+                $cE = $c->tanggal_selesai->min($dataEndDate);
                 for ($cd = $cS->copy(); $cd->lte($cE); $cd->addDay()) {
                     if ($cd->dayOfWeek == 0 || $cd->dayOfWeek == 6 || in_array($cd->format('Y-m-d'), $holidays)) continue;
                     $cutiDates[] = $cd->format('Y-m-d');
@@ -114,7 +114,7 @@ class PerformaController extends Controller
             $totalMenitStandar = 0;
             $hariCuti = 0;
 
-            for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
+            for ($d = $startDate->copy(); $d->lte($dataEndDate); $d->addDay()) {
                 $tanggal = $d->format('Y-m-d');
 
                 if ($d->dayOfWeek == 0 || $d->dayOfWeek == 6 || in_array($tanggal, $holidays)) {
