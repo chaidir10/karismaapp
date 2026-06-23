@@ -465,10 +465,6 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--dm-text, #1e293b);
-            max-width: 140px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         /* Main content area */
@@ -753,7 +749,7 @@
         <!-- Desktop Sidebar -->
         <div class="sidebar">
             <div class="sidebar-content">
-                <div style="padding:20px 16px 16px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
+                <div style="height:56px; padding:0 16px; border-bottom:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <div style="width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,#5AB6EA,#2E97D4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px;">K</div>
                         <div>
