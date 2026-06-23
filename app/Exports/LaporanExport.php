@@ -137,7 +137,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
 
         // --- Lebar kolom ---
         //         A:Tgl  B:Masuk C:Plg  D:Telat E:PlgCpt F:JamKrj G:Kurang H:Lembur  I:Status
-        $widths = [12,    10,     10,    12,     12,      14,      12,      20,        28];
+        $widths = [12,    10,     10,    10,     10,      14,      12,      18,        34];
         foreach (range('A', $lastCol) as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
