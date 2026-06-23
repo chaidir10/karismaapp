@@ -48,9 +48,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $shiftInfo = ($this->data['is_shift'] ?? false) ? ' | ' . $this->data['shift_nama'] : '';
         $bulan = $this->data['bulan'] ?? now()->format('F Y');
         return [
-            ['LAPORAN KEHADIRAN PEGAWAI', '', '', '', '', '', '', 'Nama: ' . $this->data['user']->name . $shiftInfo],
-            ['BKK KELAS I TARAKAN', '', '', '', '', '', '', 'NIP: ' . $this->data['user']->nip],
-            ['Periode: ' . $bulan],
+            ['LAPORAN KEHADIRAN PEGAWAI BKK KELAS I TARAKAN', '', '', '', '', '', '', '', 'NIP: ' . $this->data['user']->nip],
+            ['Periode: ' . $bulan, '', '', '', '', '', '', '', 'Nama: ' . $this->data['user']->name . $shiftInfo],
             [],
             ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur', 'Status'],
         ];
@@ -77,10 +76,10 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         }
 
         $rows[] = ['Ringkasan:'];
-        $rows[] = ['Total Hari Kerja', ': ' . $this->data['total_hari_kerja'] . ' Hari', '', '', 'Total Jam Kerja', ': ' . $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Hari Hadir', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', '', '', 'Total Waktu Kurang', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Hari Cuti/DL', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', '', 'Total Hari Lembur', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
-        $rows[] = ['Total Keterlambatan', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit', '', '', '', ''];
+        $rows[] = ['Total Hari Kerja', ': ' . $this->data['total_hari_kerja'] . ' Hari', 'Total Jam Kerja', '', ': ' . $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Hari Hadir', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', 'Total Waktu Kurang', '', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Hari Cuti/DL', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', 'Total Hari Lembur', '', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
+        $rows[] = ['Total Keterlambatan', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit'];
 
         return $rows;
     }
@@ -111,60 +110,55 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $lastCol = 'I';
         $lastRow = $sheet->getHighestRow();
 
-        // --- Header (baris 1-3): kiri = judul, kanan = nama/nip ---
-        $sheet->mergeCells("A1:G1");
-        $sheet->mergeCells("H1:I1");
-        $sheet->mergeCells("A2:G2");
-        $sheet->mergeCells("H2:I2");
-        $sheet->mergeCells("A3:{$lastCol}3");
-
-        // Kiri: judul + instansi + periode
+        // --- Header (baris 1-2) ---
+        $sheet->mergeCells("A1:H1");
+        $sheet->mergeCells("A2:H2");
+        // NIP dan Nama di kolom I (kanan)
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9);
-        $sheet->getStyle('A3')->getFont()->setSize(9);
-        $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF2E97D4'));
+        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('I1:I2')->getFont()->setSize(9);
+        $sheet->getStyle('I1:I2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-        // Kanan: nama + nip
-        $sheet->getStyle('H1')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle('H2')->getFont()->setSize(10);
-        $sheet->getStyle('H1:H2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        // --- Baris 3 = spacer ---
+        $sheet->getRowDimension(3)->setRowHeight(4);
 
-        // --- Kolom header (baris 5) ---
-        $sheet->getStyle("A5:{$lastCol}5")->getFont()->setBold(true)->setSize(9);
-        $sheet->getStyle("A5:{$lastCol}5")->getFill()->setFillType(Fill::FILL_SOLID)
+        // --- Kolom header (baris 4) ---
+        $sheet->getStyle("A4:{$lastCol}4")->getFont()->setBold(true)->setSize(9);
+        $sheet->getStyle("A4:{$lastCol}4")->getFill()->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setRGB('D9E2F3');
-        $sheet->getStyle("A5:{$lastCol}5")->getAlignment()
+        $sheet->getStyle("A4:{$lastCol}4")->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        // --- Border seluruh data ---
-        $sheet->getStyle("A5:{$lastCol}{$lastRow}")
+        // --- Border seluruh data (dari header kolom sampai akhir) ---
+        $sheet->getStyle("A4:{$lastCol}{$lastRow}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // --- Lebar kolom (landscape A4 ~148 chars) ---
+        // --- Lebar kolom ---
         //         A:Tgl  B:Masuk C:Plg  D:Telat E:PlgCpt F:JamKrj G:Kurang H:Lembur  I:Status
-        $widths = [12,    10,     10,    12,     12,      14,      12,      24,        22];
+        $widths = [12,    10,     10,    12,     12,      14,      12,      20,        28];
         foreach (range('A', $lastCol) as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
 
-        // --- Font dan alignment data ---
-        $sheet->getStyle("A6:{$lastCol}{$lastRow}")
+        // --- Font dan alignment data (mulai baris 5) ---
+        $dataStart = 5;
+        $sheet->getStyle("A{$dataStart}:{$lastCol}{$lastRow}")
             ->getFont()->setSize(9);
-        $sheet->getStyle("A6:{$lastCol}{$lastRow}")
+        $sheet->getStyle("A{$dataStart}:{$lastCol}{$lastRow}")
             ->getAlignment()
             ->setVertical(Alignment::VERTICAL_CENTER)
             ->setWrapText(false);
-        $sheet->getStyle("A6:A{$lastRow}")
+        $sheet->getStyle("A{$dataStart}:A{$lastRow}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // --- Row height data (compact agar muat 1 halaman) ---
+        // --- Row height (compact) ---
         for ($r = 1; $r <= $lastRow; $r++) {
             $sheet->getRowDimension($r)->setRowHeight(14);
         }
         $sheet->getRowDimension(1)->setRowHeight(16);
-        $sheet->getRowDimension(4)->setRowHeight(4);
-        $sheet->getRowDimension(5)->setRowHeight(16);
+        $sheet->getRowDimension(4)->setRowHeight(16);
 
         // --- Page setup: LANDSCAPE, fit 1 halaman lebar ---
         $sheet->getPageSetup()
@@ -178,28 +172,41 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getPageSetup()->setHorizontalCentered(true);
         $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$lastRow}");
 
-        // --- Summary rows (5 rows: ringkasan header + 4 data rows) ---
+        // --- Summary: 5 rows (1 header + 4 data) ---
         $summaryStart = $lastRow - 4;
+        $ds = $summaryStart + 1;
+        $de = $summaryStart + 4;
+
+        // Ringkasan header — merge full row
         $sheet->mergeCells("A{$summaryStart}:{$lastCol}{$summaryStart}");
+
+        // Data rows: merge C+D untuk label kanan, E-I untuk value kanan
+        for ($r = $ds; $r <= $de; $r++) {
+            $sheet->mergeCells("C{$r}:D{$r}");
+            $sheet->mergeCells("E{$r}:{$lastCol}{$r}");
+        }
+        // Baris terakhir (Total Keterlambatan) — tidak ada kolom kanan
+        $sheet->mergeCells("B{$de}:{$lastCol}{$de}");
+
+        // Font bold + alignment
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getFont()->setBold(true);
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        // Border ringkasan header
+
+        // Border seluruh ringkasan
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$summaryStart}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        // Border data ringkasan: kiri (A-B) dan kanan (E-F) dengan border
-        $ds = $summaryStart + 1;
-        $sheet->getStyle("A{$ds}:B{$lastRow}")
+        $sheet->getStyle("A{$ds}:B{$de}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $sheet->getStyle("E{$ds}:F{$lastRow}")
+        $sheet->getStyle("C{$ds}:{$lastCol}" . ($de - 1))
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         // --- Pewarnaan: weekend/libur & cuti ---
-        $dataStart = 6;
+        $colorStart = 5;
         $rowIndex = 0;
         foreach ($this->data['rows'] as $row) {
-            $r = $dataStart + $rowIndex;
+            $r = $colorStart + $rowIndex;
             if ($r >= $summaryStart) break;
 
             if (!empty($row['is_cuti'])) {
