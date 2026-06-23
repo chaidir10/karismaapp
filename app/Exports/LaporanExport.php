@@ -48,8 +48,8 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $shiftInfo = ($this->data['is_shift'] ?? false) ? ' | ' . $this->data['shift_nama'] : '';
         $bulan = $this->data['bulan'] ?? now()->format('F Y');
         return [
-            ['LAPORAN KEHADIRAN PEGAWAI BKK KELAS I TARAKAN', '', '', '', '', '', '', '', 'NIP: ' . $this->data['user']->nip],
-            ['Periode: ' . $bulan, '', '', '', '', '', '', '', 'Nama: ' . $this->data['user']->name . $shiftInfo],
+            ['LAPORAN KEHADIRAN PEGAWAI BKK KELAS I TARAKAN', '', '', '', '', '', '', '', 'Nama: ' . $this->data['user']->name . $shiftInfo],
+            ['Periode: ' . $bulan, '', '', '', '', '', '', '', 'NIP: ' . $this->data['user']->nip],
             [],
             ['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Keterlambatan', 'Pulang Cepat', 'Jam Kerja', 'Waktu Kurang', 'Lembur', 'Status'],
         ];
@@ -75,11 +75,12 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
             ];
         }
 
+        // Ringkasan — 9 kolom: A+B=label kiri, C=value kiri, D kosong, E+F=label kanan, G+H+I=value kanan
         $rows[] = ['Ringkasan:'];
-        $rows[] = ['Total Hari Kerja', ': ' . $this->data['total_hari_kerja'] . ' Hari', 'Total Jam Kerja', '', ': ' . $this->formatMenit($this->data['summary']['total_jam_kerja'])];
-        $rows[] = ['Total Hari Hadir', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', 'Total Waktu Kurang', '', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
-        $rows[] = ['Total Hari Cuti/DL', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', 'Total Hari Lembur', '', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
-        $rows[] = ['Total Keterlambatan', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit'];
+        $rows[] = ['Total Hari Kerja', '', ': ' . $this->data['total_hari_kerja'] . ' Hari', '', 'Total Jam Kerja', '', ': ' . $this->formatMenit($this->data['summary']['total_jam_kerja'])];
+        $rows[] = ['Total Hari Hadir', '', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', '', 'Total Waktu Kurang', '', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
+        $rows[] = ['Total Hari Cuti/DL', '', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari', '', 'Total Hari Lembur', '', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari'];
+        $rows[] = ['Total Keterlambatan', '', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit'];
 
         return $rows;
     }
@@ -115,7 +116,7 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->mergeCells("A2:H2");
         // NIP dan Nama di kolom I (kanan)
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF2E97D4'));
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
         $sheet->getStyle('I1:I2')->getFont()->setSize(9);
         $sheet->getStyle('I1:I2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
@@ -175,18 +176,20 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         // --- Summary: 5 rows (1 header + 4 data) ---
         $summaryStart = $lastRow - 4;
         $ds = $summaryStart + 1;
-        $de = $summaryStart + 4;
+        $de = $summaryStart + 4; // last data row (Total Keterlambatan)
 
         // Ringkasan header — merge full row
         $sheet->mergeCells("A{$summaryStart}:{$lastCol}{$summaryStart}");
 
-        // Data rows: merge C+D untuk label kanan, E-I untuk value kanan
-        for ($r = $ds; $r <= $de; $r++) {
-            $sheet->mergeCells("C{$r}:D{$r}");
-            $sheet->mergeCells("E{$r}:{$lastCol}{$r}");
+        // Rows 1-3 of data (ds to de-1): left label A+B, left value C, right label E+F, right value G+H+I
+        for ($r = $ds; $r <= $de - 1; $r++) {
+            $sheet->mergeCells("A{$r}:B{$r}");
+            $sheet->mergeCells("E{$r}:F{$r}");
+            $sheet->mergeCells("G{$r}:{$lastCol}{$r}");
         }
-        // Baris terakhir (Total Keterlambatan) — tidak ada kolom kanan
-        $sheet->mergeCells("B{$de}:{$lastCol}{$de}");
+        // Last row (Total Keterlambatan): label A+B, value C+D+E+F+G+H+I
+        $sheet->mergeCells("A{$de}:B{$de}");
+        $sheet->mergeCells("C{$de}:{$lastCol}{$de}");
 
         // Font bold + alignment
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
@@ -194,12 +197,15 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        // Border seluruh ringkasan
+        // Border: header row
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$summaryStart}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $sheet->getStyle("A{$ds}:B{$de}")
+        // Border: left side (A-C) all data rows
+        $sheet->getStyle("A{$ds}:C{$de}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $sheet->getStyle("C{$ds}:{$lastCol}" . ($de - 1))
+        // Border: right side (E-I) rows 1-3 only
+        $deLast3 = $de - 1;
+        $sheet->getStyle("E{$ds}:{$lastCol}{$deLast3}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         // --- Pewarnaan: weekend/libur & cuti ---
