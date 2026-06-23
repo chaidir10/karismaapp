@@ -581,37 +581,43 @@ class DashboardAdminController extends Controller
         $allowed = [7, 30, 90, 180, 365];
         if (!in_array($days, $allowed)) $days = 7;
 
+        $startDate = Carbon::today()->subDays($days - 1);
+        $endDate = Carbon::today();
+        $format = $days <= 30 ? 'D d/m' : 'd/m';
+
+        // 1 query: semua presensi masuk dalam range
+        $allMasuk = Presensi::with('user')
+            ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+            ->where('jenis', 'masuk')
+            ->where('status', 'approved')
+            ->get();
+
+        $regulerByDate = $allMasuk->where('is_lembur', false)->groupBy('tanggal');
+        $lemburByDate = $allMasuk->where('is_lembur', true)->groupBy('tanggal');
+
         $labels = [];
         $hadir = [];
         $telat = [];
         $lembur = [];
 
-        $format = $days <= 30 ? 'D d/m' : 'd/m';
-
         for ($i = $days - 1; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
+            $key = $date->toDateString();
             $labels[] = $date->translatedFormat($format);
 
-            $hadirCount = Presensi::whereDate('tanggal', $date)
-                ->where('jenis', 'masuk')->where('is_lembur', false)
-                ->where('status', 'approved')->distinct('user_id')->count('user_id');
-            $hadir[] = $hadirCount;
+            $dayReguler = $regulerByDate->get($key, collect());
+            $hadir[] = $dayReguler->unique('user_id')->count();
 
             $telatCount = 0;
-            $masukRecords = Presensi::with('user')->whereDate('tanggal', $date)
-                ->where('jenis', 'masuk')->where('is_lembur', false)
-                ->where('status', 'approved')->get();
-            foreach ($masukRecords as $m) {
+            foreach ($dayReguler as $m) {
+                if (!$m->user) continue;
                 $jadwal = $m->user->getJadwalKerja($date);
                 $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
                 if ($m->jam > $batas) $telatCount++;
             }
             $telat[] = $telatCount;
 
-            $lemburCount = Presensi::whereDate('tanggal', $date)
-                ->where('jenis', 'masuk')->where('is_lembur', true)
-                ->where('status', 'approved')->distinct('user_id')->count('user_id');
-            $lembur[] = $lemburCount;
+            $lembur[] = $lemburByDate->get($key, collect())->unique('user_id')->count();
         }
 
         return response()->json(compact('labels', 'hadir', 'telat', 'lembur'));
