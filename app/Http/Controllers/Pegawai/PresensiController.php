@@ -276,6 +276,7 @@ class PresensiController extends Controller
                 'jam'          => now()->format('H:i:s'),
                 'status'       => $status,
                 'is_lembur'    => $isLembur,
+                'is_darurat'   => filter_var($request->input('is_darurat', false), FILTER_VALIDATE_BOOLEAN),
                 'jam_shift_id' => $request->jam_shift_id,
             ]);
 

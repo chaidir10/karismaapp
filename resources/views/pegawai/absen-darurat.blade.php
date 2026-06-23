@@ -162,6 +162,7 @@
             form.append('foto', fotoData);
             form.append('lokasi', currentLokasi);
             form.append('is_lembur', '0');
+            form.append('is_darurat', '1');
             if (selectedShift) form.append('jam_shift_id', selectedShift);
 
             fetch('{{ route("pegawai.presensi.store") }}', { method:'POST', body:form })

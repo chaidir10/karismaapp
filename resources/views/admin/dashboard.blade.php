@@ -864,7 +864,7 @@
                             @forelse($prPendMasuk as $p)
                             <tr class="clickable-row" data-user-name="{{ $p->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="{{ $p->jenis ?? '' }}" data-jam="{{ $p->jam ?? '-' }}" data-lokasi="{{ $p->lokasi ?? '' }}" data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}" data-approve-url="/admin/presensi/{{ $p->id }}/approve" data-reject-url="/admin/presensi/{{ $p->id }}/reject">
                                 <td class="text-center text-xs">{{ $loop->iteration }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}@if($p->is_darurat ?? false) <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-left:3px;vertical-align:middle;" title="Absen Darurat"></span>@endif</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}</td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
@@ -890,7 +890,7 @@
                             @forelse($prPendPulang as $p)
                             <tr class="clickable-row" data-user-name="{{ $p->user->name ?? 'N/A' }}" data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}" data-jenis="{{ $p->jenis ?? '' }}" data-jam="{{ $p->jam ?? '-' }}" data-lokasi="{{ $p->lokasi ?? '' }}" data-foto-url="{{ $p->foto ? asset('public/storage/' . $p->foto) : '' }}" data-approve-url="/admin/presensi/{{ $p->id }}/approve" data-reject-url="/admin/presensi/{{ $p->id }}/reject">
                                 <td class="text-center text-xs">{{ $loop->iteration }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}@if($p->is_darurat ?? false) <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-left:3px;vertical-align:middle;" title="Absen Darurat"></span>@endif</td>
                                 <td class="date-cell">{{ \Carbon\Carbon::parse($p->tanggal ?? now())->translatedFormat('d M Y') }}</td>
                                 <td>
                                     <div class="action-buttons" onclick="event.stopPropagation()">
@@ -1100,7 +1100,7 @@
                                 data-approve-url="/admin/presensi/{{ $p->id }}/approve"
                                 data-reject-url="/admin/presensi/{{ $p->id }}/reject">
                                 <td class="text-center text-xs">{{ $loop->iteration }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}@if($p->is_darurat ?? false) <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-left:3px;vertical-align:middle;" title="Absen Darurat"></span>@endif</td>
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if($p->terlambat)
@@ -1144,7 +1144,7 @@
                                 data-approve-url="/admin/presensi/{{ $p->id }}/approve"
                                 data-reject-url="/admin/presensi/{{ $p->id }}/reject">
                                 <td class="text-center text-xs">{{ $loop->iteration }}</td>
-                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}</td>
+                                <td class="user-name">{{ $p->user->name ?? 'N/A' }}@if($p->is_darurat ?? false) <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-left:3px;vertical-align:middle;" title="Absen Darurat"></span>@endif</td>
                                 <td class="time-cell">{{ $p->jam ?? '-' }}</td>
                                 <td>
                                     @if(($p->waktu_kurang_menit ?? 0) > 0)

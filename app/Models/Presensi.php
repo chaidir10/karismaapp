@@ -24,11 +24,13 @@ class Presensi extends Model
         'lokasi',
         'status',
         'is_lembur',
+        'is_darurat',
         'jam_shift_id',
     ];
 
     protected $casts = [
         'is_lembur' => 'boolean',
+        'is_darurat' => 'boolean',
     ];
 
     // Tanggal otomatis dikonversi ke Carbon

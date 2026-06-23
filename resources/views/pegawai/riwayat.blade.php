@@ -139,10 +139,13 @@
                 <div class="presensi-card" onclick="document.getElementById('detailModal{{ $p->id }}').style.display='block'" style="cursor:pointer;">
                     <div class="card-icon {{ $iconClass }}"><i class="fas {{ $iconName }}"></i></div>
                     <div class="card-body">
-                        <div class="card-title">{{ $label }}</div>
+                        <div class="card-title">{{ $label }}@if($p->is_darurat) <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef4444;margin-left:4px;vertical-align:middle;" title="Absen Darurat"></span>@endif</div>
                         <div class="card-time">{{ \Carbon\Carbon::parse($p->jam)->format('H:i') }}</div>
                     </div>
                     <div class="card-status">
+                        @if($p->is_darurat)
+                            <span class="card-tag tag-danger" style="font-size:8px;">DARURAT</span>
+                        @endif
                         @if($p->status === 'pending')
                             <span class="status-dot dot-pending"></span>
                         @elseif($p->badge_text)
