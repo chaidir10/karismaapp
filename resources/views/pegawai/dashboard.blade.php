@@ -294,18 +294,31 @@
 @if($sudahPresensiMasuk && $jamMasukHariIni)
 @php
     $pulangRec = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
+
+    // Hitung elapsed di server agar HTML awal tidak 00:00:00
+    $jadwalMasukTime = \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_masuk']);
+    $actualMasukTime = \Carbon\Carbon::parse($jamMasukHariIni);
+    $timerStart = $actualMasukTime->gt($jadwalMasukTime) ? $actualMasukTime : $jadwalMasukTime;
+    $timerEnd = $pulangRec ? \Carbon\Carbon::parse($pulangRec->jam) : now();
+    $elapsedSec = max(0, $timerEnd->diffInSeconds($timerStart));
+    $elapsedStr = sprintf('%02d:%02d:%02d', floor($elapsedSec/3600), floor(($elapsedSec%3600)/60), $elapsedSec%60);
+
+    $targetSec = max(0, \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
+    if ($targetSec <= 0) $targetSec = 8 * 3600;
+    $isFulfilled = $elapsedSec >= $targetSec;
+    $timerColor = $pulangRec ? 'timer-blue' : ($isFulfilled ? 'timer-green' : 'timer-yellow');
 @endphp
-<div class="work-timer-card {{ $pulangRec ? 'timer-blue' : 'timer-yellow' }}" id="workTimerBanner"
+<div class="work-timer-card {{ $timerColor }}" id="workTimerBanner"
     data-stopped="{{ $pulangRec ? '1' : '0' }}"
     data-pulang-jam="{{ $pulangRec->jam ?? '' }}">
     <div class="timer-icon-circle">
-        <i class="fas {{ $pulangRec ? 'fa-check' : 'fa-stopwatch' }}"></i>
+        <i class="fas {{ $pulangRec ? 'fa-check' : ($isFulfilled ? 'fa-circle-check' : 'fa-stopwatch') }}"></i>
     </div>
     <div class="timer-info">
-        <div class="timer-label" id="workTimerLabel">{{ $pulangRec ? 'Total jam kerja hari ini' : 'Jam kerja berjalan' }}</div>
-        <div class="timer-clock-text" id="workTimerClock">00:00:00</div>
+        <div class="timer-label" id="workTimerLabel">{{ $pulangRec ? 'Total jam kerja hari ini' : ($isFulfilled ? 'Jam kerja terpenuhi' : 'Jam kerja berjalan') }}</div>
+        <div class="timer-clock-text" id="workTimerClock">{{ $elapsedStr }}</div>
     </div>
-    <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : '...' }}</div>
+    <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : ($isFulfilled ? '✓ Terpenuhi' : 'Berjalan') }}</div>
 </div>
 @endif
 
@@ -1270,9 +1283,12 @@
     })();
 
     // Timer jam kerja reguler + cek pulang
-    var workTimerFulfilled = false;
+    var workTimerFulfilled = @json(($sudahPresensiMasuk && $jamMasukHariIni) ? ($isFulfilled ?? false) : false);
+    var _workTimerInterval = null;
 
-    (function() {
+    function startWorkTimer() {
+        if (_workTimerInterval) { clearInterval(_workTimerInterval); _workTimerInterval = null; }
+
         var card = document.getElementById('workTimerBanner');
         var clockEl = document.getElementById('workTimerClock');
         var labelEl = document.getElementById('workTimerLabel');
@@ -1321,28 +1337,36 @@
         }
 
         function update() {
+            var el = document.getElementById('workTimerClock');
+            var c = document.getElementById('workTimerBanner');
+            var lbl = document.getElementById('workTimerLabel');
+            var bdg = document.getElementById('workTimerBadge');
+            if (!el || !c) return;
+
             var elapsed = Math.max(0, Math.floor((new Date() - startTime) / 1000));
-            clockEl.textContent = formatTime(elapsed);
+            el.textContent = formatTime(elapsed);
 
             if (elapsed >= totalTarget) {
-                card.classList.remove('timer-yellow');
-                card.classList.add('timer-green');
-                if (labelEl) labelEl.textContent = 'Jam kerja terpenuhi';
-                if (badgeEl) badgeEl.textContent = '✓ Terpenuhi';
+                c.classList.remove('timer-yellow');
+                c.classList.add('timer-green');
+                if (lbl) lbl.textContent = 'Jam kerja terpenuhi';
+                if (bdg) bdg.textContent = '✓ Terpenuhi';
                 workTimerFulfilled = true;
             } else {
                 var sisa = totalTarget - elapsed;
                 var sh = Math.floor(sisa / 3600);
                 var sm = Math.floor((sisa % 3600) / 60);
-                if (labelEl) labelEl.textContent = 'Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
-                if (badgeEl) badgeEl.textContent = 'Berjalan';
+                if (lbl) lbl.textContent = 'Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                if (bdg) bdg.textContent = 'Berjalan';
                 workTimerFulfilled = false;
             }
         }
 
         update();
-        setInterval(update, 1000);
-    })();
+        _workTimerInterval = setInterval(update, 1000);
+    }
+
+    startWorkTimer();
 
     var requireMasukFirst = @json($requireMasukBeforePulang);
     function handlePulangWithCheck() {
@@ -1402,16 +1426,33 @@
         return true;
     }
 
-    // Cleanup kamera saat Turbo cache halaman
+    // Full cleanup saat Turbo navigasi keluar halaman
     document.addEventListener('turbo:before-cache', function() {
-        cleanupPresensiModal();
+        if (_workTimerInterval) { clearInterval(_workTimerInterval); _workTimerInterval = null; }
+        stopFaceDetection();
+        if (videoStream) {
+            videoStream.getTracks().forEach(function(t) { t.stop(); });
+            videoStream = null;
+        }
+        if (_locationWatchId !== null) {
+            navigator.geolocation.clearWatch(_locationWatchId);
+            _locationWatchId = null;
+        }
+        if (mapInstance) {
+            try { mapInstance.remove(); } catch(e) {}
+            mapInstance = null;
+        }
+        _presensiReady = false;
+        currentPosition = null;
         var video = document.getElementById('video');
         if (video) { video.srcObject = null; video.load(); }
     });
 
-    // Re-init kamera saat kembali dari bfcache
+    // Re-init saat kembali dari bfcache
     window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
+            _presensiReady = false;
+            currentPosition = null;
             var modal = document.getElementById('presensiModal');
             if (modal && modal.classList.contains('show')) {
                 initializePresensiModal();
@@ -1430,6 +1471,8 @@
     })();
 
     document.addEventListener('turbo:load', function() {
+        startWorkTimer();
+
         // Re-bind jika DOM diganti oleh Turbo
         var presensiModal = document.getElementById('presensiModal');
         if (presensiModal && !presensiModal._boundPresensi) {
@@ -1466,23 +1509,35 @@
         @endif
     });
 
+    var _presensiReady = false;
+
     function initializePresensiModal() {
-        initializeCamera();
-        initializeLocation();
+        if (!_presensiReady) {
+            _presensiReady = true;
+            initializeCamera();
+            initializeLocation();
+        } else {
+            resumePresensiModal();
+        }
+        setTimeout(function() {
+            if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {}
+        }, 300);
+    }
+
+    function resumePresensiModal() {
+        var video = document.getElementById('video');
+        if (video && videoStream) {
+            video.srcObject = videoStream;
+            video.play().catch(function(){});
+            if (window._enableFaceDetection && !_faceDetectionActive) initFaceDetection();
+        } else {
+            initializeCamera();
+        }
+        if (!currentPosition) initializeLocation();
     }
 
     function cleanupPresensiModal() {
         stopFaceDetection();
-
-        if (videoStream) {
-            videoStream.getTracks().forEach(t => t.stop());
-            videoStream = null;
-        }
-
-        if (mapInstance) {
-            try { mapInstance.remove(); } catch (e) {}
-            mapInstance = null;
-        }
 
         var submitBtn = document.querySelector('.submit-btn-large');
         if (submitBtn) {
@@ -1491,23 +1546,12 @@
         }
 
         capturedPhotoData = null;
-        currentPosition = null;
         isOutsideRadius = false;
-
-        // Jangan reset is_lembur di sini — form.submit() mungkin belum selesai
-        // Reset dilakukan oleh onclick tombol reguler (setLembur(false))
 
         if (autoCloseTimer) {
             clearTimeout(autoCloseTimer);
             autoCloseTimer = null;
         }
-
-        // reset teks lokasi
-        const loc = document.getElementById('location-address-mini');
-        if (loc) loc.textContent = 'Mendeteksi lokasi...';
-
-        const infoEl = document.getElementById('locationRadiusInfo');
-        if (infoEl) infoEl.textContent = '';
     }
 
     var _faceDetectTimer = null;
@@ -1749,18 +1793,16 @@
         if (addrEl) addrEl.textContent = 'Mendeteksi lokasi...';
         var infoEl = document.getElementById('locationRadiusInfo');
         if (infoEl) infoEl.innerHTML = '';
+        if (_locationWatchId !== null) {
+            navigator.geolocation.clearWatch(_locationWatchId);
+            _locationWatchId = null;
+        }
         initializeLocation();
     }
 
-    var _locInitId = 0;
+    var _locationWatchId = null;
     function initializeLocation() {
-        var myId = ++_locInitId;
         var addrEl = document.getElementById('location-address-mini');
-
-        if (mapInstance) {
-            try { mapInstance.remove(); } catch(e) {}
-            mapInstance = null;
-        }
 
         if (!navigator.geolocation) {
             if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Browser tidak mendukung geolokasi</span>';
@@ -1770,22 +1812,24 @@
             return;
         }
 
-        navigator.geolocation.getCurrentPosition(
+        if (_locationWatchId !== null) return;
+
+        _locationWatchId = navigator.geolocation.watchPosition(
             function(pos) {
-                if (myId !== _locInitId) return;
                 currentPosition = pos;
                 updateLocationInfo(pos);
                 initializeMiniMap(pos);
             },
             function(err) {
-                if (myId !== _locInitId) return;
                 console.error(err);
-                if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Lokasi gagal dideteksi</span>';
-                var infoEl = document.getElementById('locationRadiusInfo');
-                if (infoEl) infoEl.innerHTML = '<button onclick="retryLocation()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Coba Lagi</button>';
-                initializeMiniMapWithDefault();
+                if (!currentPosition) {
+                    if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Lokasi gagal dideteksi</span>';
+                    var infoEl = document.getElementById('locationRadiusInfo');
+                    if (infoEl) infoEl.innerHTML = '<button onclick="retryLocation()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Coba Lagi</button>';
+                    initializeMiniMapWithDefault();
+                }
             },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
         );
     }
 
@@ -1855,12 +1899,13 @@
                 maxZoom: 19
             }).addTo(mapInstance);
 
-            L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
+            mapInstance._userMarker = L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
 
             ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
                 .forEach(f => mapInstance[f] && mapInstance[f].disable());
         } else {
             mapInstance.setView([lat, lng], 17);
+            if (mapInstance._userMarker) mapInstance._userMarker.setLatLng([lat, lng]);
         }
 
         // penting: setelah modal tampil, map perlu invalidateSize
