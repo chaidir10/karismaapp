@@ -10,6 +10,8 @@
         th, td { border: 1px solid #333; padding: 1.5px 2px; text-align: center; font-size: 10px; line-height: 1.2; }
         th { background-color: #e0e0e0; font-weight: bold; }
         .weekend { background-color: #f2f2f2; }
+        .summary { width: auto !important; text-align: left !important; }
+        .summary td { border: none !important; text-align: left !important; padding: 1px 0; white-space: nowrap; font-size: 10px; }
         .page-break { page-break-after: always; }
         .cover { text-align: center; padding-top: 30vh; }
         .cover h1 { font-size: 20px; margin-bottom: 8px; }
@@ -89,17 +91,17 @@
             ];
         @endphp
         <div style="margin-top:2px; font-size:10px; text-align:left;">
-            <div style="font-weight:bold; padding:2px 0;">Ringkasan:</div>
-            <table style="border:none; width:auto; text-align:left;">
+            <strong style="display:block; padding:2px 0;">Ringkasan:</strong>
+            <table class="summary">
                 @foreach($ring as $r)
                 <tr>
-                    <td style="border:none; padding:1px 0; white-space:nowrap;">{{ $r[0] }}</td>
-                    <td style="border:none; padding:1px 0 1px 4px; white-space:nowrap;">: <strong>{{ $r[1] }}</strong></td>
+                    <td>{{ $r[0] }}</td>
+                    <td style="padding-left:4px;">: <strong>{{ $r[1] }}</strong></td>
                     @if($r[2])
-                    <td style="border:none; padding:1px 0 1px 20px; white-space:nowrap;">{{ $r[2] }}</td>
-                    <td style="border:none; padding:1px 0 1px 4px; white-space:nowrap;">: <strong>{{ $r[3] }}</strong></td>
+                    <td style="padding-left:20px;">{{ $r[2] }}</td>
+                    <td style="padding-left:4px;">: <strong>{{ $r[3] }}</strong></td>
                     @else
-                    <td style="border:none;" colspan="2"></td>
+                    <td colspan="2"></td>
                     @endif
                 </tr>
                 @endforeach
