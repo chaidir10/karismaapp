@@ -123,6 +123,8 @@ class DashboardAdminController extends Controller
         $chartHadir = [];
         $chartTelat = [];
         $chartLembur = [];
+        $chartDaruratMasuk = [];
+        $chartDaruratPulang = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $chartLabels[] = $date->translatedFormat('D d/m');
@@ -147,6 +149,13 @@ class DashboardAdminController extends Controller
                 ->where('jenis', 'masuk')->where('is_lembur', true)
                 ->where('status', 'approved')->distinct('user_id')->count('user_id');
             $chartLembur[] = $lemburCount;
+
+            $chartDaruratMasuk[] = Presensi::whereDate('tanggal', $date)
+                ->where('jenis', 'masuk')->where('is_darurat', true)
+                ->distinct('user_id')->count('user_id');
+            $chartDaruratPulang[] = Presensi::whereDate('tanggal', $date)
+                ->where('jenis', 'pulang')->where('is_darurat', true)
+                ->distinct('user_id')->count('user_id');
         }
 
         // Performa pegawai bulan ini (sinkron dengan halaman Performa)
@@ -238,6 +247,8 @@ class DashboardAdminController extends Controller
             'chartHadir',
             'chartTelat',
             'chartLembur',
+            'chartDaruratMasuk',
+            'chartDaruratPulang',
             'performaList'
         ));
     }
@@ -588,27 +599,30 @@ class DashboardAdminController extends Controller
         $endDate = Carbon::today();
         $format = $days <= 30 ? 'D d/m' : 'd/m';
 
-        $allMasuk = Presensi::with('user')
+        $allPresensi = Presensi::with('user')
             ->whereHas('user', function($q) { $q->where('is_tester', false); })
             ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
-            ->where('jenis', 'masuk')
             ->where('status', 'approved')
             ->get();
 
-        $regulerByDate = $allMasuk->where('is_lembur', false)->groupBy('tanggal');
-        $lemburByDate = $allMasuk->where('is_lembur', true)->groupBy('tanggal');
+        $masukReguler = $allPresensi->where('jenis', 'masuk')->where('is_lembur', false)->groupBy('tanggal');
+        $masukLembur = $allPresensi->where('jenis', 'masuk')->where('is_lembur', true)->groupBy('tanggal');
+        $daruratMasukByDate = $allPresensi->where('jenis', 'masuk')->where('is_darurat', true)->groupBy('tanggal');
+        $daruratPulangByDate = $allPresensi->where('jenis', 'pulang')->where('is_darurat', true)->groupBy('tanggal');
 
         $labels = [];
         $hadir = [];
         $telat = [];
         $lembur = [];
+        $daruratMasuk = [];
+        $daruratPulang = [];
 
         for ($i = $days - 1; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $key = $date->toDateString();
             $labels[] = $date->translatedFormat($format);
 
-            $dayReguler = $regulerByDate->get($key, collect());
+            $dayReguler = $masukReguler->get($key, collect());
             $hadir[] = $dayReguler->unique('user_id')->count();
 
             $telatCount = 0;
@@ -620,9 +634,11 @@ class DashboardAdminController extends Controller
             }
             $telat[] = $telatCount;
 
-            $lembur[] = $lemburByDate->get($key, collect())->unique('user_id')->count();
+            $lembur[] = $masukLembur->get($key, collect())->unique('user_id')->count();
+            $daruratMasuk[] = $daruratMasukByDate->get($key, collect())->unique('user_id')->count();
+            $daruratPulang[] = $daruratPulangByDate->get($key, collect())->unique('user_id')->count();
         }
 
-        return response()->json(compact('labels', 'hadir', 'telat', 'lembur'));
+        return response()->json(compact('labels', 'hadir', 'telat', 'lembur', 'daruratMasuk', 'daruratPulang'));
     }
 }

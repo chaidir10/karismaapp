@@ -2205,13 +2205,15 @@
 <script>
     var _attendanceChart = null;
 
-    function buildChart(labels, hadir, telat, lembur) {
+    function buildChart(labels, hadir, telat, lembur, daruratMasuk, daruratPulang) {
         var ctx = document.getElementById('attendanceChart');
         if (!ctx) return;
 
         if (_attendanceChart) { _attendanceChart.destroy(); _attendanceChart = null; }
 
         var showPoints = labels.length <= 31;
+        daruratMasuk = daruratMasuk || [];
+        daruratPulang = daruratPulang || [];
 
         _attendanceChart = new Chart(ctx, {
             type: 'line',
@@ -2244,6 +2246,26 @@
                         pointBorderWidth: showPoints ? 2 : 0,
                         pointRadius: showPoints ? 4 : 0,
                         pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Darurat Masuk', data: daruratMasuk,
+                        borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.08)',
+                        fill: true, tension: 0.4, borderWidth: 2, borderDash: [5, 3],
+                        pointBackgroundColor: '#8b5cf6', pointBorderColor: '#fff',
+                        pointBorderWidth: showPoints ? 2 : 0,
+                        pointRadius: showPoints ? 4 : 0,
+                        pointHoverRadius: 6,
+                        hidden: true
+                    },
+                    {
+                        label: 'Darurat Pulang', data: daruratPulang,
+                        borderColor: '#ec4899', backgroundColor: 'rgba(236,72,153,0.08)',
+                        fill: true, tension: 0.4, borderWidth: 2, borderDash: [5, 3],
+                        pointBackgroundColor: '#ec4899', pointBorderColor: '#fff',
+                        pointBorderWidth: showPoints ? 2 : 0,
+                        pointRadius: showPoints ? 4 : 0,
+                        pointHoverRadius: 6,
+                        hidden: true
                     }
                 ]
             },
@@ -2287,7 +2309,7 @@
     function loadChartData(days) {
         fetch('/admin/dashboard/chart?days=' + days, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r) { return r.json(); })
-            .then(function(d) { buildChart(d.labels, d.hadir, d.telat, d.lembur); })
+            .then(function(d) { buildChart(d.labels, d.hadir, d.telat, d.lembur, d.daruratMasuk, d.daruratPulang); })
             .catch(function() {});
     }
 
@@ -2364,7 +2386,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        buildChart(@json($chartLabels), @json($chartHadir), @json($chartTelat), @json($chartLembur));
+        buildChart(@json($chartLabels), @json($chartHadir), @json($chartTelat), @json($chartLembur), @json($chartDaruratMasuk), @json($chartDaruratPulang));
     });
 </script>
 
