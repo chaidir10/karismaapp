@@ -96,12 +96,31 @@ class AkunController extends Controller
 
     public function toggleDarurat(Request $request)
     {
+        return $this->saveSetting($request);
+    }
+
+    public function saveSetting(Request $request)
+    {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'superadmin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        \App\Models\AppSetting::setValue('enable_absen_darurat', $request->input('enabled') ? '1' : '0');
+        $allowed = [
+            'disable_presensi_hari_libur',
+            'enable_face_detection',
+            'face_detection_mode',
+            'face_detection_users',
+            'require_masuk_before_pulang',
+            'enable_absen_darurat',
+        ];
+
+        $key = $request->input('key');
+        if (!in_array($key, $allowed)) {
+            return response()->json(['error' => 'Invalid key'], 422);
+        }
+
+        \App\Models\AppSetting::setValue($key, $request->input('value'));
         return response()->json(['ok' => true]);
     }
 }

@@ -5,6 +5,12 @@
 @section('content')
 <style>
     .akun-page { padding: 20px; padding-bottom: 100px; }
+    .akun-toggle { position:relative; display:inline-block; width:46px; height:26px; flex-shrink:0; }
+    .akun-toggle input { opacity:0; width:0; height:0; position:absolute; }
+    .akun-toggle-track { position:absolute; cursor:pointer; inset:0; background:#cbd5e1; border-radius:26px; transition:0.2s; }
+    .akun-toggle input:checked + .akun-toggle-track { background:var(--primary); }
+    .akun-toggle-thumb { position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    .akun-toggle input:checked + .akun-toggle-track .akun-toggle-thumb { left:23px; }
 
     .notif-success { background:var(--success-light); border:1px solid var(--success); color:var(--success); padding:12px 16px; border-radius:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
     .notif-error { background:var(--danger-light); border:1px solid var(--danger); color:var(--danger); padding:12px 16px; border-radius:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
@@ -254,31 +260,110 @@
 
     @if(in_array($user->role, ['admin', 'superadmin']))
     @php
-        $daruratAktif = \App\Models\AppSetting::getBool('enable_absen_darurat', false);
+        $AS = \App\Models\AppSetting::class;
+        $s_libur = $AS::getBool('disable_presensi_hari_libur', true);
+        $s_face = $AS::getBool('enable_face_detection', true);
+        $s_faceMode = $AS::getValue('face_detection_mode', 'all');
+        $s_faceUsers = json_decode($AS::getValue('face_detection_users', '[]'), true) ?: [];
+        $s_masukDulu = $AS::getBool('require_masuk_before_pulang', true);
+        $s_darurat = $AS::getBool('enable_absen_darurat', false);
+        $allPegawai = \App\Models\User::nonTester()->orderBy('name')->get(['id','name','nip']);
     @endphp
     <div style="margin-bottom:20px;">
         <div style="font-size:12px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; padding:0 4px;">Pengaturan Admin</div>
-        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; padding:16px;">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <div style="display:flex; align-items:center; gap:14px;">
-                    <div style="width:44px; height:44px; border-radius:12px; background:rgba(239,68,68,0.08); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
-                        <i class="fas fa-bolt"></i>
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; overflow:hidden;">
+
+            {{-- Nonaktifkan presensi hari libur --}}
+            <div style="padding:14px 16px; border-bottom:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:rgba(59,130,246,0.08); color:#3b82f6; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-calendar-xmark"></i></div>
+                        <div style="flex:1; min-width:0;">
+                            <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Nonaktifkan presensi hari libur</p>
+                            <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Reguler di-disable saat libur/weekend</p>
+                        </div>
                     </div>
-                    <div>
-                        <p style="font-size:14px; font-weight:600; color:var(--dark); margin:0 0 2px;">Absen Darurat</p>
-                        <p style="font-size:12px; color:var(--gray); margin:0;">Aktifkan halaman absen alternatif</p>
+                    <label class="akun-toggle"><input type="checkbox" data-key="disable_presensi_hari_libur" {{ $s_libur ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                </div>
+            </div>
+
+            {{-- Face Detection --}}
+            <div style="padding:14px 16px; border-bottom:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.08); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-face-smile"></i></div>
+                        <div style="flex:1; min-width:0;">
+                            <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Deteksi Wajah</p>
+                            <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Wajib verifikasi wajah saat absen</p>
+                        </div>
+                    </div>
+                    <label class="akun-toggle"><input type="checkbox" data-key="enable_face_detection" {{ $s_face ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                </div>
+                <div id="faceSubSection" style="margin-top:10px; {{ !$s_face ? 'display:none;' : '' }}">
+                    <select id="faceMode" onchange="saveSetting(this)" data-key="face_detection_mode" style="width:100%; padding:8px 12px; border:1px solid var(--card-border); border-radius:10px; font-size:12px; background:var(--card-bg); color:var(--dark); outline:none; margin-bottom:6px;">
+                        <option value="all" {{ $s_faceMode === 'all' ? 'selected' : '' }}>Semua pegawai</option>
+                        <option value="except" {{ $s_faceMode === 'except' ? 'selected' : '' }}>Aktifkan kecuali...</option>
+                        <option value="only" {{ $s_faceMode === 'only' ? 'selected' : '' }}>Aktifkan hanya untuk...</option>
+                    </select>
+                    <div id="faceUserBtn" style="{{ $s_faceMode === 'all' ? 'display:none;' : '' }}">
+                        <button type="button" onclick="openUserPicker('face')" style="width:100%; padding:8px 12px; border:1px dashed var(--card-border); border-radius:10px; font-size:11px; color:var(--gray); background:var(--light); cursor:pointer; text-align:left;">
+                            <i class="fas fa-user-group" style="margin-right:6px;"></i> <span id="faceUserCount">{{ count($s_faceUsers) }}</span> pegawai dipilih — <span style="color:var(--primary); font-weight:600;">Ubah</span>
+                        </button>
                     </div>
                 </div>
-                <label style="position:relative; display:inline-block; width:48px; height:28px; flex-shrink:0;">
-                    <input type="checkbox" id="toggleDaruratAkun" {{ $daruratAktif ? 'checked' : '' }} style="opacity:0; width:0; height:0; position:absolute;">
-                    <span style="position:absolute; cursor:pointer; inset:0; background:{{ $daruratAktif ? 'var(--primary)' : '#cbd5e1' }}; border-radius:28px; transition:0.2s;" id="toggleDaruratTrack">
-                        <span style="position:absolute; height:22px; width:22px; left:{{ $daruratAktif ? '23px' : '3px' }}; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="toggleDaruratThumb"></span>
-                    </span>
-                </label>
             </div>
-            <div id="daruratStatus" style="margin-top:10px; font-size:11px; font-weight:600; color:{{ $daruratAktif ? '#10b981' : '#94a3b8' }}; display:flex; align-items:center; gap:6px;">
-                <i class="fas {{ $daruratAktif ? 'fa-circle-check' : 'fa-circle-xmark' }}"></i>
-                <span id="daruratStatusText">{{ $daruratAktif ? 'Absen darurat sedang aktif' : 'Absen darurat nonaktif' }}</span>
+
+            {{-- Wajib masuk sebelum pulang --}}
+            <div style="padding:14px 16px; border-bottom:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:rgba(245,158,11,0.08); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-arrow-right-arrow-left"></i></div>
+                        <div style="flex:1; min-width:0;">
+                            <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Wajib masuk sebelum pulang</p>
+                            <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Tombol pulang aktif setelah absen masuk</p>
+                        </div>
+                    </div>
+                    <label class="akun-toggle"><input type="checkbox" data-key="require_masuk_before_pulang" {{ $s_masukDulu ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                </div>
+            </div>
+
+            {{-- Absen Darurat --}}
+            <div style="padding:14px 16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:rgba(239,68,68,0.08); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-bolt"></i></div>
+                        <div style="flex:1; min-width:0;">
+                            <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Absen Darurat</p>
+                            <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Halaman absen alternatif</p>
+                        </div>
+                    </div>
+                    <label class="akun-toggle"><input type="checkbox" data-key="enable_absen_darurat" {{ $s_darurat ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- User Picker Modal --}}
+    <div id="akunUserPicker" class="modal-overlay">
+        <div class="modal-box" style="max-height:80vh; display:flex; flex-direction:column; padding:0;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--card-border);">
+                <h3 style="font-size:15px; font-weight:700; color:var(--dark); margin:0;" id="pickerTitle">Pilih Pegawai</h3>
+                <button onclick="closeUserPicker()" class="modal-close" style="position:static;"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div style="padding:10px 20px 0;">
+                <input type="text" id="pickerSearch" placeholder="Cari nama..." oninput="renderPickerList()" style="width:100%; padding:8px 12px; border:1px solid var(--card-border); border-radius:10px; font-size:13px; background:var(--card-bg); color:var(--dark); outline:none; margin-bottom:6px;">
+                <div style="display:flex; gap:6px;">
+                    <button type="button" onclick="pickerCheckAll(true)" style="flex:1; padding:6px; border:1px solid var(--card-border); border-radius:8px; font-size:10px; font-weight:600; background:var(--light); color:var(--dark); cursor:pointer;"><i class="fas fa-check-double" style="color:#10b981;margin-right:3px;"></i>Pilih Semua</button>
+                    <button type="button" onclick="pickerCheckAll(false)" style="flex:1; padding:6px; border:1px solid var(--card-border); border-radius:8px; font-size:10px; font-weight:600; background:var(--light); color:var(--dark); cursor:pointer;"><i class="fas fa-xmark" style="color:#ef4444;margin-right:3px;"></i>Hapus Semua</button>
+                </div>
+            </div>
+            <div id="pickerList" style="flex:1; overflow-y:auto; padding:8px 20px;"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--card-border);">
+                <span style="font-size:12px; color:var(--gray);"><span id="pickerCount">0</span> dipilih</span>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" onclick="closeUserPicker()" style="padding:8px 16px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:13px; font-weight:600; cursor:pointer;">Batal</button>
+                    <button type="button" onclick="confirmUserPicker()" style="padding:8px 16px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Simpan</button>
+                </div>
             </div>
         </div>
     </div>
@@ -599,28 +684,89 @@
     }, { passive:true });
     document.addEventListener('touchend', function() { C.drag = false; });
 
-    // Toggle Absen Darurat (admin only)
-    var daruratToggle = document.getElementById('toggleDaruratAkun');
-    if (daruratToggle) {
-        daruratToggle.addEventListener('change', function() {
-            var on = this.checked;
-            var track = document.getElementById('toggleDaruratTrack');
-            var thumb = document.getElementById('toggleDaruratThumb');
-            var status = document.getElementById('daruratStatus');
-            var statusText = document.getElementById('daruratStatusText');
+    // === Admin Settings (toggle + dropdown + user picker) ===
+    function saveSetting(el) {
+        var key = el.getAttribute('data-key');
+        var val = el.type === 'checkbox' ? (el.checked ? '1' : '0') : el.value;
+        fetch('/pegawai/akun/save-setting', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ key: key, value: val })
+        }).catch(function() {});
 
-            track.style.background = on ? 'var(--primary)' : '#cbd5e1';
-            thumb.style.left = on ? '23px' : '3px';
-            status.style.color = on ? '#10b981' : '#94a3b8';
-            status.querySelector('i').className = on ? 'fas fa-circle-check' : 'fas fa-circle-xmark';
-            statusText.textContent = on ? 'Absen darurat sedang aktif' : 'Absen darurat nonaktif';
-
-            fetch('/pegawai/akun/toggle-darurat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
-                body: JSON.stringify({ enabled: on ? 1 : 0 })
-            }).catch(function() {});
-        });
+        if (key === 'enable_face_detection') {
+            var sec = document.getElementById('faceSubSection');
+            if (sec) sec.style.display = el.checked ? '' : 'none';
+        }
+        if (key === 'face_detection_mode') {
+            var btn = document.getElementById('faceUserBtn');
+            if (btn) btn.style.display = el.value !== 'all' ? '' : 'none';
+        }
     }
+
+    @if(in_array($user->role, ['admin', 'superadmin']))
+    var _allUsers = @json($allPegawai);
+    var _pickerTarget = '';
+    var _pickerSelected = [];
+    var _faceUserIds = @json($s_faceUsers);
+
+    function openUserPicker(target) {
+        _pickerTarget = target;
+        _pickerSelected = _faceUserIds.slice();
+        var modeEl = document.getElementById('faceMode');
+        var modeLabel = modeEl.value === 'except' ? 'Kecuali' : 'Hanya Untuk';
+        document.getElementById('pickerTitle').textContent = 'Face Detection — ' + modeLabel;
+        document.getElementById('pickerSearch').value = '';
+        renderPickerList();
+        openModal('akunUserPicker');
+    }
+    function closeUserPicker() { closeModal('akunUserPicker'); }
+
+    function pickerCheckAll(state) {
+        _pickerSelected = state ? _allUsers.map(function(u) { return u.id; }) : [];
+        renderPickerList();
+    }
+
+    function renderPickerList() {
+        var q = (document.getElementById('pickerSearch').value || '').toLowerCase();
+        var checked = [], unchecked = [];
+        _allUsers.forEach(function(u) {
+            if (q && u.name.toLowerCase().indexOf(q) === -1 && (u.nip || '').indexOf(q) === -1) return;
+            var isSel = _pickerSelected.indexOf(u.id) !== -1;
+            var item = '<label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--card-border);cursor:pointer;">' +
+                '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' onchange="pickerToggle(' + u.id + ',this.checked)" style="width:18px;height:18px;accent-color:var(--primary);">' +
+                '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + u.name + '</div>' +
+                '<div style="font-size:10px;color:var(--gray);">' + (u.nip || '-') + '</div></div></label>';
+            isSel ? checked.push(item) : unchecked.push(item);
+        });
+        var html = '';
+        if (checked.length > 0) {
+            html += '<div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Dipilih (' + checked.length + ')</div>' + checked.join('');
+        }
+        if (unchecked.length > 0) {
+            if (checked.length > 0) html += '<div style="height:6px;border-bottom:2px solid var(--card-border);margin-bottom:6px;"></div>';
+            html += '<div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Belum dipilih (' + unchecked.length + ')</div>' + unchecked.join('');
+        }
+        document.getElementById('pickerList').innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--gray);font-size:13px;">Tidak ditemukan</div>';
+        document.getElementById('pickerCount').textContent = _pickerSelected.length;
+    }
+
+    function pickerToggle(id, chk) {
+        if (chk && _pickerSelected.indexOf(id) === -1) _pickerSelected.push(id);
+        if (!chk) _pickerSelected = _pickerSelected.filter(function(x) { return x !== id; });
+        renderPickerList();
+    }
+
+    function confirmUserPicker() {
+        _faceUserIds = _pickerSelected.slice();
+        document.getElementById('faceUserCount').textContent = _faceUserIds.length;
+        fetch('/pegawai/akun/save-setting', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ key: 'face_detection_users', value: JSON.stringify(_faceUserIds) })
+        }).catch(function() {});
+        closeUserPicker();
+    }
+    @endif
 </script>
 @endsection
