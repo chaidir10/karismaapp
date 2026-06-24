@@ -395,6 +395,8 @@
         $s_faceUsers = json_decode($AS::getValue('face_detection_users', '[]'), true) ?: [];
         $s_masukDulu = $AS::getBool('require_masuk_before_pulang', true);
         $s_darurat = $AS::getBool('enable_absen_darurat', false);
+        $s_daruratMode = $AS::getValue('absen_darurat_mode', 'all');
+        $s_daruratUsers = json_decode($AS::getValue('absen_darurat_users', '[]'), true) ?: [];
         $allPegawai = \App\Models\User::nonTester()->orderBy('name')->get(['id','name','nip']);
     @endphp
     <div style="margin-bottom:20px;">
@@ -476,7 +478,30 @@
                             <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Halaman absen alternatif</p>
                         </div>
                     </div>
-                    <label class="akun-toggle"><input type="checkbox" data-key="enable_absen_darurat" {{ $s_darurat ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                    <label class="akun-toggle"><input type="checkbox" id="toggleDaruratAkun" data-key="enable_absen_darurat" {{ $s_darurat ? 'checked' : '' }} onchange="saveSetting(this); document.getElementById('daruratSubSection').style.display=this.checked?'':'none';"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                </div>
+                <input type="hidden" id="daruratMode" data-key="absen_darurat_mode" value="{{ $s_daruratMode }}">
+                <div id="daruratSubSection" style="margin-top:10px; {{ !$s_darurat ? 'display:none;' : '' }}">
+                    <div class="face-mode-tabs">
+                        <button type="button" class="darurat-mode-tab {{ $s_daruratMode === 'all' ? 'active' : '' }}" onclick="setDaruratMode(this,'all')">
+                            <i class="fas fa-users"></i> Semua
+                        </button>
+                        <button type="button" class="darurat-mode-tab {{ $s_daruratMode === 'except' ? 'active' : '' }}" onclick="setDaruratMode(this,'except')">
+                            <i class="fas fa-user-minus"></i> Kecuali
+                        </button>
+                        <button type="button" class="darurat-mode-tab {{ $s_daruratMode === 'only' ? 'active' : '' }}" onclick="setDaruratMode(this,'only')">
+                            <i class="fas fa-user-check"></i> Hanya
+                        </button>
+                    </div>
+                    <div id="daruratUserBtn" style="margin-top:8px; {{ $s_daruratMode === 'all' ? 'display:none;' : '' }}">
+                        <button type="button" onclick="openUserPicker('darurat')" class="face-user-btn">
+                            <div style="display:flex; align-items:center; gap:8px; flex:1;">
+                                <div style="width:28px; height:28px; border-radius:8px; background:#ef4444; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px;"><i class="fas fa-user-group"></i></div>
+                                <span><span id="daruratUserCount" style="font-weight:700; color:#ef4444;">{{ count($s_daruratUsers) }}</span> pegawai dipilih</span>
+                            </div>
+                            <i class="fas fa-chevron-right" style="font-size:11px; opacity:0.4;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -901,6 +926,16 @@
         if (btn) btn.style.display = val !== 'all' ? '' : 'none';
     }
 
+    function setDaruratMode(el, val) {
+        document.querySelectorAll('.darurat-mode-tab').forEach(function(t) { t.classList.remove('active'); });
+        el.classList.add('active');
+        var hidden = document.getElementById('daruratMode');
+        hidden.value = val;
+        saveSetting(hidden);
+        var btn = document.getElementById('daruratUserBtn');
+        if (btn) btn.style.display = val !== 'all' ? '' : 'none';
+    }
+
     // === Tester: Izin & Cache ===
     function reRequestPermissions() {
         var statusEl = document.getElementById('permStatus');
@@ -1018,13 +1053,16 @@
     var _pickerTarget = '';
     var _pickerSelected = [];
     var _faceUserIds = @json($s_faceUsers);
+    var _daruratUserIds = @json($s_daruratUsers);
 
     function openUserPicker(target) {
         _pickerTarget = target;
-        _pickerSelected = _faceUserIds.filter(function(v, i, a) { return a.indexOf(v) === i; });
-        var modeEl = document.getElementById('faceMode');
+        var sourceIds = target === 'darurat' ? _daruratUserIds : _faceUserIds;
+        _pickerSelected = sourceIds.filter(function(v, i, a) { return a.indexOf(v) === i; });
+        var modeEl = document.getElementById(target === 'darurat' ? 'daruratMode' : 'faceMode');
         var modeLabel = modeEl.value === 'except' ? 'Kecuali' : 'Hanya Untuk';
-        document.getElementById('pickerTitle').textContent = 'Face Detection — ' + modeLabel;
+        var label = target === 'darurat' ? 'Absen Darurat' : 'Face Detection';
+        document.getElementById('pickerTitle').textContent = label + ' — ' + modeLabel;
         document.getElementById('pickerSearch').value = '';
         renderPickerList();
         openModal('akunUserPicker');
@@ -1086,12 +1124,20 @@
     }
 
     function confirmUserPicker() {
-        _faceUserIds = _pickerSelected.filter(function(v, i, a) { return a.indexOf(v) === i; });
-        document.getElementById('faceUserCount').textContent = _faceUserIds.length;
+        var ids = _pickerSelected.filter(function(v, i, a) { return a.indexOf(v) === i; });
+        if (_pickerTarget === 'darurat') {
+            _daruratUserIds = ids;
+            document.getElementById('daruratUserCount').textContent = ids.length;
+            var settingKey = 'absen_darurat_users';
+        } else {
+            _faceUserIds = ids;
+            document.getElementById('faceUserCount').textContent = ids.length;
+            var settingKey = 'face_detection_users';
+        }
         fetch('/pegawai/akun/save-setting', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({ key: 'face_detection_users', value: JSON.stringify(_faceUserIds) })
+            body: JSON.stringify({ key: settingKey, value: JSON.stringify(ids) })
         }).catch(function() {});
         closeUserPicker();
     }

@@ -113,6 +113,8 @@ class AkunController extends Controller
             'face_detection_users',
             'require_masuk_before_pulang',
             'enable_absen_darurat',
+            'absen_darurat_mode',
+            'absen_darurat_users',
         ];
 
         $key = $request->input('key');
