@@ -157,8 +157,7 @@
     </div>
 </div>
 
-{{-- ═══════════ TIMER JAM KERJA — DIKOMENTARI UNTUK TES ═══════════ --}}
-{{--
+{{-- ═══════════ TIMER JAM KERJA ═══════════ --}}
 @if($sudahPresensiMasuk && $jamMasukHariIni)
 <div class="work-timer-card {{ $timerColor }}" id="workTimerBanner"
     data-stopped="{{ $pulangRec ? '1' : '0' }}"
@@ -173,7 +172,6 @@
     <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : ($isFulfilled ? '✓ Terpenuhi' : 'Berjalan') }}</div>
 </div>
 @endif
---}}
 
 {{-- ═══════════ CAROUSEL PENGUMUMAN ═══════════ --}}
 @if(isset($pengumumans) && $pengumumans->count() > 0)
@@ -772,8 +770,67 @@
     // ══════════════════════════════════════════════════════════════
     // WORK TIMER — DIKOMENTARI UNTUK TES
     // ══════════════════════════════════════════════════════════════
-    function startWorkTimer() { /* DIMATIKAN */ }
-    function startLemburTimer() { /* DIMATIKAN */ }
+    function startWorkTimer() {
+        if (state.workTimerInterval) { clearInterval(state.workTimerInterval); state.workTimerInterval = null; }
+
+        var card = $('workTimerBanner'), clockEl = $('workTimerClock');
+        if (!card || !clockEl || !CFG.jamMasuk) return;
+
+        var stopped = card.getAttribute('data-stopped') === '1';
+        var pulangJam = card.getAttribute('data-pulang-jam') || '';
+
+        var jadwalStart = parseTime(CFG.jadwalMasuk);
+        var actualStart = parseTime(CFG.jamMasuk);
+        var startTime = actualStart > jadwalStart ? actualStart : jadwalStart;
+        var endTime = parseTime(CFG.jadwalPulang);
+        var totalTarget = Math.floor((endTime - jadwalStart) / 1000);
+        if (totalTarget <= 0) totalTarget = 8 * 3600;
+
+        if (stopped && pulangJam) {
+            var pulangTime = parseTime(pulangJam);
+            var elapsed = Math.max(0, Math.floor((pulangTime - startTime) / 1000));
+            clockEl.textContent = formatSec(elapsed);
+            state.workTimerFulfilled = elapsed >= totalTarget;
+            var bdg = $('workTimerBadge');
+            if (bdg) bdg.textContent = state.workTimerFulfilled ? '✓ Terpenuhi' : 'Kurang';
+            return;
+        }
+
+        function tick() {
+            var el = $('workTimerClock'), c = $('workTimerBanner'), lbl = $('workTimerLabel'), bdg = $('workTimerBadge');
+            if (!el || !c) return;
+            var elapsed = Math.max(0, Math.floor((new Date() - startTime) / 1000));
+            el.textContent = formatSec(elapsed);
+            if (elapsed >= totalTarget) {
+                c.classList.remove('timer-yellow'); c.classList.add('timer-green');
+                if (lbl) lbl.textContent = 'Jam kerja terpenuhi';
+                if (bdg) bdg.textContent = '✓ Terpenuhi';
+                state.workTimerFulfilled = true;
+            } else {
+                var sisa = totalTarget - elapsed;
+                var sh = Math.floor(sisa / 3600), sm = Math.floor((sisa % 3600) / 60);
+                if (lbl) lbl.textContent = 'Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                if (bdg) bdg.textContent = 'Berjalan';
+                state.workTimerFulfilled = false;
+            }
+        }
+        tick();
+        state.workTimerInterval = setInterval(tick, 1000);
+    }
+
+    function startLemburTimer() {
+        var el = $('lemburTimer');
+        if (!el) return;
+        var startStr = el.getAttribute('data-start');
+        if (!startStr) return;
+        var start = parseTime(startStr);
+        function tick() {
+            var diff = Math.max(0, Math.floor((new Date() - start) / 1000));
+            el.textContent = formatSec(diff);
+        }
+        tick();
+        setInterval(tick, 1000);
+    }
 
     // ══════════════════════════════════════════════════════════════
     // PRESENSI — kamera, lokasi, face detection, submit
@@ -1226,11 +1283,11 @@
         _initialized = true;
 
         Carousel.init();
-        // startWorkTimer();   // DIMATIKAN UNTUK TES
-        // startLemburTimer(); // DIMATIKAN UNTUK TES
+        startWorkTimer();
+        startLemburTimer();
         initDetailModals();
         initNetworkDetection();
-        // initReminders();    // DIMATIKAN UNTUK TES (pakai setInterval)
+        initReminders();
 
         // Hide badges pengumuman yang sudah dibaca
         var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
