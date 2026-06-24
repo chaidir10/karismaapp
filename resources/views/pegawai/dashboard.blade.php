@@ -12,9 +12,9 @@
         $actualMasukTime = \Carbon\Carbon::parse($jamMasukHariIni);
         $timerStart = $actualMasukTime->gt($jadwalMasukTime) ? $actualMasukTime : $jadwalMasukTime;
         $timerEnd = $pulangRec ? \Carbon\Carbon::parse($pulangRec->jam) : now();
-        $elapsedSec = max(0, $timerEnd->diffInSeconds($timerStart));
+        $elapsedSec = abs($timerEnd->diffInSeconds($timerStart));
         $elapsedStr = sprintf('%02d:%02d:%02d', floor($elapsedSec/3600), floor(($elapsedSec%3600)/60), $elapsedSec%60);
-        $targetSec = max(0, \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
+        $targetSec = abs(\Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
         if ($targetSec <= 0) $targetSec = 8 * 3600;
         $isFulfilled = $elapsedSec >= $targetSec;
         $timerColor = $pulangRec ? 'timer-blue' : ($isFulfilled ? 'timer-green' : 'timer-yellow');
@@ -806,7 +806,7 @@
     })();
 
     // ══════════════════════════════════════════════════════════════
-    // WORK TIMER — DIKOMENTARI UNTUK TES
+    // WORK TIMER
     // ══════════════════════════════════════════════════════════════
     function startWorkTimer() {
         if (state.workTimerInterval) { clearInterval(state.workTimerInterval); state.workTimerInterval = null; }
