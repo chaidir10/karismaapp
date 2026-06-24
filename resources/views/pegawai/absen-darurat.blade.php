@@ -13,13 +13,13 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; overflow:hidden; }
-        .camera-area { position:absolute; inset:0; overflow:hidden; background:#111; }
-        #video { width:100%; height:100%; object-fit:contain; display:block; transform:scaleX(-1); }
+        .camera-area { position:absolute; top:0; left:0; right:0; bottom:220px; overflow:hidden; background:#111; }
+        #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
-        .bottom-panel { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(to top, #111 85%, transparent); padding:10px 14px; padding-bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:3; }
+        .bottom-panel { position:fixed; bottom:0; left:0; right:0; background:#111; padding:10px 14px; padding-bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:3; }
         .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:8px; width:100%; }
         .map-strip { height:70px; }
         #miniMap { width:100%; height:100%; }
@@ -42,7 +42,7 @@
         .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; display:none; }
         .toast-success { background:#10b981; color:#fff; }
         .toast-error { background:#ef4444; color:#fff; }
-        .guide-oval { position:absolute; top:50%; left:50%; transform:translate(-50%,-55%); width:180px; height:230px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; z-index:1; pointer-events:none; }
+        .guide-oval { position:absolute; top:45%; left:50%; transform:translate(-50%,-50%); width:180px; height:230px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; z-index:1; pointer-events:none; }
         canvas#captureCanvas { display:none; }
     </style>
 </head>
