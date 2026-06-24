@@ -13,15 +13,15 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; display:flex; flex-direction:column; overflow:hidden; }
-        .camera-area { flex:1; min-height:0; position:relative; overflow:hidden; background:#111; }
+        .camera-area { flex:1; min-height:0; position:relative; overflow:hidden; background:#111; margin-bottom:0; }
         #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
-        .bottom-panel { flex-shrink:0; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; width:100%; box-sizing:border-box; }
-        .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:10px; width:100%; }
-        .map-strip { height:80px; }
+        .bottom-panel { flex-shrink:0; max-height:45vh; overflow-y:auto; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; width:100%; box-sizing:border-box; }
+        .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:8px; width:100%; }
+        .map-strip { height:70px; }
         #miniMap { width:100%; height:100%; }
         .loc-info { padding:10px 14px; display:flex; align-items:center; gap:10px; }
         .loc-info-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
@@ -30,14 +30,14 @@
         .loc-info-icon.loading { background:rgba(148,163,184,0.15); color:#94a3b8; }
         .loc-info-text { flex:1; min-width:0; font-size:12px; color:#e2e8f0; font-weight:500; line-height:1.3; }
         .loc-info-sub { font-size:10px; color:#64748b; font-weight:400; margin-top:1px; }
-        .btn-row { display:flex; gap:10px; }
-        .btn-absen { flex:1; height:50px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-row { display:flex; gap:8px; }
+        .btn-absen { flex:1; height:46px; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-absen:active { opacity:0.85; transform:scale(0.97); }
         .btn-absen:disabled { opacity:0.4; cursor:not-allowed; }
         .btn-masuk { background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; }
         .btn-pulang { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; }
-        .shift-row { display:flex; gap:6px; margin-bottom:8px; }
-        .shift-btn { flex:1; padding:7px 4px; border:1px solid #333; border-radius:10px; background:#1a1a2e; color:#94a3b8; font-size:11px; font-weight:600; cursor:pointer; text-align:center; }
+        .shift-row { display:flex; gap:6px; margin-bottom:6px; }
+        .shift-btn { flex:1; padding:6px 4px; border:1px solid #333; border-radius:10px; background:#1a1a2e; color:#94a3b8; font-size:11px; font-weight:600; cursor:pointer; text-align:center; }
         .shift-btn.active { border-color:#5AB6EA; color:#5AB6EA; background:rgba(90,182,234,0.1); }
         .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; display:none; }
         .toast-success { background:#10b981; color:#fff; }

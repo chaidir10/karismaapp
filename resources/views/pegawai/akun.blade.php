@@ -934,10 +934,8 @@
         var hidden = document.getElementById('faceMode');
         hidden.value = val;
         saveSetting(hidden);
-        var btn = document.getElementById('faceUserBtn');
-        if (btn) btn.style.display = val !== 'all' ? '' : 'none';
-        var list = _userLists['face_' + val] || [];
-        document.getElementById('faceUserCount').textContent = list.length;
+        document.getElementById('faceUserBtn').style.display = val !== 'all' ? '' : 'none';
+        document.getElementById('faceUserCount').textContent = (_userLists['face_' + val] || []).length;
     }
 
     function setDaruratMode(el, val) {
@@ -946,10 +944,8 @@
         var hidden = document.getElementById('daruratMode');
         hidden.value = val;
         saveSetting(hidden);
-        var btn = document.getElementById('daruratUserBtn');
-        if (btn) btn.style.display = val !== 'all' ? '' : 'none';
-        var list = _userLists['darurat_' + val] || [];
-        document.getElementById('daruratUserCount').textContent = list.length;
+        document.getElementById('daruratUserBtn').style.display = val !== 'all' ? '' : 'none';
+        document.getElementById('daruratUserCount').textContent = (_userLists['darurat_' + val] || []).length;
     }
 
     // === Tester: Izin & Cache ===
@@ -1067,6 +1063,7 @@
     @if(in_array($user->role, ['admin', 'superadmin']))
     var _allUsers = @json($allPegawai);
     var _pickerTarget = '';
+    var _pickerMode = '';
     var _pickerSelected = [];
     var _userLists = {
         face_except: @json($s_faceExcept),
@@ -1075,17 +1072,17 @@
         darurat_only: @json($s_daruratOnly)
     };
 
-    function _getListKey(target) {
-        var modeEl = document.getElementById(target === 'darurat' ? 'daruratMode' : 'faceMode');
-        return target + '_' + (modeEl ? modeEl.value : 'except');
-    }
-
     function openUserPicker(target) {
         _pickerTarget = target;
-        var key = _getListKey(target);
-        _pickerSelected = (_userLists[key] || []).filter(function(v, i, a) { return a.indexOf(v) === i; });
         var modeEl = document.getElementById(target === 'darurat' ? 'daruratMode' : 'faceMode');
-        var modeLabel = modeEl.value === 'except' ? 'Kecuali' : 'Hanya Untuk';
+        _pickerMode = modeEl ? modeEl.value : 'except';
+        var key = target + '_' + _pickerMode;
+        var source = _userLists[key] || [];
+        _pickerSelected = [];
+        for (var i = 0; i < source.length; i++) {
+            if (_pickerSelected.indexOf(source[i]) === -1) _pickerSelected.push(source[i]);
+        }
+        var modeLabel = _pickerMode === 'except' ? 'Kecuali' : 'Hanya Untuk';
         var label = target === 'darurat' ? 'Absen Darurat' : 'Face Detection';
         document.getElementById('pickerTitle').textContent = label + ' — ' + modeLabel;
         document.getElementById('pickerSearch').value = '';
@@ -1149,15 +1146,18 @@
     }
 
     function confirmUserPicker() {
-        var ids = _pickerSelected.filter(function(v, i, a) { return a.indexOf(v) === i; });
-        var key = _getListKey(_pickerTarget);
-        _userLists[key] = ids;
+        var ids = [];
+        for (var i = 0; i < _pickerSelected.length; i++) {
+            if (ids.indexOf(_pickerSelected[i]) === -1) ids.push(_pickerSelected[i]);
+        }
+
+        var key = _pickerTarget + '_' + _pickerMode;
+        _userLists[key] = ids.slice();
 
         var countEl = _pickerTarget === 'darurat' ? 'daruratUserCount' : 'faceUserCount';
         document.getElementById(countEl).textContent = ids.length;
 
-        var modeEl = document.getElementById(_pickerTarget === 'darurat' ? 'daruratMode' : 'faceMode');
-        var settingKey = (_pickerTarget === 'darurat' ? 'absen_darurat_users_' : 'face_detection_users_') + modeEl.value;
+        var settingKey = (_pickerTarget === 'darurat' ? 'absen_darurat_users_' : 'face_detection_users_') + _pickerMode;
 
         fetch('/pegawai/akun/save-setting', {
             method: 'POST',
