@@ -46,6 +46,29 @@
         background:var(--primary); border-color:var(--primary); color:#fff;
     }
 
+    .face-mode-tabs {
+        display:flex; gap:6px; padding:4px; background:var(--light); border-radius:12px;
+        border:1px solid var(--card-border);
+    }
+    .face-mode-tab {
+        flex:1; padding:8px 4px; border:none; border-radius:9px; font-size:11px; font-weight:600;
+        background:transparent; color:var(--gray); cursor:pointer; display:flex; align-items:center;
+        justify-content:center; gap:5px; transition: all 0.2s;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .face-mode-tab:active { opacity:0.8; }
+    .face-mode-tab.active {
+        background:var(--primary); color:#fff; box-shadow:0 2px 8px rgba(46,151,212,0.25);
+    }
+    .face-user-btn {
+        width:100%; padding:10px 14px; border:1.5px solid var(--card-border); border-radius:12px;
+        font-size:12px; color:var(--dark); background:var(--card-bg); cursor:pointer;
+        display:flex; align-items:center; justify-content:space-between;
+        transition: border-color 0.2s;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .face-user-btn:active { border-color:var(--primary); }
+
 
     /* Profile Hero */
     .profile-hero {
@@ -404,15 +427,26 @@
                     </div>
                     <label class="akun-toggle"><input type="checkbox" data-key="enable_face_detection" {{ $s_face ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
                 </div>
+                <input type="hidden" id="faceMode" data-key="face_detection_mode" value="{{ $s_faceMode }}">
                 <div id="faceSubSection" style="margin-top:10px; {{ !$s_face ? 'display:none;' : '' }}">
-                    <select id="faceMode" onchange="saveSetting(this)" data-key="face_detection_mode" style="width:100%; padding:8px 12px; border:1px solid var(--card-border); border-radius:10px; font-size:12px; background:var(--card-bg); color:var(--dark); outline:none; margin-bottom:6px;">
-                        <option value="all" {{ $s_faceMode === 'all' ? 'selected' : '' }}>Semua pegawai</option>
-                        <option value="except" {{ $s_faceMode === 'except' ? 'selected' : '' }}>Aktifkan kecuali...</option>
-                        <option value="only" {{ $s_faceMode === 'only' ? 'selected' : '' }}>Aktifkan hanya untuk...</option>
-                    </select>
-                    <div id="faceUserBtn" style="{{ $s_faceMode === 'all' ? 'display:none;' : '' }}">
-                        <button type="button" onclick="openUserPicker('face')" style="width:100%; padding:8px 12px; border:1px dashed var(--card-border); border-radius:10px; font-size:11px; color:var(--gray); background:var(--light); cursor:pointer; text-align:left;">
-                            <i class="fas fa-user-group" style="margin-right:6px;"></i> <span id="faceUserCount">{{ count($s_faceUsers) }}</span> pegawai dipilih — <span style="color:var(--primary); font-weight:600;">Ubah</span>
+                    <div class="face-mode-tabs">
+                        <button type="button" class="face-mode-tab {{ $s_faceMode === 'all' ? 'active' : '' }}" data-val="all" onclick="setFaceMode(this,'all')">
+                            <i class="fas fa-users"></i> Semua
+                        </button>
+                        <button type="button" class="face-mode-tab {{ $s_faceMode === 'except' ? 'active' : '' }}" data-val="except" onclick="setFaceMode(this,'except')">
+                            <i class="fas fa-user-minus"></i> Kecuali
+                        </button>
+                        <button type="button" class="face-mode-tab {{ $s_faceMode === 'only' ? 'active' : '' }}" data-val="only" onclick="setFaceMode(this,'only')">
+                            <i class="fas fa-user-check"></i> Hanya
+                        </button>
+                    </div>
+                    <div id="faceUserBtn" style="margin-top:8px; {{ $s_faceMode === 'all' ? 'display:none;' : '' }}">
+                        <button type="button" onclick="openUserPicker('face')" class="face-user-btn">
+                            <div style="display:flex; align-items:center; gap:8px; flex:1;">
+                                <div style="width:28px; height:28px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px;"><i class="fas fa-user-group"></i></div>
+                                <span><span id="faceUserCount" style="font-weight:700; color:var(--primary);">{{ count($s_faceUsers) }}</span> pegawai dipilih</span>
+                            </div>
+                            <i class="fas fa-chevron-right" style="font-size:11px; opacity:0.4;"></i>
                         </button>
                     </div>
                 </div>
@@ -854,6 +888,17 @@
         .catch(function() {
             if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
         });
+    }
+
+    // === Face Mode Tabs ===
+    function setFaceMode(el, val) {
+        document.querySelectorAll('.face-mode-tab').forEach(function(t) { t.classList.remove('active'); });
+        el.classList.add('active');
+        var hidden = document.getElementById('faceMode');
+        hidden.value = val;
+        saveSetting(hidden);
+        var btn = document.getElementById('faceUserBtn');
+        if (btn) btn.style.display = val !== 'all' ? '' : 'none';
     }
 
     // === Tester: Izin & Cache ===
