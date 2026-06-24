@@ -1787,89 +1787,145 @@
         if (submitBtn) submitBtn.disabled = true;
     }
 
-
-    // === LOKASI — pola darurat (proven works) ===
-    var wilayahList = @json($wilayahJson);
-    var _locationWatchId = null;
-    var _locationMarker = null;
-
-    function haversine(lat1,lng1,lat2,lng2) {
-        var R=6371000, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
-        var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
-        return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-    }
-
-    function initializeLocation() {
-        var mapEl = document.getElementById('mini-map');
-
-        // 1. Buat map LANGSUNG
-        if (mapEl && window.L && !mapInstance) {
-            var dLat = wilayahList.length > 0 ? wilayahList[0].lat : 3.3;
-            var dLng = wilayahList.length > 0 ? wilayahList[0].lng : 117.6;
-            mapInstance = L.map(mapEl, { zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false });
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(mapInstance);
-            mapInstance.setView([dLat, dLng], 15);
-            setTimeout(function(){ if(mapInstance) try{mapInstance.invalidateSize();}catch(e){} }, 200);
-            setTimeout(function(){ if(mapInstance) try{mapInstance.invalidateSize();}catch(e){} }, 800);
-        }
-
-        // 2. GPS watch
-        if (!navigator.geolocation) {
-            var el = document.getElementById('location-address-mini');
-            if (el) el.innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444;"></i> GPS tidak tersedia';
-            return;
-        }
-        if (_locationWatchId !== null) return;
-
-        _locationWatchId = navigator.geolocation.watchPosition(function(pos) {
-            var lat = pos.coords.latitude, lng = pos.coords.longitude;
-            currentPosition = pos;
-
-            var inp = document.getElementById('lokasiInput');
-            if (inp) inp.value = lat + ',' + lng;
-
-            if (mapInstance) {
-                mapInstance.setView([lat, lng], 17);
-                if (_locationMarker) mapInstance.removeLayer(_locationMarker);
-                _locationMarker = L.marker([lat, lng]).addTo(mapInstance);
-                try { mapInstance.invalidateSize(); } catch(e) {}
-            }
-
-            var inRadius = false, nearestDist = Infinity;
-            for (var i = 0; i < wilayahList.length; i++) {
-                var d = haversine(lat,lng,wilayahList[i].lat,wilayahList[i].lng);
-                if (d < nearestDist) nearestDist = d;
-                if (d <= wilayahList[i].radius) { inRadius = true; break; }
-            }
-
-            isOutsideRadius = !inRadius;
-            var addrEl = document.getElementById('location-address-mini');
-            var infoEl = document.getElementById('locationRadiusInfo');
-            if (inRadius) {
-                if (addrEl) addrEl.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> Di dalam wilayah kerja';
-                if (infoEl) infoEl.textContent = '';
-            } else {
-                if (addrEl) addrEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#f59e0b;"></i> Di luar radius (' + Math.round(nearestDist) + 'm)';
-                if (infoEl) infoEl.textContent = '';
-            }
-        }, function() {
-            if (!currentPosition) {
-                var el = document.getElementById('location-address-mini');
-                if (el) el.innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444;"></i> Gagal — <span onclick="retryLocation()" style="text-decoration:underline;cursor:pointer;">Coba lagi</span>';
-            }
-        }, { enableHighAccuracy:true, timeout:15000, maximumAge:10000 });
-    }
-
     function retryLocation() {
-        if (_locationWatchId !== null) { navigator.geolocation.clearWatch(_locationWatchId); _locationWatchId = null; }
-        if (mapInstance) { try { mapInstance.remove(); } catch(e) {} mapInstance = null; }
-        _locationMarker = null;
-        var el = document.getElementById('location-address-mini');
-        if (el) el.textContent = 'Mendeteksi lokasi...';
+        var addrEl = document.getElementById('location-address-mini');
+        if (addrEl) addrEl.textContent = 'Mendeteksi lokasi...';
+        var infoEl = document.getElementById('locationRadiusInfo');
+        if (infoEl) infoEl.innerHTML = '';
+        if (_locationWatchId !== null) {
+            navigator.geolocation.clearWatch(_locationWatchId);
+            _locationWatchId = null;
+        }
         initializeLocation();
     }
 
-    var detailWilayahAlamat = @json($wilayahJson[0]['alamat'] ?? '');
+    var _locationWatchId = null;
+    function initializeLocation() {
+        var addrEl = document.getElementById('location-address-mini');
+
+        // Langsung buat map default (seperti darurat) — jangan tunggu GPS
+        initializeMiniMapWithDefault();
+
+        if (!navigator.geolocation) {
+            if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Browser tidak mendukung geolokasi</span>';
+            var infoEl = document.getElementById('locationRadiusInfo');
+            if (infoEl) infoEl.innerHTML = '<button onclick="location.reload()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Refresh Halaman</button>';
+            return;
+        }
+
+        if (_locationWatchId !== null) return;
+
+        _locationWatchId = navigator.geolocation.watchPosition(
+            function(pos) {
+                currentPosition = pos;
+                updateLocationInfo(pos);
+                updateMiniMapPosition(pos);
+            },
+            function(err) {
+                console.error(err);
+                if (!currentPosition) {
+                    if (addrEl) addrEl.innerHTML = '<span style="color:var(--danger);">Lokasi gagal dideteksi</span>';
+                    var infoEl = document.getElementById('locationRadiusInfo');
+                    if (infoEl) infoEl.innerHTML = '<button onclick="retryLocation()" style="margin-top:6px;padding:6px 16px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-rotate-right"></i> Coba Lagi</button>';
+                }
+            },
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000 }
+        );
+    }
+
+    const wilayahList = @json($wilayahJson);
+
+    function updateLocationInfo(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        const lokasiInput = document.getElementById('lokasiInput');
+        if (lokasiInput) lokasiInput.value = `${lat},${lng}`;
+
+        const infoEl = document.getElementById('locationRadiusInfo');
+        const submitBtn = document.querySelector('.submit-btn-large');
+        const addrEl = document.getElementById('location-address-mini');
+
+        var matched = null;
+        for (var i = 0; i < wilayahList.length; i++) {
+            if (haversineDistance(lat, lng, wilayahList[i].lat, wilayahList[i].lng) <= wilayahList[i].radius) {
+                matched = wilayahList[i];
+                break;
+            }
+        }
+
+        if (matched) {
+            if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);"><i class="fas fa-check-circle" style="color:#10b981;font-size:11px;"></i><span style="font-size:11px;font-weight:600;color:#10b981;">Di dalam wilayah kerja</span></div>';
+            if (addrEl) addrEl.textContent = matched.alamat || 'Lokasi terverifikasi';
+            isOutsideRadius = false;
+        } else {
+            if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:11px;"></i><span style="font-size:11px;font-weight:600;color:#f59e0b;">Di luar radius wilayah kerja</span></div>';
+            isOutsideRadius = true;
+            if (addrEl) getAddressFromCoordinates(lat, lng, addrEl);
+        }
+    }
+
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const toRad = x => x * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+        return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function updateMiniMapPosition(position) {
+        if (!mapInstance || !window.L) return;
+
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+
+        mapInstance.setView([lat, lng], 17);
+
+        if (mapInstance._userMarker) {
+            mapInstance._userMarker.setLatLng([lat, lng]);
+        } else {
+            mapInstance._userMarker = L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
+        }
+
+        setTimeout(function() { if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {} }, 100);
+    }
+
+    function initializeMiniMapWithDefault() {
+        var mapEl = document.getElementById('mini-map');
+        if (!mapEl) return;
+
+        if (!window.L) { setTimeout(initializeMiniMapWithDefault, 500); return; }
+
+        if (mapEl.offsetWidth === 0 || mapEl.offsetHeight === 0) {
+            setTimeout(initializeMiniMapWithDefault, 300);
+            return;
+        }
+
+        if (!mapInstance) {
+            var defaultLat = wilayahList.length > 0 ? wilayahList[0].lat : 3.3;
+            var defaultLng = wilayahList.length > 0 ? wilayahList[0].lng : 117.6;
+            mapInstance = L.map(mapEl, {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([defaultLat, defaultLng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(mapInstance);
+
+            ['dragging','touchZoom','doubleClickZoom','scrollWheelZoom','boxZoom','keyboard']
+                .forEach(function(f) { if (mapInstance[f]) mapInstance[f].disable(); });
+
+            setTimeout(function() { if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {} }, 100);
+            setTimeout(function() { if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {} }, 500);
+        }
+    }
+
+    const detailWilayahAlamat = @json($wilayahJson[0]['alamat'] ?? '');
 
     function initializeDetailModals() {
         if (!window.L) return;
