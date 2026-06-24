@@ -1,6 +1,11 @@
 @extends('layouts.pegawai')
 @section('title', 'Home')
 
+@push('head')
+<meta name="turbo-visit-control" content="reload">
+<meta name="turbo-cache-control" content="no-cache">
+@endpush
+
 @php
     $masukDisabled = $sudahPresensiMasuk || ($disablePresensiLibur ?? false);
     $pulangDisabled = $sudahPresensiPulang || ($disablePresensiLibur ?? false);
@@ -465,7 +470,7 @@
 <div class="modal fade" id="presensiModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
         <div class="modal-content" style="border:none; border-radius:0; height:100vh; background:#000; display:flex; flex-direction:column; overflow:hidden;">
-            <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" style="display:flex; flex-direction:column; height:100%;">
+            <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" data-turbo="false" style="display:flex; flex-direction:column; height:100%;">
                 @csrf
                 <input type="hidden" name="jenis" id="jenisPresensi">
                 <input type="hidden" name="foto" id="fotoInput">
@@ -1278,7 +1283,11 @@
     // ══════════════════════════════════════════════════════════════
     // INIT — satu kali saat DOM ready
     // ══════════════════════════════════════════════════════════════
+    var _initialized = false;
     function init() {
+        if (_initialized) return;
+        _initialized = true;
+
         Carousel.init();
         startWorkTimer();
         startLemburTimer();
@@ -1303,6 +1312,9 @@
     } else {
         init();
     }
+
+    // Safety net: jika Turbo aktif dari layout, pastikan init jalan juga pada turbo:load
+    document.addEventListener('turbo:load', init);
 
 
 })();

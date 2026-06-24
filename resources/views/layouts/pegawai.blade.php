@@ -34,6 +34,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com" defer></script>
     <meta name="turbo-prefetch" content="true">
+    @stack('head')
 
     <script>
         (function() {
