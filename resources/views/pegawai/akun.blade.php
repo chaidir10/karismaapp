@@ -88,15 +88,37 @@
     .action-subtitle { font-size:12px; color:var(--gray); margin:0; }
     .action-arrow { color:var(--gray); font-size:12px; flex-shrink:0; }
 
-    /* Photo Preview Modal */
+    /* Photo Preview Modal — smooth morph */
     .photo-preview-overlay {
-        display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9);
-        z-index:100; align-items:center; justify-content:center; flex-direction:column;
+        position:fixed; inset:0; z-index:100;
+        display:flex; align-items:center; justify-content:center; flex-direction:column;
+        pointer-events:none; opacity:0;
     }
-    .photo-preview-overlay.visible { display:flex; }
-    .photo-preview-overlay img { max-width:90%; max-height:75vh; border-radius:12px; object-fit:contain; }
+    .photo-preview-overlay.visible { pointer-events:auto; opacity:1; }
+    .photo-preview-bg {
+        position:absolute; inset:0; background:#000; opacity:0;
+        transition: opacity 0.3s ease;
+    }
+    .photo-preview-overlay.visible .photo-preview-bg { opacity:0.92; }
+    .photo-preview-content {
+        position:relative; z-index:1;
+        transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), border-radius 0.35s ease, width 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), height 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+        overflow:hidden; border-radius:50%;
+        width:88px; height:88px;
+    }
+    .photo-preview-overlay.visible .photo-preview-content {
+        border-radius:16px;
+        width:min(85vw, 400px); height:min(85vw, 400px);
+    }
+    .photo-preview-content img, .photo-preview-content .pp-placeholder {
+        width:100%; height:100%; object-fit:cover; display:block;
+    }
     .photo-preview-close {
         position:absolute; top:16px; right:16px; width:40px; height:40px; border-radius:50%;
+        z-index:2; opacity:0; transition: opacity 0.2s 0.15s;
+    }
+    .photo-preview-overlay.visible .photo-preview-close { opacity:1; }
+    .photo-preview-close {
         background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:18px;
         cursor:pointer; display:flex; align-items:center; justify-content:center;
     }
@@ -353,14 +375,17 @@
 
 <!-- Photo Preview -->
 <div id="photoPreview" class="photo-preview-overlay">
+    <div class="photo-preview-bg"></div>
     <button class="photo-preview-close" onclick="closePhotoPreview()"><i class="fas fa-xmark"></i></button>
-    @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
-    <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}" alt="Foto Profil">
-    @else
-    <div style="color:#fff; font-size:80px; width:200px; height:200px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-weight:700;">
-        {{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->take(2)->join('') }}
+    <div class="photo-preview-content" id="photoPreviewContent">
+        @if($user->foto_profil && Storage::disk('public')->exists('foto_profil/' . $user->foto_profil))
+        <img src="{{ asset('public/storage/foto_profil/' . $user->foto_profil) }}" alt="Foto Profil">
+        @else
+        <div class="pp-placeholder" style="color:#fff; font-size:80px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-weight:700;">
+            {{ collect(explode(' ', $user->name))->map(fn($n) => substr($n,0,1))->take(2)->join('') }}
+        </div>
+        @endif
     </div>
-    @endif
 </div>
 
 <!-- Logout Modal -->
@@ -477,9 +502,56 @@
     function openLogoutModal() { openModal('logoutModal'); }
     function closeLogoutModal() { closeModal('logoutModal'); }
 
-    function openPhotoPreview() { document.getElementById('photoPreview').classList.add('visible'); }
-    function closePhotoPreview() { document.getElementById('photoPreview').classList.remove('visible'); }
-    document.getElementById('photoPreview').addEventListener('click', function(e) { if (e.target === this) closePhotoPreview(); });
+    function openPhotoPreview() {
+        var avatar = document.querySelector('.profile-avatar');
+        var content = document.getElementById('photoPreviewContent');
+        var overlay = document.getElementById('photoPreview');
+        if (!avatar || !content) return;
+
+        var r = avatar.getBoundingClientRect();
+        var cx = window.innerWidth / 2;
+        var cy = window.innerHeight / 2;
+        var dx = r.left + r.width / 2 - cx;
+        var dy = r.top + r.height / 2 - cy;
+
+        content.style.transition = 'none';
+        content.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        content.style.width = r.width + 'px';
+        content.style.height = r.height + 'px';
+        content.style.borderRadius = '50%';
+
+        overlay.style.display = 'flex';
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                content.style.transition = '';
+                overlay.classList.add('visible');
+                content.style.transform = 'translate(0,0)';
+            });
+        });
+    }
+    function closePhotoPreview() {
+        var avatar = document.querySelector('.profile-avatar');
+        var content = document.getElementById('photoPreviewContent');
+        var overlay = document.getElementById('photoPreview');
+        if (!avatar || !content) return;
+
+        var r = avatar.getBoundingClientRect();
+        var cx = window.innerWidth / 2;
+        var cy = window.innerHeight / 2;
+        var dx = r.left + r.width / 2 - cx;
+        var dy = r.top + r.height / 2 - cy;
+
+        overlay.classList.remove('visible');
+        content.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        content.style.width = r.width + 'px';
+        content.style.height = r.height + 'px';
+        content.style.borderRadius = '50%';
+
+        setTimeout(function() { overlay.style.display = 'none'; }, 350);
+    }
+    document.getElementById('photoPreview').addEventListener('click', function(e) {
+        if (e.target === this || e.target.classList.contains('photo-preview-bg')) closePhotoPreview();
+    });
 
     // Logout
     document.addEventListener('turbo:load', function() {
@@ -518,19 +590,16 @@
         _cropOverlay.height = h;
         C.circleR = Math.min(w, h) * 0.38;
         var cx = w / 2, cy = h / 2;
+        var size = C.circleR * 2;
         var ctx = _cropOverlay.getContext('2d');
         ctx.fillStyle = 'rgba(0,0,0,0.55)';
         ctx.fillRect(0, 0, w, h);
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(cx, cy, C.circleR, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(cx - C.circleR, cy - C.circleR, size, size);
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = 'rgba(255,255,255,0.5)';
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(cx, cy, C.circleR, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.strokeRect(cx - C.circleR, cy - C.circleR, size, size);
     }
 
     function onPhotoSelected(input) {
@@ -600,11 +669,6 @@
         canvas.width = outSize; canvas.height = outSize;
         var ctx = canvas.getContext('2d');
 
-        // Clip to circle
-        ctx.beginPath();
-        ctx.arc(outSize / 2, outSize / 2, outSize / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
         ctx.drawImage(_cropImg, srcX, srcY, srcW, srcH, 0, 0, outSize, outSize);
 
         var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
