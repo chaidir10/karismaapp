@@ -609,8 +609,7 @@
         locationWatch   : null,
         locationMarker  : null,
         workTimerInterval: null,
-        workTimerFulfilled: @json(($sudahPresensiMasuk && $jamMasukHariIni) ? ($isFulfilled ?? false) : false),
-        cameraInitId    : 0
+        workTimerFulfilled: @json(($sudahPresensiMasuk && $jamMasukHariIni) ? ($isFulfilled ?? false) : false)
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -879,16 +878,24 @@
         initModal: function() {
             Presensi.initCamera();
             Presensi.initLocation();
-            setTimeout(function() { if (state.mapInstance) try { state.mapInstance.invalidateSize(); } catch(e) {} }, 400);
+            setTimeout(function() { if (state.mapInstance) try { state.mapInstance.invalidateSize(); } catch(e) {} }, 500);
+            setTimeout(function() { if (state.mapInstance) try { state.mapInstance.invalidateSize(); } catch(e) {} }, 1500);
         },
 
         cleanupModal: function() {
             Presensi.stopFace();
-            if (state.videoStream) { state.videoStream.getTracks().forEach(function(t) { t.stop(); }); state.videoStream = null; }
-            var video = $('video');
-            if (video) video.srcObject = null;
-            if (state.locationWatch !== null) { navigator.geolocation.clearWatch(state.locationWatch); state.locationWatch = null; }
-            if (state.mapInstance) { try { state.mapInstance.remove(); } catch(e) {} state.mapInstance = null; }
+            if (state.videoStream) {
+                state.videoStream.getTracks().forEach(function(t) { t.stop(); });
+                state.videoStream = null;
+            }
+            if (state.locationWatch !== null) {
+                navigator.geolocation.clearWatch(state.locationWatch);
+                state.locationWatch = null;
+            }
+            if (state.mapInstance) {
+                try { state.mapInstance.remove(); } catch(e) {}
+                state.mapInstance = null;
+            }
             state.locationMarker = null;
             state.currentPosition = null;
             state.capturedPhoto = null;
@@ -900,23 +907,20 @@
         initCamera: function() {
             var video = $('video');
             if (!video) return;
-            var myId = ++state.cameraInitId;
 
             Presensi.stopFace();
             if (state.videoStream) { state.videoStream.getTracks().forEach(function(t) { t.stop(); }); state.videoStream = null; }
-            video.srcObject = null;
 
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { Presensi.showCameraError(); return; }
 
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false })
                 .then(function(stream) {
-                    if (myId !== state.cameraInitId) { stream.getTracks().forEach(function(t) { t.stop(); }); return; }
                     state.videoStream = stream;
                     video.srcObject = stream;
-                    return video.play().catch(function() {});
+                    video.muted = true;
+                    return video.play();
                 })
                 .then(function() {
-                    if (myId !== state.cameraInitId) return;
                     if (CFG.enableFace) {
                         Presensi.initFace();
                     } else {
@@ -928,7 +932,7 @@
                     }
                 })
                 .catch(function(err) {
-                    if (err === 'stale') return;
+                    console.error('Camera error:', err);
                     Presensi.showCameraError();
                 });
         },
@@ -1300,14 +1304,6 @@
         init();
     }
 
-    // Cleanup saat user navigasi pergi
-    window.addEventListener('beforeunload', function() {
-        if (state.workTimerInterval) clearInterval(state.workTimerInterval);
-        Presensi.stopFace();
-        if (state.videoStream) state.videoStream.getTracks().forEach(function(t) { t.stop(); });
-        if (state.locationWatch !== null) navigator.geolocation.clearWatch(state.locationWatch);
-        if (state.mapInstance) try { state.mapInstance.remove(); } catch(e) {}
-    });
 
 })();
 </script>
