@@ -260,6 +260,28 @@
         </div>
     </div>
 
+    @if($user->is_tester)
+    <div style="margin-bottom:20px;">
+        <div style="font-size:12px; font-weight:700; color:#ef4444; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; padding:0 4px;">Tester Tools</div>
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; overflow:hidden;">
+            <div style="padding:14px 16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:10px; background:rgba(239,68,68,0.08); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-clock-rotate-left"></i></div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Reset Presensi Hari Ini</p>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Hapus rekam kehadiran hari ini</p>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button type="button" onclick="resetPresensi('reguler')" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:12px; font-weight:600; cursor:pointer;"><i class="fas fa-clock" style="color:#3b82f6; margin-right:4px;"></i> Reguler</button>
+                    <button type="button" onclick="resetPresensi('lembur')" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:12px; font-weight:600; cursor:pointer;"><i class="fas fa-bolt" style="color:#f59e0b; margin-right:4px;"></i> Lembur</button>
+                    <button type="button" onclick="resetPresensi('all')" style="flex:1; padding:10px; border-radius:10px; border:none; background:#ef4444; color:#fff; font-size:12px; font-weight:600; cursor:pointer;"><i class="fas fa-trash" style="margin-right:4px;"></i> Semua</button>
+                </div>
+                <div id="resetStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     @if(in_array($user->role, ['admin', 'superadmin']))
     @php
@@ -728,6 +750,28 @@
         }
     }, { passive:true });
     document.addEventListener('touchend', function() { C.drag = false; });
+
+    // === Tester: Reset Presensi ===
+    function resetPresensi(type) {
+        if (!confirm('Reset presensi ' + (type === 'all' ? 'reguler + lembur' : type) + ' hari ini?')) return;
+        var statusEl = document.getElementById('resetStatus');
+        fetch('/pegawai/akun/reset-presensi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ type: type })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.textContent = d.message || 'Berhasil direset';
+                setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+            }
+        })
+        .catch(function() {
+            if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
+        });
+    }
 
     // === Admin Settings (toggle + dropdown + user picker) ===
     function saveSetting(el) {

@@ -123,4 +123,26 @@ class AkunController extends Controller
         \App\Models\AppSetting::setValue($key, $request->input('value'));
         return response()->json(['ok' => true]);
     }
+
+    public function resetPresensi(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_tester) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $today = now()->toDateString();
+        $type = $request->input('type', 'all');
+        $query = \App\Models\Presensi::where('user_id', $user->id)->whereDate('tanggal', $today);
+
+        if ($type === 'reguler') {
+            $count = $query->where('is_lembur', false)->delete();
+        } elseif ($type === 'lembur') {
+            $count = $query->where('is_lembur', true)->delete();
+        } else {
+            $count = $query->delete();
+        }
+
+        return response()->json(['ok' => true, 'message' => $count . ' data presensi dihapus']);
+    }
 }

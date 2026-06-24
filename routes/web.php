@@ -146,6 +146,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::post('/akun', [AkunController::class, 'update'])->name('akun.update');
         Route::post('/akun/toggle-darurat', [AkunController::class, 'toggleDarurat'])->name('akun.toggle-darurat');
         Route::post('/akun/save-setting', [AkunController::class, 'saveSetting'])->name('akun.save-setting');
+        Route::post('/akun/reset-presensi', [AkunController::class, 'resetPresensi'])->name('akun.reset-presensi');
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
     });
 
