@@ -1156,7 +1156,7 @@
                 }
             @endphp
             @if($daruratAccess)
-            <a href="{{ route('pegawai.presensi.darurat') }}" class="nav-item nav-darurat">
+            <a href="{{ route('pegawai.presensi.darurat') }}" class="nav-item nav-darurat" data-turbo="false">
                 <div class="nav-icon"><i class="fas fa-bolt"></i></div>
                 <div>Darurat</div>
             </a>
