@@ -172,11 +172,14 @@ class PresensiController extends Controller
         } else {
             // Reguler: validasi seperti biasa
             if ($request->jenis === 'pulang') {
-                $sudahMasuk = Presensi::where('user_id', $userId)
-                    ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', false)->exists();
-                if (!$sudahMasuk) {
-                    return redirect()->route('pegawai.dashboard')
-                        ->with('error', 'Anda belum melakukan presensi masuk hari ini!');
+                $requireMasukFirst = \App\Models\AppSetting::getBool('require_masuk_before_pulang', true);
+                if ($requireMasukFirst) {
+                    $sudahMasuk = Presensi::where('user_id', $userId)
+                        ->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', false)->exists();
+                    if (!$sudahMasuk) {
+                        return redirect()->route('pegawai.dashboard')
+                            ->with('error', 'Anda belum melakukan presensi masuk hari ini!');
+                    }
                 }
 
                 $sudahPulang = Presensi::where('user_id', $userId)
