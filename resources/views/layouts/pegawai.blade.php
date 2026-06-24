@@ -1069,34 +1069,31 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- Custom UI: Toast, Confirm, Date/Time Picker --}}
+    {{-- Custom UI: Form inputs, Confirm dialog --}}
     <style>
-        .k-toast-wrap{position:fixed;top:0;left:0;right:0;z-index:99999;display:flex;flex-direction:column;align-items:center;pointer-events:none;padding:12px 16px;gap:8px}
-        .k-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;max-width:360px;width:100%;font-size:13px;font-weight:500;line-height:1.4;animation:kToastIn .35s ease;box-shadow:0 8px 30px rgba(0,0,0,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-        .k-toast.out{animation:kToastOut .3s ease forwards}
-        .k-toast .k-ti{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-        .k-toast .k-tm{flex:1;min-width:0}
-        .k-toast.warn{background:rgba(255,255,255,.95);color:#92400e;border:1px solid rgba(245,158,11,.2)}.k-toast.warn .k-ti{background:rgba(245,158,11,.12);color:#f59e0b}
-        .k-toast.err{background:rgba(255,255,255,.95);color:#991b1b;border:1px solid rgba(239,68,68,.2)}.k-toast.err .k-ti{background:rgba(239,68,68,.12);color:#ef4444}
-        .k-toast.ok{background:rgba(255,255,255,.95);color:#065f46;border:1px solid rgba(16,185,129,.2)}.k-toast.ok .k-ti{background:rgba(16,185,129,.12);color:#10b981}
-        .k-toast.info{background:rgba(255,255,255,.95);color:#1e40af;border:1px solid rgba(59,130,246,.2)}.k-toast.info .k-ti{background:rgba(59,130,246,.12);color:#3b82f6}
-        [data-theme="dark"] .k-toast{background:rgba(30,30,30,.95)!important}
-        [data-theme="dark"] .k-toast.warn{color:#fbbf24}[data-theme="dark"] .k-toast.err{color:#fca5a5}[data-theme="dark"] .k-toast.ok{color:#6ee7b7}[data-theme="dark"] .k-toast.info{color:#93c5fd}
-        @keyframes kToastIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes kToastOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-12px) scale(.95)}}
-
-        .k-confirm-bg{display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:16px;animation:kFadeIn .2s ease}
-        .k-confirm-bg.show{display:flex}
-        .k-confirm-box{background:var(--card-bg,#fff);border-radius:20px;padding:24px;width:90%;max-width:340px;text-align:center;animation:kSlideUp .3s ease}
-        .k-confirm-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px}
-        .k-confirm-title{font-weight:700;font-size:16px;margin-bottom:6px;color:var(--dark,#1a1a2e)}
-        .k-confirm-msg{font-size:13px;color:var(--gray,#94a3b8);margin-bottom:16px;line-height:1.5}
-        .k-confirm-btns{display:flex;gap:10px}
-        .k-confirm-btns button{flex:1;padding:12px;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;border:none}
-        .k-confirm-cancel{background:var(--card-bg,#fff)!important;color:var(--dark,#1a1a2e)!important;border:1px solid var(--card-border,#e2e8f0)!important}
-        .k-confirm-ok{color:#fff!important}
-        @keyframes kFadeIn{from{opacity:0}to{opacity:1}}
-        @keyframes kSlideUp{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        /* Custom select arrow */
+        .k-select { -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; background-size:14px; padding-right:38px !important; }
+        /* Custom date/time wrappers */
+        .k-date-wrap, .k-time-wrap { position:relative; }
+        .k-date-wrap::after, .k-time-wrap::after { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-family:'Font Awesome 6 Free'; font-weight:900; font-size:13px; color:var(--gray); pointer-events:none; }
+        .k-date-wrap::after { content:'\f073'; }
+        .k-time-wrap::after { content:'\f017'; }
+        .k-date-wrap input, .k-time-wrap input { width:100%; padding:12px 38px 12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; -webkit-appearance:none; appearance:none; }
+        .k-date-wrap input:focus, .k-time-wrap input:focus { border-color:var(--primary); }
+        .k-date-wrap input::-webkit-calendar-picker-indicator, .k-time-wrap input::-webkit-calendar-picker-indicator { opacity:0; position:absolute; inset:0; width:100%; height:100%; cursor:pointer; }
+        /* Confirm dialog */
+        .k-confirm-bg { display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,.5); align-items:center; justify-content:center; padding:16px; }
+        .k-confirm-bg.show { display:flex; animation:kFadeIn .2s ease; }
+        .k-confirm-box { background:var(--card-bg,#fff); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center; animation:kSlideUp .3s ease; }
+        .k-confirm-icon { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:24px; }
+        .k-confirm-title { font-weight:700; font-size:16px; margin-bottom:6px; color:var(--dark,#1a1a2e); }
+        .k-confirm-msg { font-size:13px; color:var(--gray,#94a3b8); margin-bottom:16px; line-height:1.5; }
+        .k-confirm-btns { display:flex; gap:10px; }
+        .k-confirm-btns button { flex:1; padding:12px; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer; border:none; }
+        .k-confirm-cancel { background:var(--card-bg,#fff)!important; color:var(--dark,#1a1a2e)!important; border:1px solid var(--card-border,#e2e8f0)!important; }
+        .k-confirm-ok { color:#fff!important; }
+        @keyframes kFadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes kSlideUp { from{opacity:0;transform:translateY(20px) scale(.95)} to{opacity:1;transform:translateY(0) scale(1)} }
     </style>
 
     @stack('styles')
@@ -1378,6 +1375,55 @@
         @if(session('warning'))
         document.addEventListener('DOMContentLoaded', function() { showWarning(@json(session('warning'))); });
         @endif
+    </script>
+
+    <!-- Custom Confirm Dialog -->
+    <div id="kConfirmBg" class="k-confirm-bg" onclick="if(event.target===this){this.classList.remove('show');if(window._kConfirmReject)window._kConfirmReject();}">
+        <div class="k-confirm-box">
+            <div class="k-confirm-icon" id="kConfirmIcon"></div>
+            <div class="k-confirm-title" id="kConfirmTitle"></div>
+            <div class="k-confirm-msg" id="kConfirmMsg"></div>
+            <div class="k-confirm-btns">
+                <button class="k-confirm-cancel" onclick="document.getElementById('kConfirmBg').classList.remove('show');if(window._kConfirmReject)window._kConfirmReject();">Batal</button>
+                <button class="k-confirm-ok" id="kConfirmOk">Ya</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function kConfirm(opts) {
+            var bg = document.getElementById('kConfirmBg');
+            var iconEl = document.getElementById('kConfirmIcon');
+            var titleEl = document.getElementById('kConfirmTitle');
+            var msgEl = document.getElementById('kConfirmMsg');
+            var okBtn = document.getElementById('kConfirmOk');
+
+            var type = opts.type || 'warning';
+            var colors = {
+                warning: { iconBg:'var(--warning-light)', iconColor:'var(--warning)', btnBg:'linear-gradient(135deg,#f59e0b,#d97706)', icon:'fa-triangle-exclamation' },
+                danger:  { iconBg:'var(--danger-light)', iconColor:'var(--danger)', btnBg:'linear-gradient(135deg,#ef4444,#dc2626)', icon:'fa-circle-exclamation' },
+                info:    { iconBg:'var(--primary-soft)', iconColor:'var(--primary-dark)', btnBg:'linear-gradient(135deg,var(--primary),var(--primary-dark))', icon:'fa-circle-info' },
+                success: { iconBg:'var(--success-light)', iconColor:'var(--success)', btnBg:'linear-gradient(135deg,#10b981,#059669)', icon:'fa-circle-check' }
+            };
+            var c = colors[type] || colors.warning;
+
+            iconEl.style.background = c.iconBg;
+            iconEl.style.color = c.iconColor;
+            iconEl.innerHTML = '<i class="fas ' + (opts.icon || c.icon) + '"></i>';
+            titleEl.textContent = opts.title || 'Konfirmasi';
+            msgEl.textContent = opts.message || 'Apakah Anda yakin?';
+            okBtn.textContent = opts.okText || 'Ya';
+            okBtn.style.background = c.btnBg;
+
+            return new Promise(function(resolve, reject) {
+                window._kConfirmReject = function() { window._kConfirmReject = null; reject(); };
+                okBtn.onclick = function() {
+                    bg.classList.remove('show');
+                    window._kConfirmReject = null;
+                    resolve();
+                };
+                bg.classList.add('show');
+            });
+        }
     </script>
 
     <!-- Push scripts dari child blade -->

@@ -87,36 +87,6 @@
     }
     .btn-submit { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; }
     .btn-cancel { background:var(--gray-light); color:var(--dark); }
-
-    /* Custom select arrow */
-    .k-select {
-        -webkit-appearance:none; appearance:none;
-        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-        background-repeat:no-repeat; background-position:right 14px center; background-size:14px;
-        padding-right:38px !important;
-    }
-    /* Custom date/time — wrapper approach */
-    .k-date-wrap, .k-time-wrap {
-        position:relative;
-    }
-    .k-date-wrap::after, .k-time-wrap::after {
-        position:absolute; right:14px; top:50%; transform:translateY(-50%);
-        font-family:'Font Awesome 6 Free'; font-weight:900; font-size:13px;
-        color:var(--gray); pointer-events:none;
-    }
-    .k-date-wrap::after { content:'\f073'; }
-    .k-time-wrap::after { content:'\f017'; }
-    .k-date-wrap input, .k-time-wrap input {
-        width:100%; padding:12px 38px 12px 14px; border:1px solid var(--card-border);
-        border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg);
-        outline:none; -webkit-appearance:none; appearance:none;
-    }
-    .k-date-wrap input:focus, .k-time-wrap input:focus { border-color:var(--primary); }
-    /* Hide native calendar/clock icon */
-    .k-date-wrap input::-webkit-calendar-picker-indicator,
-    .k-time-wrap input::-webkit-calendar-picker-indicator {
-        opacity:0; position:absolute; inset:0; width:100%; height:100%; cursor:pointer;
-    }
 </style>
 
 <div class="pengajuan-page">
@@ -367,11 +337,11 @@
                     </div>
                     <div style="margin-bottom:14px;">
                         <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal</label>
-                        <input type="date" name="tanggal" id="tanggal" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                        <div class="k-date-wrap"><input type="date" name="tanggal" id="tanggal" required></div>
                     </div>
                     <div style="margin-bottom:14px;">
                         <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Waktu</label>
-                        <input type="time" name="waktu" id="waktuPengajuan" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                        <div class="k-time-wrap"><input type="time" name="waktu" id="waktuPengajuan" required></div>
                     </div>
                     <div style="margin-bottom:14px;">
                         <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Alasan</label>
@@ -405,7 +375,7 @@
                     @csrf
                     <div style="margin-bottom:14px;">
                         <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Jenis</label>
-                        <select name="jenis_cuti" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none; -webkit-appearance:none; appearance:none;">
+                        <select name="jenis_cuti" required class="k-select" style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
                             <option value="">-- Pilih Jenis --</option>
                             <option value="cuti_tahunan">Cuti Tahunan</option>
                             <option value="cuti_sakit">Cuti Sakit</option>
@@ -418,11 +388,11 @@
                     <div style="display:flex; gap:10px; margin-bottom:14px;">
                         <div style="flex:1;">
                             <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal Mulai</label>
-                            <input type="date" name="tanggal_mulai" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                            <div class="k-date-wrap"><input type="date" name="tanggal_mulai" required></div>
                         </div>
                         <div style="flex:1;">
                             <label style="font-size:12px; font-weight:600; color:var(--gray); display:block; margin-bottom:6px;">Tanggal Selesai</label>
-                            <input type="date" name="tanggal_selesai" required style="width:100%; padding:12px 14px; border:1px solid var(--card-border); border-radius:12px; font-size:14px; color:var(--dark); background:var(--card-bg); outline:none;">
+                            <div class="k-date-wrap"><input type="date" name="tanggal_selesai" required></div>
                         </div>
                     </div>
                     <div style="margin-bottom:14px;">
