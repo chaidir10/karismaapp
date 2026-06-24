@@ -81,19 +81,25 @@
                 </label>
 
                 @php
-                    $faceUserIds = json_decode($settings['face_detection_users'] ?? '[]', true) ?: [];
                     $faceMode = $settings['face_detection_mode'] ?? 'all';
+                    $faceExceptIds = json_decode($settings['face_detection_users_except'] ?? '[]', true) ?: [];
+                    $faceOnlyIds = json_decode($settings['face_detection_users_only'] ?? '[]', true) ?: [];
+                    $faceUserIds = $faceMode === 'except' ? $faceExceptIds : $faceOnlyIds;
                 @endphp
+                <input type="hidden" name="face_detection_mode" id="faceDetectMode" value="{{ $faceMode }}">
                 <div id="faceDetectUserSection" style="margin-top:12px; {{ ($settings['enable_face_detection'] ?? '1') !== '1' ? 'display:none;' : '' }}">
-                    <select name="face_detection_mode" id="faceDetectMode" style="width:100%; padding:9px 12px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text); outline:none; margin-bottom:8px;">
-                        <option value="all" {{ $faceMode === 'all' ? 'selected' : '' }}>Semua pegawai wajib face detection</option>
-                        <option value="except" {{ $faceMode === 'except' ? 'selected' : '' }}>Aktifkan kecuali...</option>
-                        <option value="only" {{ $faceMode === 'only' ? 'selected' : '' }}>Aktifkan hanya untuk...</option>
-                    </select>
+                    <div class="setting-tabs" style="margin-bottom:8px;">
+                        <button type="button" class="setting-tab {{ $faceMode === 'all' ? 'active' : '' }}" onclick="event.preventDefault();setAdminMode('face',this,'all')"><i class="fas fa-users"></i> Semua</button>
+                        <button type="button" class="setting-tab {{ $faceMode === 'except' ? 'active' : '' }}" onclick="event.preventDefault();setAdminMode('face',this,'except')"><i class="fas fa-user-minus"></i> Kecuali</button>
+                        <button type="button" class="setting-tab {{ $faceMode === 'only' ? 'active' : '' }}" onclick="event.preventDefault();setAdminMode('face',this,'only')"><i class="fas fa-user-check"></i> Hanya</button>
+                    </div>
                     <div id="faceUserBtn" style="display:{{ $faceMode !== 'all' ? 'block' : 'none' }};">
-                        <button type="button" onclick="event.preventDefault();openUserModal('face')" style="width:100%; padding:9px 12px; border:1px dashed var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; color:var(--dm-muted,#64748b); background:var(--dm-bg,#f9fafb); cursor:pointer; text-align:left;">
-                            <i class="fas fa-user-group" style="margin-right:6px;"></i>
-                            <span id="faceUserCount">{{ count($faceUserIds) }}</span> pegawai dipilih — <span style="color:var(--dm-text,#2E97D4);">Ubah</span>
+                        <button type="button" onclick="event.preventDefault();openUserModal('face')" class="setting-user-btn">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div style="width:26px; height:26px; border-radius:7px; background:#5AB6EA; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px;"><i class="fas fa-user-group"></i></div>
+                                <span><strong id="faceUserCount" style="color:#5AB6EA;">{{ count($faceUserIds) }}</strong> pegawai dipilih</span>
+                            </div>
+                            <i class="fas fa-chevron-right" style="font-size:10px; opacity:0.3;"></i>
                         </button>
                     </div>
                 </div>
@@ -122,19 +128,25 @@
                     </label>
 
                     @php
-                        $allowedIds = json_decode($settings['absen_darurat_users'] ?? '[]', true) ?: [];
                         $daruratMode = $settings['absen_darurat_mode'] ?? 'all';
+                        $daruratExceptIds = json_decode($settings['absen_darurat_users_except'] ?? '[]', true) ?: [];
+                        $daruratOnlyIds = json_decode($settings['absen_darurat_users_only'] ?? '[]', true) ?: [];
+                        $allowedIds = $daruratMode === 'except' ? $daruratExceptIds : $daruratOnlyIds;
                     @endphp
+                    <input type="hidden" name="absen_darurat_mode" id="daruratMode" value="{{ $daruratMode }}">
                     <div id="daruratUserSection" style="margin-top:12px; {{ ($settings['enable_absen_darurat'] ?? '0') !== '1' ? 'display:none;' : '' }}">
-                        <select name="absen_darurat_mode" id="daruratMode" style="width:100%; padding:9px 12px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text); outline:none; margin-bottom:8px;">
-                            <option value="all" {{ $daruratMode === 'all' ? 'selected' : '' }}>Semua pegawai boleh akses</option>
-                            <option value="except" {{ $daruratMode === 'except' ? 'selected' : '' }}>Aktifkan kecuali...</option>
-                            <option value="only" {{ $daruratMode === 'only' ? 'selected' : '' }}>Aktifkan hanya untuk...</option>
-                        </select>
+                        <div class="setting-tabs" style="margin-bottom:8px;">
+                            <button type="button" class="setting-tab {{ $daruratMode === 'all' ? 'active-red' : '' }}" onclick="event.preventDefault();setAdminMode('darurat',this,'all')"><i class="fas fa-users"></i> Semua</button>
+                            <button type="button" class="setting-tab {{ $daruratMode === 'except' ? 'active-red' : '' }}" onclick="event.preventDefault();setAdminMode('darurat',this,'except')"><i class="fas fa-user-minus"></i> Kecuali</button>
+                            <button type="button" class="setting-tab {{ $daruratMode === 'only' ? 'active-red' : '' }}" onclick="event.preventDefault();setAdminMode('darurat',this,'only')"><i class="fas fa-user-check"></i> Hanya</button>
+                        </div>
                         <div id="daruratUserBtn" style="display:{{ $daruratMode !== 'all' ? 'block' : 'none' }};">
-                            <button type="button" onclick="event.preventDefault();openUserModal('darurat')" style="width:100%; padding:9px 12px; border:1px dashed var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; color:var(--dm-muted,#64748b); background:var(--dm-bg,#f9fafb); cursor:pointer; text-align:left;">
-                                <i class="fas fa-user-group" style="margin-right:6px;"></i>
-                                <span id="daruratUserCount">{{ count($allowedIds) }}</span> pegawai dipilih — <span style="color:var(--dm-text,#2E97D4);">Ubah</span>
+                            <button type="button" onclick="event.preventDefault();openUserModal('darurat')" class="setting-user-btn">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <div style="width:26px; height:26px; border-radius:7px; background:#ef4444; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px;"><i class="fas fa-user-group"></i></div>
+                                    <span><strong id="daruratUserCount" style="color:#ef4444;">{{ count($allowedIds) }}</strong> pegawai dipilih</span>
+                                </div>
+                                <i class="fas fa-chevron-right" style="font-size:10px; opacity:0.3;"></i>
                             </button>
                         </div>
                     </div>
@@ -143,15 +155,25 @@
             </div>
         </div>
 
-        <!-- Hidden inputs for selected users -->
-        <div id="faceHiddenInputs">
-            @foreach($faceUserIds as $uid)
-            <input type="hidden" name="face_detection_users[]" value="{{ $uid }}">
+        <!-- Hidden inputs for selected users (per mode) -->
+        <div id="faceExceptInputs">
+            @foreach($faceExceptIds as $uid)
+            <input type="hidden" name="face_detection_users_except[]" value="{{ $uid }}">
             @endforeach
         </div>
-        <div id="daruratHiddenInputs">
-            @foreach($allowedIds as $uid)
-            <input type="hidden" name="absen_darurat_users[]" value="{{ $uid }}">
+        <div id="faceOnlyInputs">
+            @foreach($faceOnlyIds as $uid)
+            <input type="hidden" name="face_detection_users_only[]" value="{{ $uid }}">
+            @endforeach
+        </div>
+        <div id="daruratExceptInputs">
+            @foreach($daruratExceptIds as $uid)
+            <input type="hidden" name="absen_darurat_users_except[]" value="{{ $uid }}">
+            @endforeach
+        </div>
+        <div id="daruratOnlyInputs">
+            @foreach($daruratOnlyIds as $uid)
+            <input type="hidden" name="absen_darurat_users_only[]" value="{{ $uid }}">
             @endforeach
         </div>
 
@@ -188,6 +210,16 @@
 @push('styles')
 <style>
     .sr-only { position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; border:0 !important; padding:0 !important; margin:-1px !important; top:auto !important; left:auto !important; }
+    .setting-tabs { display:flex; gap:4px; padding:3px; background:var(--dm-bg,#f1f5f9); border-radius:10px; border:1px solid var(--dm-border,#e2e8f0); }
+    .setting-tab { flex:1; padding:7px 6px; border:none; border-radius:8px; font-size:12px; font-weight:600; background:transparent; color:var(--dm-muted,#94a3b8); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:all 0.2s; }
+    .setting-tab:hover { color:var(--dm-text,#475569); }
+    .setting-tab.active { background:#5AB6EA; color:#fff; box-shadow:0 2px 6px rgba(90,182,234,0.25); }
+    .setting-tab.active-red { background:#ef4444; color:#fff; box-shadow:0 2px 6px rgba(239,68,68,0.25); }
+    .setting-user-btn { display:flex; align-items:center; justify-content:space-between; width:100%; padding:9px 12px; border:1.5px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; color:var(--dm-text,#374151); background:var(--dm-card,#fff); cursor:pointer; transition:border-color 0.2s; }
+    .setting-user-btn:hover { border-color:#5AB6EA; }
+    [data-theme="dark"] .setting-tabs { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.06); }
+    [data-theme="dark"] .setting-tab { color:rgba(255,255,255,0.4); }
+    [data-theme="dark"] .setting-tab:hover { color:rgba(255,255,255,0.7); }
 </style>
 @endpush
 @push('scripts')
@@ -251,14 +283,22 @@
         var el = this;
         keepScroll(function() { document.getElementById('faceDetectUserSection').style.display = el.checked ? '' : 'none'; });
     });
-    document.getElementById('faceDetectMode').addEventListener('change', function() {
-        var el = this;
-        keepScroll(function() { document.getElementById('faceUserBtn').style.display = el.value !== 'all' ? 'block' : 'none'; });
-    });
-    document.getElementById('daruratMode').addEventListener('change', function() {
-        var el = this;
-        keepScroll(function() { document.getElementById('daruratUserBtn').style.display = el.value !== 'all' ? 'block' : 'none'; });
-    });
+    function setAdminMode(target, btn, val) {
+        var tabs = btn.parentElement.querySelectorAll('.setting-tab');
+        var activeClass = target === 'darurat' ? 'active-red' : 'active';
+        tabs.forEach(function(t) { t.classList.remove('active', 'active-red'); });
+        btn.classList.add(activeClass);
+
+        var hiddenId = target === 'face' ? 'faceDetectMode' : 'daruratMode';
+        document.getElementById(hiddenId).value = val;
+
+        var btnId = target === 'face' ? 'faceUserBtn' : 'daruratUserBtn';
+        document.getElementById(btnId).style.display = val !== 'all' ? 'block' : 'none';
+
+        var countId = target === 'face' ? 'faceUserCount' : 'daruratUserCount';
+        var c = document.getElementById(_getContainerId(target, val));
+        document.getElementById(countId).textContent = c ? c.querySelectorAll('input').length : 0;
+    }
 
     // User picker modal — separate lists per target+mode
     @php $allPegawai = \App\Models\User::nonTester()->orderBy('name')->get(['id','name','nip']); @endphp
@@ -266,11 +306,16 @@
     var currentTarget = '';
     var currentMode = '';
     var tempSelected = [];
+    function _getContainerId(target, mode) {
+        if (target === 'face') return mode === 'except' ? 'faceExceptInputs' : 'faceOnlyInputs';
+        return mode === 'except' ? 'daruratExceptInputs' : 'daruratOnlyInputs';
+    }
+
     function openUserModal(target) {
         currentTarget = target;
         var modeEl = document.getElementById(target === 'face' ? 'faceDetectMode' : 'daruratMode');
         currentMode = modeEl.value;
-        var container = document.getElementById(target === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs');
+        var container = document.getElementById(_getContainerId(target, currentMode));
         tempSelected = Array.from(container.querySelectorAll('input')).map(function(i) { return parseInt(i.value); });
 
         var modeLabel = currentMode === 'except' ? 'Kecuali' : 'Hanya Untuk';
@@ -345,9 +390,10 @@
     }
 
     function confirmUserModal() {
-        var containerId = currentTarget === 'face' ? 'faceHiddenInputs' : 'daruratHiddenInputs';
+        var containerId = _getContainerId(currentTarget, currentMode);
         var countId = currentTarget === 'face' ? 'faceUserCount' : 'daruratUserCount';
-        var inputName = currentTarget === 'face' ? 'face_detection_users[]' : 'absen_darurat_users[]';
+        var prefix = currentTarget === 'face' ? 'face_detection_users_' : 'absen_darurat_users_';
+        var inputName = prefix + currentMode + '[]';
         var container = document.getElementById(containerId);
         container.innerHTML = '';
         tempSelected.forEach(function(id) {
