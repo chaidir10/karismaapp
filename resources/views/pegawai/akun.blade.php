@@ -402,11 +402,13 @@
         $s_libur = $AS::getBool('disable_presensi_hari_libur', true);
         $s_face = $AS::getBool('enable_face_detection', true);
         $s_faceMode = $AS::getValue('face_detection_mode', 'all');
-        $s_faceUsers = json_decode($AS::getValue('face_detection_users', '[]'), true) ?: [];
+        $s_faceExcept = json_decode($AS::getValue('face_detection_users_except', '[]'), true) ?: [];
+        $s_faceOnly = json_decode($AS::getValue('face_detection_users_only', '[]'), true) ?: [];
         $s_masukDulu = $AS::getBool('require_masuk_before_pulang', true);
         $s_darurat = $AS::getBool('enable_absen_darurat', false);
         $s_daruratMode = $AS::getValue('absen_darurat_mode', 'all');
-        $s_daruratUsers = json_decode($AS::getValue('absen_darurat_users', '[]'), true) ?: [];
+        $s_daruratExcept = json_decode($AS::getValue('absen_darurat_users_except', '[]'), true) ?: [];
+        $s_daruratOnly = json_decode($AS::getValue('absen_darurat_users_only', '[]'), true) ?: [];
         $allPegawai = \App\Models\User::nonTester()->orderBy('name')->get(['id','name','nip']);
     @endphp
     <div style="margin-bottom:20px;">
@@ -456,7 +458,7 @@
                         <button type="button" onclick="openUserPicker('face')" class="face-user-btn">
                             <div style="display:flex; align-items:center; gap:8px; flex:1;">
                                 <div style="width:28px; height:28px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px;"><i class="fas fa-user-group"></i></div>
-                                <span><span id="faceUserCount" style="font-weight:700; color:var(--primary);">{{ count($s_faceUsers) }}</span> pegawai dipilih</span>
+                                <span><span id="faceUserCount" style="font-weight:700; color:var(--primary);">{{ $s_faceMode === 'except' ? count($s_faceExcept) : count($s_faceOnly) }}</span> pegawai dipilih</span>
                             </div>
                             <i class="fas fa-chevron-right" style="font-size:11px; opacity:0.4;"></i>
                         </button>
@@ -507,7 +509,7 @@
                         <button type="button" onclick="openUserPicker('darurat')" class="face-user-btn">
                             <div style="display:flex; align-items:center; gap:8px; flex:1;">
                                 <div style="width:28px; height:28px; border-radius:8px; background:#ef4444; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px;"><i class="fas fa-user-group"></i></div>
-                                <span><span id="daruratUserCount" style="font-weight:700; color:#ef4444;">{{ count($s_daruratUsers) }}</span> pegawai dipilih</span>
+                                <span><span id="daruratUserCount" style="font-weight:700; color:#ef4444;">{{ $s_daruratMode === 'except' ? count($s_daruratExcept) : count($s_daruratOnly) }}</span> pegawai dipilih</span>
                             </div>
                             <i class="fas fa-chevron-right" style="font-size:11px; opacity:0.4;"></i>
                         </button>
@@ -934,6 +936,8 @@
         saveSetting(hidden);
         var btn = document.getElementById('faceUserBtn');
         if (btn) btn.style.display = val !== 'all' ? '' : 'none';
+        var list = _userLists['face_' + val] || [];
+        document.getElementById('faceUserCount').textContent = list.length;
     }
 
     function setDaruratMode(el, val) {
@@ -944,6 +948,8 @@
         saveSetting(hidden);
         var btn = document.getElementById('daruratUserBtn');
         if (btn) btn.style.display = val !== 'all' ? '' : 'none';
+        var list = _userLists['darurat_' + val] || [];
+        document.getElementById('daruratUserCount').textContent = list.length;
     }
 
     // === Tester: Izin & Cache ===
@@ -1062,13 +1068,22 @@
     var _allUsers = @json($allPegawai);
     var _pickerTarget = '';
     var _pickerSelected = [];
-    var _faceUserIds = @json($s_faceUsers);
-    var _daruratUserIds = @json($s_daruratUsers);
+    var _userLists = {
+        face_except: @json($s_faceExcept),
+        face_only: @json($s_faceOnly),
+        darurat_except: @json($s_daruratExcept),
+        darurat_only: @json($s_daruratOnly)
+    };
+
+    function _getListKey(target) {
+        var modeEl = document.getElementById(target === 'darurat' ? 'daruratMode' : 'faceMode');
+        return target + '_' + (modeEl ? modeEl.value : 'except');
+    }
 
     function openUserPicker(target) {
         _pickerTarget = target;
-        var sourceIds = target === 'darurat' ? _daruratUserIds : _faceUserIds;
-        _pickerSelected = sourceIds.filter(function(v, i, a) { return a.indexOf(v) === i; });
+        var key = _getListKey(target);
+        _pickerSelected = (_userLists[key] || []).filter(function(v, i, a) { return a.indexOf(v) === i; });
         var modeEl = document.getElementById(target === 'darurat' ? 'daruratMode' : 'faceMode');
         var modeLabel = modeEl.value === 'except' ? 'Kecuali' : 'Hanya Untuk';
         var label = target === 'darurat' ? 'Absen Darurat' : 'Face Detection';
@@ -1135,15 +1150,15 @@
 
     function confirmUserPicker() {
         var ids = _pickerSelected.filter(function(v, i, a) { return a.indexOf(v) === i; });
-        if (_pickerTarget === 'darurat') {
-            _daruratUserIds = ids;
-            document.getElementById('daruratUserCount').textContent = ids.length;
-            var settingKey = 'absen_darurat_users';
-        } else {
-            _faceUserIds = ids;
-            document.getElementById('faceUserCount').textContent = ids.length;
-            var settingKey = 'face_detection_users';
-        }
+        var key = _getListKey(_pickerTarget);
+        _userLists[key] = ids;
+
+        var countEl = _pickerTarget === 'darurat' ? 'daruratUserCount' : 'faceUserCount';
+        document.getElementById(countEl).textContent = ids.length;
+
+        var modeEl = document.getElementById(_pickerTarget === 'darurat' ? 'daruratMode' : 'faceMode');
+        var settingKey = (_pickerTarget === 'darurat' ? 'absen_darurat_users_' : 'face_detection_users_') + modeEl.value;
+
         fetch('/pegawai/akun/save-setting', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },

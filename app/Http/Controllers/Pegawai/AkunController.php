@@ -115,6 +115,10 @@ class AkunController extends Controller
             'enable_absen_darurat',
             'absen_darurat_mode',
             'absen_darurat_users',
+            'face_detection_users_except',
+            'face_detection_users_only',
+            'absen_darurat_users_except',
+            'absen_darurat_users_only',
         ];
 
         $key = $request->input('key');
