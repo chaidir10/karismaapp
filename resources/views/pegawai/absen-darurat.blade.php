@@ -51,7 +51,8 @@
         <video id="video" autoplay playsinline muted></video>
         <div class="guide-oval"></div>
         <div class="overlay-top">
-            <div class="user-info">{{ $user->name }}<small>{{ $user->nip }}</small></div>
+            <a href="{{ route('pegawai.dashboard') }}" style="width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; text-decoration:none; flex-shrink:0; -webkit-tap-highlight-color:transparent;"><i class="fas fa-arrow-left"></i></a>
+            <div class="user-info" style="flex:1; text-align:center;">{{ $user->name }}<small>{{ $user->nip }}</small></div>
             <span class="badge-darurat"><i class="fas fa-bolt"></i> DARURAT</span>
         </div>
     </div>
