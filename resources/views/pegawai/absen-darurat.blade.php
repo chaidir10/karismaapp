@@ -13,13 +13,13 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; overflow:hidden; }
-        .camera-area { position:absolute; top:0; left:0; right:0; bottom:220px; overflow:hidden; background:#111; }
+        .camera-area { position:absolute; top:0; left:0; right:0; overflow:hidden; background:#111; }
         #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
-        .bottom-panel { position:fixed; bottom:0; left:0; right:0; background:#111; padding:10px 14px; padding-bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:3; }
+        .bottom-panel { position:fixed; bottom:0; left:0; right:0; background:#111; padding:8px 14px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px)); z-index:3; }
         .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:8px; width:100%; }
         .map-strip { height:70px; }
         #miniMap { width:100%; height:100%; }
@@ -89,6 +89,16 @@
         var currentLokasi = '';
         var selectedShift = '';
         var processing = false;
+
+        // Fit kamera di atas bottom panel
+        function fitCamera() {
+            var panel = document.querySelector('.bottom-panel');
+            var cam = document.querySelector('.camera-area');
+            if (panel && cam) cam.style.bottom = panel.offsetHeight + 'px';
+        }
+        fitCamera();
+        window.addEventListener('resize', fitCamera);
+        setTimeout(fitCamera, 300);
 
         // Kamera
         (function() {
