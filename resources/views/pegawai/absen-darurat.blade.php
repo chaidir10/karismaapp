@@ -19,11 +19,16 @@
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
         .bottom-panel { flex-shrink:0; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; }
-        .map-strip { height:80px; border-radius:12px; overflow:hidden; margin-bottom:8px; border:1px solid #333; }
+        .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:10px; }
+        .map-strip { height:80px; }
         #miniMap { width:100%; height:100%; }
-        .location-info { font-size:11px; color:#94a3b8; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
-        .location-info i { color:#10b981; }
-        .location-info.outside i { color:#ef4444; }
+        .loc-info { padding:10px 14px; display:flex; align-items:center; gap:10px; }
+        .loc-info-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+        .loc-info-icon.in { background:rgba(16,185,129,0.15); color:#10b981; }
+        .loc-info-icon.out { background:rgba(245,158,11,0.15); color:#f59e0b; }
+        .loc-info-icon.loading { background:rgba(148,163,184,0.15); color:#94a3b8; }
+        .loc-info-text { flex:1; min-width:0; font-size:12px; color:#e2e8f0; font-weight:500; line-height:1.3; }
+        .loc-info-sub { font-size:10px; color:#64748b; font-weight:400; margin-top:1px; }
         .btn-row { display:flex; gap:10px; }
         .btn-absen { flex:1; height:50px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-absen:active { opacity:0.85; transform:scale(0.97); }
@@ -51,8 +56,13 @@
     </div>
 
     <div class="bottom-panel">
-        <div class="map-strip"><div id="miniMap"></div></div>
-        <div class="location-info" id="locationInfo"><i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...</div>
+        <div class="loc-card">
+            <div class="map-strip"><div id="miniMap"></div></div>
+            <div class="loc-info" id="locationInfo">
+                <div class="loc-info-icon loading"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="loc-info-text">Mendeteksi lokasi...<div class="loc-info-sub">Menunggu sinyal GPS</div></div>
+            </div>
+        </div>
 
         @if($shifts->count() > 0)
         <div class="shift-row">
@@ -116,18 +126,19 @@
             }
             var el = document.getElementById('locationInfo');
             if (inRadius) {
-                el.className = 'location-info';
-                el.innerHTML = '<i class="fas fa-check-circle"></i> Di dalam wilayah kerja <span style="opacity:0.6;">(akurasi: ' + acc + 'm)</span>';
+                el.innerHTML = '<div class="loc-info-icon in"><i class="fas fa-check-circle"></i></div>' +
+                    '<div class="loc-info-text">Di dalam wilayah kerja<div class="loc-info-sub">Akurasi: ' + acc + 'm</div></div>';
             } else {
-                el.className = 'location-info outside';
-                el.innerHTML = '<i class="fas fa-exclamation-circle"></i> Di luar radius (' + Math.round(nearestDist) + 'm dari titik terdekat, akurasi: ' + acc + 'm)';
+                var distText = nearestDist !== Infinity ? Math.round(nearestDist) + 'm dari titik terdekat' : 'Tidak ada wilayah';
+                el.innerHTML = '<div class="loc-info-icon out"><i class="fas fa-exclamation-circle"></i></div>' +
+                    '<div class="loc-info-text">Di luar radius<div class="loc-info-sub">' + distText + ' &middot; Akurasi: ' + acc + 'm</div></div>';
             }
         }
 
         if (navigator.geolocation) {
             // Watch position — terus update lokasi untuk akurasi terbaik
             navigator.geolocation.watchPosition(updateLocation, function() {
-                document.getElementById('locationInfo').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444;"></i> Gagal mendapatkan lokasi';
+                document.getElementById('locationInfo').innerHTML = '<div class="loc-info-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;"><i class="fas fa-times-circle"></i></div><div class="loc-info-text" style="color:#ef4444;">Gagal mendapatkan lokasi<div class="loc-info-sub">Pastikan GPS aktif</div></div>';
             }, { enableHighAccuracy:true, timeout:30000, maximumAge:0 });
         }
 
