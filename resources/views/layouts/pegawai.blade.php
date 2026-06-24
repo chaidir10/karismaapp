@@ -417,6 +417,18 @@
             transform:translate(-50%,-50%);
         }
         .nav-item.active { pointer-events:none; }
+        .nav-darurat { color:#ef4444 !important; font-weight:600 !important; }
+        .nav-darurat .nav-icon { position:relative; }
+        .nav-darurat .nav-icon::before {
+            content:''; position:absolute; width:32px; height:32px; border-radius:10px;
+            background:#ef4444; opacity:0.15; top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            animation: daruratPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes daruratPulse {
+            0%, 100% { opacity:0.1; transform:translate(-50%,-50%) scale(1); }
+            50% { opacity:0.25; transform:translate(-50%,-50%) scale(1.3); }
+        }
 
         /* Loader */
         .loading-overlay {
@@ -1133,6 +1145,23 @@
                 <div class="nav-icon"><i class="fas fa-house"></i></div>
                 <div>Home</div>
             </a>
+            @if(\App\Models\AppSetting::getBool('enable_absen_darurat', false))
+            @php
+                $daruratAccess = true;
+                $dMode = \App\Models\AppSetting::getValue('absen_darurat_mode', 'all');
+                if ($dMode !== 'all') {
+                    $dUserIds = json_decode(\App\Models\AppSetting::getValue('absen_darurat_users_' . $dMode, '[]'), true) ?: [];
+                    if ($dMode === 'except' && in_array(auth()->id(), $dUserIds)) $daruratAccess = false;
+                    if ($dMode === 'only' && !in_array(auth()->id(), $dUserIds)) $daruratAccess = false;
+                }
+            @endphp
+            @if($daruratAccess)
+            <a href="{{ route('pegawai.presensi.darurat') }}" class="nav-item nav-darurat">
+                <div class="nav-icon"><i class="fas fa-bolt"></i></div>
+                <div>Darurat</div>
+            </a>
+            @endif
+            @endif
             <a href="{{ route('pegawai.riwayat') }}" class="nav-item {{ Route::is('pegawai.riwayat') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="fas fa-clock-rotate-left"></i></div>
                 <div>Riwayat</div>
