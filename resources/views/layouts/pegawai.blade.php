@@ -1068,6 +1068,37 @@
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Custom UI: Toast, Confirm, Date/Time Picker --}}
+    <style>
+        .k-toast-wrap{position:fixed;top:0;left:0;right:0;z-index:99999;display:flex;flex-direction:column;align-items:center;pointer-events:none;padding:12px 16px;gap:8px}
+        .k-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;max-width:360px;width:100%;font-size:13px;font-weight:500;line-height:1.4;animation:kToastIn .35s ease;box-shadow:0 8px 30px rgba(0,0,0,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .k-toast.out{animation:kToastOut .3s ease forwards}
+        .k-toast .k-ti{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+        .k-toast .k-tm{flex:1;min-width:0}
+        .k-toast.warn{background:rgba(255,255,255,.95);color:#92400e;border:1px solid rgba(245,158,11,.2)}.k-toast.warn .k-ti{background:rgba(245,158,11,.12);color:#f59e0b}
+        .k-toast.err{background:rgba(255,255,255,.95);color:#991b1b;border:1px solid rgba(239,68,68,.2)}.k-toast.err .k-ti{background:rgba(239,68,68,.12);color:#ef4444}
+        .k-toast.ok{background:rgba(255,255,255,.95);color:#065f46;border:1px solid rgba(16,185,129,.2)}.k-toast.ok .k-ti{background:rgba(16,185,129,.12);color:#10b981}
+        .k-toast.info{background:rgba(255,255,255,.95);color:#1e40af;border:1px solid rgba(59,130,246,.2)}.k-toast.info .k-ti{background:rgba(59,130,246,.12);color:#3b82f6}
+        [data-theme="dark"] .k-toast{background:rgba(30,30,30,.95)!important}
+        [data-theme="dark"] .k-toast.warn{color:#fbbf24}[data-theme="dark"] .k-toast.err{color:#fca5a5}[data-theme="dark"] .k-toast.ok{color:#6ee7b7}[data-theme="dark"] .k-toast.info{color:#93c5fd}
+        @keyframes kToastIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes kToastOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-12px) scale(.95)}}
+
+        .k-confirm-bg{display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:16px;animation:kFadeIn .2s ease}
+        .k-confirm-bg.show{display:flex}
+        .k-confirm-box{background:var(--card-bg,#fff);border-radius:20px;padding:24px;width:90%;max-width:340px;text-align:center;animation:kSlideUp .3s ease}
+        .k-confirm-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px}
+        .k-confirm-title{font-weight:700;font-size:16px;margin-bottom:6px;color:var(--dark,#1a1a2e)}
+        .k-confirm-msg{font-size:13px;color:var(--gray,#94a3b8);margin-bottom:16px;line-height:1.5}
+        .k-confirm-btns{display:flex;gap:10px}
+        .k-confirm-btns button{flex:1;padding:12px;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;border:none}
+        .k-confirm-cancel{background:var(--card-bg,#fff)!important;color:var(--dark,#1a1a2e)!important;border:1px solid var(--card-border,#e2e8f0)!important}
+        .k-confirm-ok{color:#fff!important}
+        @keyframes kFadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes kSlideUp{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+    </style>
+
     @stack('styles')
 </head>
 
@@ -1187,13 +1218,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Hapus service worker lama jika ada
+        // Force update SW ke versi self-destruct — hapus semua cache
         if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                reg.update();
+            }).catch(function() {});
             navigator.serviceWorker.getRegistrations().then(function(regs) {
-                regs.forEach(function(r) { r.unregister(); });
+                regs.forEach(function(r) { r.update(); });
             });
         }
-        // Hapus cache lama jika ada
         if ('caches' in window) {
             caches.keys().then(function(names) {
                 names.forEach(function(n) { caches.delete(n); });
@@ -1297,6 +1330,44 @@
         function showSuccess(msg) { showPgToast(msg, 'success'); }
         function showError(msg) { showPgToast(msg, 'error'); }
         function showWarning(msg) { showPgToast(msg, 'warning'); }
+
+        function showConfirm(opts) {
+            var old = document.getElementById('kConfirmOverlay');
+            if (old) old.remove();
+
+            var colors = {
+                warning: { bg:'var(--warning-light,#fef3c7)', color:'var(--warning,#f59e0b)', icon:'fa-exclamation-triangle', btn:'linear-gradient(135deg,#f59e0b,#d97706)' },
+                danger:  { bg:'rgba(239,68,68,0.1)', color:'#ef4444', icon:'fa-trash', btn:'linear-gradient(135deg,#ef4444,#dc2626)' },
+                success: { bg:'var(--success-light,#d1fae5)', color:'var(--success,#10b981)', icon:'fa-check-circle', btn:'linear-gradient(135deg,#10b981,#059669)' },
+                info:    { bg:'rgba(59,130,246,0.1)', color:'#3b82f6', icon:'fa-circle-info', btn:'linear-gradient(135deg,#3b82f6,#2563eb)' }
+            };
+            var c = colors[opts.type || 'warning'] || colors.warning;
+            var icon = opts.icon || c.icon;
+
+            var el = document.createElement('div');
+            el.id = 'kConfirmOverlay';
+            el.className = 'k-confirm-bg show';
+            el.onclick = function(e) { if (e.target === el) closeConfirm(); };
+            el.innerHTML =
+                '<div class="k-confirm-box">' +
+                    '<div class="k-confirm-icon" style="background:' + c.bg + ';color:' + c.color + '"><i class="fas ' + icon + '"></i></div>' +
+                    '<div class="k-confirm-title">' + (opts.title || 'Konfirmasi') + '</div>' +
+                    '<div class="k-confirm-msg">' + (opts.message || 'Apakah Anda yakin?') + '</div>' +
+                    '<div class="k-confirm-btns">' +
+                        '<button class="k-confirm-cancel" id="kConfirmCancel">' + (opts.cancelText || 'Batal') + '</button>' +
+                        '<button class="k-confirm-ok" id="kConfirmOk" style="background:' + c.btn + '">' + (opts.confirmText || 'Ya') + '</button>' +
+                    '</div>' +
+                '</div>';
+            document.body.appendChild(el);
+
+            document.getElementById('kConfirmCancel').onclick = function() { closeConfirm(); if (opts.onCancel) opts.onCancel(); };
+            document.getElementById('kConfirmOk').onclick = function() { closeConfirm(); if (opts.onConfirm) opts.onConfirm(); };
+        }
+
+        function closeConfirm() {
+            var el = document.getElementById('kConfirmOverlay');
+            if (el) el.remove();
+        }
 
         @if(session('success'))
         document.addEventListener('DOMContentLoaded', function() { showSuccess(@json(session('success'))); });

@@ -1160,22 +1160,26 @@
         },
 
         capture: function() {
-            if (!state.videoStream || !state.currentPosition) {
-                alert('Kamera atau lokasi belum siap. Pastikan izin kamera & lokasi diizinkan.');
+            if (!state.videoStream) {
+                showPgToast('Kamera belum siap. Pastikan izin kamera diaktifkan.', 'error');
+                return;
+            }
+            if (!state.currentPosition) {
+                showPgToast('Lokasi sedang dideteksi, tunggu sebentar...', 'warning');
                 return;
             }
             if (!state.faceDetected) {
-                alert('Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.');
+                showPgToast('Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.', 'warning');
                 return;
             }
             var jenis = $('jenisPresensi') ? $('jenisPresensi').value : '';
             var lemburVal = $('isLemburInput') ? $('isLemburInput').value : '';
             if (CFG.requireMasuk && jenis === 'pulang' && !CFG.sudahMasuk && lemburVal !== '1') {
-                alert('Anda belum melakukan presensi masuk hari ini.');
+                showPgToast('Anda belum melakukan presensi masuk hari ini.', 'error');
                 return;
             }
             var video = $('video'), canvas = $('canvas');
-            if (!video || !canvas || !video.videoWidth) { alert('Gagal mengambil foto.'); return; }
+            if (!video || !canvas || !video.videoWidth) { showPgToast('Gagal mengambil foto. Coba lagi.', 'error'); return; }
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
@@ -1195,7 +1199,7 @@
         },
 
         submit: function() {
-            if (!state.capturedPhoto) { alert('Foto belum diambil.'); return; }
+            if (!state.capturedPhoto) { showPgToast('Foto belum diambil.', 'error'); return; }
             var fotoInput = $('fotoInput');
             if (fotoInput) fotoInput.value = state.capturedPhoto;
             var confirmBtn = $('confirmPresensiBtn');

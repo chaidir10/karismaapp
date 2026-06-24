@@ -907,7 +907,16 @@
 
     // === Tester: Reset Presensi ===
     function resetPresensi(type) {
-        if (!confirm('Reset presensi ' + (type === 'all' ? 'reguler + lembur' : type) + ' hari ini?')) return;
+        showConfirm({
+            type: 'danger',
+            icon: 'fa-rotate-left',
+            title: 'Reset Presensi',
+            message: 'Reset presensi ' + (type === 'all' ? 'reguler + lembur' : type) + ' hari ini?',
+            confirmText: 'Ya, Reset',
+            onConfirm: function() { doResetPresensi(type); }
+        });
+    }
+    function doResetPresensi(type) {
         var statusEl = document.getElementById('resetStatus');
         fetch('/pegawai/akun/reset-presensi', {
             method: 'POST',
