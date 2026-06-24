@@ -976,7 +976,7 @@
 
     function openUserPicker(target) {
         _pickerTarget = target;
-        _pickerSelected = _faceUserIds.slice();
+        _pickerSelected = _faceUserIds.filter(function(v, i, a) { return a.indexOf(v) === i; });
         var modeEl = document.getElementById('faceMode');
         var modeLabel = modeEl.value === 'except' ? 'Kecuali' : 'Hanya Untuk';
         document.getElementById('pickerTitle').textContent = 'Face Detection — ' + modeLabel;
@@ -1035,13 +1035,13 @@
         if (isSel) {
             _pickerSelected = _pickerSelected.filter(function(x) { return x !== id; });
         } else {
-            _pickerSelected.push(id);
+            if (_pickerSelected.indexOf(id) === -1) _pickerSelected.push(id);
         }
         renderPickerList();
     }
 
     function confirmUserPicker() {
-        _faceUserIds = _pickerSelected.slice();
+        _faceUserIds = _pickerSelected.filter(function(v, i, a) { return a.indexOf(v) === i; });
         document.getElementById('faceUserCount').textContent = _faceUserIds.length;
         fetch('/pegawai/akun/save-setting', {
             method: 'POST',
