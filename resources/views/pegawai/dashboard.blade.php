@@ -1403,17 +1403,13 @@
     function proceedSelesaiLembur() {
         setJenis('pulang');
         setLembur(true);
-        if (!_presensiReady || !videoStream) { _presensiReady = true; initializeCamera(); }
-        if (!currentPosition) initializeLocation();
         closeLemburConfirm();
-        setTimeout(function() { var m = getPresensiModal(); if (m) m.show(); }, 300);
+        setTimeout(function() { openPresensiModal(); }, 300);
     }
 
     function proceedPulang() {
-        if (!_presensiReady || !videoStream) { _presensiReady = true; initializeCamera(); }
-        if (!currentPosition) initializeLocation();
         closeSimpleModal('earlyPulangModal');
-        setTimeout(function() { var m = getPresensiModal(); if (m) m.show(); }, 300);
+        setTimeout(function() { openPresensiModal(); }, 300);
     }
 
     function handlePulangClick() {
@@ -1442,8 +1438,7 @@
             try { mapInstance.remove(); } catch(e) {}
             mapInstance = null;
         }
-        _presensiReady = false;
-        _presensiModalInstance = null;
+        _locationMarker = null;
         currentPosition = null;
         var video = document.getElementById('video');
         if (video) { video.srcObject = null; video.load(); }
@@ -1452,7 +1447,6 @@
     // Re-init saat kembali dari bfcache
     window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
-            _presensiReady = false;
             currentPosition = null;
             var modal = document.getElementById('presensiModal');
             if (modal && modal.classList.contains('show')) {
@@ -1510,63 +1504,39 @@
         @endif
     });
 
-    var _presensiReady = false;
-    var _presensiModalInstance = null;
-
-    function getPresensiModal() {
-        if (!_presensiModalInstance) {
-            var el = document.getElementById('presensiModal');
-            if (el) _presensiModalInstance = new bootstrap.Modal(el);
-        }
-        return _presensiModalInstance;
-    }
-
     function openPresensiModal() {
-        if (!_presensiReady) {
-            _presensiReady = true;
-            initializeCamera();
-            initializeLocation();
-        } else if (!videoStream) {
-            initializeCamera();
-        }
-        if (!currentPosition) initializeLocation();
-        var m = getPresensiModal();
-        if (m) m.show();
+        var el = document.getElementById('presensiModal');
+        if (el) new bootstrap.Modal(el).show();
     }
 
     function initializePresensiModal() {
-        var video = document.getElementById('video');
-        if (video && videoStream) {
-            video.srcObject = videoStream;
-            video.play().catch(function(){});
-        }
-        if (window._enableFaceDetection && !_faceDetectionActive && videoStream) {
-            initFaceDetection();
-        } else if (!window._enableFaceDetection && videoStream) {
-            var submitBtn = document.querySelector('.submit-btn-large');
-            if (submitBtn) submitBtn.disabled = false;
-            faceDetected = true;
-        }
+        initializeCamera();
+        initializeLocation();
         setTimeout(function() {
             if (mapInstance) try { mapInstance.invalidateSize(); } catch(e) {}
-        }, 300);
-        verifyCameraHealth();
-    }
-
-    function verifyCameraHealth() {
-        setTimeout(function() {
-            var video = document.getElementById('video');
-            if (!video) return;
-            var modal = document.getElementById('presensiModal');
-            if (!modal || !modal.classList.contains('show')) return;
-            if (!videoStream || !video.srcObject || video.readyState < 2) {
-                initializeCamera();
-            }
-        }, 3000);
+        }, 400);
     }
 
     function cleanupPresensiModal() {
         stopFaceDetection();
+
+        if (videoStream) {
+            videoStream.getTracks().forEach(function(t) { t.stop(); });
+            videoStream = null;
+        }
+        var video = document.getElementById('video');
+        if (video) { video.srcObject = null; }
+
+        if (_locationWatchId !== null) {
+            navigator.geolocation.clearWatch(_locationWatchId);
+            _locationWatchId = null;
+        }
+        if (mapInstance) {
+            try { mapInstance.remove(); } catch(e) {}
+            mapInstance = null;
+        }
+        _locationMarker = null;
+        currentPosition = null;
 
         var submitBtn = document.querySelector('.submit-btn-large');
         if (submitBtn) {
