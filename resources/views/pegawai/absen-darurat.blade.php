@@ -42,7 +42,7 @@
         .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; display:none; }
         .toast-success { background:#10b981; color:#fff; }
         .toast-error { background:#ef4444; color:#fff; }
-        .face-guide { position:absolute; inset:0; z-index:1; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .face-guide { position:absolute; inset:0; z-index:1; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center; padding-top:10%; }
         .face-guide-oval { width:60%; max-width:240px; aspect-ratio:3/4; border:2px solid rgba(255,255,255,0.35); border-radius:50%; }
         .face-guide-text { color:rgba(255,255,255,0.7); font-size:11px; margin-top:10px; text-shadow:0 1px 4px rgba(0,0,0,0.5); font-weight:500; }
         canvas#captureCanvas { display:none; }
