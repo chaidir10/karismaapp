@@ -60,6 +60,16 @@
     .face-mode-tab.active {
         background:var(--primary); color:#fff; box-shadow:0 2px 8px rgba(46,151,212,0.25);
     }
+    .darurat-mode-tab {
+        flex:1; padding:8px 4px; border:none; border-radius:9px; font-size:11px; font-weight:600;
+        background:transparent; color:var(--gray); cursor:pointer; display:flex; align-items:center;
+        justify-content:center; gap:5px; transition: all 0.2s;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .darurat-mode-tab:active { opacity:0.8; }
+    .darurat-mode-tab.active {
+        background:#ef4444; color:#fff; box-shadow:0 2px 8px rgba(239,68,68,0.25);
+    }
     .face-user-btn {
         width:100%; padding:10px 14px; border:1.5px solid var(--card-border); border-radius:12px;
         font-size:12px; color:var(--dark); background:var(--card-bg); cursor:pointer;
@@ -427,7 +437,7 @@
                             <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Wajib verifikasi wajah saat absen</p>
                         </div>
                     </div>
-                    <label class="akun-toggle"><input type="checkbox" data-key="enable_face_detection" {{ $s_face ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                    <label class="akun-toggle"><input type="checkbox" data-key="enable_face_detection" {{ $s_face ? 'checked' : '' }} onchange="saveSetting(this); document.getElementById('faceSubSection').style.display=this.checked?'':'none';"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
                 </div>
                 <input type="hidden" id="faceMode" data-key="face_detection_mode" value="{{ $s_faceMode }}">
                 <div id="faceSubSection" style="margin-top:10px; {{ !$s_face ? 'display:none;' : '' }}">
