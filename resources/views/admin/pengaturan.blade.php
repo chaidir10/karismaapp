@@ -261,7 +261,7 @@
     });
 
     // User picker modal — separate lists per target+mode
-    @php $allPegawai = \App\Models\User::orderBy('name')->get(['id','name','nip']); @endphp
+    @php $allPegawai = \App\Models\User::nonTester()->orderBy('name')->get(['id','name','nip']); @endphp
     var allUsers = @json($allPegawai);
     var currentTarget = '';
     var currentMode = '';

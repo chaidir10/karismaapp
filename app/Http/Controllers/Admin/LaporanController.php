@@ -16,7 +16,7 @@ class LaporanController extends Controller
 {
     public function index()
     {
-        $users = User::orderBy('name')->get();
+        $users = User::nonTester()->orderBy('name')->get();
         return view('admin.manajemenlaporan', compact('users'));
     }
 
@@ -26,8 +26,8 @@ class LaporanController extends Controller
         $endDate   = Carbon::createFromFormat('Y-m', $bulan)->endOfMonth();
 
         $users = $userId
-            ? User::where('id', $userId)->get()
-            : User::orderBy('name')->get();
+            ? User::nonTester()->where('id', $userId)->get()
+            : User::nonTester()->orderBy('name')->get();
 
         $holidays = \App\Helpers\HolidayHelper::get($startDate->year);
         $laporan = [];

@@ -14,7 +14,7 @@ class PegawaiController extends Controller
 {
     public function index()
     {
-        $pegawai = User::with('wilayahKerja')->get();
+        $pegawai = User::nonTester()->with('wilayahKerja')->get();
         $today = Carbon::today()->format('Y-m-d');
         $userRole = Auth::user()->role ?? 'pegawai';
         $kehadiranHariIni = [];

@@ -17,7 +17,7 @@ class ManajemenPegawaiController extends Controller
      */
     public function index()
     {
-        $users = User::with(['wilayahKerja', 'wilayahKerjaList', 'jamShift'])->get();
+        $users = User::nonTester()->with(['wilayahKerja', 'wilayahKerjaList', 'jamShift'])->get();
         $units = WilayahKerja::all();
         $shifts = JamShift::all();
 

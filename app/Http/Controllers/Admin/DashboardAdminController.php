@@ -17,21 +17,23 @@ class DashboardAdminController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        // Jumlah pegawai hadir hari ini (masuk yang approved)
-        $jumlahHadir = Presensi::whereDate('tanggal', $today)
+        $excludeTester = function($q) { $q->where('is_tester', false); };
+
+        $jumlahHadir = Presensi::whereHas('user', $excludeTester)
+            ->whereDate('tanggal', $today)
             ->where('jenis', 'masuk')
             ->where('status', 'approved')
             ->distinct('user_id')
             ->count('user_id');
 
         // Total pegawai
-        $jumlahPegawai = User::count();
+        $jumlahPegawai = User::nonTester()->count();
 
         // Total pengajuan pending
         $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
 
-        // Presensi hari ini (reguler saja, bukan lembur)
         $presensiHariIni = Presensi::with('user')
+            ->whereHas('user', $excludeTester)
             ->whereDate('tanggal', $today)
             ->where('status', 'approved')
             ->where('is_lembur', false)
@@ -160,7 +162,7 @@ class DashboardAdminController extends Controller
             }
         }
 
-        $allUsers = User::where('role', '!=', 'superadmin')->get();
+        $allUsers = User::nonTester()->where('role', '!=', 'superadmin')->get();
         $performaList = [];
 
         foreach ($allUsers as $u) {
@@ -453,7 +455,7 @@ class DashboardAdminController extends Controller
             ->count('user_id');
 
         // Total pegawai
-        $jumlahPegawai = User::count();
+        $jumlahPegawai = User::nonTester()->count();
 
         // Total pengajuan pending
         $jumlahPengajuan = PengajuanPresensi::where('status', 'pending')->count();
@@ -585,8 +587,8 @@ class DashboardAdminController extends Controller
         $endDate = Carbon::today();
         $format = $days <= 30 ? 'D d/m' : 'd/m';
 
-        // 1 query: semua presensi masuk dalam range
         $allMasuk = Presensi::with('user')
+            ->whereHas('user', function($q) { $q->where('is_tester', false); })
             ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
             ->where('jenis', 'masuk')
             ->where('status', 'approved')

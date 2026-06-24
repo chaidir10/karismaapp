@@ -73,7 +73,7 @@ class PerformaController extends Controller
             return ['performa' => [], 'hari_kerja' => 0];
         }
 
-        $users = User::where('role', '!=', 'superadmin')->orderBy('name')->get();
+        $users = User::nonTester()->where('role', '!=', 'superadmin')->orderBy('name')->get();
         $performa = [];
 
         foreach ($users as $user) {

@@ -33,6 +33,7 @@ class User extends Authenticatable
         'jenis_pegawai',
         'email',
         'password',
+        'is_tester',
     ];
 
     /**
@@ -62,6 +63,11 @@ class User extends Authenticatable
     public function presensis()
     {
         return $this->hasMany(Presensi::class);
+    }
+
+    public function scopeNonTester($query)
+    {
+        return $query->where('is_tester', false);
     }
 
     /**
