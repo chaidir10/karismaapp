@@ -288,6 +288,20 @@
                 </div>
                 <div id="resetStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
             </div>
+            <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:10px; background:rgba(168,85,247,0.08); color:#a855f7; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-shield-halved"></i></div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Izin & Cache</p>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Request ulang izin / bersihkan cache</p>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button type="button" onclick="reRequestPermissions()" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:11px; font-weight:600; cursor:pointer;"><i class="fas fa-key" style="color:#a855f7; margin-right:4px;"></i> Request Izin</button>
+                    <button type="button" onclick="clearAllCache()" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:11px; font-weight:600; cursor:pointer;"><i class="fas fa-broom" style="color:#f59e0b; margin-right:4px;"></i> Clear Cache</button>
+                </div>
+                <div id="permStatus" style="margin-top:6px; font-size:10px; color:var(--gray); text-align:center;"></div>
+            </div>
             @php $allWilayah = \App\Models\WilayahKerja::all(); $userWilayahIds = $user->wilayahKerjaList->pluck('id')->toArray(); @endphp
             <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
                 <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -819,6 +833,74 @@
         })
         .catch(function() {
             if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
+        });
+    }
+
+    // === Tester: Izin & Cache ===
+    function reRequestPermissions() {
+        var statusEl = document.getElementById('permStatus');
+        var results = [];
+
+        // Kamera
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video:true })
+                .then(function(s) { s.getTracks().forEach(function(t){t.stop();}); results.push('Kamera: OK'); updatePermStatus(results); })
+                .catch(function() { results.push('Kamera: Ditolak'); updatePermStatus(results); });
+        } else { results.push('Kamera: Tidak didukung'); }
+
+        // Lokasi
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function() { results.push('Lokasi: OK'); updatePermStatus(results); },
+                function() { results.push('Lokasi: Ditolak'); updatePermStatus(results); },
+                { timeout:10000 }
+            );
+        } else { results.push('Lokasi: Tidak didukung'); }
+
+        // Notifikasi
+        if ('Notification' in window) {
+            Notification.requestPermission().then(function(r) {
+                results.push('Notifikasi: ' + (r === 'granted' ? 'OK' : r === 'denied' ? 'Ditolak' : 'Belum'));
+                updatePermStatus(results);
+            });
+        } else { results.push('Notifikasi: Tidak didukung'); }
+
+        if (statusEl) statusEl.textContent = 'Meminta izin...';
+    }
+
+    function updatePermStatus(results) {
+        var el = document.getElementById('permStatus');
+        if (el) el.textContent = results.join(' · ');
+    }
+
+    function clearAllCache() {
+        var statusEl = document.getElementById('permStatus');
+        if (statusEl) statusEl.textContent = 'Membersihkan...';
+        var tasks = [];
+
+        // Clear caches
+        if (window.caches) {
+            tasks.push(caches.keys().then(function(names) {
+                return Promise.all(names.map(function(n) { return caches.delete(n); }));
+            }));
+        }
+
+        // Unregister SW
+        if ('serviceWorker' in navigator) {
+            tasks.push(navigator.serviceWorker.getRegistrations().then(function(regs) {
+                return Promise.all(regs.map(function(r) { return r.unregister(); }));
+            }));
+        }
+
+        // Clear localStorage & sessionStorage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        Promise.all(tasks).then(function() {
+            if (statusEl) statusEl.textContent = 'Cache, SW, storage dibersihkan. Reload...';
+            setTimeout(function() { location.reload(true); }, 1000);
+        }).catch(function() {
+            if (statusEl) statusEl.textContent = 'Gagal membersihkan';
         });
     }
 
