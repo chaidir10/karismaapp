@@ -184,7 +184,13 @@
 
     <!-- Profile Hero -->
     <div class="profile-hero">
-        <button type="button" onclick="openModal('editModal')" style="position:absolute; top:14px; right:14px; z-index:2; width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;">
+        <button type="button" onclick="toggleTheme()" style="position:absolute; top:14px; left:14px; z-index:2; width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;">
+            <i class="fas fa-sun" id="theme-icon-sun"></i><i class="fas fa-moon" id="theme-icon-moon" style="display:none;"></i>
+        </button>
+        <button type="button" onclick="openLogoutModal()" style="position:absolute; top:14px; right:14px; z-index:2; width:36px; height:36px; border-radius:10px; background:rgba(239,68,68,0.2); border:none; color:#fff; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+        </button>
+        <button type="button" onclick="openModal('editModal')" style="position:absolute; bottom:14px; right:14px; z-index:2; width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;">
             <i class="fas fa-pen-to-square"></i>
         </button>
         <div class="profile-avatar" onclick="openPhotoPreview()">
@@ -198,6 +204,7 @@
         <p class="profile-nip">NIP. {{ $user->nip ?? '-' }}</p>
         <span class="profile-tag">{{ $user->jabatan ?? 'Pegawai' }}</span>
     </div>
+    <form action="{{ route('pegawai.akun.logout') }}" method="POST" id="logoutForm" style="display:none;">@csrf</form>
 
     <!-- Info -->
     <div class="info-list">
@@ -231,32 +238,6 @@
         </div>
     </div>
 
-    <!-- Actions -->
-    <div class="action-list">
-        <button type="button" onclick="toggleTheme()" class="action-item">
-            <div class="action-icon action-icon-theme">
-                <i class="fas fa-sun" id="theme-icon-sun"></i>
-                <i class="fas fa-moon" id="theme-icon-moon" style="display:none;"></i>
-            </div>
-            <div class="action-content">
-                <p class="action-title">Tampilan</p>
-                <p class="action-subtitle">Ubah ke mode gelap / terang</p>
-            </div>
-            <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
-        </button>
-
-        <form action="{{ route('pegawai.akun.logout') }}" method="POST" id="logoutForm">
-            @csrf
-            <button type="button" onclick="openLogoutModal()" class="action-item">
-                <div class="action-icon action-icon-logout"><i class="fas fa-arrow-right-from-bracket"></i></div>
-                <div class="action-content">
-                    <p class="action-title">Keluar</p>
-                    <p class="action-subtitle">Logout dari aplikasi</p>
-                </div>
-                <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
-            </button>
-        </form>
-    </div>
 
     @if(in_array($user->role, ['admin', 'superadmin']))
     @php
