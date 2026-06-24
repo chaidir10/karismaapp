@@ -1422,8 +1422,92 @@
     });
 
     function openPresensiModal() {
-        var el = document.getElementById('presensiModal');
-        if (el) new bootstrap.Modal(el).show();
+        checkPermissions(function() {
+            var el = document.getElementById('presensiModal');
+            if (el) new bootstrap.Modal(el).show();
+        });
+    }
+
+    function checkPermissions(onReady) {
+        var issues = [];
+        var checks = 0;
+        var total = 2;
+
+        function done() {
+            checks++;
+            if (checks < total) return;
+            if (issues.length === 0) { onReady(); return; }
+            showPermissionModal(issues, onReady);
+        }
+
+        // Cek kamera
+        if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions.query({ name: 'camera' }).then(function(r) {
+                if (r.state === 'denied') issues.push('camera');
+                done();
+            }).catch(function() { done(); });
+        } else { done(); }
+
+        // Cek lokasi
+        if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions.query({ name: 'geolocation' }).then(function(r) {
+                if (r.state === 'denied') issues.push('location');
+                done();
+            }).catch(function() { done(); });
+        } else { done(); }
+
+        // Request notifikasi (non-blocking)
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }
+
+    function showPermissionModal(issues, onReady) {
+        var existing = document.getElementById('permissionModal');
+        if (existing) existing.remove();
+
+        var items = '';
+        if (issues.indexOf('camera') !== -1) {
+            items += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid rgba(239,68,68,0.2);border-radius:12px;background:rgba(239,68,68,0.04);">' +
+                '<div style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,0.1);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><i class="fas fa-camera"></i></div>' +
+                '<div><div style="font-size:13px;font-weight:600;color:var(--dark);">Kamera diblokir</div><div style="font-size:11px;color:var(--gray);">Izinkan akses kamera di pengaturan browser</div></div></div>';
+        }
+        if (issues.indexOf('location') !== -1) {
+            items += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid rgba(245,158,11,0.2);border-radius:12px;background:rgba(245,158,11,0.04);margin-top:8px;">' +
+                '<div style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.1);color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><i class="fas fa-location-dot"></i></div>' +
+                '<div><div style="font-size:13px;font-weight:600;color:var(--dark);">Lokasi diblokir</div><div style="font-size:11px;color:var(--gray);">Izinkan akses lokasi di pengaturan browser</div></div></div>';
+        }
+
+        var modal = document.createElement('div');
+        modal.id = 'permissionModal';
+        modal.style.cssText = 'display:flex;position:fixed;inset:0;z-index:1060;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:16px;';
+        modal.innerHTML = '<div style="background:var(--card-bg);border-radius:20px;width:100%;max-width:380px;overflow:hidden;">' +
+            '<div style="padding:24px 24px 0;text-align:center;">' +
+            '<div style="width:56px;height:56px;border-radius:14px;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i class="fas fa-shield-halved" style="font-size:22px;color:#ef4444;"></i></div>' +
+            '<h5 style="font-weight:700;font-size:17px;color:var(--dark);margin-bottom:6px;">Izin Diperlukan</h5>' +
+            '<p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.5;">Untuk absen, aplikasi membutuhkan akses berikut:</p>' +
+            '</div>' +
+            '<div style="padding:0 24px;">' + items + '</div>' +
+            '<div style="padding:16px 24px 24px;display:flex;gap:10px;margin-top:8px;">' +
+            '<button onclick="document.getElementById(\'permissionModal\').remove()" style="flex:1;padding:14px;border-radius:14px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--dark);font-weight:600;font-size:14px;cursor:pointer;">Tutup</button>' +
+            '<button onclick="document.getElementById(\'permissionModal\').remove();retryPermissions()" style="flex:1;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-weight:600;font-size:14px;cursor:pointer;">Coba Lagi</button>' +
+            '</div></div>';
+        document.body.appendChild(modal);
+    }
+
+    function retryPermissions() {
+        var promises = [];
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            promises.push(navigator.mediaDevices.getUserMedia({ video:true }).then(function(s) { s.getTracks().forEach(function(t){t.stop();}); }).catch(function(){}));
+        }
+        if (navigator.geolocation) {
+            promises.push(new Promise(function(resolve) {
+                navigator.geolocation.getCurrentPosition(function() { resolve(); }, function() { resolve(); }, { timeout:5000 });
+            }));
+        }
+        Promise.all(promises).then(function() {
+            openPresensiModal();
+        });
     }
 
     function initializePresensiModal() {
