@@ -12,6 +12,23 @@
     .akun-toggle-thumb { position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
     .akun-toggle input:checked + .akun-toggle-track .akun-toggle-thumb { left:23px; }
 
+    .tester-wl-item {
+        display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:8px;
+        border:1.5px solid var(--card-border); border-radius:12px; cursor:pointer;
+        transition: border-color 0.2s, background 0.2s;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .tester-wl-item:active { opacity:0.85; }
+    .tester-wl-item.active { border-color:var(--primary); background:rgba(46,151,212,0.06); }
+    .tester-wl-check {
+        width:24px; height:24px; border-radius:8px; flex-shrink:0;
+        border:2px solid var(--card-border); display:flex; align-items:center; justify-content:center;
+        font-size:11px; color:transparent; transition: all 0.2s;
+    }
+    .tester-wl-item.active .tester-wl-check {
+        background:var(--primary); border-color:var(--primary); color:#fff;
+    }
+
 
     /* Profile Hero */
     .profile-hero {
@@ -271,26 +288,45 @@
                 </div>
                 <div id="resetStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
             </div>
+            @php $allWilayah = \App\Models\WilayahKerja::all(); $userWilayahIds = $user->wilayahKerjaList->pluck('id')->toArray(); @endphp
             <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-                    <div style="width:40px; height:40px; border-radius:10px; background:rgba(59,130,246,0.08); color:#3b82f6; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-map-location-dot"></i></div>
-                    <div style="flex:1; min-width:0;">
-                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Wilayah Kerja</p>
-                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Pilih wilayah untuk pengujian</p>
-                    </div>
-                </div>
-                @php $allWilayah = \App\Models\WilayahKerja::all(); $userWilayahIds = $user->wilayahKerjaList->pluck('id')->toArray(); @endphp
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                    @foreach($allWilayah as $w)
-                    <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--card-border); border-radius:10px; cursor:pointer; {{ in_array($w->id, $userWilayahIds) ? 'background:rgba(59,130,246,0.06); border-color:rgba(59,130,246,0.3);' : '' }}">
-                        <input type="checkbox" value="{{ $w->id }}" {{ in_array($w->id, $userWilayahIds) ? 'checked' : '' }} onchange="saveWilayah()" class="tester-wilayah-cb" style="width:18px; height:18px; accent-color:var(--primary);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:rgba(59,130,246,0.08); color:#3b82f6; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-map-location-dot"></i></div>
                         <div style="flex:1; min-width:0;">
-                            <div style="font-size:12px; font-weight:600; color:var(--dark);">{{ $w->alamat ?: $w->nama ?? 'Wilayah #'.$w->id }}</div>
-                            <div style="font-size:10px; color:var(--gray);">Radius: {{ $w->radius ?? 100 }}m</div>
+                            <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Wilayah Kerja</p>
+                            <p style="font-size:11px; color:var(--gray); margin:2px 0 0;"><span id="wilayahCount">{{ count($userWilayahIds) }}</span> wilayah dipilih</p>
                         </div>
-                    </label>
-                    @endforeach
+                    </div>
+                    <button type="button" onclick="openModal('wilayahModal')" style="padding:7px 14px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;">Ubah</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wilayah Modal -->
+    <div id="wilayahModal" class="modal-overlay">
+        <div class="modal-box" style="max-height:75vh; display:flex; flex-direction:column; padding:0;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--card-border);">
+                <h3 style="font-size:15px; font-weight:700; color:var(--dark); margin:0;">Pilih Wilayah Kerja</h3>
+                <button onclick="closeModal('wilayahModal')" class="modal-close" style="position:static;"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div style="flex:1; overflow-y:auto; padding:12px 20px;">
+                @foreach($allWilayah as $w)
+                <label class="tester-wl-item {{ in_array($w->id, $userWilayahIds) ? 'active' : '' }}" data-id="{{ $w->id }}" onclick="toggleWilayahItem(this)">
+                    <div class="tester-wl-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:13px; font-weight:600; color:var(--dark);">{{ $w->alamat ?: $w->nama ?? 'Wilayah #'.$w->id }}</div>
+                        <div style="font-size:10px; color:var(--gray); margin-top:1px;">Radius: {{ $w->radius ?? 100 }}m &middot; {{ number_format($w->latitude, 5) }}, {{ number_format($w->longitude, 5) }}</div>
+                    </div>
+                </label>
+                @endforeach
+            </div>
+            <div style="padding:12px 20px; border-top:1px solid var(--card-border); display:flex; gap:8px;">
+                <button type="button" onclick="closeModal('wilayahModal')" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:13px; font-weight:600; cursor:pointer;">Batal</button>
+                <button type="button" onclick="confirmWilayah()" style="flex:1; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Simpan</button>
             </div>
         </div>
     </div>
@@ -786,11 +822,15 @@
         });
     }
 
-    // === Tester: Wilayah Kerja ===
-    function saveWilayah() {
+    // === Tester: Wilayah Kerja Modal ===
+    function toggleWilayahItem(el) {
+        el.classList.toggle('active');
+    }
+
+    function confirmWilayah() {
         var ids = [];
-        document.querySelectorAll('.tester-wilayah-cb').forEach(function(cb) {
-            if (cb.checked) ids.push(parseInt(cb.value));
+        document.querySelectorAll('.tester-wl-item.active').forEach(function(el) {
+            ids.push(parseInt(el.getAttribute('data-id')));
         });
         fetch('/pegawai/akun/set-wilayah', {
             method: 'POST',
@@ -798,7 +838,11 @@
             body: JSON.stringify({ wilayah_ids: ids })
         })
         .then(function(r) { return r.json(); })
-        .then(function(d) { showSuccess(d.message || 'Wilayah diperbarui'); })
+        .then(function(d) {
+            document.getElementById('wilayahCount').textContent = ids.length;
+            showSuccess(d.message || 'Wilayah diperbarui');
+            closeModal('wilayahModal');
+        })
         .catch(function() { showError('Gagal menyimpan'); });
     }
 
