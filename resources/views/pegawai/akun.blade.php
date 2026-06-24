@@ -1034,12 +1034,10 @@
         var isSel = _pickerSelected.indexOf(id) !== -1;
         if (isSel) {
             _pickerSelected = _pickerSelected.filter(function(x) { return x !== id; });
-            el.classList.remove('active');
         } else {
             _pickerSelected.push(id);
-            el.classList.add('active');
         }
-        document.getElementById('pickerCount').textContent = _pickerSelected.length;
+        renderPickerList();
     }
 
     function confirmUserPicker() {
