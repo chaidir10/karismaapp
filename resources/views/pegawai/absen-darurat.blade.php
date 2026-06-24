@@ -18,8 +18,8 @@
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
         .badge-darurat { background:#ef4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
-        .bottom-panel { flex-shrink:0; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; }
-        .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:10px; }
+        .bottom-panel { flex-shrink:0; background:#111; padding:10px 14px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2; width:100%; box-sizing:border-box; }
+        .loc-card { background:#1a1f2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin-bottom:10px; width:100%; }
         .map-strip { height:80px; }
         #miniMap { width:100%; height:100%; }
         .loc-info { padding:10px 14px; display:flex; align-items:center; gap:10px; }
