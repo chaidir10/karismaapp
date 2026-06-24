@@ -14,7 +14,7 @@
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; overflow:hidden; }
         .camera-area { position:absolute; inset:0; overflow:hidden; background:#111; }
-        #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
+        #video { width:100%; height:100%; object-fit:contain; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
