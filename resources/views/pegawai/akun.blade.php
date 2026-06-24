@@ -29,6 +29,23 @@
         background:var(--primary); border-color:var(--primary); color:#fff;
     }
 
+    .picker-user-item {
+        display:flex; align-items:center; gap:10px; padding:10px 12px; margin-bottom:6px;
+        border:1.5px solid var(--card-border); border-radius:12px; cursor:pointer;
+        transition: border-color 0.2s, background 0.2s;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .picker-user-item:active { opacity:0.85; }
+    .picker-user-item.active { border-color:var(--primary); background:rgba(46,151,212,0.05); }
+    .picker-user-check {
+        width:22px; height:22px; border-radius:7px; flex-shrink:0;
+        border:2px solid var(--card-border); display:flex; align-items:center; justify-content:center;
+        font-size:10px; color:transparent; transition: all 0.2s;
+    }
+    .picker-user-item.active .picker-user-check {
+        background:var(--primary); border-color:var(--primary); color:#fff;
+    }
+
 
     /* Profile Hero */
     .profile-hero {
@@ -433,25 +450,28 @@
 
     {{-- User Picker Modal --}}
     <div id="akunUserPicker" class="modal-overlay">
-        <div class="modal-box" style="max-height:80vh; display:flex; flex-direction:column; padding:0;">
-            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--card-border);">
-                <h3 style="font-size:15px; font-weight:700; color:var(--dark); margin:0;" id="pickerTitle">Pilih Pegawai</h3>
-                <button onclick="closeUserPicker()" class="modal-close" style="position:static;"><i class="fas fa-xmark"></i></button>
-            </div>
-            <div style="padding:10px 20px 0;">
-                <input type="text" id="pickerSearch" placeholder="Cari nama..." oninput="renderPickerList()" style="width:100%; padding:8px 12px; border:1px solid var(--card-border); border-radius:10px; font-size:13px; background:var(--card-bg); color:var(--dark); outline:none; margin-bottom:6px;">
-                <div style="display:flex; gap:6px;">
-                    <button type="button" onclick="pickerCheckAll(true)" style="flex:1; padding:6px; border:1px solid var(--card-border); border-radius:8px; font-size:10px; font-weight:600; background:var(--light); color:var(--dark); cursor:pointer;"><i class="fas fa-check-double" style="color:#10b981;margin-right:3px;"></i>Pilih Semua</button>
-                    <button type="button" onclick="pickerCheckAll(false)" style="flex:1; padding:6px; border:1px solid var(--card-border); border-radius:8px; font-size:10px; font-weight:600; background:var(--light); color:var(--dark); cursor:pointer;"><i class="fas fa-xmark" style="color:#ef4444;margin-right:3px;"></i>Hapus Semua</button>
+        <div class="modal-box" style="max-height:85vh; display:flex; flex-direction:column; padding:0;">
+            <div style="padding:20px 20px 0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                    <div>
+                        <h3 style="font-size:16px; font-weight:700; color:var(--dark); margin:0;" id="pickerTitle">Pilih Pegawai</h3>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;"><span id="pickerCount">0</span> pegawai dipilih</p>
+                    </div>
+                    <button onclick="closeUserPicker()" style="width:32px; height:32px; border-radius:10px; border:none; background:var(--light); color:var(--gray); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-xmark"></i></button>
+                </div>
+                <div style="position:relative; margin-bottom:10px;">
+                    <i class="fas fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--gray); font-size:13px;"></i>
+                    <input type="text" id="pickerSearch" placeholder="Cari nama atau NIP..." oninput="renderPickerList()" style="width:100%; padding:10px 12px 10px 36px; border:1.5px solid var(--card-border); border-radius:12px; font-size:13px; background:var(--card-bg); color:var(--dark); outline:none;">
+                </div>
+                <div style="display:flex; gap:8px; margin-bottom:4px;">
+                    <button type="button" onclick="pickerCheckAll(true)" style="flex:1; padding:8px; border:1.5px solid rgba(16,185,129,0.2); border-radius:10px; font-size:11px; font-weight:600; background:rgba(16,185,129,0.05); color:#10b981; cursor:pointer;"><i class="fas fa-check-double" style="margin-right:4px;"></i>Pilih Semua</button>
+                    <button type="button" onclick="pickerCheckAll(false)" style="flex:1; padding:8px; border:1.5px solid rgba(239,68,68,0.2); border-radius:10px; font-size:11px; font-weight:600; background:rgba(239,68,68,0.05); color:#ef4444; cursor:pointer;"><i class="fas fa-xmark" style="margin-right:4px;"></i>Hapus Semua</button>
                 </div>
             </div>
-            <div id="pickerList" style="flex:1; overflow-y:auto; padding:8px 20px;"></div>
-            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--card-border);">
-                <span style="font-size:12px; color:var(--gray);"><span id="pickerCount">0</span> dipilih</span>
-                <div style="display:flex; gap:8px;">
-                    <button type="button" onclick="closeUserPicker()" style="padding:8px 16px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:13px; font-weight:600; cursor:pointer;">Batal</button>
-                    <button type="button" onclick="confirmUserPicker()" style="padding:8px 16px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Simpan</button>
-                </div>
+            <div id="pickerList" style="flex:1; overflow-y:auto; padding:8px 16px;"></div>
+            <div style="padding:14px 20px; border-top:1px solid var(--card-border); display:flex; gap:10px;">
+                <button type="button" onclick="closeUserPicker()" style="flex:1; padding:13px; border-radius:12px; border:1.5px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:14px; font-weight:600; cursor:pointer;">Batal</button>
+                <button type="button" onclick="confirmUserPicker()" style="flex:1; padding:13px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-size:14px; font-weight:600; cursor:pointer;">Simpan</button>
             </div>
         </div>
     </div>
@@ -971,27 +991,36 @@
         renderPickerList();
     }
 
+    function getInitials(name) {
+        return name.split(' ').map(function(w) { return w.charAt(0); }).slice(0, 2).join('').toUpperCase();
+    }
+    var _avatarColors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16'];
+
     function renderPickerList() {
         var q = (document.getElementById('pickerSearch').value || '').toLowerCase();
         var checked = [], unchecked = [];
-        _allUsers.forEach(function(u) {
+        _allUsers.forEach(function(u, idx) {
             if (q && u.name.toLowerCase().indexOf(q) === -1 && (u.nip || '').indexOf(q) === -1) return;
             var isSel = _pickerSelected.indexOf(u.id) !== -1;
-            var item = '<label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--card-border);cursor:pointer;">' +
-                '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' onchange="pickerToggle(' + u.id + ',this.checked)" style="width:18px;height:18px;accent-color:var(--primary);">' +
-                '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + u.name + '</div>' +
-                '<div style="font-size:10px;color:var(--gray);">' + (u.nip || '-') + '</div></div></label>';
+            var color = _avatarColors[idx % _avatarColors.length];
+            var initials = getInitials(u.name);
+            var item = '<div class="picker-user-item ' + (isSel ? 'active' : '') + '" data-uid="' + u.id + '" onclick="pickerToggleCard(this,' + u.id + ')">' +
+                '<div class="picker-user-check"><i class="fas fa-check"></i></div>' +
+                '<div style="width:36px;height:36px;border-radius:10px;background:' + color + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0;">' + initials + '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                '<div style="font-size:13px;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + u.name + '</div>' +
+                '<div style="font-size:10px;color:var(--gray);">' + (u.nip || '-') + '</div></div></div>';
             isSel ? checked.push(item) : unchecked.push(item);
         });
         var html = '';
         if (checked.length > 0) {
-            html += '<div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Dipilih (' + checked.length + ')</div>' + checked.join('');
+            html += '<div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;padding:8px 4px 6px;display:flex;align-items:center;gap:6px;"><i class="fas fa-circle-check" style="font-size:9px;"></i>Dipilih (' + checked.length + ')</div>' + checked.join('');
         }
         if (unchecked.length > 0) {
-            if (checked.length > 0) html += '<div style="height:6px;border-bottom:2px solid var(--card-border);margin-bottom:6px;"></div>';
-            html += '<div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Belum dipilih (' + unchecked.length + ')</div>' + unchecked.join('');
+            if (checked.length > 0) html += '<div style="height:1px;background:var(--card-border);margin:8px 0;"></div>';
+            html += '<div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;padding:8px 4px 6px;display:flex;align-items:center;gap:6px;"><i class="fas fa-circle" style="font-size:9px;"></i>Belum dipilih (' + unchecked.length + ')</div>' + unchecked.join('');
         }
-        document.getElementById('pickerList').innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--gray);font-size:13px;">Tidak ditemukan</div>';
+        document.getElementById('pickerList').innerHTML = html || '<div style="padding:30px;text-align:center;color:var(--gray);font-size:13px;"><i class="fas fa-search" style="font-size:24px;opacity:0.3;display:block;margin-bottom:8px;"></i>Tidak ditemukan</div>';
         document.getElementById('pickerCount').textContent = _pickerSelected.length;
     }
 
@@ -999,6 +1028,18 @@
         if (chk && _pickerSelected.indexOf(id) === -1) _pickerSelected.push(id);
         if (!chk) _pickerSelected = _pickerSelected.filter(function(x) { return x !== id; });
         renderPickerList();
+    }
+
+    function pickerToggleCard(el, id) {
+        var isSel = _pickerSelected.indexOf(id) !== -1;
+        if (isSel) {
+            _pickerSelected = _pickerSelected.filter(function(x) { return x !== id; });
+            el.classList.remove('active');
+        } else {
+            _pickerSelected.push(id);
+            el.classList.add('active');
+        }
+        document.getElementById('pickerCount').textContent = _pickerSelected.length;
     }
 
     function confirmUserPicker() {
