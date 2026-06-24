@@ -1969,9 +1969,9 @@
             return;
         }
 
-        const jenis = document.getElementById('jenisPresensi')?.value || '';
-        const lemburVal = document.getElementById('isLemburInput')?.value;
-        if (jenis === 'pulang' && !sudahPresensiMasuk && lemburVal !== '1') {
+        var jenis = document.getElementById('jenisPresensi') ? document.getElementById('jenisPresensi').value : '';
+        var lemburVal = document.getElementById('isLemburInput') ? document.getElementById('isLemburInput').value : '';
+        if (requireMasukFirst && jenis === 'pulang' && !sudahPresensiMasuk && lemburVal !== '1') {
             showError("Anda belum melakukan presensi masuk hari ini.");
             return;
         }
