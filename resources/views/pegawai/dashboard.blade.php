@@ -1353,7 +1353,7 @@
     }
 
     function handlePulangClick() {
-        if (!sudahPresensiMasuk) {
+        if (requireMasukFirst && !sudahPresensiMasuk) {
             openSimpleModal('warningModal');
             return false;
         }
