@@ -14,7 +14,7 @@
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; overflow:hidden; }
         .camera-area { position:absolute; top:0; left:0; right:0; overflow:hidden; background:#111; }
-        #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
+        #video { width:100%; height:100%; object-fit:cover; object-position:center 30%; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
@@ -108,7 +108,7 @@
         (function() {
             var video = document.getElementById('video');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-            navigator.mediaDevices.getUserMedia({ video: { facingMode:'user', width:{ideal:480}, height:{ideal:360} }, audio:false })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode:'user', width:{ideal:720}, height:{ideal:1280} }, audio:false })
                 .then(function(stream) { video.srcObject = stream; video.play(); })
                 .catch(function() { showToast('Kamera tidak dapat diakses', 'error'); });
         })();
