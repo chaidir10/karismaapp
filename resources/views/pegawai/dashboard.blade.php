@@ -268,7 +268,7 @@
         ->where('tanggal', now()->format('Y-m-d'))
         ->where('jenis', 'masuk')->where('is_lembur', true)->first();
 @endphp
-<button class="lembur-fab lembur-active" onclick="App.openModal('confirmLemburModal')">
+<button class="lembur-fab lembur-active" onclick="App.openLemburConfirm()">
     <div class="lembur-fab-icon pulse"><i class="fas fa-bolt"></i></div>
     <div class="lembur-fab-text">
         <span class="lembur-fab-label">Selesai Lembur</span>
@@ -428,14 +428,18 @@
 {{-- ═══════════ MODAL KONFIRMASI LEMBUR ═══════════ --}}
 <div id="confirmLemburModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)App.closeModal('confirmLemburModal')">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
-        <div style="width:56px;height:56px;background:var(--success-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-            <i class="fas fa-bolt" style="font-size:24px;color:var(--success);"></i>
+        <div style="width:56px;height:56px;background:rgba(16,185,129,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <i class="fas fa-bolt" style="font-size:24px;color:#10b981;"></i>
         </div>
-        <h5 style="font-weight:700; font-size:16px; margin-bottom:8px; color:var(--dark);">Selesai Lembur</h5>
-        <p style="font-size:13px; color:var(--gray); margin-bottom:16px;">Yakin ingin mengakhiri lembur?</p>
+        <h5 style="font-weight:700; font-size:16px; margin-bottom:6px; color:var(--dark);">Selesai Lembur?</h5>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:6px; line-height:1.5;">Anda akan mengakhiri sesi lembur dan melakukan presensi pulang lembur.</p>
+        <div id="lemburDurasiInfo" style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:10px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.15); margin-bottom:16px;">
+            <i class="fas fa-stopwatch" style="font-size:11px; color:#10b981;"></i>
+            <span style="font-size:12px; font-weight:600; color:#10b981;" id="lemburDurasiText">Durasi: -</span>
+        </div>
         <div style="display:flex; gap:10px;">
             <button onclick="App.closeModal('confirmLemburModal')" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">Batal</button>
-            <button onclick="App.setJenis('pulang'); App.setLembur(true); App.closeModal('confirmLemburModal'); App.openPresensi()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Selesai</button>
+            <button onclick="App.confirmSelesaiLembur()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Selesai</button>
         </div>
     </div>
 </div>
@@ -706,6 +710,20 @@
 
         confirmEarlyPulang: function() {
             App.closeModal('earlyPulangModal');
+            setTimeout(function() { App.openPresensi(); }, 350);
+        },
+
+        openLemburConfirm: function() {
+            var timerEl = $('lemburTimer');
+            var durasiEl = $('lemburDurasiText');
+            if (timerEl && durasiEl) durasiEl.textContent = 'Durasi: ' + timerEl.textContent;
+            App.openModal('confirmLemburModal');
+        },
+
+        confirmSelesaiLembur: function() {
+            App.setJenis('pulang');
+            App.setLembur(true);
+            App.closeModal('confirmLemburModal');
             setTimeout(function() { App.openPresensi(); }, 350);
         },
 
