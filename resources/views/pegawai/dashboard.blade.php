@@ -12,9 +12,9 @@
         $actualMasukTime = \Carbon\Carbon::parse($jamMasukHariIni);
         $timerStart = $actualMasukTime->gt($jadwalMasukTime) ? $actualMasukTime : $jadwalMasukTime;
         $timerEnd = $pulangRec ? \Carbon\Carbon::parse($pulangRec->jam) : now();
-        $elapsedSec = abs($timerEnd->diffInSeconds($timerStart));
+        $elapsedSec = max(0, $timerEnd->diffInSeconds($timerStart));
         $elapsedStr = sprintf('%02d:%02d:%02d', floor($elapsedSec/3600), floor(($elapsedSec%3600)/60), $elapsedSec%60);
-        $targetSec = abs(\Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
+        $targetSec = max(0, \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
         if ($targetSec <= 0) $targetSec = 8 * 3600;
         $isFulfilled = $elapsedSec >= $targetSec;
         $timerColor = $pulangRec ? 'timer-blue' : ($isFulfilled ? 'timer-green' : 'timer-yellow');
@@ -157,7 +157,7 @@
     </div>
 </div>
 
-{{-- ═══════════ TIMER JAM KERJA — DIMATIKAN UNTUK TES ═══════════ --}}
+{{-- ═══════════ TIMER JAM KERJA — DIKOMENTARI UNTUK TES ═══════════ --}}
 {{--
 @if($sudahPresensiMasuk && $jamMasukHariIni)
 <div class="work-timer-card {{ $timerColor }}" id="workTimerBanner"
@@ -412,8 +412,7 @@
 </div>
 @endforeach
 
-{{-- ═══════════ MODAL PERINGATAN JAM KERJA — DIMATIKAN UNTUK TES ═══════════ --}}
-{{--
+{{-- ═══════════ MODAL PERINGATAN JAM KERJA ═══════════ --}}
 <div id="earlyPulangModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)App.closeModal('earlyPulangModal')">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
         <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
@@ -427,7 +426,6 @@
         </div>
     </div>
 </div>
---}}
 
 {{-- ═══════════ MODAL KONFIRMASI LEMBUR ═══════════ --}}
 <div id="confirmLemburModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)App.closeModal('confirmLemburModal')">
@@ -567,24 +565,6 @@
     .lembur-done .lembur-fab-text { font-size:12px; font-weight:600; }
     .pulse { animation:fabPulse 2s infinite; }
     @keyframes fabPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 50%{box-shadow:0 0 0 6px rgba(255,255,255,0)} }
-
-    .toast-container { position:fixed; top:0; left:0; right:0; z-index:9999; display:flex; flex-direction:column; align-items:center; pointer-events:none; padding:12px 16px; gap:8px; }
-    .toast-item { pointer-events:auto; display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:14px; max-width:360px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,0.15); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); font-size:13px; font-weight:500; line-height:1.4; animation:toastIn 0.35s ease; }
-    .toast-item.toast-out { animation:toastOut 0.3s ease forwards; }
-    .toast-item .toast-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
-    .toast-item .toast-msg { flex:1; min-width:0; }
-    .toast-warning { background:rgba(255,255,255,0.95); color:#92400e; border:1px solid rgba(245,158,11,0.2); }
-    .toast-warning .toast-icon { background:rgba(245,158,11,0.12); color:#f59e0b; }
-    .toast-error { background:rgba(255,255,255,0.95); color:#991b1b; border:1px solid rgba(239,68,68,0.2); }
-    .toast-error .toast-icon { background:rgba(239,68,68,0.12); color:#ef4444; }
-    .toast-info { background:rgba(255,255,255,0.95); color:#1e40af; border:1px solid rgba(59,130,246,0.2); }
-    .toast-info .toast-icon { background:rgba(59,130,246,0.12); color:#3b82f6; }
-    [data-theme="dark"] .toast-warning, [data-theme="dark"] .toast-error, [data-theme="dark"] .toast-info { background:rgba(30,30,30,0.95); }
-    [data-theme="dark"] .toast-warning { color:#fbbf24; }
-    [data-theme="dark"] .toast-error { color:#fca5a5; }
-    [data-theme="dark"] .toast-info { color:#93c5fd; }
-    @keyframes toastIn { from{opacity:0;transform:translateY(-20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
-    @keyframes toastOut { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(-12px) scale(0.95)} }
 </style>
 @endpush
 
@@ -673,26 +653,6 @@
         });
     }
 
-    var _toastContainer = null;
-    function showToast(msg, type, duration) {
-        type = type || 'warning';
-        duration = duration || 3000;
-        if (!_toastContainer) {
-            _toastContainer = document.createElement('div');
-            _toastContainer.className = 'toast-container';
-            document.body.appendChild(_toastContainer);
-        }
-        var icons = { warning: 'fa-triangle-exclamation', error: 'fa-circle-xmark', info: 'fa-circle-info' };
-        var toast = document.createElement('div');
-        toast.className = 'toast-item toast-' + type;
-        toast.innerHTML = '<div class="toast-icon"><i class="fas ' + (icons[type] || icons.warning) + '"></i></div><div class="toast-msg">' + msg + '</div>';
-        _toastContainer.appendChild(toast);
-        setTimeout(function() {
-            toast.classList.add('toast-out');
-            setTimeout(function() { toast.remove(); }, 300);
-        }, duration);
-    }
-
     function reverseGeocode(lat, lng, el) {
         el.textContent = 'Mendeteksi alamat...';
         fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
@@ -735,7 +695,15 @@
             App.setJenis('pulang');
             App.setLembur(false);
             if (CFG.shiftId) $('jamShiftIdInput').value = CFG.shiftId;
-            App.openPresensi();
+
+            if (!state.workTimerFulfilled) {
+                var clockEl = $('workTimerClock');
+                var msg = $('earlyPulangMsg');
+                if (msg) msg.textContent = 'Jam kerja hari ini belum terpenuhi (' + (clockEl ? clockEl.textContent : '') + '). Apakah yakin ingin absen pulang?';
+                App.openModal('earlyPulangModal');
+            } else {
+                App.openPresensi();
+            }
         },
 
         openInfoModal: function(id) {
@@ -802,23 +770,10 @@
     })();
 
     // ══════════════════════════════════════════════════════════════
-    // WORK TIMER — DIMATIKAN UNTUK TES
+    // WORK TIMER — DIKOMENTARI UNTUK TES
     // ══════════════════════════════════════════════════════════════
     function startWorkTimer() { /* DIMATIKAN */ }
-
-    function startLemburTimer() {
-        var el = $('lemburTimer');
-        if (!el) return;
-        var startStr = el.getAttribute('data-start');
-        if (!startStr) return;
-        var start = parseTime(startStr);
-        function tick() {
-            var diff = Math.max(0, Math.floor((new Date() - start) / 1000));
-            el.textContent = formatSec(diff);
-        }
-        tick();
-        setInterval(tick, 1000);
-    }
+    function startLemburTimer() { /* DIMATIKAN */ }
 
     // ══════════════════════════════════════════════════════════════
     // PRESENSI — kamera, lokasi, face detection, submit
@@ -1112,26 +1067,22 @@
         },
 
         capture: function() {
-            if (!state.videoStream) {
-                showToast('Kamera belum siap. Pastikan izin kamera diaktifkan.', 'error');
-                return;
-            }
-            if (!state.currentPosition) {
-                showToast('Lokasi sedang dideteksi, tunggu sebentar...', 'warning');
+            if (!state.videoStream || !state.currentPosition) {
+                alert('Kamera atau lokasi belum siap. Pastikan izin kamera & lokasi diizinkan.');
                 return;
             }
             if (!state.faceDetected) {
-                showToast('Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.', 'warning');
+                alert('Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.');
                 return;
             }
             var jenis = $('jenisPresensi') ? $('jenisPresensi').value : '';
             var lemburVal = $('isLemburInput') ? $('isLemburInput').value : '';
             if (CFG.requireMasuk && jenis === 'pulang' && !CFG.sudahMasuk && lemburVal !== '1') {
-                showToast('Anda belum melakukan presensi masuk hari ini.', 'error');
+                alert('Anda belum melakukan presensi masuk hari ini.');
                 return;
             }
             var video = $('video'), canvas = $('canvas');
-            if (!video || !canvas || !video.videoWidth) { showToast('Gagal mengambil foto. Coba lagi.', 'error'); return; }
+            if (!video || !canvas || !video.videoWidth) { alert('Gagal mengambil foto.'); return; }
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
@@ -1151,7 +1102,7 @@
         },
 
         submit: function() {
-            if (!state.capturedPhoto) { showToast('Foto belum diambil.', 'error'); return; }
+            if (!state.capturedPhoto) { alert('Foto belum diambil.'); return; }
             var fotoInput = $('fotoInput');
             if (fotoInput) fotoInput.value = state.capturedPhoto;
             var confirmBtn = $('confirmPresensiBtn');
@@ -1275,11 +1226,11 @@
         _initialized = true;
 
         Carousel.init();
-        startWorkTimer();
-        startLemburTimer();
+        // startWorkTimer();   // DIMATIKAN UNTUK TES
+        // startLemburTimer(); // DIMATIKAN UNTUK TES
         initDetailModals();
         initNetworkDetection();
-        initReminders();
+        // initReminders();    // DIMATIKAN UNTUK TES (pakai setInterval)
 
         // Hide badges pengumuman yang sudah dibaca
         var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
