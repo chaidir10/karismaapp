@@ -953,6 +953,7 @@
                                 data-tanggal="{{ \Carbon\Carbon::parse($peng->tanggal ?? now())->translatedFormat('d M Y') }}"
                                 data-jenis="{{ $peng->jenis ?? '' }}"
                                 data-alasan="{{ $peng->alasan ?? 'Tidak ada alasan' }}"
+                                data-waktu="{{ $peng->waktu ? \Carbon\Carbon::parse($peng->waktu)->format('H:i') : '-' }}"
                                 data-bukti-url="{{ $peng->bukti ? asset('public/storage/' . $peng->bukti) : '' }}"
                                 data-approve-url="/admin/pengajuan/{{ $peng->id }}/approve"
                                 data-reject-url="/admin/pengajuan/{{ $peng->id }}/reject">
@@ -1299,6 +1300,7 @@
                     <div class="info-item"><label>Pegawai</label><span id="detailPegawaiPengajuan">-</span></div>
                     <div class="info-item"><label>Tanggal</label><span id="detailTanggalPengajuan">-</span></div>
                     <div class="info-item"><label>Jenis</label><span id="detailJenisPengajuan">-</span></div>
+                    <div class="info-item"><label>Waktu</label><span id="detailWaktuPengajuan">-</span></div>
                     <div class="info-item"><label>Status</label><span class="badge badge-warning">Pending</span></div>
                     <div class="info-item full"><label>Alasan</label><span id="detailAlasanPengajuan">-</span></div>
                 </div>
@@ -1658,6 +1660,7 @@
                     tanggal           : this.dataset.tanggal,
                     jenis             : this.dataset.jenis,
                     alasan            : this.dataset.alasan,
+                    waktu             : this.dataset.waktu,
                     bukti_url         : this.dataset.buktiUrl,
                     approve_url       : this.dataset.approveUrl,
                     reject_url        : this.dataset.rejectUrl
@@ -1753,6 +1756,7 @@
         document.getElementById('detailPegawaiPengajuan').textContent = data.user_name || 'N/A';
         document.getElementById('detailTanggalPengajuan').textContent  = data.tanggal  || '-';
         document.getElementById('detailJenisPengajuan').textContent    = capitalize(data.jenis);
+        document.getElementById('detailWaktuPengajuan').textContent    = data.waktu    || '-';
         document.getElementById('detailAlasanPengajuan').textContent   = data.alasan   || 'Tidak ada alasan';
 
         var buktiEl = document.getElementById('detailBuktiPengajuan');

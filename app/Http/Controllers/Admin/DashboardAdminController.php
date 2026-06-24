@@ -272,6 +272,7 @@ class DashboardAdminController extends Controller
                 'tanggal' => $pengajuan->tanggal,
                 'tanggal_formatted' => Carbon::parse($pengajuan->tanggal)->translatedFormat('d M Y'),
                 'jenis' => $pengajuan->jenis,
+                'waktu' => $pengajuan->waktu ? Carbon::parse($pengajuan->waktu)->format('H:i') : '-',
                 'alasan' => $pengajuan->alasan,
                 'bukti' => $pengajuan->bukti,
                 'bukti_url' => $pengajuan->bukti_url,
