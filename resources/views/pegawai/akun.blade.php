@@ -107,8 +107,8 @@
         width:88px; height:88px;
     }
     .photo-preview-overlay.visible .photo-preview-content {
-        border-radius:16px;
-        width:min(85vw, 400px); height:min(85vw, 400px);
+        border-radius:12px;
+        width:92vw; height:92vw; max-width:500px; max-height:500px;
     }
     .photo-preview-content img, .photo-preview-content .pp-placeholder {
         width:100%; height:100%; object-fit:cover; display:block;
