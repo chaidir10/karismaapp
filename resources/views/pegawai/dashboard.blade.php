@@ -1,11 +1,6 @@
 @extends('layouts.pegawai')
 @section('title', 'Home')
 
-@push('head')
-<meta name="turbo-visit-control" content="reload">
-<meta name="turbo-cache-control" content="no-cache">
-@endpush
-
 @php
     $masukDisabled = $sudahPresensiMasuk || ($disablePresensiLibur ?? false);
     $pulangDisabled = $sudahPresensiPulang || ($disablePresensiLibur ?? false);
@@ -162,7 +157,8 @@
     </div>
 </div>
 
-{{-- ═══════════ TIMER JAM KERJA ═══════════ --}}
+{{-- ═══════════ TIMER JAM KERJA — DIKOMENTARI UNTUK TES ═══════════ --}}
+{{--
 @if($sudahPresensiMasuk && $jamMasukHariIni)
 <div class="work-timer-card {{ $timerColor }}" id="workTimerBanner"
     data-stopped="{{ $pulangRec ? '1' : '0' }}"
@@ -177,6 +173,7 @@
     <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : ($isFulfilled ? '✓ Terpenuhi' : 'Berjalan') }}</div>
 </div>
 @endif
+--}}
 
 {{-- ═══════════ CAROUSEL PENGUMUMAN ═══════════ --}}
 @if(isset($pengumumans) && $pengumumans->count() > 0)
@@ -470,7 +467,7 @@
 <div class="modal fade" id="presensiModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen-mobile" style="margin:0; max-width:none; width:100%; height:100%;">
         <div class="modal-content" style="border:none; border-radius:0; height:100vh; background:#000; display:flex; flex-direction:column; overflow:hidden;">
-            <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" data-turbo="false" style="display:flex; flex-direction:column; height:100%;">
+            <form id="formPresensi" method="POST" action="{{ route('pegawai.presensi.store') }}" enctype="multipart/form-data" style="display:flex; flex-direction:column; height:100%;">
                 @csrf
                 <input type="hidden" name="jenis" id="jenisPresensi">
                 <input type="hidden" name="foto" id="fotoInput">
@@ -773,70 +770,10 @@
     })();
 
     // ══════════════════════════════════════════════════════════════
-    // WORK TIMER
+    // WORK TIMER — DIKOMENTARI UNTUK TES
     // ══════════════════════════════════════════════════════════════
-    function startWorkTimer() {
-        if (state.workTimerInterval) { clearInterval(state.workTimerInterval); state.workTimerInterval = null; }
-
-        var card = $('workTimerBanner'), clockEl = $('workTimerClock');
-        if (!card || !clockEl || !CFG.jamMasuk) return;
-
-        var stopped = card.getAttribute('data-stopped') === '1';
-        var pulangJam = card.getAttribute('data-pulang-jam') || '';
-        var now = new Date();
-
-        var jadwalStart = parseTime(CFG.jadwalMasuk);
-        var actualStart = parseTime(CFG.jamMasuk);
-        var startTime = actualStart > jadwalStart ? actualStart : jadwalStart;
-        var endTime = parseTime(CFG.jadwalPulang);
-        var totalTarget = Math.floor((endTime - jadwalStart) / 1000);
-        if (totalTarget <= 0) totalTarget = 8 * 3600;
-
-        if (stopped && pulangJam) {
-            var pulangTime = parseTime(pulangJam);
-            var elapsed = Math.max(0, Math.floor((pulangTime - startTime) / 1000));
-            clockEl.textContent = formatSec(elapsed);
-            state.workTimerFulfilled = elapsed >= totalTarget;
-            var bdg = $('workTimerBadge');
-            if (bdg) bdg.textContent = state.workTimerFulfilled ? '✓ Terpenuhi' : 'Kurang';
-            return;
-        }
-
-        function tick() {
-            var el = $('workTimerClock'), c = $('workTimerBanner'), lbl = $('workTimerLabel'), bdg = $('workTimerBadge');
-            if (!el || !c) return;
-            var elapsed = Math.max(0, Math.floor((new Date() - startTime) / 1000));
-            el.textContent = formatSec(elapsed);
-            if (elapsed >= totalTarget) {
-                c.classList.remove('timer-yellow'); c.classList.add('timer-green');
-                if (lbl) lbl.textContent = 'Jam kerja terpenuhi';
-                if (bdg) bdg.textContent = '✓ Terpenuhi';
-                state.workTimerFulfilled = true;
-            } else {
-                var sisa = totalTarget - elapsed;
-                var sh = Math.floor(sisa / 3600), sm = Math.floor((sisa % 3600) / 60);
-                if (lbl) lbl.textContent = 'Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
-                if (bdg) bdg.textContent = 'Berjalan';
-                state.workTimerFulfilled = false;
-            }
-        }
-        tick();
-        state.workTimerInterval = setInterval(tick, 1000);
-    }
-
-    function startLemburTimer() {
-        var el = $('lemburTimer');
-        if (!el) return;
-        var startStr = el.getAttribute('data-start');
-        if (!startStr) return;
-        var start = parseTime(startStr);
-        function tick() {
-            var diff = Math.max(0, Math.floor((new Date() - start) / 1000));
-            el.textContent = formatSec(diff);
-        }
-        tick();
-        setInterval(tick, 1000);
-    }
+    function startWorkTimer() { /* DIMATIKAN */ }
+    function startLemburTimer() { /* DIMATIKAN */ }
 
     // ══════════════════════════════════════════════════════════════
     // PRESENSI — kamera, lokasi, face detection, submit
@@ -1289,11 +1226,11 @@
         _initialized = true;
 
         Carousel.init();
-        startWorkTimer();
-        startLemburTimer();
+        // startWorkTimer();   // DIMATIKAN UNTUK TES
+        // startLemburTimer(); // DIMATIKAN UNTUK TES
         initDetailModals();
         initNetworkDetection();
-        initReminders();
+        // initReminders();    // DIMATIKAN UNTUK TES (pakai setInterval)
 
         // Hide badges pengumuman yang sudah dibaca
         var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
@@ -1312,10 +1249,6 @@
     } else {
         init();
     }
-
-    // Safety net: jika Turbo aktif dari layout, pastikan init jalan juga pada turbo:load
-    document.addEventListener('turbo:load', init);
-
 
 })();
 </script>

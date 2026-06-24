@@ -33,7 +33,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com" defer></script>
-    <meta name="turbo-prefetch" content="true">
     @stack('head')
 
     <script>
@@ -453,12 +452,6 @@
             40% { opacity:1; transform:scale(1.1); }
         }
         .loading-text { color:var(--gray); font-size:13px; font-weight:500; }
-
-        /* Turbo progress bar */
-        .turbo-progress-bar {
-            background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
-            height: 3px !important;
-        }
 
 
         /* Bootstrap modal override — slide up consistently */
@@ -1157,7 +1150,7 @@
                 }
             @endphp
             @if($daruratAccess)
-            <a href="{{ route('pegawai.presensi.darurat') }}" class="nav-item nav-darurat" data-turbo="false">
+            <a href="{{ route('pegawai.presensi.darurat') }}" class="nav-item nav-darurat">
                 <div class="nav-icon"><i class="fas fa-bolt"></i></div>
                 <div>Darurat</div>
             </a>
@@ -1193,68 +1186,26 @@
     <!-- External JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8/dist/turbo.es2017-esm.js"></script>
     <script>
-        // Force update: jika versi berubah, clear cache dan reload
-        (function() {
-            var APP_VERSION = '2026062402';
-            var storedVer = localStorage.getItem('karisma-app-version');
-            if (storedVer && storedVer !== APP_VERSION) {
-                localStorage.setItem('karisma-app-version', APP_VERSION);
-                if ('caches' in window) {
-                    caches.keys().then(function(names) {
-                        names.forEach(function(n) { caches.delete(n); });
-                    });
-                }
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(function(regs) {
-                        regs.forEach(function(r) { r.unregister(); });
-                    });
-                }
-                setTimeout(function() { location.reload(true); }, 500);
-                return;
-            }
-            localStorage.setItem('karisma-app-version', APP_VERSION);
-        })();
-
-        // Register SW (self-destruct version)
+        // Hapus service worker lama jika ada
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register("/sw.js")
-                    .then(function(reg) {
-                        reg.update();
-                        reg.addEventListener('updatefound', function() {
-                            var newWorker = reg.installing;
-                            newWorker.addEventListener('statechange', function() {
-                                if (newWorker.state === 'activated') {
-                                    location.reload();
-                                }
-                            });
-                        });
-                    })
-                    .catch(function(e) { console.error('SW failed:', e); });
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                regs.forEach(function(r) { r.unregister(); });
+            });
+        }
+        // Hapus cache lama jika ada
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                names.forEach(function(n) { caches.delete(n); });
             });
         }
 
-        // Turbo Drive — no overlay, use native progress bar
         (function() {
-            // Turbo progress bar appears after 100ms delay (configurable)
-            if (window.Turbo) {
-                Turbo.setProgressBarDelay(300);
-            } else {
-                document.addEventListener('turbo:before-render', function() {
-                    if (window.Turbo) Turbo.setProgressBarDelay(300);
-                }, { once: true });
-            }
-
-            // Hide old overlay on load
             var overlay = document.getElementById('loadingOverlay');
             function hideOverlay() { if (overlay) overlay.classList.remove('active'); }
 
-            document.addEventListener('turbo:load', function() { hideOverlay(); updateGreeting(); });
             document.addEventListener('DOMContentLoaded', function() { hideOverlay(); updateGreeting(); });
 
-            // Only show overlay for form submits (not navigation)
             window.showLoading = function(msg) {
                 if (!overlay) return;
                 var txt = overlay.querySelector('.loading-text');
@@ -1262,33 +1213,6 @@
                 overlay.classList.add('active');
             };
             window.hideLoading = hideOverlay;
-
-            document.addEventListener('turbo:submit-start', function() { window.showLoading('Mengirim...'); });
-            document.addEventListener('turbo:submit-end', hideOverlay);
-
-            // Cleanup before Turbo caches page — close modals, remove backdrops
-            document.addEventListener('turbo:before-cache', function() {
-                // Bootstrap modals — dispose completely
-                document.querySelectorAll('.modal').forEach(function(m) {
-                    m.classList.remove('show');
-                    m.removeAttribute('aria-modal');
-                    m.removeAttribute('role');
-                    m.style.display = 'none';
-                    var inst = bootstrap.Modal.getInstance(m);
-                    if(inst) inst.dispose();
-                });
-                // Remove ALL backdrops
-                document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
-                // Custom overlays
-                document.querySelectorAll('.modal-overlay.visible').forEach(function(m) { m.classList.remove('visible'); });
-                document.querySelectorAll('.create-overlay.active').forEach(function(m) { m.classList.remove('active'); });
-                document.querySelectorAll('.photo-preview-overlay.visible').forEach(function(m) { m.classList.remove('visible'); });
-                document.querySelectorAll('.crop-modal.visible').forEach(function(m) { m.classList.remove('visible'); });
-                // Reset body
-                document.body.style.overflow = '';
-                document.body.classList.remove('modal-open');
-                document.body.style.paddingRight = '';
-            });
         })();
 
         function updateGreeting() {
