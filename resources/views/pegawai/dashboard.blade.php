@@ -563,6 +563,24 @@
     .lembur-done .lembur-fab-text { font-size:12px; font-weight:600; }
     .pulse { animation:fabPulse 2s infinite; }
     @keyframes fabPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 50%{box-shadow:0 0 0 6px rgba(255,255,255,0)} }
+
+    .toast-container { position:fixed; top:0; left:0; right:0; z-index:9999; display:flex; flex-direction:column; align-items:center; pointer-events:none; padding:12px 16px; gap:8px; }
+    .toast-item { pointer-events:auto; display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:14px; max-width:360px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,0.15); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); font-size:13px; font-weight:500; line-height:1.4; animation:toastIn 0.35s ease; }
+    .toast-item.toast-out { animation:toastOut 0.3s ease forwards; }
+    .toast-item .toast-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .toast-item .toast-msg { flex:1; min-width:0; }
+    .toast-warning { background:rgba(255,255,255,0.95); color:#92400e; border:1px solid rgba(245,158,11,0.2); }
+    .toast-warning .toast-icon { background:rgba(245,158,11,0.12); color:#f59e0b; }
+    .toast-error { background:rgba(255,255,255,0.95); color:#991b1b; border:1px solid rgba(239,68,68,0.2); }
+    .toast-error .toast-icon { background:rgba(239,68,68,0.12); color:#ef4444; }
+    .toast-info { background:rgba(255,255,255,0.95); color:#1e40af; border:1px solid rgba(59,130,246,0.2); }
+    .toast-info .toast-icon { background:rgba(59,130,246,0.12); color:#3b82f6; }
+    [data-theme="dark"] .toast-warning, [data-theme="dark"] .toast-error, [data-theme="dark"] .toast-info { background:rgba(30,30,30,0.95); }
+    [data-theme="dark"] .toast-warning { color:#fbbf24; }
+    [data-theme="dark"] .toast-error { color:#fca5a5; }
+    [data-theme="dark"] .toast-info { color:#93c5fd; }
+    @keyframes toastIn { from{opacity:0;transform:translateY(-20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes toastOut { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(-12px) scale(0.95)} }
 </style>
 @endpush
 
@@ -649,6 +667,26 @@
             iconSize: [36, 54],
             iconAnchor: [18, 27]
         });
+    }
+
+    var _toastContainer = null;
+    function showToast(msg, type, duration) {
+        type = type || 'warning';
+        duration = duration || 3000;
+        if (!_toastContainer) {
+            _toastContainer = document.createElement('div');
+            _toastContainer.className = 'toast-container';
+            document.body.appendChild(_toastContainer);
+        }
+        var icons = { warning: 'fa-triangle-exclamation', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+        var toast = document.createElement('div');
+        toast.className = 'toast-item toast-' + type;
+        toast.innerHTML = '<div class="toast-icon"><i class="fas ' + (icons[type] || icons.warning) + '"></i></div><div class="toast-msg">' + msg + '</div>';
+        _toastContainer.appendChild(toast);
+        setTimeout(function() {
+            toast.classList.add('toast-out');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, duration);
     }
 
     function reverseGeocode(lat, lng, el) {
@@ -1124,22 +1162,26 @@
         },
 
         capture: function() {
-            if (!state.videoStream || !state.currentPosition) {
-                alert('Kamera atau lokasi belum siap. Pastikan izin kamera & lokasi diizinkan.');
+            if (!state.videoStream) {
+                showToast('Kamera belum siap. Pastikan izin kamera diaktifkan.', 'error');
+                return;
+            }
+            if (!state.currentPosition) {
+                showToast('Lokasi sedang dideteksi, tunggu sebentar...', 'warning');
                 return;
             }
             if (!state.faceDetected) {
-                alert('Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.');
+                showToast('Wajah belum terdeteksi. Posisikan wajah dalam lingkaran.', 'warning');
                 return;
             }
             var jenis = $('jenisPresensi') ? $('jenisPresensi').value : '';
             var lemburVal = $('isLemburInput') ? $('isLemburInput').value : '';
             if (CFG.requireMasuk && jenis === 'pulang' && !CFG.sudahMasuk && lemburVal !== '1') {
-                alert('Anda belum melakukan presensi masuk hari ini.');
+                showToast('Anda belum melakukan presensi masuk hari ini.', 'error');
                 return;
             }
             var video = $('video'), canvas = $('canvas');
-            if (!video || !canvas || !video.videoWidth) { alert('Gagal mengambil foto.'); return; }
+            if (!video || !canvas || !video.videoWidth) { showToast('Gagal mengambil foto. Coba lagi.', 'error'); return; }
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
@@ -1159,7 +1201,7 @@
         },
 
         submit: function() {
-            if (!state.capturedPhoto) { alert('Foto belum diambil.'); return; }
+            if (!state.capturedPhoto) { showToast('Foto belum diambil.', 'error'); return; }
             var fotoInput = $('fotoInput');
             if (fotoInput) fotoInput.value = state.capturedPhoto;
             var confirmBtn = $('confirmPresensiBtn');
