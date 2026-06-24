@@ -157,8 +157,7 @@
     </div>
 </div>
 
-{{-- ═══════════ TIMER JAM KERJA — DIKOMENTARI UNTUK TES ═══════════ --}}
-{{--
+{{-- ═══════════ TIMER JAM KERJA ═══════════ --}}
 @if($sudahPresensiMasuk && $jamMasukHariIni)
 <div class="work-timer-card {{ $timerColor }}" id="workTimerBanner"
     data-stopped="{{ $pulangRec ? '1' : '0' }}"
@@ -173,7 +172,6 @@
     <div class="timer-badge" id="workTimerBadge">{{ $pulangRec ? 'Selesai' : ($isFulfilled ? '✓ Terpenuhi' : 'Berjalan') }}</div>
 </div>
 @endif
---}}
 
 {{-- ═══════════ CAROUSEL PENGUMUMAN ═══════════ --}}
 @if(isset($pengumumans) && $pengumumans->count() > 0)
@@ -422,7 +420,7 @@
         <p style="font-size:13px; color:var(--gray); margin-bottom:16px;" id="earlyPulangMsg">Apakah Anda yakin ingin absen pulang?</p>
         <div style="display:flex; gap:10px;">
             <button onclick="App.closeModal('earlyPulangModal')" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">Batal</button>
-            <button onclick="App.closeModal('earlyPulangModal'); App.openPresensi()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Pulang</button>
+            <button onclick="App.confirmEarlyPulang()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Pulang</button>
         </div>
     </div>
 </div>
@@ -706,6 +704,11 @@
             }
         },
 
+        confirmEarlyPulang: function() {
+            App.closeModal('earlyPulangModal');
+            setTimeout(function() { App.openPresensi(); }, 350);
+        },
+
         openInfoModal: function(id) {
             $('infoModal' + id).style.display = 'block';
             var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
@@ -770,10 +773,80 @@
     })();
 
     // ══════════════════════════════════════════════════════════════
-    // WORK TIMER — DIKOMENTARI UNTUK TES
+    // WORK TIMER
     // ══════════════════════════════════════════════════════════════
-    function startWorkTimer() { /* DIMATIKAN */ }
-    function startLemburTimer() { /* DIMATIKAN */ }
+    var _workTimerTickFn = null;
+
+    function pauseWorkTimer() {
+        if (state.workTimerInterval) { clearInterval(state.workTimerInterval); state.workTimerInterval = null; }
+    }
+
+    function resumeWorkTimer() {
+        if (!_workTimerTickFn || state.workTimerInterval) return;
+        state.workTimerInterval = setInterval(_workTimerTickFn, 1000);
+    }
+
+    function startWorkTimer() {
+        if (state.workTimerInterval) { clearInterval(state.workTimerInterval); state.workTimerInterval = null; }
+
+        var card = $('workTimerBanner'), clockEl = $('workTimerClock');
+        if (!card || !clockEl || !CFG.jamMasuk) return;
+
+        var stopped = card.getAttribute('data-stopped') === '1';
+        var pulangJam = card.getAttribute('data-pulang-jam') || '';
+
+        var jadwalStart = parseTime(CFG.jadwalMasuk);
+        var actualStart = parseTime(CFG.jamMasuk);
+        var startTime = actualStart > jadwalStart ? actualStart : jadwalStart;
+        var endTime = parseTime(CFG.jadwalPulang);
+        var totalTarget = Math.floor((endTime - jadwalStart) / 1000);
+        if (totalTarget <= 0) totalTarget = 8 * 3600;
+
+        if (stopped && pulangJam) {
+            var pulangTime = parseTime(pulangJam);
+            var elapsed = Math.max(0, Math.floor((pulangTime - startTime) / 1000));
+            clockEl.textContent = formatSec(elapsed);
+            state.workTimerFulfilled = elapsed >= totalTarget;
+            var bdg = $('workTimerBadge');
+            if (bdg) bdg.textContent = state.workTimerFulfilled ? '✓ Terpenuhi' : 'Kurang';
+            return;
+        }
+
+        _workTimerTickFn = function() {
+            var el = $('workTimerClock'), c = $('workTimerBanner'), lbl = $('workTimerLabel'), bdg = $('workTimerBadge');
+            if (!el || !c) return;
+            var elapsed = Math.max(0, Math.floor((new Date() - startTime) / 1000));
+            el.textContent = formatSec(elapsed);
+            if (elapsed >= totalTarget) {
+                c.classList.remove('timer-yellow'); c.classList.add('timer-green');
+                if (lbl) lbl.textContent = 'Jam kerja terpenuhi';
+                if (bdg) bdg.textContent = '✓ Terpenuhi';
+                state.workTimerFulfilled = true;
+            } else {
+                var sisa = totalTarget - elapsed;
+                var sh = Math.floor(sisa / 3600), sm = Math.floor((sisa % 3600) / 60);
+                if (lbl) lbl.textContent = 'Sisa ' + (sh > 0 ? sh + 'j ' : '') + sm + 'm';
+                if (bdg) bdg.textContent = 'Berjalan';
+                state.workTimerFulfilled = false;
+            }
+        };
+        _workTimerTickFn();
+        state.workTimerInterval = setInterval(_workTimerTickFn, 1000);
+    }
+
+    function startLemburTimer() {
+        var el = $('lemburTimer');
+        if (!el) return;
+        var startStr = el.getAttribute('data-start');
+        if (!startStr) return;
+        var start = parseTime(startStr);
+        function tick() {
+            var diff = Math.max(0, Math.floor((new Date() - start) / 1000));
+            el.textContent = formatSec(diff);
+        }
+        tick();
+        setInterval(tick, 1000);
+    }
 
     // ══════════════════════════════════════════════════════════════
     // PRESENSI — kamera, lokasi, face detection, submit
@@ -818,6 +891,7 @@
         },
 
         initModal: function() {
+            pauseWorkTimer();
             Presensi.initCamera();
             Presensi.initLocation();
             setTimeout(function() { if (state.mapInstance) try { state.mapInstance.invalidateSize(); } catch(e) {} }, 500);
@@ -844,6 +918,7 @@
             state.isOutsideRadius = false;
             var btn = $('btnCapture');
             if (btn) { btn.innerHTML = '<i class="fas fa-camera" style="margin-right:8px;"></i> Ambil Foto & Absen'; btn.disabled = true; }
+            resumeWorkTimer();
         },
 
         initCamera: function() {
@@ -1226,11 +1301,11 @@
         _initialized = true;
 
         Carousel.init();
-        // startWorkTimer();   // DIMATIKAN UNTUK TES
-        // startLemburTimer(); // DIMATIKAN UNTUK TES
+        startWorkTimer();
+        startLemburTimer();
         initDetailModals();
         initNetworkDetection();
-        // initReminders();    // DIMATIKAN UNTUK TES (pakai setInterval)
+        initReminders();
 
         // Hide badges pengumuman yang sudah dibaca
         var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
