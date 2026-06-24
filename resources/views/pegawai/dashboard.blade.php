@@ -1844,11 +1844,21 @@
             var addrEl = document.getElementById('location-address-mini');
             var infoEl = document.getElementById('locationRadiusInfo');
             if (inRadius) {
-                if (addrEl) addrEl.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;margin-right:4px;"></i> Di dalam wilayah kerja';
-                if (infoEl) infoEl.innerHTML = '';
+                var matchedWilayah = null;
+                for (var j = 0; j < wilayahList.length; j++) {
+                    if (haversine(lat,lng,wilayahList[j].lat,wilayahList[j].lng) <= wilayahList[j].radius) { matchedWilayah = wilayahList[j]; break; }
+                }
+                if (addrEl) addrEl.textContent = (matchedWilayah && matchedWilayah.alamat) ? matchedWilayah.alamat : 'Lokasi terverifikasi';
+                if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);margin-top:4px;"><i class="fas fa-check-circle" style="color:#10b981;font-size:10px;"></i><span style="font-size:10px;font-weight:600;color:#10b981;">Di dalam wilayah kerja</span></div>';
             } else {
-                if (addrEl) addrEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#f59e0b;margin-right:4px;"></i> Di luar radius (' + Math.round(nearestDist) + 'm dari titik terdekat)';
-                if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,0.08);margin-top:4px;"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:10px;"></i><span style="font-size:10px;font-weight:600;color:#f59e0b;">Presensi akan butuh approval admin</span></div>';
+                var closest = wilayahList.length > 0 ? wilayahList[0] : null;
+                var closestDist = Infinity;
+                for (var j = 0; j < wilayahList.length; j++) {
+                    var dd = haversine(lat,lng,wilayahList[j].lat,wilayahList[j].lng);
+                    if (dd < closestDist) { closestDist = dd; closest = wilayahList[j]; }
+                }
+                if (addrEl) addrEl.textContent = (closest && closest.alamat) ? closest.alamat : 'Lokasi tidak dikenali';
+                if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);margin-top:4px;"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:10px;"></i><span style="font-size:10px;font-weight:600;color:#f59e0b;">Anda berada di luar radius (' + Math.round(nearestDist) + 'm)</span></div>';
             }
         }, function() {
             if (!currentPosition) {
