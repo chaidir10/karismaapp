@@ -1196,22 +1196,27 @@
     <script>
         // Force update: jika versi berubah, clear cache dan reload
         (function() {
-            var APP_VERSION = '2026062201';
+            var APP_VERSION = '2026062402';
             var storedVer = localStorage.getItem('karisma-app-version');
             if (storedVer && storedVer !== APP_VERSION) {
                 localStorage.setItem('karisma-app-version', APP_VERSION);
                 if ('caches' in window) {
                     caches.keys().then(function(names) {
                         names.forEach(function(n) { caches.delete(n); });
-                    }).then(function() { location.reload(true); });
-                } else {
-                    location.reload(true);
+                    });
                 }
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(regs) {
+                        regs.forEach(function(r) { r.unregister(); });
+                    });
+                }
+                setTimeout(function() { location.reload(true); }, 500);
                 return;
             }
             localStorage.setItem('karisma-app-version', APP_VERSION);
         })();
 
+        // Register SW (self-destruct version)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register("/sw.js")
