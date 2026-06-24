@@ -1156,7 +1156,7 @@
                 '<div style="width:8px;height:8px;border-radius:50%;background:#2E97D4;opacity:0.4;margin-top:1px;"></div>' +
                 '</div>',
             iconSize: [36, 54],
-            iconAnchor: [18, 54]
+            iconAnchor: [18, 27]
         });
     }
 
