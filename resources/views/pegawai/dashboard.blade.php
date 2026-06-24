@@ -577,7 +577,7 @@
 @endforeach
 
 {{-- Modal Peringatan Jam Kerja Belum Terpenuhi --}}
-<div id="earlyPulangModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('earlyPulangModal')">
+<div id="earlyPulangModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('earlyPulangModal')">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
         <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
             <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--warning);"></i>
@@ -592,7 +592,7 @@
 </div>
 
 {{-- Modal Konfirmasi Selesai Lembur --}}
-<div id="confirmLemburModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeLemburConfirm()">
+<div id="confirmLemburModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeLemburConfirm()">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
         <div style="width:56px;height:56px;background:var(--success-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
             <i class="fas fa-bolt" style="font-size:24px;color:var(--success);"></i>
@@ -608,7 +608,7 @@
 
 {{-- Modal Pilih Shift --}}
 @if($user->can_shift && $shifts->count() > 0)
-<div id="shiftPickerModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('shiftPickerModal')">
+<div id="shiftPickerModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('shiftPickerModal')">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:380px;">
                 <h5 style="font-weight:700; font-size:16px; text-align:center; margin-bottom:16px; color:var(--dark);">Pilih Jadwal Kerja</h5>
                 <div style="display:flex; flex-direction:column; gap:10px;">
@@ -685,7 +685,7 @@
 </div>
 
 <!-- Modal Konfirmasi Presensi (Luar Radius) -->
-<div id="confirmationModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('confirmationModal')">
+<div id="confirmationModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('confirmationModal')">
     <div style="background:var(--card-bg); border-radius:20px; width:90%; max-width:380px; overflow:hidden;">
         <div style="padding:24px 24px 0; text-align:center;">
             <div style="width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
@@ -766,7 +766,7 @@
 </div> -->
 
 <!-- Modal Peringatan Belum Presensi Masuk -->
-<div id="warningModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('warningModal')">
+<div id="warningModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)closeSimpleModal('warningModal')">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
         <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
             <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--warning);"></i>
