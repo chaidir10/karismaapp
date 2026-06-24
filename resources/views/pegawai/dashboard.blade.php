@@ -1148,9 +1148,15 @@
     function profileMarkerIcon() {
         return L.divIcon({
             className: '',
-            html: '<div style="width:40px;height:40px;border-radius:50%;border:3px solid var(--primary);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.2);"><img src="' + _profilePhoto + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.src=\'https://ui-avatars.com/api/?name=U&background=5AB6EA&color=fff&size=80\'"></div>',
-            iconSize: [40, 40],
-            iconAnchor: [20, 40]
+            html: '<div style="display:flex;flex-direction:column;align-items:center;">' +
+                '<div style="width:36px;height:36px;border-radius:50%;border:3px solid #2E97D4;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.25);background:#fff;">' +
+                '<img src="' + _profilePhoto + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.src=\'https://ui-avatars.com/api/?name=U&background=5AB6EA&color=fff&size=80\'">' +
+                '</div>' +
+                '<div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #2E97D4;margin-top:-2px;"></div>' +
+                '<div style="width:8px;height:8px;border-radius:50%;background:#2E97D4;opacity:0.4;margin-top:1px;"></div>' +
+                '</div>',
+            iconSize: [36, 54],
+            iconAnchor: [18, 54]
         });
     }
 
@@ -1829,7 +1835,7 @@
             if (mapInstance) {
                 mapInstance.setView([lat, lng], 17);
                 if (_locationMarker) mapInstance.removeLayer(_locationMarker);
-                _locationMarker = L.marker([lat, lng]).addTo(mapInstance);
+                _locationMarker = L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(mapInstance);
                 try { mapInstance.invalidateSize(); } catch(e) {}
             }
 
@@ -1851,14 +1857,18 @@
                 if (addrEl) addrEl.textContent = (matchedWilayah && matchedWilayah.alamat) ? matchedWilayah.alamat : 'Lokasi terverifikasi';
                 if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);margin-top:4px;"><i class="fas fa-check-circle" style="color:#10b981;font-size:10px;"></i><span style="font-size:10px;font-weight:600;color:#10b981;">Di dalam wilayah kerja</span></div>';
             } else {
-                var closest = wilayahList.length > 0 ? wilayahList[0] : null;
-                var closestDist = Infinity;
-                for (var j = 0; j < wilayahList.length; j++) {
-                    var dd = haversine(lat,lng,wilayahList[j].lat,wilayahList[j].lng);
-                    if (dd < closestDist) { closestDist = dd; closest = wilayahList[j]; }
+                if (addrEl) {
+                    addrEl.textContent = 'Mendeteksi alamat...';
+                    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data && data.display_name) addrEl.textContent = data.display_name;
+                            else addrEl.textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
+                        })
+                        .catch(function() { addrEl.textContent = lat.toFixed(6) + ', ' + lng.toFixed(6); });
                 }
-                if (addrEl) addrEl.textContent = (closest && closest.alamat) ? closest.alamat : 'Lokasi tidak dikenali';
-                if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);margin-top:4px;"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:10px;"></i><span style="font-size:10px;font-weight:600;color:#f59e0b;">Anda berada di luar radius (' + Math.round(nearestDist) + 'm)</span></div>';
+                var distText = (nearestDist !== Infinity) ? ' (' + Math.round(nearestDist) + 'm)' : '';
+                if (infoEl) infoEl.innerHTML = '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);margin-top:4px;"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:10px;"></i><span style="font-size:10px;font-weight:600;color:#f59e0b;">Anda berada di luar radius' + distText + '</span></div>';
             }
         }, function() {
             if (!currentPosition) {
