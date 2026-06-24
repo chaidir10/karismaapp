@@ -14,7 +14,7 @@
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; height:100vh; height:100dvh; overflow:hidden; }
         .camera-area { position:absolute; top:0; left:0; right:0; overflow:hidden; background:#111; }
-        #video { width:100%; height:100%; object-fit:cover; object-position:center 30%; display:block; transform:scaleX(-1); }
+        #video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
         .overlay-top { position:absolute; top:0; left:0; right:0; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent); z-index:2; display:flex; justify-content:space-between; align-items:center; }
         .user-info { font-size:13px; font-weight:600; }
         .user-info small { display:block; font-size:10px; opacity:0.7; font-weight:400; }
@@ -42,14 +42,19 @@
         .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; display:none; }
         .toast-success { background:#10b981; color:#fff; }
         .toast-error { background:#ef4444; color:#fff; }
-        .guide-oval { position:absolute; top:45%; left:50%; transform:translate(-50%,-50%); width:180px; height:230px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; z-index:1; pointer-events:none; }
+        .face-guide { position:absolute; inset:0; z-index:1; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .face-guide-oval { width:60%; max-width:240px; aspect-ratio:3/4; border:2px solid rgba(255,255,255,0.35); border-radius:50%; }
+        .face-guide-text { color:rgba(255,255,255,0.7); font-size:11px; margin-top:10px; text-shadow:0 1px 4px rgba(0,0,0,0.5); font-weight:500; }
         canvas#captureCanvas { display:none; }
     </style>
 </head>
 <body>
     <div class="camera-area">
         <video id="video" autoplay playsinline muted></video>
-        <div class="guide-oval"></div>
+        <div class="face-guide">
+            <div class="face-guide-oval"></div>
+            <div class="face-guide-text"><i class="fas fa-user"></i> Posisikan wajah di dalam lingkaran</div>
+        </div>
         <div class="overlay-top">
             <a href="{{ route('pegawai.dashboard') }}" style="width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; text-decoration:none; flex-shrink:0; -webkit-tap-highlight-color:transparent;"><i class="fas fa-arrow-left"></i></a>
             <div class="user-info" style="flex:1; text-align:center;">{{ $user->name }}<small>{{ $user->nip }}</small></div>
@@ -108,7 +113,7 @@
         (function() {
             var video = document.getElementById('video');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-            navigator.mediaDevices.getUserMedia({ video: { facingMode:'user', width:{ideal:720}, height:{ideal:1280} }, audio:false })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode:'user', width:{ideal:640}, height:{ideal:480} }, audio:false })
                 .then(function(stream) { video.srcObject = stream; video.play(); })
                 .catch(function() { showToast('Kamera tidak dapat diakses', 'error'); });
         })();
