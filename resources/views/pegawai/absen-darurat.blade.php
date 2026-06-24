@@ -76,8 +76,12 @@
         @endif
 
         <div class="btn-row">
-            <button class="btn-absen btn-masuk" id="btnMasuk" onclick="doAbsen('masuk')"><i class="fas fa-arrow-right-to-bracket"></i> Masuk</button>
-            <button class="btn-absen btn-pulang" id="btnPulang" onclick="doAbsen('pulang')"><i class="fas fa-arrow-right-from-bracket"></i> Pulang</button>
+            <button class="btn-absen btn-masuk" id="btnMasuk" onclick="doAbsen('masuk')" {{ $sudahMasuk ? 'disabled' : '' }}>
+                <i class="fas {{ $sudahMasuk ? 'fa-check-circle' : 'fa-arrow-right-to-bracket' }}"></i> {{ $sudahMasuk ? 'Sudah Masuk' : 'Masuk' }}
+            </button>
+            <button class="btn-absen btn-pulang" id="btnPulang" onclick="doAbsen('pulang')" {{ $sudahPulang ? 'disabled' : '' }}>
+                <i class="fas {{ $sudahPulang ? 'fa-check-circle' : 'fa-arrow-right-from-bracket' }}"></i> {{ $sudahPulang ? 'Sudah Pulang' : 'Pulang' }}
+            </button>
         </div>
     </div>
 

@@ -41,7 +41,11 @@ class PresensiController extends Controller
 
         $shifts = $user->can_shift ? \App\Models\JamShift::all() : collect();
 
-        return view('pegawai.absen-darurat', compact('user', 'wilayahJson', 'shifts'));
+        $today = now()->toDateString();
+        $sudahMasuk = Presensi::where('user_id', $user->id)->where('tanggal', $today)->where('jenis', 'masuk')->where('is_lembur', false)->exists();
+        $sudahPulang = Presensi::where('user_id', $user->id)->where('tanggal', $today)->where('jenis', 'pulang')->where('is_lembur', false)->exists();
+
+        return view('pegawai.absen-darurat', compact('user', 'wilayahJson', 'shifts', 'sudahMasuk', 'sudahPulang'));
     }
 
     /**
