@@ -271,6 +271,27 @@
                 </div>
                 <div id="resetStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
             </div>
+            <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <div style="width:40px; height:40px; border-radius:10px; background:rgba(59,130,246,0.08); color:#3b82f6; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-map-location-dot"></i></div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Wilayah Kerja</p>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Pilih wilayah untuk pengujian</p>
+                    </div>
+                </div>
+                @php $allWilayah = \App\Models\WilayahKerja::all(); $userWilayahIds = $user->wilayahKerjaList->pluck('id')->toArray(); @endphp
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    @foreach($allWilayah as $w)
+                    <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--card-border); border-radius:10px; cursor:pointer; {{ in_array($w->id, $userWilayahIds) ? 'background:rgba(59,130,246,0.06); border-color:rgba(59,130,246,0.3);' : '' }}">
+                        <input type="checkbox" value="{{ $w->id }}" {{ in_array($w->id, $userWilayahIds) ? 'checked' : '' }} onchange="saveWilayah()" class="tester-wilayah-cb" style="width:18px; height:18px; accent-color:var(--primary);">
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:12px; font-weight:600; color:var(--dark);">{{ $w->alamat ?: $w->nama ?? 'Wilayah #'.$w->id }}</div>
+                            <div style="font-size:10px; color:var(--gray);">Radius: {{ $w->radius ?? 100 }}m</div>
+                        </div>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
         </div>
     </div>
     @endif
@@ -763,6 +784,22 @@
         .catch(function() {
             if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
         });
+    }
+
+    // === Tester: Wilayah Kerja ===
+    function saveWilayah() {
+        var ids = [];
+        document.querySelectorAll('.tester-wilayah-cb').forEach(function(cb) {
+            if (cb.checked) ids.push(parseInt(cb.value));
+        });
+        fetch('/pegawai/akun/set-wilayah', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ wilayah_ids: ids })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) { showSuccess(d.message || 'Wilayah diperbarui'); })
+        .catch(function() { showError('Gagal menyimpan'); });
     }
 
     // === Admin Settings (toggle + dropdown + user picker) ===

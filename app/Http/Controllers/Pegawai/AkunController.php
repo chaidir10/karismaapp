@@ -145,4 +145,17 @@ class AkunController extends Controller
 
         return response()->json(['ok' => true, 'message' => $count . ' data presensi dihapus']);
     }
+
+    public function setWilayah(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_tester) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $ids = $request->input('wilayah_ids', []);
+        $user->wilayahKerjaList()->sync($ids);
+
+        return response()->json(['ok' => true, 'message' => count($ids) . ' wilayah dipilih']);
+    }
 }
