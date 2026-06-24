@@ -12,8 +12,6 @@
     .akun-toggle-thumb { position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
     .akun-toggle input:checked + .akun-toggle-track .akun-toggle-thumb { left:23px; }
 
-    .notif-success { background:var(--success-light); border:1px solid var(--success); color:var(--success); padding:12px 16px; border-radius:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
-    .notif-error { background:var(--danger-light); border:1px solid var(--danger); color:var(--danger); padding:12px 16px; border-radius:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
 
     /* Profile Hero */
     .profile-hero {
@@ -197,12 +195,6 @@
 </style>
 
 <div class="akun-page">
-    @if(session('success'))
-    <div class="notif-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
-    @endif
-    @if($errors->any())
-    <div class="notif-error"><i class="fas fa-exclamation-circle"></i> Terjadi kesalahan. Silakan periksa form di bawah.</div>
-    @endif
 
     <!-- Profile Hero -->
     <div class="profile-hero">

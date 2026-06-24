@@ -1281,6 +1281,75 @@
         }
     </script>
 
+    <!-- Global Toast -->
+    <div id="pgToast" style="position:fixed; top:0; left:0; right:0; z-index:9999; display:flex; justify-content:center; padding:12px 16px; pointer-events:none;">
+        <div id="pgToastInner" style="pointer-events:auto; max-width:420px; width:100%; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:12px; transform:translateY(-120%); opacity:0; transition:transform 0.35s cubic-bezier(0.2,0.9,0.3,1), opacity 0.3s; box-shadow:0 8px 30px rgba(0,0,0,0.15); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);">
+            <div id="pgToastIcon" style="width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;"></div>
+            <div style="flex:1; min-width:0;">
+                <div id="pgToastTitle" style="font-size:13px; font-weight:700; line-height:1.2;"></div>
+                <div id="pgToastMsg" style="font-size:12px; opacity:0.85; line-height:1.3; margin-top:1px;"></div>
+            </div>
+            <button onclick="hidePgToast()" style="background:none; border:none; color:inherit; opacity:0.5; font-size:16px; cursor:pointer; padding:4px; flex-shrink:0;"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div id="pgToastTimer" style="position:absolute; bottom:0; left:16px; right:16px; height:3px; pointer-events:none;">
+            <div id="pgToastBar" style="height:100%; border-radius:2px; width:100%; transform-origin:left;"></div>
+        </div>
+    </div>
+    <script>
+        var _pgToastTimeout = null;
+        var _pgToastTypes = {
+            success: { bg:'rgba(16,185,129,0.95)', icon:'fa-check', iconBg:'rgba(255,255,255,0.2)', title:'Berhasil', bar:'rgba(255,255,255,0.3)' },
+            error:   { bg:'rgba(239,68,68,0.95)', icon:'fa-xmark', iconBg:'rgba(255,255,255,0.2)', title:'Gagal', bar:'rgba(255,255,255,0.3)' },
+            warning: { bg:'rgba(245,158,11,0.95)', icon:'fa-exclamation', iconBg:'rgba(255,255,255,0.2)', title:'Perhatian', bar:'rgba(255,255,255,0.3)' },
+            info:    { bg:'rgba(59,130,246,0.95)', icon:'fa-info', iconBg:'rgba(255,255,255,0.2)', title:'Info', bar:'rgba(255,255,255,0.3)' }
+        };
+
+        function showPgToast(msg, type, title) {
+            var t = _pgToastTypes[type] || _pgToastTypes.info;
+            var inner = document.getElementById('pgToastInner');
+            var bar = document.getElementById('pgToastBar');
+            inner.style.background = t.bg;
+            inner.style.color = '#fff';
+            document.getElementById('pgToastIcon').style.background = t.iconBg;
+            document.getElementById('pgToastIcon').innerHTML = '<i class="fas ' + t.icon + '"></i>';
+            document.getElementById('pgToastTitle').textContent = title || t.title;
+            document.getElementById('pgToastMsg').textContent = msg;
+            bar.style.background = t.bar;
+            bar.style.transition = 'none';
+            bar.style.transform = 'scaleX(1)';
+
+            if (_pgToastTimeout) clearTimeout(_pgToastTimeout);
+            inner.style.transform = 'translateY(0)';
+            inner.style.opacity = '1';
+            requestAnimationFrame(function() {
+                bar.style.transition = 'transform 3.5s linear';
+                bar.style.transform = 'scaleX(0)';
+            });
+            _pgToastTimeout = setTimeout(hidePgToast, 3500);
+        }
+
+        function hidePgToast() {
+            var inner = document.getElementById('pgToastInner');
+            inner.style.transform = 'translateY(-120%)';
+            inner.style.opacity = '0';
+            if (_pgToastTimeout) { clearTimeout(_pgToastTimeout); _pgToastTimeout = null; }
+        }
+
+        function showSuccess(msg) { showPgToast(msg, 'success'); }
+        function showError(msg) { showPgToast(msg, 'error'); }
+        function showWarning(msg) { showPgToast(msg, 'warning'); }
+
+        @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function() { showSuccess(@json(session('success'))); });
+        @endif
+        @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function() { showError(@json(session('error'))); });
+        @endif
+        @if(session('warning'))
+        document.addEventListener('DOMContentLoaded', function() { showWarning(@json(session('warning'))); });
+        @endif
+    </script>
+
     <!-- Push scripts dari child blade -->
     @stack('scripts')
 </body>

@@ -777,53 +777,6 @@
     </div>
 </div>
 
-<!-- Toast Notifikasi -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
-    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body py-3">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-check-circle me-2 fs-5"></i>
-                    <div>
-                        <div class="fw-semibold">Presensi Berhasil</div>
-                        <div class="small opacity-90" id="successToastMessage">Presensi berhasil dicatat</div>
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-
-    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body py-3">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-exclamation-circle me-2 fs-5"></i>
-                    <div>
-                        <div class="fw-semibold">Presensi Gagal</div>
-                        <div class="small opacity-90" id="errorToastMessage">Terjadi kesalahan saat presensi</div>
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-
-    <div id="warningToast" class="toast align-items-center text-white bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body py-3">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
-                    <div>
-                        <div class="fw-semibold">Perhatian</div>
-                        <div class="small opacity-90" id="warningToastMessage">Anda berada di luar radius</div>
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('styles')
@@ -847,25 +800,6 @@
         }
     }
 
-
-    /* Toast Styles */
-    .toast {
-        min-width: 320px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .toast.bg-success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    }
-
-    .toast.bg-danger {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    }
-
-    .toast.bg-warning {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-    }
 
     /* Modal Styles */
     .modal-content.rounded-2xl {
@@ -1485,29 +1419,6 @@
         // Detail map modals
         initializeDetailModals();
 
-        // Inisialisasi toast
-        if (window.bootstrap?.Toast) {
-            const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-            toastElList.map(function(toastEl) {
-                return new bootstrap.Toast(toastEl, {
-                    autohide: true,
-                    delay: 5000
-                });
-            });
-        }
-
-        // Handle response dari server
-        @if(session('success'))
-            showSuccess(@json(session('success')));
-        @endif
-
-        @if(session('error'))
-            showError(@json(session('error')));
-        @endif
-
-        @if(session('warning'))
-            showWarning(@json(session('warning')));
-        @endif
     });
 
     function openPresensiModal() {
@@ -2076,26 +1987,5 @@
     }
 
     // Fungsi Notifikasi
-    function showSuccess(message) {
-        const toast = document.getElementById('successToast');
-        const messageEl = document.getElementById('successToastMessage');
-        if (message && messageEl) messageEl.textContent = message;
-        if (toast && window.bootstrap?.Toast) bootstrap.Toast.getOrCreateInstance(toast).show();
-    }
-
-    function showError(message) {
-        const toast = document.getElementById('errorToast');
-        const messageEl = document.getElementById('errorToastMessage');
-        if (message && messageEl) messageEl.textContent = message;
-        if (toast && window.bootstrap?.Toast) bootstrap.Toast.getOrCreateInstance(toast).show();
-        else alert(message || 'Terjadi kesalahan');
-    }
-
-    function showWarning(message) {
-        const toast = document.getElementById('warningToast');
-        const messageEl = document.getElementById('warningToastMessage');
-        if (message && messageEl) messageEl.textContent = message;
-        if (toast && window.bootstrap?.Toast) bootstrap.Toast.getOrCreateInstance(toast).show();
-    }
 </script>
 @endpush
