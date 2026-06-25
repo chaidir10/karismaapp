@@ -220,6 +220,7 @@
 
     .table-container {
         overflow-x: auto;
+        min-height: 340px;
     }
 
     .data-table {
@@ -2362,15 +2363,22 @@
         octx.fillStyle = '#64748b';
         var now = new Date();
         octx.fillText('Diunduh: ' + now.toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) + ' ' + now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), 40, 72);
+        octx.fillText('Indikator: ' + activeNames, 40, 88);
 
-        // Render chart besar ke offscreen
+        // Render chart — hanya dataset yang sedang visible
+        var visibleData = JSON.parse(JSON.stringify(_attendanceChart.data));
+        visibleData.datasets = visibleData.datasets.filter(function(ds, i) {
+            return _attendanceChart.isDatasetVisible(i);
+        });
+        var activeNames = visibleData.datasets.map(function(ds) { return ds.label; }).join(', ');
+
         var tempCanvas = document.createElement('canvas');
         tempCanvas.width = 1043;
         tempCanvas.height = 660;
         var tempChart = new Chart(tempCanvas, {
             type: 'line',
             plugins: [ChartDataLabels],
-            data: JSON.parse(JSON.stringify(_attendanceChart.data)),
+            data: visibleData,
             options: {
                 responsive: false,
                 maintainAspectRatio: false,
