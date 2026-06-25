@@ -131,13 +131,13 @@
                 </div>
             </div>
         </div>
-        <div style="padding:8px 16px 0;">
+        <div style="padding:14px 16px 10px;">
             <div style="position:relative;">
                 <i class="fas fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--dm-muted,#94a3b8); font-size:12px;"></i>
                 <input type="text" id="holidaySearch" placeholder="Cari libur..." oninput="filterHolidays()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
             </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto" style="min-height:460px;">
             <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
                 <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
