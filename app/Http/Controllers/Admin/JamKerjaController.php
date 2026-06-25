@@ -175,7 +175,7 @@ class JamKerjaController extends Controller
         $year = (int) $request->input('year', date('Y'));
         \Illuminate\Support\Facades\Cache::forget("holidays_api_{$year}");
         $count = HolidayHelper::syncFromApi($year);
-        return redirect()->route('admin.jamkerja.index', ['year' => $year])
+        return redirect(route('admin.jamkerja.index', ['year' => $year]) . '#libur')
             ->with('success', $count > 0 ? "{$count} libur baru disinkronkan dari API" : "Data libur {$year} sudah terbaru");
     }
 
@@ -192,7 +192,7 @@ class JamKerjaController extends Controller
             'is_active' => true,
         ]);
         $year = \Carbon\Carbon::parse($request->date)->year;
-        return redirect()->route('admin.jamkerja.index', ['year' => $year])->with('success', 'Hari libur berhasil ditambahkan');
+        return redirect(route('admin.jamkerja.index', ['year' => $year]) . '#libur')->with('success', 'Hari libur berhasil ditambahkan');
     }
 
     public function updateHoliday(Request $request, $id)
@@ -204,7 +204,7 @@ class JamKerjaController extends Controller
         ]);
         $holiday->update($request->only('date', 'name'));
         $year = \Carbon\Carbon::parse($request->date)->year;
-        return redirect()->route('admin.jamkerja.index', ['year' => $year])->with('success', 'Hari libur berhasil diperbarui');
+        return redirect(route('admin.jamkerja.index', ['year' => $year]) . '#libur')->with('success', 'Hari libur berhasil diperbarui');
     }
 
     public function destroyHoliday($id)

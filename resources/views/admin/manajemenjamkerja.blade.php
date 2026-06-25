@@ -102,7 +102,7 @@
 </div>
 
 {{-- ===================== HARI LIBUR ===================== --}}
-<div class="mt-6">
+<div class="mt-6" id="libur">
     <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div class="px-6 py-4" style="background:var(--dm-bg,#f9fafb); border-bottom:1px solid var(--dm-border,#e2e8f0);">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -112,20 +112,20 @@
                     </h2>
                     <p class="text-xs mt-1" style="color:var(--dm-muted,#64748b);">Data dari API libur nasional + jadwal custom admin</p>
                 </div>
-                <div class="flex items-center gap-2 flex-wrap">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                     <form action="{{ route('admin.jamkerja.holiday.sync') }}" method="POST" class="inline" data-no-loading="true">
                         @csrf
                         <input type="hidden" name="year" value="{{ $year }}">
-                        <button type="submit" class="btn-header" style="font-size:11px; padding:6px 12px;">
+                        <button type="submit" style="padding:8px 14px; border:1px solid rgba(59,130,246,0.25); border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; background:rgba(59,130,246,0.08); color:#3b82f6; transition:all 0.15s; -webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='rgba(59,130,246,0.16)'" onmouseout="this.style.background='rgba(59,130,246,0.08)'">
                             <i class="fas fa-rotate"></i> Sync API {{ $year }}
                         </button>
                     </form>
-                    <select onchange="window.location.href='?year='+this.value" style="padding:5px 28px 5px 10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 8px center;">
+                    <select onchange="window.location.href='?year='+this.value+'#libur'" style="padding:8px 32px 8px 12px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 10px center;">
                         @for($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
                         <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endfor
                     </select>
-                    <button onclick="openModal('modalAddHoliday')" class="btn-header" style="font-size:11px; padding:6px 12px; background:#ef4444; border-color:#ef4444;">
+                    <button onclick="openModal('modalAddHoliday')" style="padding:8px 14px; border:1px solid rgba(239,68,68,0.25); border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; background:rgba(239,68,68,0.08); color:#ef4444; transition:all 0.15s; -webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='rgba(239,68,68,0.16)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">
                         <i class="fas fa-plus"></i> Tambah Libur
                     </button>
                 </div>
@@ -196,13 +196,13 @@
                 @if($holidays->onFirstPage())
                 <span class="px-3 py-1.5 text-xs rounded-lg" style="color:var(--dm-muted,#94a3b8); border:1px solid var(--dm-border,#e2e8f0);">&lsaquo;</span>
                 @else
-                <a href="{{ $holidays->previousPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&lsaquo;</a>
+                <a href="{{ $holidays->previousPageUrl() }}#libur" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&lsaquo;</a>
                 @endif
                 @foreach($holidays->getUrlRange(1, $holidays->lastPage()) as $page => $url)
-                <a href="{{ $url }}" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="{{ $page == $holidays->currentPage() ? 'background:#3b82f6; color:#fff; border:1px solid #3b82f6;' : 'color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0);' }} text-decoration:none;">{{ $page }}</a>
+                <a href="{{ $url }}#libur" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="{{ $page == $holidays->currentPage() ? 'background:#3b82f6; color:#fff; border:1px solid #3b82f6;' : 'color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0);' }} text-decoration:none;">{{ $page }}</a>
                 @endforeach
                 @if($holidays->hasMorePages())
-                <a href="{{ $holidays->nextPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&rsaquo;</a>
+                <a href="{{ $holidays->nextPageUrl() }}#libur" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&rsaquo;</a>
                 @else
                 <span class="px-3 py-1.5 text-xs rounded-lg" style="color:var(--dm-muted,#94a3b8); border:1px solid var(--dm-border,#e2e8f0);">&rsaquo;</span>
                 @endif
