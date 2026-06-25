@@ -102,7 +102,7 @@
 </div>
 
 {{-- ===================== HARI LIBUR ===================== --}}
-<div class="mt-6" id="libur">
+<div class="mt-6" id="liburSection">
     <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div class="px-6 py-4" style="background:var(--dm-bg,#f9fafb); border-bottom:1px solid var(--dm-border,#e2e8f0);">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -741,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var fromSession = {{ session('scrollToLibur') ? 'true' : 'false' }};
     if (fromStorage || fromSession) {
         sessionStorage.removeItem('scrollToLibur');
-        var el = document.getElementById('libur');
+        var el = document.getElementById('liburSection');
         if (el) setTimeout(function() { el.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
     }
 });
