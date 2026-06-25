@@ -1399,14 +1399,14 @@
                     '<div class="k-confirm-title">' + (opts.title || 'Konfirmasi') + '</div>' +
                     '<div class="k-confirm-msg">' + (opts.message || 'Apakah Anda yakin?') + '</div>' +
                     '<div class="k-confirm-btns">' +
-                        '<button class="k-confirm-cancel" id="kConfirmCancel">' + (opts.cancelText || 'Batal') + '</button>' +
-                        '<button class="k-confirm-ok" id="kConfirmOk" style="background:' + c.btn + '">' + (opts.confirmText || 'Ya') + '</button>' +
+                        '<button class="k-confirm-cancel">' + (opts.cancelText || 'Batal') + '</button>' +
+                        '<button class="k-confirm-ok" style="background:' + c.btn + '">' + (opts.confirmText || 'Ya') + '</button>' +
                     '</div>' +
                 '</div>';
             document.body.appendChild(el);
 
-            document.getElementById('kConfirmCancel').onclick = function() { closeConfirm(); if (opts.onCancel) opts.onCancel(); };
-            document.getElementById('kConfirmOk').onclick = function() { closeConfirm(); if (opts.onConfirm) opts.onConfirm(); };
+            el.querySelector('.k-confirm-cancel').onclick = function() { closeConfirm(); if (opts.onCancel) opts.onCancel(); };
+            el.querySelector('.k-confirm-ok').onclick = function() { closeConfirm(); if (opts.onConfirm) opts.onConfirm(); };
         }
 
         function closeConfirm() {
@@ -1423,55 +1423,6 @@
         @if(session('warning'))
         document.addEventListener('DOMContentLoaded', function() { showWarning(@json(session('warning'))); });
         @endif
-    </script>
-
-    <!-- Custom Confirm Dialog -->
-    <div id="kConfirmBg" class="k-confirm-bg" onclick="if(event.target===this){this.classList.remove('show');if(window._kConfirmReject)window._kConfirmReject();}">
-        <div class="k-confirm-box">
-            <div class="k-confirm-icon" id="kConfirmIcon"></div>
-            <div class="k-confirm-title" id="kConfirmTitle"></div>
-            <div class="k-confirm-msg" id="kConfirmMsg"></div>
-            <div class="k-confirm-btns">
-                <button class="k-confirm-cancel" onclick="document.getElementById('kConfirmBg').classList.remove('show');if(window._kConfirmReject)window._kConfirmReject();">Batal</button>
-                <button class="k-confirm-ok" id="kConfirmOk">Ya</button>
-            </div>
-        </div>
-    </div>
-    <script>
-        function kConfirm(opts) {
-            var bg = document.getElementById('kConfirmBg');
-            var iconEl = document.getElementById('kConfirmIcon');
-            var titleEl = document.getElementById('kConfirmTitle');
-            var msgEl = document.getElementById('kConfirmMsg');
-            var okBtn = document.getElementById('kConfirmOk');
-
-            var type = opts.type || 'warning';
-            var colors = {
-                warning: { iconBg:'var(--warning-light)', iconColor:'var(--warning)', btnBg:'linear-gradient(135deg,#f59e0b,#d97706)', icon:'fa-triangle-exclamation' },
-                danger:  { iconBg:'var(--danger-light)', iconColor:'var(--danger)', btnBg:'linear-gradient(135deg,#ef4444,#dc2626)', icon:'fa-circle-exclamation' },
-                info:    { iconBg:'var(--primary-soft)', iconColor:'var(--primary-dark)', btnBg:'linear-gradient(135deg,var(--primary),var(--primary-dark))', icon:'fa-circle-info' },
-                success: { iconBg:'var(--success-light)', iconColor:'var(--success)', btnBg:'linear-gradient(135deg,#10b981,#059669)', icon:'fa-circle-check' }
-            };
-            var c = colors[type] || colors.warning;
-
-            iconEl.style.background = c.iconBg;
-            iconEl.style.color = c.iconColor;
-            iconEl.innerHTML = '<i class="fas ' + (opts.icon || c.icon) + '"></i>';
-            titleEl.textContent = opts.title || 'Konfirmasi';
-            msgEl.textContent = opts.message || 'Apakah Anda yakin?';
-            okBtn.textContent = opts.okText || 'Ya';
-            okBtn.style.background = c.btnBg;
-
-            return new Promise(function(resolve, reject) {
-                window._kConfirmReject = function() { window._kConfirmReject = null; reject(); };
-                okBtn.onclick = function() {
-                    bg.classList.remove('show');
-                    window._kConfirmReject = null;
-                    resolve();
-                };
-                bg.classList.add('show');
-            });
-        }
     </script>
 
     <!-- Push scripts dari child blade -->
