@@ -195,10 +195,10 @@
                 </tbody>
             </table>
         </div>
-        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between; position:absolute; bottom:0; left:0; right:0; background:var(--dm-card,#fff);">
-            <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
-            <div id="holidayPages" style="display:flex; gap:4px;"></div>
-        </div>
+    </div>
+    <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between; background:var(--dm-card,#fff); border-radius:0 0 14px 14px;">
+        <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
+        <div id="holidayPages" style="display:flex; gap:4px;"></div>
     </div>
 </div>
 

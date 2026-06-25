@@ -221,7 +221,6 @@
     .table-container {
         overflow-x: auto;
         min-height: 340px;
-        position: relative;
     }
 
     .data-table {
@@ -300,11 +299,6 @@
         border-top: 1px solid var(--gray-200);
         font-size: 12px;
         color: var(--gray-500);
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--white);
     }
 
     .pagination-info {
@@ -2052,7 +2046,7 @@
 
         var paginationDiv = document.createElement('div');
         paginationDiv.className = 'table-pagination';
-        container.appendChild(paginationDiv);
+        container.parentElement.appendChild(paginationDiv);
 
         var instance = { allRows: allRows, rows: allRows.slice(), currentPage: 1, _paginationDiv: paginationDiv, _searchQuery: '' };
         tableInstances[tbodyId] = instance;
