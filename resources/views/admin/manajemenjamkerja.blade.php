@@ -120,7 +120,7 @@
                             <i class="fas fa-rotate"></i> Sync API {{ $year }}
                         </button>
                     </form>
-                    <select onchange="window.location.href='?year='+this.value+'#libur'" style="padding:8px 32px 8px 12px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 10px center;">
+                    <select onchange="sessionStorage.setItem('scrollToLibur','1'); window.location.href='?year='+this.value" style="padding:8px 32px 8px 12px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 10px center;">
                         @for($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
                         <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endfor
@@ -137,9 +137,9 @@
                 <input type="text" id="holidaySearch" placeholder="Cari libur..." oninput="filterHolidays()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
             </div>
         </div>
-        <div class="overflow-x-auto" style="min-height:460px; position:relative;">
+        <div class="overflow-x-auto" style="height:420px; overflow-y:auto;">
             <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
-                <thead style="background:var(--dm-bg,#f9fafb);">
+                <thead style="background:var(--dm-bg,#f9fafb); position:sticky; top:0; z-index:1;">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:50px;">No</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Tanggal</th>
@@ -195,10 +195,10 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between; background:var(--dm-card,#fff); border-radius:0 0 14px 14px;">
-        <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
-        <div id="holidayPages" style="display:flex; gap:4px;"></div>
+        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between;">
+            <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
+            <div id="holidayPages" style="display:flex; gap:4px;"></div>
+        </div>
     </div>
 </div>
 
@@ -737,8 +737,11 @@ function goHolidayPage(p) {
 
 document.addEventListener('DOMContentLoaded', function() {
     initHolidayPager();
-    if (window.location.hash === '#libur') {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
+    var shouldScroll = sessionStorage.getItem('scrollToLibur') || {{ session('scrollToLibur') ? 'true' : 'false' }};
+    if (shouldScroll) {
+        sessionStorage.removeItem('scrollToLibur');
+        var el = document.getElementById('libur');
+        if (el) setTimeout(function() { el.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
     }
 });
 
