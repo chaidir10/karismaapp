@@ -250,18 +250,16 @@ class LaporanController extends Controller
      */
     private function calculateMinutesWithoutSeconds(Carbon $start, Carbon $end, bool $roundUp = false): int
     {
-        // Buat copy tanpa detik
         $startWithoutSeconds = $start->copy()->setSeconds(0);
         $endWithoutSeconds = $end->copy()->setSeconds(0);
-        
-        $diffInMinutes = $startWithoutSeconds->diffInMinutes($endWithoutSeconds);
-        
-        // Jika perlu dibulatkan ke atas dan ada sisa detik yang signifikan
+
+        $diffInMinutes = abs($startWithoutSeconds->diffInMinutes($endWithoutSeconds));
+
         if ($roundUp && $start->second > 0) {
             $diffInMinutes++;
         }
-        
-        return $diffInMinutes;
+
+        return (int) $diffInMinutes;
     }
 
     private function shortenHoliday(string $name): string

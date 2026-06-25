@@ -202,8 +202,8 @@ class DashboardAdminController extends Controller
                 if ($jmObj->lt($jmDefault->copy()->addMinute())) { $tepatMasuk++; } else { $telat++; }
                 if ($jpObj->gte($jpDefault)) { $pulangTepat++; }
 
-                $dStandar = $jmDefault->diffInMinutes($jpDefault);
-                $dAktual = $jmObj->copy()->setSeconds(0)->diffInMinutes($jpObj->copy()->setSeconds(0));
+                $dStandar = abs($jmDefault->diffInMinutes($jpDefault));
+                $dAktual = abs($jmObj->copy()->setSeconds(0)->diffInMinutes($jpObj->copy()->setSeconds(0)));
                 $totalMenitKerja += $dAktual;
                 if ($dAktual >= $dStandar) { $jamKerjaCukup++; }
             }

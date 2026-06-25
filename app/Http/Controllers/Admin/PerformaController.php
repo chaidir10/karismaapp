@@ -156,8 +156,8 @@ class PerformaController extends Controller
                     $pulangCepat++;
                 }
 
-                $durasiStandar = $jamMasukDefault->diffInMinutes($jamPulangDefault);
-                $durasiAktual = $jamMasukObj->copy()->setSeconds(0)->diffInMinutes($jamPulangObj->copy()->setSeconds(0));
+                $durasiStandar = abs($jamMasukDefault->diffInMinutes($jamPulangDefault));
+                $durasiAktual = abs($jamMasukObj->copy()->setSeconds(0)->diffInMinutes($jamPulangObj->copy()->setSeconds(0)));
                 $totalMenitKerja += $durasiAktual;
                 $totalMenitStandar += $durasiStandar;
                 if ($durasiAktual >= $durasiStandar) {
