@@ -137,7 +137,7 @@
                 <input type="text" id="holidaySearch" placeholder="Cari libur..." oninput="filterHolidays()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
             </div>
         </div>
-        <div class="overflow-x-auto" style="min-height:460px;">
+        <div class="overflow-x-auto" style="min-height:460px; display:flex; flex-direction:column;">
             <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
                 <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
@@ -195,7 +195,7 @@
                 </tbody>
             </table>
         </div>
-        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center; justify-content:space-between;">
+        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between;">
             <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
             <div id="holidayPages" style="display:flex; gap:4px;"></div>
         </div>

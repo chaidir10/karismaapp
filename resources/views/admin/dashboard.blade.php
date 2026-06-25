@@ -221,7 +221,12 @@
     .table-container {
         overflow-x: auto;
         min-height: 340px;
+        display: flex;
+        flex-direction: column;
     }
+    .table-container .data-table { flex: 1; }
+    .table-container + .table-pagination,
+    .table-pagination { margin-top: auto; }
 
     .data-table {
         width: 100%;
@@ -331,9 +336,10 @@
     }
 
     .pagination-buttons button.active {
-        background: var(--primary);
-        color: var(--white);
-        border-color: var(--primary);
+        background: #3b82f6;
+        color: #ffffff;
+        border-color: #3b82f6;
+        font-weight: 700;
     }
 
     .pagination-buttons button:disabled {
