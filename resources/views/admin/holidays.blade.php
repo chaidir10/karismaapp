@@ -9,13 +9,14 @@
 
 @section('content')
 <style>
-    .month-tabs { display:flex; gap:4px; padding:14px 16px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .month-tabs { display:flex; gap:3px; margin:12px 16px; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--dm-border,#e2e8f0); overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
     .month-tabs::-webkit-scrollbar { display:none; }
-    .month-tab { padding:7px 14px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; background:transparent; color:var(--dm-muted,#94a3b8); transition:all 0.15s; position:relative; }
+    .month-tab { flex:1; min-width:0; padding:8px 4px; border:none; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; background:transparent; color:var(--dm-muted,#94a3b8); transition:all 0.15s; text-align:center; -webkit-tap-highlight-color:transparent; }
     .month-tab:hover { background:var(--dm-bg,#f1f5f9); color:var(--dm-text,#1e293b); }
-    .month-tab.active { background:#3b82f6; color:#fff; box-shadow:0 2px 8px rgba(59,130,246,0.3); }
-    .month-tab .tab-count { font-size:9px; font-weight:700; background:rgba(0,0,0,0.15); padding:1px 5px; border-radius:4px; margin-left:4px; }
+    .month-tab.active { background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); }
+    .month-tab .tab-count { font-size:8px; font-weight:700; background:rgba(0,0,0,0.08); padding:1px 4px; border-radius:4px; margin-left:2px; }
     .month-tab.active .tab-count { background:rgba(255,255,255,0.25); }
+    .month-tab-all { flex:none !important; padding:8px 12px !important; border-left:1px solid var(--dm-border,#e2e8f0); margin-left:2px; }
     .month-panel { display:none; }
     .month-panel.active { display:block; }
     .holiday-row { transition:opacity 0.2s; }
@@ -54,8 +55,8 @@
                 @if($count > 0)<span class="tab-count">{{ $count }}</span>@endif
             </button>
             @endfor
-            <button class="month-tab" onclick="switchMonth(0, this)" style="border-left:1px solid var(--dm-border,#e2e8f0); margin-left:4px; padding-left:14px;">
-                <i class="fas fa-list" style="margin-right:4px;"></i> Semua
+            <button class="month-tab month-tab-all" onclick="switchMonth(0, this)">
+                <i class="fas fa-list" style="margin-right:3px; font-size:10px;"></i> Semua
             </button>
         </div>
 
@@ -184,6 +185,19 @@
 
 @push('scripts')
 <script>
+function openModal(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.style.display = 'flex';
+}
+function closeModal(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('hidden');
+    el.style.display = '';
+}
+
 function switchMonth(m, btn) {
     document.querySelectorAll('.month-panel').forEach(function(p) { p.classList.remove('active'); });
     document.querySelectorAll('.month-tab').forEach(function(t) { t.classList.remove('active'); });

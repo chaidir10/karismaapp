@@ -524,17 +524,37 @@
     }
 
     // Event listeners for live filtering
-    document.getElementById('searchInput').addEventListener('input', filterPegawai);
-    document.getElementById('filterUnit').addEventListener('change', filterPegawai);
-    document.getElementById('filterJenis').addEventListener('change', filterPegawai);
+    function saveFilterState() {
+        sessionStorage.setItem('pgFilter', JSON.stringify({
+            search: document.getElementById('searchInput').value,
+            unit: document.getElementById('filterUnit').value,
+            jenis: document.getElementById('filterJenis').value
+        }));
+    }
 
-    // Reset filter
+    function restoreFilterState() {
+        var saved = sessionStorage.getItem('pgFilter');
+        if (!saved) return;
+        var f = JSON.parse(saved);
+        if (f.search) document.getElementById('searchInput').value = f.search;
+        if (f.unit) document.getElementById('filterUnit').value = f.unit;
+        if (f.jenis) document.getElementById('filterJenis').value = f.jenis;
+        if (f.search || f.unit || f.jenis) filterPegawai();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() { filterPegawai(); saveFilterState(); });
+    document.getElementById('filterUnit').addEventListener('change', function() { filterPegawai(); saveFilterState(); });
+    document.getElementById('filterJenis').addEventListener('change', function() { filterPegawai(); saveFilterState(); });
+
     document.getElementById('resetFilter').addEventListener('click', function() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterUnit').value = '';
         document.getElementById('filterJenis').value = '';
         filterPegawai();
+        sessionStorage.removeItem('pgFilter');
     });
+
+    restoreFilterState();
 
     // Modal functions with animations
     function openModal(id) {
