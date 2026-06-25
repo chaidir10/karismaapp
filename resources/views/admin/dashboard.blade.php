@@ -221,12 +221,8 @@
     .table-container {
         overflow-x: auto;
         min-height: 340px;
-        display: flex;
-        flex-direction: column;
+        position: relative;
     }
-    .table-container .data-table { flex: 1; }
-    .table-container + .table-pagination,
-    .table-pagination { margin-top: auto; }
 
     .data-table {
         width: 100%;
@@ -304,6 +300,11 @@
         border-top: 1px solid var(--gray-200);
         font-size: 12px;
         color: var(--gray-500);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--white);
     }
 
     .pagination-info {
@@ -335,11 +336,13 @@
         border-color: var(--gray-300);
     }
 
-    .pagination-buttons button.active {
-        background: #3b82f6;
-        color: #ffffff;
-        border-color: #3b82f6;
+    .pagination-buttons button.active,
+    .pagination-buttons button.active:hover {
+        background: #3b82f6 !important;
+        color: #ffffff !important;
+        border-color: #3b82f6 !important;
         font-weight: 700;
+        box-shadow: 0 2px 8px rgba(59,130,246,0.35);
     }
 
     .pagination-buttons button:disabled {

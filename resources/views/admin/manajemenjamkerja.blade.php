@@ -137,7 +137,7 @@
                 <input type="text" id="holidaySearch" placeholder="Cari libur..." oninput="filterHolidays()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
             </div>
         </div>
-        <div class="overflow-x-auto" style="min-height:460px; display:flex; flex-direction:column;">
+        <div class="overflow-x-auto" style="min-height:460px; position:relative;">
             <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
                 <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
@@ -195,7 +195,7 @@
                 </tbody>
             </table>
         </div>
-        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between;">
+        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); align-items:center; justify-content:space-between; position:absolute; bottom:0; left:0; right:0; background:var(--dm-card,#fff);">
             <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
             <div id="holidayPages" style="display:flex; gap:4px;"></div>
         </div>
@@ -720,7 +720,7 @@ function renderHolidayPage() {
     var html = '';
     var btnStyle = 'padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); text-decoration:none;';
     var btnDisabled = 'padding:4px 10px; border-radius:8px; font-size:11px; border:1px solid var(--dm-border,#e2e8f0); color:var(--dm-muted,#94a3b8); cursor:default;';
-    var btnActive = 'padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid #3b82f6; background:#3b82f6; color:#fff;';
+    var btnActive = 'padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; border:1px solid #3b82f6; background:#3b82f6; color:#fff; box-shadow:0 2px 8px rgba(59,130,246,0.35);';
 
     html += _hPage > 1 ? '<button style="' + btnStyle + '" onclick="goHolidayPage(' + (_hPage-1) + ')">&lsaquo;</button>' : '<span style="' + btnDisabled + '">&lsaquo;</span>';
     for (var p = 1; p <= totalPages; p++) {
@@ -735,7 +735,12 @@ function goHolidayPage(p) {
     renderHolidayPage();
 }
 
-document.addEventListener('DOMContentLoaded', initHolidayPager);
+document.addEventListener('DOMContentLoaded', function() {
+    initHolidayPager();
+    if (window.location.hash === '#libur') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+});
 
 function toggleHoliday(id, btn) {
     fetch('{{ url("admin/jamkerja/holiday") }}/' + id + '/toggle', { method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
