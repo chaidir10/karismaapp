@@ -2202,6 +2202,7 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>
     var _attendanceChart = null;
 
@@ -2269,6 +2270,7 @@
                     }
                 ]
             },
+            plugins: [ChartDataLabels],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -2283,11 +2285,24 @@
                         titleFont: { size: 12 }, bodyFont: { size: 12 },
                         padding: 10, cornerRadius: 8,
                         displayColors: true, boxWidth: 8, boxHeight: 8, boxPadding: 4
+                    },
+                    datalabels: {
+                        display: function(ctx) {
+                            return ctx.dataset.data[ctx.dataIndex] > 0 && !ctx.dataset.hidden && labels.length <= 31;
+                        },
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 2,
+                        font: { size: 10, weight: '600' },
+                        color: function(ctx) { return ctx.dataset.borderColor; },
+                        formatter: function(v) { return v; }
                     }
                 },
+                layout: { padding: { top: 20 } },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        grace: '15%',
                         ticks: { stepSize: 1, font: { size: 11 }, color: '#94a3b8' },
                         grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
                         border: { display: false }
@@ -2344,22 +2359,30 @@
         tempCanvas.height = 660;
         var tempChart = new Chart(tempCanvas, {
             type: 'line',
+            plugins: [ChartDataLabels],
             data: JSON.parse(JSON.stringify(_attendanceChart.data)),
             options: {
                 responsive: false,
                 maintainAspectRatio: false,
                 animation: false,
                 interaction: { mode: 'index', intersect: false },
+                layout: { padding: { top: 24 } },
                 plugins: {
                     legend: {
                         position: 'bottom',
                         labels: { boxWidth: 12, boxHeight: 12, borderRadius: 6, useBorderRadius: true, padding: 24, font: { size: 14, weight: '500' }, color: '#1e293b' }
                     },
-                    tooltip: { enabled: false }
+                    tooltip: { enabled: false },
+                    datalabels: {
+                        display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0 && !ctx.dataset.hidden; },
+                        anchor: 'end', align: 'top', offset: 2,
+                        font: { size: 12, weight: '600' },
+                        color: function(ctx) { return ctx.dataset.borderColor; }
+                    }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
+                        beginAtZero: true, grace: '15%',
                         ticks: { stepSize: 1, font: { size: 13 }, color: '#64748b' },
                         grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false },
                         border: { display: false }

@@ -16,7 +16,13 @@ class AkunController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('pegawai.akun', compact('user'));
+
+        $allPegawai = collect();
+        if (in_array($user->role, ['admin', 'superadmin'])) {
+            $allPegawai = \App\Models\User::nonTester()->orderBy('name')->get(['id', 'name', 'nip']);
+        }
+
+        return view('pegawai.akun', compact('user', 'allPegawai'));
     }
 
     /**

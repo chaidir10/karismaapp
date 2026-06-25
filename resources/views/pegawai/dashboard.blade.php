@@ -12,9 +12,9 @@
         $actualMasukTime = \Carbon\Carbon::parse($jamMasukHariIni);
         $timerStart = $actualMasukTime->gt($jadwalMasukTime) ? $actualMasukTime : $jadwalMasukTime;
         $timerEnd = $pulangRec ? \Carbon\Carbon::parse($pulangRec->jam) : now();
-        $elapsedSec = max(0, $timerEnd->diffInSeconds($timerStart));
+        $elapsedSec = abs($timerEnd->diffInSeconds($timerStart));
         $elapsedStr = sprintf('%02d:%02d:%02d', floor($elapsedSec/3600), floor(($elapsedSec%3600)/60), $elapsedSec%60);
-        $targetSec = max(0, \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
+        $targetSec = abs(\Carbon\Carbon::parse($jadwalKerjaHariIni['jam_pulang'])->diffInSeconds($jadwalMasukTime));
         if ($targetSec <= 0) $targetSec = 8 * 3600;
         $isFulfilled = $elapsedSec >= $targetSec;
         $timerColor = $pulangRec ? 'timer-blue' : ($isFulfilled ? 'timer-green' : 'timer-yellow');
@@ -410,21 +410,6 @@
 </div>
 @endforeach
 
-{{-- ═══════════ MODAL PERINGATAN JAM KERJA ═══════════ --}}
-<div id="earlyPulangModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)App.closeModal('earlyPulangModal')">
-    <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
-        <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-            <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--warning);"></i>
-        </div>
-        <h5 style="font-weight:700; font-size:16px; margin-bottom:8px; color:var(--dark);">Jam Kerja Belum Terpenuhi</h5>
-        <p style="font-size:13px; color:var(--gray); margin-bottom:16px;" id="earlyPulangMsg">Apakah Anda yakin ingin absen pulang?</p>
-        <div style="display:flex; gap:10px;">
-            <button onclick="App.closeModal('earlyPulangModal')" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-weight:600; font-size:14px; cursor:pointer;">Batal</button>
-            <button onclick="App.confirmEarlyPulang()" style="flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-weight:600; font-size:14px; cursor:pointer;">Ya, Pulang</button>
-        </div>
-    </div>
-</div>
-
 {{-- ═══════════ MODAL KONFIRMASI LEMBUR ═══════════ --}}
 <div id="confirmLemburModal" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;" onclick="if(event.target===this)App.closeModal('confirmLemburModal')">
     <div style="background:var(--card-bg); border-radius:20px; padding:24px; width:90%; max-width:340px; text-align:center;">
@@ -700,17 +685,11 @@
 
             if (!state.workTimerFulfilled) {
                 var clockEl = $('workTimerClock');
-                var msg = $('earlyPulangMsg');
-                if (msg) msg.textContent = 'Jam kerja hari ini belum terpenuhi (' + (clockEl ? clockEl.textContent : '') + '). Apakah yakin ingin absen pulang?';
-                App.openModal('earlyPulangModal');
-            } else {
-                App.openPresensi();
+                var waktu = clockEl ? clockEl.textContent : '';
+                showPgToast('Jam kerja belum terpenuhi (' + waktu + ')', 'warning', 'Peringatan');
             }
-        },
 
-        confirmEarlyPulang: function() {
-            App.closeModal('earlyPulangModal');
-            setTimeout(function() { App.openPresensi(); }, 350);
+            App.openPresensi();
         },
 
         openLemburConfirm: function() {
@@ -1322,23 +1301,24 @@
         if (_initialized) return;
         _initialized = true;
 
-        Carousel.init();
-        startWorkTimer();
-        startLemburTimer();
-        initDetailModals();
-        initNetworkDetection();
-        initReminders();
-
-        // Hide badges pengumuman yang sudah dibaca
-        var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
-        read.forEach(function(id) { var b = $('badgeBaru' + id); if (b) b.style.display = 'none'; });
-
-        // Bind presensi modal
+        // Bind presensi modal PERTAMA — ini yang paling kritis
         var presensiModal = $('presensiModal');
         if (presensiModal) {
             presensiModal.addEventListener('shown.bs.modal', Presensi.initModal);
             presensiModal.addEventListener('hidden.bs.modal', Presensi.cleanupModal);
         }
+
+        // Timer & fitur lain dibungkus try-catch — jangan sampai crash menghalangi presensi
+        try { Carousel.init(); } catch(e) { console.error('Carousel init error:', e); }
+        try { startWorkTimer(); } catch(e) { console.error('WorkTimer error:', e); }
+        try { startLemburTimer(); } catch(e) { console.error('LemburTimer error:', e); }
+        try { initDetailModals(); } catch(e) { console.error('DetailModals error:', e); }
+        try { initNetworkDetection(); } catch(e) { console.error('Network error:', e); }
+        try { initReminders(); } catch(e) { console.error('Reminders error:', e); }
+
+        // Hide badges pengumuman yang sudah dibaca
+        var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
+        read.forEach(function(id) { var b = $('badgeBaru' + id); if (b) b.style.display = 'none'; });
     }
 
     if (document.readyState === 'loading') {
