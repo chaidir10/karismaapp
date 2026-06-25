@@ -158,6 +158,38 @@ class AkunController extends Controller
         return response()->json(['ok' => true, 'message' => $count . ' data presensi dihapus']);
     }
 
+    public function simulasiTerpenuhi(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_tester) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $today = now()->format('Y-m-d');
+        $jadwal = $user->getJadwalKerja($today);
+        $jamMasuk = $jadwal['jam_masuk'];
+        $jamPulang = $jadwal['jam_pulang'];
+
+        $durasiDetik = abs(strtotime($jamPulang) - strtotime($jamMasuk));
+        $masukSimulasi = now()->subSeconds($durasiDetik + 1800)->format('H:i:s');
+
+        $presensi = \App\Models\Presensi::updateOrCreate(
+            ['user_id' => $user->id, 'tanggal' => $today, 'jenis' => 'masuk', 'is_lembur' => false],
+            ['jam' => $masukSimulasi, 'status' => 'approved', 'lokasi' => null, 'foto' => null]
+        );
+
+        \App\Models\Presensi::where('user_id', $user->id)
+            ->where('tanggal', $today)
+            ->where('jenis', 'pulang')
+            ->where('is_lembur', false)
+            ->delete();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Masuk di-set ke ' . \Carbon\Carbon::parse($masukSimulasi)->format('H:i') . ' — jam kerja terpenuhi, siap pulang'
+        ]);
+    }
+
     public function updateJamPresensi(Request $request)
     {
         $user = Auth::user();

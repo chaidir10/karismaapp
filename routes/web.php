@@ -148,6 +148,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::post('/akun/save-setting', [AkunController::class, 'saveSetting'])->name('akun.save-setting');
         Route::post('/akun/reset-presensi', [AkunController::class, 'resetPresensi'])->name('akun.reset-presensi');
         Route::post('/akun/update-jam', [AkunController::class, 'updateJamPresensi'])->name('akun.update-jam');
+        Route::post('/akun/simulasi-terpenuhi', [AkunController::class, 'simulasiTerpenuhi'])->name('akun.simulasi-terpenuhi');
         Route::post('/akun/set-wilayah', [AkunController::class, 'setWilayah'])->name('akun.set-wilayah');
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
     });

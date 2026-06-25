@@ -338,6 +338,19 @@
                 </div>
                 <div id="resetStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
             </div>
+            <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.08); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-forward-fast"></i></div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Simulasi Jam Terpenuhi</p>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Buat presensi masuk seolah sudah kerja penuh</p>
+                    </div>
+                </div>
+                <button type="button" onclick="simulasiJamTerpenuhi()" style="width:100%; padding:11px; border-radius:10px; border:none; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                    <i class="fas fa-play"></i> Set Masuk 9 Jam Lalu (Siap Pulang)
+                </button>
+                <div id="simulasiStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
+            </div>
             @php
                 $testerPresensiHariIni = \App\Models\Presensi::where('user_id', $user->id)
                     ->where('tanggal', now()->format('Y-m-d'))
@@ -967,6 +980,26 @@
         })
         .catch(function() {
             if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
+        });
+    }
+
+    function simulasiJamTerpenuhi() {
+        var statusEl = document.getElementById('simulasiStatus');
+        fetch('/pegawai/akun/simulasi-terpenuhi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.ok) {
+                if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#10b981'; statusEl.textContent = d.message; }
+                setTimeout(function() { location.reload(); }, 1500);
+            } else {
+                if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = d.message || 'Gagal'; }
+            }
+        })
+        .catch(function() {
+            if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal menghubungi server'; }
         });
     }
 
