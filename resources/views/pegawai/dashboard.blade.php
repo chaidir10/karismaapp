@@ -1021,9 +1021,13 @@
         tryFaceApi: function(video, btn, statusEl) {
             if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat model...'; }
             if (typeof faceapi !== 'undefined') {
+                var faceApiTimeout = setTimeout(function() {
+                    if (!state.faceActive) Presensi.showFaceError(statusEl);
+                }, 15000);
                 (async function() {
                     try {
                         await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/');
+                        clearTimeout(faceApiTimeout);
                         state.faceActive = true;
                         var opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 });
                         state.faceTimer = setInterval(async function() {
@@ -1037,7 +1041,7 @@
                             } catch(e) {}
                             state.faceDetecting = false;
                         }, 500);
-                    } catch(e) { Presensi.showFaceError(statusEl); }
+                    } catch(e) { clearTimeout(faceApiTimeout); Presensi.showFaceError(statusEl); }
                 })();
                 return;
             }
@@ -1046,6 +1050,7 @@
 
         showFaceError: function(statusEl) {
             Presensi.stopFace();
+            reportDeviceIssue('face_detection_error');
             var btn = $('btnCapture');
             if (btn) btn.disabled = true;
             if (statusEl) { statusEl.className = 'face-status no-face'; statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Face detection gagal. <span onclick="location.reload()" style="text-decoration:underline;cursor:pointer;font-weight:700;">Refresh</span>'; }

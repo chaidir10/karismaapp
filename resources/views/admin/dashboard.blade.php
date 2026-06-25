@@ -754,7 +754,7 @@
                 <i class="fas fa-user-check"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $jumlahHadir ?? 0 }}</h3>
+                <h3 class="stat-value" id="statHadir">{{ $jumlahHadir ?? 0 }}</h3>
                 <p class="stat-label">Hadir Hari Ini</p>
             </div>
         </a>
@@ -763,7 +763,7 @@
                 <i class="fas fa-user-group"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $jumlahPegawai ?? 0 }}</h3>
+                <h3 class="stat-value" id="statPegawai">{{ $jumlahPegawai ?? 0 }}</h3>
                 <p class="stat-label">Total Pegawai</p>
             </div>
         </a>
@@ -772,7 +772,7 @@
                 <i class="fas fa-paper-plane"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $jumlahPengajuan ?? 0 }}</h3>
+                <h3 class="stat-value" id="statPengajuan">{{ $jumlahPengajuan ?? 0 }}</h3>
                 <p class="stat-label">Pengajuan Pending</p>
             </div>
         </a>
@@ -781,11 +781,17 @@
                 <i class="fas fa-bolt"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $lemburHariIni->where('jenis','masuk')->count() }}</h3>
+                <h3 class="stat-value" id="statLembur">{{ $lemburHariIni->where('jenis','masuk')->count() }}</h3>
                 <p class="stat-label">Lembur Hari Ini</p>
             </div>
         </a>
     </div>
+    <div id="liveIndicator" style="display:flex; align-items:center; gap:6px; margin-bottom:16px; font-size:11px; color:var(--dm-muted,#64748b);">
+        <span style="width:6px; height:6px; border-radius:50%; background:#10b981; animation:livePulse 2s infinite;"></span>
+        <span>Live — update otomatis tiap 30 detik</span>
+        <span id="lastUpdated" style="margin-left:auto; font-size:10px;"></span>
+    </div>
+    <style>@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}</style>
 
     {{-- Grafik + Performa --}}
     <div class="chart-performa-grid" style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px;">
@@ -2411,6 +2417,52 @@
     document.addEventListener('DOMContentLoaded', function() {
         buildChart(@json($chartLabels), @json($chartHadir), @json($chartTelat), @json($chartLembur), @json($chartDaruratMasuk), @json($chartDaruratPulang));
     });
+
+    // ══════════════════════════════════════════════════════════════
+    // AUTO-REFRESH — polling tiap 30 detik
+    // ══════════════════════════════════════════════════════════════
+    (function() {
+        function updateTimestamp() {
+            var el = document.getElementById('lastUpdated');
+            if (el) el.textContent = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        }
+
+        function animateValue(el, newVal) {
+            var old = parseInt(el.textContent) || 0;
+            if (old === newVal) return;
+            el.textContent = newVal;
+            el.style.transition = 'none';
+            el.style.transform = 'scale(1.2)';
+            el.style.color = newVal > old ? '#10b981' : '#ef4444';
+            setTimeout(function() {
+                el.style.transition = 'transform 0.3s, color 0.3s';
+                el.style.transform = 'scale(1)';
+                el.style.color = '';
+            }, 50);
+        }
+
+        function refreshDashboard() {
+            fetch('/admin/dashboard/data', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    if (!res.success) return;
+                    var d = res.data;
+
+                    var h = document.getElementById('statHadir');
+                    var p = document.getElementById('statPegawai');
+                    var q = document.getElementById('statPengajuan');
+                    if (h) animateValue(h, d.jumlahHadir);
+                    if (p) animateValue(p, d.jumlahPegawai);
+                    if (q) animateValue(q, d.jumlahPengajuan);
+
+                    updateTimestamp();
+                })
+                .catch(function() {});
+        }
+
+        updateTimestamp();
+        setInterval(refreshDashboard, 30000);
+    })();
 </script>
 
 @endsection

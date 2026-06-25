@@ -45,6 +45,7 @@ class DeviceIssue extends Model
             'camera_error' => 'Kamera Gagal',
             'location_blocked' => 'Lokasi Diblokir',
             'location_error' => 'Lokasi Gagal',
+            'face_detection_error' => 'Face Detection Gagal',
             default => $type,
         };
     }
@@ -54,6 +55,7 @@ class DeviceIssue extends Model
         return match ($type) {
             'camera_blocked', 'camera_error' => ['icon' => 'fa-camera', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)'],
             'location_blocked', 'location_error' => ['icon' => 'fa-location-dot', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
+            'face_detection_error' => ['icon' => 'fa-face-meh', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)'],
             default => ['icon' => 'fa-circle-exclamation', 'color' => '#64748b', 'bg' => 'rgba(100,116,139,0.1)'],
         };
     }

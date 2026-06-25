@@ -51,7 +51,7 @@ class DeviceIssueController extends Controller
     public static function report(Request $request)
     {
         $request->validate([
-            'type' => 'required|string|in:camera_blocked,camera_error,location_blocked,location_error',
+            'type' => 'required|string|in:camera_blocked,camera_error,location_blocked,location_error,face_detection_error',
         ]);
 
         DeviceIssue::report(
