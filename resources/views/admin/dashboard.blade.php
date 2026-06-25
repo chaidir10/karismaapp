@@ -2294,7 +2294,7 @@
                     },
                     datalabels: {
                         display: function(ctx) {
-                            return ctx.dataset.data[ctx.dataIndex] > 0 && !ctx.dataset.hidden && labels.length <= 31;
+                            return ctx.dataset.data[ctx.dataIndex] > 0 && ctx.chart.isDatasetVisible(ctx.datasetIndex) && labels.length <= 31;
                         },
                         anchor: 'end',
                         align: 'top',
@@ -2380,7 +2380,7 @@
                     },
                     tooltip: { enabled: false },
                     datalabels: {
-                        display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0 && !ctx.dataset.hidden; },
+                        display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0 && ctx.chart.isDatasetVisible(ctx.datasetIndex); },
                         anchor: 'end', align: 'top', offset: 2,
                         font: { size: 12, weight: '600' },
                         color: function(ctx) { return ctx.dataset.borderColor; }
