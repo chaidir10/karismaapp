@@ -988,6 +988,7 @@
     }
     function doResetPresensi(type) {
         var statusEl = document.getElementById('resetStatus');
+        if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = 'var(--gray)'; statusEl.textContent = 'Mereset...'; }
         fetch('/pegawai/akun/reset-presensi', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
@@ -995,14 +996,15 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(d) {
-            if (statusEl) {
-                statusEl.style.display = 'block';
-                statusEl.textContent = d.message || 'Berhasil direset';
-                setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+            if (d.ok) {
+                showPgToast(d.message || 'Berhasil direset', 'success');
+                setTimeout(function() { location.reload(); }, 1000);
+            } else {
+                if (statusEl) { statusEl.style.color = '#ef4444'; statusEl.textContent = d.error || 'Gagal'; }
             }
         })
         .catch(function() {
-            if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
+            if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal menghubungi server'; }
         });
     }
 
