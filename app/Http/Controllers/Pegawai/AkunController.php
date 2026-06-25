@@ -118,6 +118,7 @@ class AkunController extends Controller
             'face_detection_mode',
             'face_detection_users',
             'require_masuk_before_pulang',
+            'enable_work_timer',
             'enable_absen_darurat',
             'absen_darurat_mode',
             'absen_darurat_users',
@@ -167,13 +168,37 @@ class AkunController extends Controller
 
         $today = now()->format('Y-m-d');
         $jadwal = $user->getJadwalKerja($today);
-        $jamMasuk = $jadwal['jam_masuk'];
-        $jamPulang = $jadwal['jam_pulang'];
+        $jamMasukJadwal = $jadwal['jam_masuk'];
+        $jamPulangJadwal = $jadwal['jam_pulang'];
+        $mode = $request->input('mode', 'terpenuhi');
 
-        $durasiDetik = abs(strtotime($jamPulang) - strtotime($jamMasuk));
-        $masukSimulasi = now()->subSeconds($durasiDetik + 1800)->format('H:i:s');
+        if ($mode === 'jadwal') {
+            $masukSimulasi = $jamMasukJadwal;
+            $label = 'jam jadwal (' . \Carbon\Carbon::parse($masukSimulasi)->format('H:i') . ')';
+        } elseif ($mode === 'custom') {
+            $jam = $request->input('jam');
+            if (!$jam) {
+                return response()->json(['ok' => false, 'message' => 'Jam tidak valid'], 422);
+            }
+            $masukSimulasi = $jam . ':00';
+            $label = \Carbon\Carbon::parse($masukSimulasi)->format('H:i');
+        } else {
+            $durasiDetik = abs(strtotime($jamPulangJadwal) - strtotime($jamMasukJadwal));
+            $jadwalStart = \Carbon\Carbon::parse($jamMasukJadwal);
+            $elapsedFromJadwal = abs(now()->diffInSeconds($jadwalStart));
+            if ($elapsedFromJadwal >= $durasiDetik) {
+                $masukSimulasi = $jamMasukJadwal;
+                $label = \Carbon\Carbon::parse($masukSimulasi)->format('H:i') . ' — jam terpenuhi, siap pulang';
+            } else {
+                $sisa = $durasiDetik - $elapsedFromJadwal;
+                $sisaJam = floor($sisa / 3600);
+                $sisaMenit = floor(($sisa % 3600) / 60);
+                $masukSimulasi = $jamMasukJadwal;
+                $label = 'Masuk di-set ke ' . \Carbon\Carbon::parse($masukSimulasi)->format('H:i') . ' — terpenuhi dalam ' . ($sisaJam > 0 ? $sisaJam . 'j ' : '') . $sisaMenit . 'm lagi';
+            }
+        }
 
-        $presensi = \App\Models\Presensi::updateOrCreate(
+        \App\Models\Presensi::updateOrCreate(
             ['user_id' => $user->id, 'tanggal' => $today, 'jenis' => 'masuk', 'is_lembur' => false],
             ['jam' => $masukSimulasi, 'status' => 'approved', 'lokasi' => null, 'foto' => null]
         );
@@ -184,10 +209,7 @@ class AkunController extends Controller
             ->where('is_lembur', false)
             ->delete();
 
-        return response()->json([
-            'ok' => true,
-            'message' => 'Masuk di-set ke ' . \Carbon\Carbon::parse($masukSimulasi)->format('H:i') . ' — jam kerja terpenuhi, siap pulang'
-        ]);
+        return response()->json(['ok' => true, 'message' => 'Masuk di-set ke ' . $label]);
     }
 
     public function updateJamPresensi(Request $request)

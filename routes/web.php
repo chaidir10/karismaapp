@@ -286,6 +286,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             \App\Models\AppSetting::setValue('face_detection_users_except', json_encode($request->input('face_detection_users_except', [])));
             \App\Models\AppSetting::setValue('face_detection_users_only', json_encode($request->input('face_detection_users_only', [])));
             \App\Models\AppSetting::setValue('require_masuk_before_pulang', $request->boolean('require_masuk_before_pulang') ? '1' : '0');
+            \App\Models\AppSetting::setValue('enable_work_timer', $request->boolean('enable_work_timer') ? '1' : '0');
             \App\Models\AppSetting::setValue('enable_absen_darurat', $request->boolean('enable_absen_darurat') ? '1' : '0');
             \App\Models\AppSetting::setValue('absen_darurat_mode', $request->input('absen_darurat_mode', 'all'));
             \App\Models\AppSetting::setValue('absen_darurat_users_except', json_encode($request->input('absen_darurat_users_except', [])));

@@ -342,13 +342,21 @@
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
                     <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.08); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-forward-fast"></i></div>
                     <div style="flex:1; min-width:0;">
-                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Simulasi Jam Terpenuhi</p>
-                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Buat presensi masuk seolah sudah kerja penuh</p>
+                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Simulasi Presensi Masuk</p>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Set jam masuk ke waktu tertentu untuk test</p>
                     </div>
                 </div>
-                <button type="button" onclick="simulasiJamTerpenuhi()" style="width:100%; padding:11px; border-radius:10px; border:none; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
-                    <i class="fas fa-play"></i> Set Masuk 9 Jam Lalu (Siap Pulang)
-                </button>
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <button type="button" onclick="simulasiMasuk('jadwal')" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--dark); font-size:11px; font-weight:600; cursor:pointer;"><i class="fas fa-clock" style="color:#3b82f6; margin-right:4px;"></i> Jam Jadwal</button>
+                    <button type="button" onclick="simulasiMasuk('terpenuhi')" style="flex:1; padding:10px; border-radius:10px; border:none; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-size:11px; font-weight:600; cursor:pointer;"><i class="fas fa-check" style="margin-right:4px;"></i> Jam Terpenuhi</button>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:11px; color:var(--gray); white-space:nowrap;">Custom:</span>
+                    <div class="k-time-wrap" style="flex:1;">
+                        <input type="time" id="simulasiJamCustom" value="07:30" style="padding:8px 30px 8px 10px; font-size:13px; border-radius:8px;">
+                    </div>
+                    <button type="button" onclick="simulasiMasuk('custom')" style="padding:8px 14px; border-radius:8px; border:none; background:var(--primary); color:#fff; font-size:11px; font-weight:600; cursor:pointer;">Set</button>
+                </div>
                 <div id="simulasiStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
             </div>
             @php
@@ -452,6 +460,7 @@
         $s_faceExcept = json_decode($AS::getValue('face_detection_users_except', '[]'), true) ?: [];
         $s_faceOnly = json_decode($AS::getValue('face_detection_users_only', '[]'), true) ?: [];
         $s_masukDulu = $AS::getBool('require_masuk_before_pulang', true);
+        $s_timer = $AS::getBool('enable_work_timer', true);
         $s_darurat = $AS::getBool('enable_absen_darurat', false);
         $s_daruratMode = $AS::getValue('absen_darurat_mode', 'all');
         $s_daruratExcept = json_decode($AS::getValue('absen_darurat_users_except', '[]'), true) ?: [];
@@ -524,6 +533,20 @@
                         </div>
                     </div>
                     <label class="akun-toggle"><input type="checkbox" data-key="require_masuk_before_pulang" {{ $s_masukDulu ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
+                </div>
+            </div>
+
+            {{-- Timer Jam Kerja --}}
+            <div style="padding:14px 16px; border-bottom:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:rgba(59,130,246,0.08); color:#3b82f6; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-stopwatch"></i></div>
+                        <div style="flex:1; min-width:0;">
+                            <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Timer Jam Kerja</p>
+                            <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Tampilkan timer di dashboard. Matikan jika ganggu kamera/lokasi</p>
+                        </div>
+                    </div>
+                    <label class="akun-toggle"><input type="checkbox" data-key="enable_work_timer" {{ $s_timer ? 'checked' : '' }} onchange="saveSetting(this)"><span class="akun-toggle-track"><span class="akun-toggle-thumb"></span></span></label>
                 </div>
             </div>
 
@@ -983,11 +1006,17 @@
         });
     }
 
-    function simulasiJamTerpenuhi() {
+    function simulasiMasuk(mode) {
+        var jam = '';
+        if (mode === 'custom') {
+            jam = document.getElementById('simulasiJamCustom').value;
+            if (!jam) return;
+        }
         var statusEl = document.getElementById('simulasiStatus');
         fetch('/pegawai/akun/simulasi-terpenuhi', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ mode: mode, jam: jam })
         })
         .then(function(r) { return r.json(); })
         .then(function(d) {

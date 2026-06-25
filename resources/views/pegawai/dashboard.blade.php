@@ -4,10 +4,11 @@
 @php
     $masukDisabled = $sudahPresensiMasuk || ($disablePresensiLibur ?? false);
     $pulangDisabled = $sudahPresensiPulang || ($disablePresensiLibur ?? false);
+    $enableWorkTimer = \App\Models\AppSetting::getBool('enable_work_timer', true);
 
     $pulangRec = $riwayatHariIni->where('jenis', 'pulang')->where('is_lembur', false)->first();
 
-    if ($sudahPresensiMasuk && $jamMasukHariIni) {
+    if ($enableWorkTimer && $sudahPresensiMasuk && $jamMasukHariIni) {
         $jadwalMasukTime = \Carbon\Carbon::parse($jadwalKerjaHariIni['jam_masuk']);
         $actualMasukTime = \Carbon\Carbon::parse($jamMasukHariIni);
         $timerStart = $actualMasukTime->gt($jadwalMasukTime) ? $actualMasukTime : $jadwalMasukTime;
@@ -158,7 +159,7 @@
 </div>
 
 {{-- ═══════════ TIMER JAM KERJA ═══════════ --}}
-@if($sudahPresensiMasuk && $jamMasukHariIni)
+@if($enableWorkTimer && $sudahPresensiMasuk && $jamMasukHariIni)
 <div class="work-timer-card {{ $timerColor }}" id="workTimerBanner"
     data-stopped="{{ $pulangRec ? '1' : '0' }}"
     data-pulang-jam="{{ $pulangRec->jam ?? '' }}">
@@ -598,7 +599,7 @@
         locationWatch   : null,
         locationMarker  : null,
         workTimerInterval: null,
-        workTimerFulfilled: @json(($sudahPresensiMasuk && $jamMasukHariIni) ? ($isFulfilled ?? false) : false)
+        workTimerFulfilled: @json(!$enableWorkTimer || (($sudahPresensiMasuk && $jamMasukHariIni) ? ($isFulfilled ?? false) : false))
     };
 
     // ══════════════════════════════════════════════════════════════
