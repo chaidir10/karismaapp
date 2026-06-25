@@ -54,12 +54,14 @@
             --success-bg: rgba(52,211,153,0.08);
             --divider: rgba(255,255,255,0.06);
         }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; scrollbar-width:none; }
+        *::-webkit-scrollbar { display:none; }
+        html { height:100%; overflow:hidden; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
-            min-height: 100vh;
-            min-height: 100dvh;
+            height: 100%;
+            overflow-y: auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -190,11 +192,11 @@
         /* Success modal */
         .modal-overlay {
             position:fixed; inset:0; z-index:100;
-            background:rgba(0,0,0,0.4); display:flex;
+            background:rgba(0,0,0,0.4); display:none;
             align-items:flex-end; justify-content:center; padding:0;
             opacity:0; transition: opacity 0.2s;
         }
-        .modal-overlay.active { opacity:1; }
+        .modal-overlay.active { display:flex; opacity:1; }
         .modal-box {
             background:var(--card); border:1px solid var(--card-border);
             border-radius:20px 20px 0 0; padding:28px 24px 32px;
@@ -344,7 +346,7 @@
             document.getElementById('modalMessage').textContent = msgEl.textContent;
             var modal = document.getElementById('successModal');
             modal.style.display = 'flex';
-            requestAnimationFrame(function(){ modal.classList.add('active'); });
+            requestAnimationFrame(function(){ requestAnimationFrame(function(){ modal.classList.add('active'); }); });
         }
         function closeSuccessModal() {
             var modal = document.getElementById('successModal');

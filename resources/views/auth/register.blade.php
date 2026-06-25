@@ -54,18 +54,19 @@
             --success-bg: rgba(52,211,153,0.08);
             --divider: rgba(255,255,255,0.06);
         }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; scrollbar-width:none; }
+        *::-webkit-scrollbar { display:none; }
+        html { height:100%; overflow:hidden; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
-            min-height: 100vh;
-            min-height: 100dvh;
+            height: 100%;
+            overflow-y: auto;
             display: flex;
             align-items: flex-start;
             justify-content: center;
             padding: 16px;
             transition: background 0.3s;
-            overflow-y: auto;
         }
         body::before {
             content: '';
