@@ -131,6 +131,12 @@
                 </div>
             </div>
         </div>
+        <div style="padding:8px 16px 0;">
+            <div style="position:relative;">
+                <i class="fas fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--dm-muted,#94a3b8); font-size:12px;"></i>
+                <input type="text" id="holidaySearch" placeholder="Cari libur..." oninput="filterHolidays()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
+            </div>
+        </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
                 <thead style="background:var(--dm-bg,#f9fafb);">
@@ -143,10 +149,10 @@
                         <th class="px-4 py-3 text-right text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:120px;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
+                <tbody id="holidayBody" class="divide-y" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
                     @forelse($holidays as $i => $h)
-                    <tr id="holidayRow{{ $h->id }}" style="{{ !$h->is_active ? 'opacity:0.5;' : '' }}">
-                        <td class="px-4 py-3 text-sm" style="color:var(--dm-muted,#64748b);">{{ $holidays->firstItem() + $i }}</td>
+                    <tr id="holidayRow{{ $h->id }}" style="{{ !$h->is_active ? 'opacity:0.5;' : '' }}" data-search="{{ strtolower($h->name . ' ' . $h->date->translatedFormat('d M Y l')) }}">
+                        <td class="px-4 py-3 text-sm hnum" style="color:var(--dm-muted,#64748b);">{{ $i + 1 }}</td>
                         <td class="px-4 py-3 text-sm font-medium" style="color:var(--dm-text,#1e293b);">
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <span style="font-variant-numeric:tabular-nums;">{{ $h->date->translatedFormat('d M Y') }}</span>
@@ -178,7 +184,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr>
+                    <tr class="holiday-empty">
                         <td colspan="6" class="px-6 py-12 text-center" style="color:var(--dm-muted,#94a3b8);">
                             <i class="fas fa-calendar-xmark" style="font-size:28px; opacity:0.3; display:block; margin-bottom:8px;"></i>
                             <p class="text-sm">Belum ada data libur untuk {{ $year }}</p>
@@ -189,26 +195,10 @@
                 </tbody>
             </table>
         </div>
-        @if($holidays->hasPages())
-        <div class="px-6 py-3" style="border-top:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center; justify-content:space-between;">
-            <span class="text-xs" style="color:var(--dm-muted,#64748b);">{{ $holidays->firstItem() }}–{{ $holidays->lastItem() }} dari {{ $holidays->total() }}</span>
-            <div style="display:flex; gap:4px;">
-                @if($holidays->onFirstPage())
-                <span class="px-3 py-1.5 text-xs rounded-lg" style="color:var(--dm-muted,#94a3b8); border:1px solid var(--dm-border,#e2e8f0);">&lsaquo;</span>
-                @else
-                <a href="{{ $holidays->previousPageUrl() }}#libur" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&lsaquo;</a>
-                @endif
-                @foreach($holidays->getUrlRange(1, $holidays->lastPage()) as $page => $url)
-                <a href="{{ $url }}#libur" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="{{ $page == $holidays->currentPage() ? 'background:#3b82f6; color:#fff; border:1px solid #3b82f6;' : 'color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0);' }} text-decoration:none;">{{ $page }}</a>
-                @endforeach
-                @if($holidays->hasMorePages())
-                <a href="{{ $holidays->nextPageUrl() }}#libur" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&rsaquo;</a>
-                @else
-                <span class="px-3 py-1.5 text-xs rounded-lg" style="color:var(--dm-muted,#94a3b8); border:1px solid var(--dm-border,#e2e8f0);">&rsaquo;</span>
-                @endif
-            </div>
+        <div id="holidayPager" style="display:none; padding:10px 16px; border-top:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center; justify-content:space-between;">
+            <span id="holidayInfo" class="text-xs" style="color:var(--dm-muted,#64748b);"></span>
+            <div id="holidayPages" style="display:flex; gap:4px;"></div>
         </div>
-        @endif
     </div>
 </div>
 
@@ -682,6 +672,70 @@ function deleteHoliday(id) {
         }
     });
 }
+
+// ===================== HOLIDAY PAGINATION =====================
+var _hPage = 1, _hPerPage = 7, _hRows = [], _hFiltered = [];
+
+function initHolidayPager() {
+    var tbody = document.getElementById('holidayBody');
+    if (!tbody) return;
+    _hRows = Array.from(tbody.querySelectorAll('tr:not(.holiday-empty)'));
+    _hFiltered = _hRows.slice();
+    renderHolidayPage();
+}
+
+function filterHolidays() {
+    var q = (document.getElementById('holidaySearch').value || '').toLowerCase();
+    _hFiltered = _hRows.filter(function(r) {
+        return !q || (r.getAttribute('data-search') || '').indexOf(q) !== -1;
+    });
+    _hPage = 1;
+    renderHolidayPage();
+}
+
+function renderHolidayPage() {
+    var total = _hFiltered.length;
+    var totalPages = Math.max(1, Math.ceil(total / _hPerPage));
+    if (_hPage > totalPages) _hPage = totalPages;
+    var start = (_hPage - 1) * _hPerPage;
+    var end = start + _hPerPage;
+
+    _hRows.forEach(function(r) { r.style.display = 'none'; });
+    _hFiltered.forEach(function(r, i) {
+        r.style.display = (i >= start && i < end) ? '' : 'none';
+        var numCell = r.querySelector('.hnum');
+        if (numCell) numCell.textContent = i + 1;
+    });
+
+    var pager = document.getElementById('holidayPager');
+    var info = document.getElementById('holidayInfo');
+    var pages = document.getElementById('holidayPages');
+    if (total <= _hPerPage) {
+        pager.style.display = 'none';
+        return;
+    }
+    pager.style.display = 'flex';
+    info.textContent = (start + 1) + '–' + Math.min(end, total) + ' dari ' + total;
+
+    var html = '';
+    var btnStyle = 'padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); text-decoration:none;';
+    var btnDisabled = 'padding:4px 10px; border-radius:8px; font-size:11px; border:1px solid var(--dm-border,#e2e8f0); color:var(--dm-muted,#94a3b8); cursor:default;';
+    var btnActive = 'padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid #3b82f6; background:#3b82f6; color:#fff;';
+
+    html += _hPage > 1 ? '<button style="' + btnStyle + '" onclick="goHolidayPage(' + (_hPage-1) + ')">&lsaquo;</button>' : '<span style="' + btnDisabled + '">&lsaquo;</span>';
+    for (var p = 1; p <= totalPages; p++) {
+        html += '<button style="' + (p === _hPage ? btnActive : btnStyle) + '" onclick="goHolidayPage(' + p + ')">' + p + '</button>';
+    }
+    html += _hPage < totalPages ? '<button style="' + btnStyle + '" onclick="goHolidayPage(' + (_hPage+1) + ')">&rsaquo;</button>' : '<span style="' + btnDisabled + '">&rsaquo;</span>';
+    pages.innerHTML = html;
+}
+
+function goHolidayPage(p) {
+    _hPage = p;
+    renderHolidayPage();
+}
+
+document.addEventListener('DOMContentLoaded', initHolidayPager);
 
 function toggleHoliday(id, btn) {
     fetch('{{ url("admin/jamkerja/holiday") }}/' + id + '/toggle', { method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })

@@ -21,12 +21,10 @@ class JamKerjaController extends Controller
         $jamKerja = JamKerja::all();
         $jamShift = JamShift::all();
         $year = (int) request('year', date('Y'));
-        $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->paginate(7, ['*'], 'holiday_page');
-        $holidays->appends(['year' => $year]);
-        if ($holidays->isEmpty() && !request()->has('holiday_page')) {
+        $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->get();
+        if ($holidays->isEmpty()) {
             HolidayHelper::syncFromApi($year);
-            $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->paginate(7, ['*'], 'holiday_page');
-            $holidays->appends(['year' => $year]);
+            $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->get();
         }
         return view('admin.manajemenjamkerja', compact('jamKerja', 'jamShift', 'holidays', 'year'));
     }
