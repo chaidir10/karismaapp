@@ -204,11 +204,13 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::prefix('jamkerja')->name('jamkerja.')->group(function () {
             Route::get('/', [JamKerjaController::class, 'index'])->name('index');
 
-            // Jam kerja normal
-            Route::get('/{id}', [JamKerjaController::class, 'show'])->name('show');
-            Route::post('/', [JamKerjaController::class, 'store'])->name('store');
-            Route::put('/{id}', [JamKerjaController::class, 'update'])->name('update');
-            Route::delete('/{id}', [JamKerjaController::class, 'destroy'])->name('destroy');
+            // Hari Libur (harus sebelum /{id} agar tidak tertangkap)
+            Route::get('/holidays', [JamKerjaController::class, 'holidays'])->name('holidays');
+            Route::post('/holiday/sync', [JamKerjaController::class, 'syncHolidays'])->name('holiday.sync');
+            Route::post('/holiday', [JamKerjaController::class, 'storeHoliday'])->name('holiday.store');
+            Route::put('/holiday/{id}', [JamKerjaController::class, 'updateHoliday'])->name('holiday.update');
+            Route::delete('/holiday/{id}', [JamKerjaController::class, 'destroyHoliday'])->name('holiday.destroy');
+            Route::post('/holiday/{id}/toggle', [JamKerjaController::class, 'toggleHoliday'])->name('holiday.toggle');
 
             // Jam shift
             Route::post('/shift', [JamKerjaController::class, 'storeShift'])->name('shift.store');
@@ -216,13 +218,11 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::put('/shift/{id}', [JamKerjaController::class, 'updateShift'])->name('shift.update');
             Route::delete('/shift/{id}', [JamKerjaController::class, 'destroyShift'])->name('shift.destroy');
 
-            // Hari Libur
-            Route::get('/holidays', [JamKerjaController::class, 'holidays'])->name('holidays');
-            Route::post('/holiday/sync', [JamKerjaController::class, 'syncHolidays'])->name('holiday.sync');
-            Route::post('/holiday', [JamKerjaController::class, 'storeHoliday'])->name('holiday.store');
-            Route::put('/holiday/{id}', [JamKerjaController::class, 'updateHoliday'])->name('holiday.update');
-            Route::delete('/holiday/{id}', [JamKerjaController::class, 'destroyHoliday'])->name('holiday.destroy');
-            Route::post('/holiday/{id}/toggle', [JamKerjaController::class, 'toggleHoliday'])->name('holiday.toggle');
+            // Jam kerja normal (/{id} paling bawah)
+            Route::get('/{id}', [JamKerjaController::class, 'show'])->name('show');
+            Route::post('/', [JamKerjaController::class, 'store'])->name('store');
+            Route::put('/{id}', [JamKerjaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [JamKerjaController::class, 'destroy'])->name('destroy');
         });
 
         // --------------------
