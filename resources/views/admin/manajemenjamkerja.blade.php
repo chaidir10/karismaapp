@@ -137,9 +137,9 @@
                 <input type="text" id="holidaySearch" placeholder="Cari libur..." oninput="filterHolidays()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--dm-border,#e2e8f0); border-radius:10px; font-size:12px; background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
             </div>
         </div>
-        <div class="overflow-x-auto" style="height:420px; overflow-y:auto;">
+        <div class="overflow-x-auto" style="min-height:380px;">
             <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
-                <thead style="background:var(--dm-bg,#f9fafb); position:sticky; top:0; z-index:1;">
+                <thead style="background:var(--dm-bg,#f9fafb);">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:50px;">No</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Tanggal</th>
@@ -737,8 +737,9 @@ function goHolidayPage(p) {
 
 document.addEventListener('DOMContentLoaded', function() {
     initHolidayPager();
-    var shouldScroll = sessionStorage.getItem('scrollToLibur') || {{ session('scrollToLibur') ? 'true' : 'false' }};
-    if (shouldScroll) {
+    var fromStorage = sessionStorage.getItem('scrollToLibur');
+    var fromSession = {{ session('scrollToLibur') ? 'true' : 'false' }};
+    if (fromStorage || fromSession) {
         sessionStorage.removeItem('scrollToLibur');
         var el = document.getElementById('libur');
         if (el) setTimeout(function() { el.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
