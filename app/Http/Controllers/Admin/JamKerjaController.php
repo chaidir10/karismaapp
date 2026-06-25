@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\JamKerja;
 use App\Models\JamShift;
+use App\Models\CustomHoliday;
+use App\Helpers\HolidayHelper;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,7 +20,15 @@ class JamKerjaController extends Controller
     {
         $jamKerja = JamKerja::all();
         $jamShift = JamShift::all();
-        return view('admin.manajemenjamkerja', compact('jamKerja', 'jamShift'));
+        $year = (int) request('year', date('Y'));
+        $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->paginate(10, ['*'], 'holiday_page');
+        $holidays->appends(['year' => $year]);
+        if ($holidays->isEmpty() && !request()->has('holiday_page')) {
+            HolidayHelper::syncFromApi($year);
+            $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->paginate(10, ['*'], 'holiday_page');
+            $holidays->appends(['year' => $year]);
+        }
+        return view('admin.manajemenjamkerja', compact('jamKerja', 'jamShift', 'holidays', 'year'));
     }
 
     // =====================================================
@@ -154,5 +164,60 @@ class JamKerjaController extends Controller
         $jamShift = JamShift::findOrFail($id);
         $jamShift->delete();
         return response()->json(['success' => true]);
+    }
+
+    // =====================================================
+    // =============== HARI LIBUR ==========================
+    // =====================================================
+
+    public function syncHolidays(Request $request)
+    {
+        $year = (int) $request->input('year', date('Y'));
+        \Illuminate\Support\Facades\Cache::forget("holidays_api_{$year}");
+        $count = HolidayHelper::syncFromApi($year);
+        return redirect()->route('admin.jamkerja.index', ['year' => $year])
+            ->with('success', $count > 0 ? "{$count} libur baru disinkronkan dari API" : "Data libur {$year} sudah terbaru");
+    }
+
+    public function storeHoliday(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date|unique:custom_holidays,date',
+            'name' => 'required|string|max:255',
+        ]);
+        CustomHoliday::create([
+            'date' => $request->date,
+            'name' => $request->name,
+            'source' => 'manual',
+            'is_active' => true,
+        ]);
+        $year = \Carbon\Carbon::parse($request->date)->year;
+        return redirect()->route('admin.jamkerja.index', ['year' => $year])->with('success', 'Hari libur berhasil ditambahkan');
+    }
+
+    public function updateHoliday(Request $request, $id)
+    {
+        $holiday = CustomHoliday::findOrFail($id);
+        $request->validate([
+            'date' => 'required|date|unique:custom_holidays,date,' . $id,
+            'name' => 'required|string|max:255',
+        ]);
+        $holiday->update($request->only('date', 'name'));
+        $year = \Carbon\Carbon::parse($request->date)->year;
+        return redirect()->route('admin.jamkerja.index', ['year' => $year])->with('success', 'Hari libur berhasil diperbarui');
+    }
+
+    public function destroyHoliday($id)
+    {
+        $holiday = CustomHoliday::findOrFail($id);
+        $holiday->delete();
+        return response()->json(['success' => true]);
+    }
+
+    public function toggleHoliday($id)
+    {
+        $holiday = CustomHoliday::findOrFail($id);
+        $holiday->update(['is_active' => !$holiday->is_active]);
+        return response()->json(['success' => true, 'is_active' => $holiday->is_active]);
     }
 }

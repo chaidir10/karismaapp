@@ -101,6 +101,166 @@
     </div>
 </div>
 
+{{-- ===================== HARI LIBUR ===================== --}}
+<div class="mt-6">
+    <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
+        <div class="px-6 py-4" style="background:var(--dm-bg,#f9fafb); border-bottom:1px solid var(--dm-border,#e2e8f0);">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold" style="color:var(--dm-text,#1e293b);">
+                        <i class="fas fa-calendar-xmark" style="color:#ef4444; margin-right:6px;"></i>Hari Libur Nasional & Custom
+                    </h2>
+                    <p class="text-xs mt-1" style="color:var(--dm-muted,#64748b);">Data dari API libur nasional + jadwal custom admin</p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <form action="{{ route('admin.jamkerja.holiday.sync') }}" method="POST" class="inline" data-no-loading="true">
+                        @csrf
+                        <input type="hidden" name="year" value="{{ $year }}">
+                        <button type="submit" class="btn-header" style="font-size:11px; padding:6px 12px;">
+                            <i class="fas fa-rotate"></i> Sync API {{ $year }}
+                        </button>
+                    </form>
+                    <select onchange="window.location.href='?year='+this.value" style="padding:5px 28px 5px 10px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:12px; font-weight:600; background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-repeat:no-repeat; background-position:right 8px center;">
+                        @for($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
+                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
+                    <button onclick="openModal('modalAddHoliday')" class="btn-header" style="font-size:11px; padding:6px 12px; background:#ef4444; border-color:#ef4444;">
+                        <i class="fas fa-plus"></i> Tambah Libur
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y" style="border-color:var(--dm-border,#e2e8f0);">
+                <thead style="background:var(--dm-bg,#f9fafb);">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:50px;">No</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Nama Libur</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:80px;">Sumber</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:70px;">Status</th>
+                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:120px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
+                    @forelse($holidays as $i => $h)
+                    <tr id="holidayRow{{ $h->id }}" style="{{ !$h->is_active ? 'opacity:0.5;' : '' }}">
+                        <td class="px-4 py-3 text-sm" style="color:var(--dm-muted,#64748b);">{{ $holidays->firstItem() + $i }}</td>
+                        <td class="px-4 py-3 text-sm font-medium" style="color:var(--dm-text,#1e293b);">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-variant-numeric:tabular-nums;">{{ $h->date->translatedFormat('d M Y') }}</span>
+                                <span class="text-xs" style="color:var(--dm-muted,#94a3b8);">({{ $h->date->translatedFormat('l') }})</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm" style="color:var(--dm-text,#1e293b);">{{ $h->name }}</td>
+                        <td class="px-4 py-3 text-center">
+                            @if($h->source === 'api')
+                            <span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; background:rgba(59,130,246,0.1); color:#3b82f6;">API</span>
+                            @else
+                            <span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; background:rgba(245,158,11,0.1); color:#d97706;">Manual</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="toggleHoliday({{ $h->id }}, this)" title="{{ $h->is_active ? 'Nonaktifkan' : 'Aktifkan' }}" style="background:none; border:none; cursor:pointer; font-size:16px;">
+                                <i class="fas {{ $h->is_active ? 'fa-toggle-on' : 'fa-toggle-off' }}" style="color:{{ $h->is_active ? '#10b981' : '#94a3b8' }};"></i>
+                            </button>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <div style="display:flex; justify-content:flex-end; gap:6px;">
+                                <button onclick="editHoliday({{ $h->id }}, '{{ $h->date->format('Y-m-d') }}', '{{ addslashes($h->name) }}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(59,130,246,0.1); color:#3b82f6; border:none; cursor:pointer;">
+                                    <i class="fas fa-pen" style="font-size:10px;"></i> Edit
+                                </button>
+                                <button onclick="deleteHoliday({{ $h->id }})" class="text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; cursor:pointer;">
+                                    <i class="fas fa-trash" style="font-size:10px;"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center" style="color:var(--dm-muted,#94a3b8);">
+                            <i class="fas fa-calendar-xmark" style="font-size:28px; opacity:0.3; display:block; margin-bottom:8px;"></i>
+                            <p class="text-sm">Belum ada data libur untuk {{ $year }}</p>
+                            <p class="text-xs mt-1">Klik "Sync API {{ $year }}" untuk mengambil dari API</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if($holidays->hasPages())
+        <div class="px-6 py-3" style="border-top:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center; justify-content:space-between;">
+            <span class="text-xs" style="color:var(--dm-muted,#64748b);">{{ $holidays->firstItem() }}–{{ $holidays->lastItem() }} dari {{ $holidays->total() }}</span>
+            <div style="display:flex; gap:4px;">
+                @if($holidays->onFirstPage())
+                <span class="px-3 py-1.5 text-xs rounded-lg" style="color:var(--dm-muted,#94a3b8); border:1px solid var(--dm-border,#e2e8f0);">&lsaquo;</span>
+                @else
+                <a href="{{ $holidays->previousPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&lsaquo;</a>
+                @endif
+                @foreach($holidays->getUrlRange(1, $holidays->lastPage()) as $page => $url)
+                <a href="{{ $url }}" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="{{ $page == $holidays->currentPage() ? 'background:#3b82f6; color:#fff; border:1px solid #3b82f6;' : 'color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0);' }} text-decoration:none;">{{ $page }}</a>
+                @endforeach
+                @if($holidays->hasMorePages())
+                <a href="{{ $holidays->nextPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg font-semibold" style="color:var(--dm-text,#1e293b); border:1px solid var(--dm-border,#e2e8f0); text-decoration:none;">&rsaquo;</a>
+                @else
+                <span class="px-3 py-1.5 text-xs rounded-lg" style="color:var(--dm-muted,#94a3b8); border:1px solid var(--dm-border,#e2e8f0);">&rsaquo;</span>
+                @endif
+            </div>
+        </div>
+        @endif
+    </div>
+</div>
+
+{{-- Modal Tambah Libur --}}
+<div id="modalAddHoliday" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-8">
+    <div class="w-full max-w-md p-6 relative mx-4 my-auto" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+        <button onclick="closeModal('modalAddHoliday')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"><i class="fas fa-times"></i></button>
+        <h2 class="text-xl font-bold mb-1" style="color:var(--dm-text,#1e293b);">Tambah Hari Libur</h2>
+        <p class="mb-4 text-sm" style="color:var(--dm-muted,#64748b);">Tambahkan libur custom di luar API</p>
+        <form action="{{ route('admin.jamkerja.holiday.store') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1" style="color:var(--dm-text,#374151);">Tanggal</label>
+                <input type="date" name="date" required class="w-full px-4 py-2.5 rounded-xl text-sm" style="border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1" style="color:var(--dm-text,#374151);">Nama Libur</label>
+                <input type="text" name="name" required placeholder="Contoh: Libur Kantor" class="w-full px-4 py-2.5 rounded-xl text-sm" style="border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeModal('modalAddHoliday')" class="flex-1 py-2.5 rounded-xl text-sm font-semibold" style="border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); cursor:pointer;">Batal</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white" style="background:#ef4444; border:none; cursor:pointer;">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Edit Libur --}}
+<div id="modalEditHoliday" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-8">
+    <div class="w-full max-w-md p-6 relative mx-4 my-auto" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
+        <button onclick="closeModal('modalEditHoliday')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"><i class="fas fa-times"></i></button>
+        <h2 class="text-xl font-bold mb-1" style="color:var(--dm-text,#1e293b);">Edit Hari Libur</h2>
+        <p class="mb-4 text-sm" style="color:var(--dm-muted,#64748b);">Ubah tanggal atau nama libur</p>
+        <form id="editHolidayForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1" style="color:var(--dm-text,#374151);">Tanggal</label>
+                <input type="date" name="date" id="editHolidayDate" required class="w-full px-4 py-2.5 rounded-xl text-sm" style="border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1" style="color:var(--dm-text,#374151);">Nama Libur</label>
+                <input type="text" name="name" id="editHolidayName" required class="w-full px-4 py-2.5 rounded-xl text-sm" style="border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-bg,#f9fafb); color:var(--dm-text,#1e293b); outline:none;">
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeModal('modalEditHoliday')" class="flex-1 py-2.5 rounded-xl text-sm font-semibold" style="border:1px solid var(--dm-border,#e2e8f0); background:var(--dm-card,#fff); color:var(--dm-text,#1e293b); cursor:pointer;">Batal</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white" style="background:#3b82f6; border:none; cursor:pointer;">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{-- ===================== MODAL JAM KERJA ===================== --}}
 <!-- Tambah Jam Kerja -->
 <div id="modalAddJam" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto py-8">
@@ -364,7 +524,7 @@ function openEditModal(id){
         document.getElementById('editJamPulang').value = data.jam_pulang.slice(0,5);
         openModal('modalEditJam');
     })
-    .catch(()=> alert('Gagal mengambil data jam kerja.'));
+    .catch(function(){ showError('Gagal mengambil data jam kerja.'); });
 }
 
 document.getElementById('formEditJam').addEventListener('submit', function(e){
@@ -403,21 +563,14 @@ document.getElementById('formEditJam').addEventListener('submit', function(e){
 
 // Hapus Jam Kerja
 function deleteJam(id){
-    if(!confirm('Yakin ingin menghapus jam kerja ini?')) return;
-    
-    fetch(`{{ url('admin/jamkerja') }}/${id}`, {
-        method: 'DELETE',
-        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-    })
-    .then(res => res.json())
-    .then(data => { 
-        if(data.success) {
-            location.reload();
-        } else {
-            alert('Gagal menghapus jam kerja.');
+    showConfirm({
+        type: 'danger', title: 'Hapus Jam Kerja', message: 'Yakin ingin menghapus jam kerja ini?', confirmText: 'Ya, Hapus',
+        onConfirm: function() {
+            fetch(`{{ url('admin/jamkerja') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'} })
+            .then(r => r.json()).then(d => { if(d.success) location.reload(); else showError('Gagal menghapus jam kerja.'); })
+            .catch(function() { showError('Terjadi kesalahan.'); });
         }
-    })
-    .catch(()=> alert('Terjadi kesalahan.'));
+    });
 }
 
 // ===================== JAM SHIFT =====================
@@ -464,7 +617,7 @@ function openEditShiftModal(id){
         document.getElementById('editShiftJamPulang').value = data.jam_pulang.slice(0,5);
         openModal('modalEditShift');
     })
-    .catch(()=> alert('Gagal mengambil data shift.'));
+    .catch(function(){ showError('Gagal mengambil data shift.'); });
 }
 
 document.getElementById('formEditShift').addEventListener('submit', function(e){
@@ -503,21 +656,49 @@ document.getElementById('formEditShift').addEventListener('submit', function(e){
 
 // Hapus Shift
 function deleteShift(id){
-    if(!confirm('Yakin ingin menghapus shift ini?')) return;
-    
-    fetch(`{{ url('admin/jamkerja/shift') }}/${id}`, {
-        method: 'DELETE',
-        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-    })
-    .then(res => res.json())
-    .then(data => { 
-        if(data.success) {
-            location.reload();
-        } else {
-            alert('Gagal menghapus shift.');
+    showConfirm({
+        type: 'danger', title: 'Hapus Shift', message: 'Yakin ingin menghapus shift ini?', confirmText: 'Ya, Hapus',
+        onConfirm: function() {
+            fetch(`{{ url('admin/jamkerja/shift') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'} })
+            .then(r => r.json()).then(d => { if(d.success) location.reload(); });
         }
-    })
-    .catch(()=> alert('Terjadi kesalahan.'));
+    });
+}
+
+function editHoliday(id, date, name) {
+    document.getElementById('editHolidayForm').action = '{{ url("admin/jamkerja/holiday") }}/' + id;
+    document.getElementById('editHolidayDate').value = date;
+    document.getElementById('editHolidayName').value = name;
+    openModal('modalEditHoliday');
+}
+
+function deleteHoliday(id) {
+    showConfirm({
+        type: 'danger', icon: 'fa-calendar-xmark', title: 'Hapus Hari Libur', message: 'Yakin ingin menghapus hari libur ini?', confirmText: 'Ya, Hapus',
+        onConfirm: function() {
+            fetch('{{ url("admin/jamkerja/holiday") }}/' + id, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { if(d.success) { var row = document.getElementById('holidayRow'+id); if(row) { row.style.opacity='0'; setTimeout(function(){ location.reload(); }, 300); } } });
+        }
+    });
+}
+
+function toggleHoliday(id, btn) {
+    fetch('{{ url("admin/jamkerja/holiday") }}/' + id + '/toggle', { method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if(d.success) {
+            var icon = btn.querySelector('i');
+            var row = document.getElementById('holidayRow'+id);
+            if(d.is_active) {
+                icon.className = 'fas fa-toggle-on'; icon.style.color = '#10b981';
+                if(row) row.style.opacity = '1';
+            } else {
+                icon.className = 'fas fa-toggle-off'; icon.style.color = '#94a3b8';
+                if(row) row.style.opacity = '0.5';
+            }
+        }
+    });
 }
 </script>
 @endpush

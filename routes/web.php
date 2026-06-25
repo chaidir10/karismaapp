@@ -215,6 +215,13 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::get('/shift/{id}', [JamKerjaController::class, 'showShift'])->name('shift.show');
             Route::put('/shift/{id}', [JamKerjaController::class, 'updateShift'])->name('shift.update');
             Route::delete('/shift/{id}', [JamKerjaController::class, 'destroyShift'])->name('shift.destroy');
+
+            // Hari Libur
+            Route::post('/holiday/sync', [JamKerjaController::class, 'syncHolidays'])->name('holiday.sync');
+            Route::post('/holiday', [JamKerjaController::class, 'storeHoliday'])->name('holiday.store');
+            Route::put('/holiday/{id}', [JamKerjaController::class, 'updateHoliday'])->name('holiday.update');
+            Route::delete('/holiday/{id}', [JamKerjaController::class, 'destroyHoliday'])->name('holiday.destroy');
+            Route::post('/holiday/{id}/toggle', [JamKerjaController::class, 'toggleHoliday'])->name('holiday.toggle');
         });
 
         // --------------------

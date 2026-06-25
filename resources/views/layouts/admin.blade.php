@@ -1041,6 +1041,44 @@
         });
     </script>
 
+    <script>
+        function showSuccess(msg) { showAdminToast(msg, 'success'); }
+        function showError(msg) { showAdminToast(msg, 'error'); }
+        function showWarning(msg) { showAdminToast(msg, 'info'); }
+
+        function showConfirm(opts) {
+            var old = document.getElementById('adminConfirmOverlay');
+            if (old) old.remove();
+            var colors = {
+                warning: { bg:'rgba(245,158,11,0.1)', color:'#f59e0b', icon:'fa-exclamation-triangle', btn:'linear-gradient(135deg,#f59e0b,#d97706)' },
+                danger:  { bg:'rgba(239,68,68,0.1)', color:'#ef4444', icon:'fa-trash', btn:'linear-gradient(135deg,#ef4444,#dc2626)' },
+                success: { bg:'rgba(16,185,129,0.1)', color:'#10b981', icon:'fa-check-circle', btn:'linear-gradient(135deg,#10b981,#059669)' },
+                info:    { bg:'rgba(59,130,246,0.1)', color:'#3b82f6', icon:'fa-circle-info', btn:'linear-gradient(135deg,#3b82f6,#2563eb)' }
+            };
+            var c = colors[opts.type || 'warning'] || colors.warning;
+            var el = document.createElement('div');
+            el.id = 'adminConfirmOverlay';
+            el.style.cssText = 'display:flex;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:16px;animation:acFadeIn 0.2s ease;';
+            el.onclick = function(e) { if (e.target === el) { el.remove(); } };
+            el.innerHTML =
+                '<div style="background:var(--dm-card,#fff);border-radius:16px;padding:24px;width:100%;max-width:360px;text-align:center;animation:acSlideUp 0.25s ease;border:1px solid var(--dm-border,#e2e8f0);">' +
+                '<div style="width:52px;height:52px;border-radius:14px;background:'+c.bg+';color:'+c.color+';display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;"><i class="fas '+(opts.icon||c.icon)+'"></i></div>' +
+                '<div style="font-size:16px;font-weight:700;color:var(--dm-text,#1e293b);margin-bottom:6px;">'+(opts.title||'Konfirmasi')+'</div>' +
+                '<div style="font-size:13px;color:var(--dm-muted,#64748b);margin-bottom:18px;line-height:1.5;">'+(opts.message||'Apakah Anda yakin?')+'</div>' +
+                '<div style="display:flex;gap:10px;">' +
+                '<button class="ac-cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--dm-border,#e2e8f0);background:var(--dm-card,#fff);color:var(--dm-text,#1e293b);font-weight:600;font-size:13px;cursor:pointer;">'+(opts.cancelText||'Batal')+'</button>' +
+                '<button class="ac-ok" style="flex:1;padding:11px;border-radius:10px;border:none;background:'+c.btn+';color:#fff;font-weight:600;font-size:13px;cursor:pointer;">'+(opts.confirmText||'Ya')+'</button>' +
+                '</div></div>';
+            document.body.appendChild(el);
+            el.querySelector('.ac-cancel').onclick = function() { el.remove(); if(opts.onCancel) opts.onCancel(); };
+            el.querySelector('.ac-ok').onclick = function() { el.remove(); if(opts.onConfirm) opts.onConfirm(); };
+        }
+    </script>
+    <style>
+        @keyframes acFadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes acSlideUp{from{opacity:0;transform:translateY(12px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    </style>
+
     @stack('scripts')
 </body>
 
