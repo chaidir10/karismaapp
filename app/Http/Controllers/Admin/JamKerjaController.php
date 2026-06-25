@@ -20,13 +20,18 @@ class JamKerjaController extends Controller
     {
         $jamKerja = JamKerja::all();
         $jamShift = JamShift::all();
+        return view('admin.manajemenjamkerja', compact('jamKerja', 'jamShift'));
+    }
+
+    public function holidays()
+    {
         $year = (int) request('year', date('Y'));
         $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->get();
         if ($holidays->isEmpty()) {
             HolidayHelper::syncFromApi($year);
             $holidays = CustomHoliday::whereYear('date', $year)->orderBy('date')->get();
         }
-        return view('admin.manajemenjamkerja', compact('jamKerja', 'jamShift', 'holidays', 'year'));
+        return view('admin.holidays', compact('holidays', 'year'));
     }
 
     // =====================================================
@@ -173,7 +178,7 @@ class JamKerjaController extends Controller
         $year = (int) $request->input('year', date('Y'));
         \Illuminate\Support\Facades\Cache::forget("holidays_api_{$year}");
         $count = HolidayHelper::syncFromApi($year);
-        return redirect(route('admin.jamkerja.index', ['year' => $year]))->with('scrollToLibur', true)
+        return redirect(route('admin.jamkerja.holidays', ['year' => $year]))
             ->with('success', $count > 0 ? "{$count} libur baru disinkronkan dari API" : "Data libur {$year} sudah terbaru");
     }
 
@@ -190,7 +195,7 @@ class JamKerjaController extends Controller
             'is_active' => true,
         ]);
         $year = \Carbon\Carbon::parse($request->date)->year;
-        return redirect(route('admin.jamkerja.index', ['year' => $year]))->with('scrollToLibur', true)->with('success', 'Hari libur berhasil ditambahkan');
+        return redirect(route('admin.jamkerja.holidays', ['year' => $year]))->with('success', 'Hari libur berhasil ditambahkan');
     }
 
     public function updateHoliday(Request $request, $id)
@@ -202,7 +207,7 @@ class JamKerjaController extends Controller
         ]);
         $holiday->update($request->only('date', 'name'));
         $year = \Carbon\Carbon::parse($request->date)->year;
-        return redirect(route('admin.jamkerja.index', ['year' => $year]))->with('scrollToLibur', true)->with('success', 'Hari libur berhasil diperbarui');
+        return redirect(route('admin.jamkerja.holidays', ['year' => $year]))->with('success', 'Hari libur berhasil diperbarui');
     }
 
     public function destroyHoliday($id)

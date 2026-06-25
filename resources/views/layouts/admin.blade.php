@@ -771,8 +771,11 @@
                         <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
                             <i class="fas fa-user-group"></i> Pegawai
                         </a>
-                        <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
+                        <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif">
                             <i class="fas fa-clock"></i> Jam Kerja
+                        </a>
+                        <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif">
+                            <i class="fas fa-calendar-xmark"></i> Hari Libur
                         </a>
                         <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
                             <i class="fas fa-location-dot"></i> Lokasi
@@ -910,8 +913,11 @@
                     <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.index')) active @endif">
                         <i class="fas fa-user-group"></i> Pegawai
                     </a>
-                    <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.*')) active @endif">
+                    <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif">
                         <i class="fas fa-clock"></i> Jam Kerja
+                    </a>
+                    <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif">
+                        <i class="fas fa-calendar-xmark"></i> Hari Libur
                     </a>
                     <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif">
                         <i class="fas fa-location-dot"></i> Lokasi
