@@ -641,6 +641,17 @@
         });
     }
 
+    var _reportedIssues = {};
+    function reportDeviceIssue(type) {
+        if (_reportedIssues[type]) return;
+        _reportedIssues[type] = true;
+        fetch('/pegawai/report-device-issue', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+            body: JSON.stringify({ type: type })
+        }).catch(function() {});
+    }
+
     function reverseGeocode(lat, lng, el) {
         el.textContent = 'Mendeteksi alamat...';
         fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
@@ -855,6 +866,7 @@
             function done() {
                 if (++checks < total) return;
                 if (issues.length === 0) { onReady(); return; }
+                issues.forEach(function(i) { reportDeviceIssue(i === 'camera' ? 'camera_blocked' : 'location_blocked'); });
                 Presensi.showPermissionError(issues, onReady);
             }
             if (navigator.permissions && navigator.permissions.query) {
@@ -948,6 +960,7 @@
                 })
                 .catch(function(err) {
                     console.error('Camera error:', err);
+                    reportDeviceIssue('camera_error');
                     Presensi.showCameraError();
                 });
         },
@@ -1124,6 +1137,7 @@
                 }
             }, function() {
                 if (!state.currentPosition) {
+                    reportDeviceIssue('location_error');
                     var el = $('location-address-mini');
                     if (el) el.innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444;margin-right:4px;"></i> Gagal deteksi lokasi — <span onclick="Presensi.retryLocation()" style="text-decoration:underline;cursor:pointer;font-weight:600;">Coba lagi</span>';
                 }

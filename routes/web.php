@@ -151,6 +151,7 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
         Route::post('/akun/simulasi-terpenuhi', [AkunController::class, 'simulasiTerpenuhi'])->name('akun.simulasi-terpenuhi');
         Route::post('/akun/set-wilayah', [AkunController::class, 'setWilayah'])->name('akun.set-wilayah');
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
+        Route::post('/report-device-issue', [\App\Http\Controllers\Admin\DeviceIssueController::class, 'report'])->name('report-device-issue');
     });
 
     // --------------------
@@ -248,6 +249,13 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             Route::post('/upload-image', [PengumumanController::class, 'uploadImage'])->name('upload-image');
             Route::post('/reorder', [PengumumanController::class, 'reorder'])->name('reorder');
         });
+
+        // --------------------
+        // Kendala Perangkat
+        // --------------------
+        Route::get('/kendala-perangkat', [\App\Http\Controllers\Admin\DeviceIssueController::class, 'index'])->name('device-issues.index');
+        Route::post('/kendala-perangkat/{id}/resolve', [\App\Http\Controllers\Admin\DeviceIssueController::class, 'resolve'])->name('device-issues.resolve');
+        Route::post('/kendala-perangkat/user/{userId}/resolve', [\App\Http\Controllers\Admin\DeviceIssueController::class, 'resolveUser'])->name('device-issues.resolve-user');
 
         // --------------------
         // Pengaturan

@@ -787,7 +787,12 @@
                             <i class="fas fa-bullhorn"></i> Pengumuman
                         </a>
 
-                        <div class="sidebar-title">Pengaturan</div>
+                        <div class="sidebar-title">Sistem</div>
+                        @php $diCount = \App\Models\DeviceIssue::whereNull('resolved_at')->count(); @endphp
+                        <a href="{{ route('admin.device-issues.index') }}" class="sidebar-item @if(request()->routeIs('admin.device-issues.*')) active @endif">
+                            <i class="fas fa-mobile-screen-button"></i> Kendala Perangkat
+                            @if($diCount > 0)<span style="margin-left:auto; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; min-width:18px; text-align:center;">{{ $diCount }}</span>@endif
+                        </a>
                         <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengaturan.*')) active @endif">
                             <i class="fas fa-gear"></i> Pengaturan
                         </a>
