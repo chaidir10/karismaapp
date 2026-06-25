@@ -158,6 +158,25 @@ class AkunController extends Controller
         return response()->json(['ok' => true, 'message' => $count . ' data presensi dihapus']);
     }
 
+    public function updateJamPresensi(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_tester) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'id' => 'required|integer',
+            'jam' => 'required|date_format:H:i',
+        ]);
+
+        $presensi = \App\Models\Presensi::where('user_id', $user->id)->findOrFail($request->id);
+        $presensi->jam = $request->jam . ':00';
+        $presensi->save();
+
+        return response()->json(['ok' => true, 'message' => ucfirst($presensi->jenis) . ' diubah ke ' . $request->jam]);
+    }
+
     public function setWilayah(Request $request)
     {
         $user = Auth::user();

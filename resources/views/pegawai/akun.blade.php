@@ -338,6 +338,40 @@
                 </div>
                 <div id="resetStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
             </div>
+            @php
+                $testerPresensiHariIni = \App\Models\Presensi::where('user_id', $user->id)
+                    ->where('tanggal', now()->format('Y-m-d'))
+                    ->orderBy('is_lembur')->orderBy('jenis')
+                    ->get();
+            @endphp
+            @if($testerPresensiHariIni->count() > 0)
+            <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.08); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-pen-to-square"></i></div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px; font-weight:600; color:var(--dark); margin:0;">Ubah Jam Presensi</p>
+                        <p style="font-size:11px; color:var(--gray); margin:2px 0 0;">Edit waktu masuk/pulang hari ini</p>
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    @foreach($testerPresensiHariIni as $tp)
+                    @php
+                        $tpLabel = ($tp->is_lembur ? 'Lembur ' : '') . ucfirst($tp->jenis);
+                        $tpColor = $tp->jenis === 'masuk' ? '#3b82f6' : '#f59e0b';
+                        $tpIcon = $tp->is_lembur ? 'fa-bolt' : ($tp->jenis === 'masuk' ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket');
+                    @endphp
+                    <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--light); border-radius:10px; border:1px solid var(--card-border);">
+                        <i class="fas {{ $tpIcon }}" style="color:{{ $tpColor }}; font-size:14px; width:20px; text-align:center;"></i>
+                        <span style="font-size:12px; font-weight:600; color:var(--dark); flex:1;">{{ $tpLabel }}</span>
+                        <div class="k-time-wrap" style="width:100px;">
+                            <input type="time" value="{{ \Carbon\Carbon::parse($tp->jam)->format('H:i') }}" data-presensi-id="{{ $tp->id }}" onchange="updateJamPresensi(this)" style="padding:8px 30px 8px 10px; font-size:13px; border-radius:8px;">
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                <div id="jamStatus" style="margin-top:8px; font-size:11px; color:#10b981; text-align:center; display:none;"></div>
+            </div>
+            @endif
             <div style="padding:14px 16px; border-top:1px solid var(--card-border);">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div style="width:40px; height:40px; border-radius:10px; background:rgba(168,85,247,0.08); color:#a855f7; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fas fa-shield-halved"></i></div>
@@ -933,6 +967,30 @@
         })
         .catch(function() {
             if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal reset'; }
+        });
+    }
+
+    function updateJamPresensi(input) {
+        var id = input.getAttribute('data-presensi-id');
+        var jam = input.value;
+        if (!jam) return;
+        var statusEl = document.getElementById('jamStatus');
+        fetch('/pegawai/akun/update-jam', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ id: parseInt(id), jam: jam })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.style.color = '#10b981';
+                statusEl.textContent = d.message || 'Berhasil diubah';
+                setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+            }
+        })
+        .catch(function() {
+            if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = '#ef4444'; statusEl.textContent = 'Gagal mengubah jam'; setTimeout(function() { statusEl.style.display = 'none'; }, 3000); }
         });
     }
 
