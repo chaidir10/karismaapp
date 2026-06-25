@@ -791,7 +791,11 @@
         <span>Live — update otomatis tiap 30 detik</span>
         <span id="lastUpdated" style="margin-left:auto; font-size:10px;"></span>
     </div>
-    <style>@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}</style>
+    <style>
+        @keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        .new-data-banner:hover{background:rgba(59,130,246,0.14)!important;}
+    </style>
 
     {{-- Grafik + Performa --}}
     <div class="chart-performa-grid" style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px;">
@@ -857,10 +861,10 @@
             $prPendMasuk = collect($presensiPending ?? [])->where('jenis','masuk');
             $prPendPulang = collect($presensiPending ?? [])->where('jenis','pulang');
         @endphp
-        <div class="content-card">
+        <div class="content-card" id="presensiPendingSection">
             <div class="card-header">
                 <h2 class="card-title">Presensi Diluar Radius</h2>
-                <span class="card-badge">{{ count($presensiPending ?? []) }} menunggu</span>
+                <span class="card-badge" id="badgePresensiPending">{{ count($presensiPending ?? []) }} menunggu</span>
             </div>
             <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
                 <button type="button" class="pr-tab active" data-prtab="masuk" onclick="switchPrTab('masuk')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
@@ -928,7 +932,7 @@
         <div class="content-card" id="pengajuanPendingSection">
             <div class="card-header">
                 <h2 class="card-title">Pengajuan Pending</h2>
-                <span class="card-badge">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
+                <span class="card-badge" id="badgePengajuanPending">{{ count($pengajuanPending ?? []) + count($cutiPending ?? []) }} menunggu</span>
             </div>
             <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
                 <button type="button" class="admin-pend-tab active" data-pend="presensi" onclick="switchAdminPendTab('presensi')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
@@ -1080,7 +1084,7 @@
         <div class="content-card" id="presensiHariIniSection">
             <div class="card-header">
                 <h2 class="card-title">Daftar Presensi Hari Ini</h2>
-                <span class="card-badge">{{ count($presensiHariIni ?? []) }} aktivitas</span>
+                <span class="card-badge" id="badgePresensiHariIni">{{ count($presensiHariIni ?? []) }} aktivitas</span>
             </div>
             <div style="display:flex; gap:4px; margin:12px 16px 0; padding:3px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid var(--gray-200);">
                 <button type="button" class="hi-tab active" data-hitab="masuk" onclick="switchHiTab('masuk')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; box-shadow:0 2px 8px rgba(90,182,234,0.25), inset 0 1px 1px rgba(255,255,255,0.2); -webkit-tap-highlight-color:transparent;">
@@ -2441,6 +2445,24 @@
             }, 50);
         }
 
+        var _lastCounts = {
+            presensiHariIni: {{ count($presensiHariIni ?? []) }},
+            pengajuanPending: {{ count($pengajuanPending ?? []) }},
+            presensiPending: {{ count($presensiPending ?? []) }}
+        };
+
+        function showNewDataBanner(sectionId, msg) {
+            var section = document.getElementById(sectionId);
+            if (!section || section.querySelector('.new-data-banner')) return;
+            var banner = document.createElement('div');
+            banner.className = 'new-data-banner';
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;margin:0 16px 12px;border-radius:10px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);font-size:12px;font-weight:600;color:#3b82f6;cursor:pointer;animation:fadeSlideIn 0.3s ease;';
+            banner.innerHTML = '<i class="fas fa-rotate-right"></i> ' + msg;
+            banner.onclick = function() { location.reload(); };
+            var header = section.querySelector('.card-header');
+            if (header) header.after(banner);
+        }
+
         function refreshDashboard() {
             fetch('/admin/dashboard/data', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(function(r) { return r.json(); })
@@ -2454,6 +2476,33 @@
                     if (h) animateValue(h, d.jumlahHadir);
                     if (p) animateValue(p, d.jumlahPegawai);
                     if (q) animateValue(q, d.jumlahPengajuan);
+
+                    var newPresensi = d.presensiHariIni ? d.presensiHariIni.length : 0;
+                    var newPengajuan = d.pengajuanPending ? d.pengajuanPending.length : 0;
+                    var newPrPending = d.presensiPending ? d.presensiPending.length : 0;
+
+                    var b1 = document.getElementById('badgePresensiHariIni');
+                    if (b1) b1.textContent = newPresensi + ' aktivitas';
+                    var b2 = document.getElementById('badgePengajuanPending');
+                    if (b2) b2.textContent = newPengajuan + ' menunggu';
+                    var b3 = document.getElementById('badgePresensiPending');
+                    if (b3) b3.textContent = newPrPending + ' menunggu';
+
+                    if (newPresensi > _lastCounts.presensiHariIni) {
+                        var diff = newPresensi - _lastCounts.presensiHariIni;
+                        showNewDataBanner('presensiHariIniSection', diff + ' presensi baru — ketuk untuk muat');
+                    }
+                    if (newPengajuan > _lastCounts.pengajuanPending) {
+                        var diff = newPengajuan - _lastCounts.pengajuanPending;
+                        showNewDataBanner('pengajuanPendingSection', diff + ' pengajuan baru — ketuk untuk muat');
+                    }
+                    if (newPrPending > _lastCounts.presensiPending) {
+                        showNewDataBanner('presensiPendingSection', 'Ada presensi pending baru — ketuk untuk muat');
+                    }
+
+                    _lastCounts.presensiHariIni = newPresensi;
+                    _lastCounts.pengajuanPending = newPengajuan;
+                    _lastCounts.presensiPending = newPrPending;
 
                     updateTimestamp();
                 })
