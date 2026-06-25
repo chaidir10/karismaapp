@@ -1275,6 +1275,22 @@
                     showLoading('Mengirim...');
                 }
             });
+
+            document.addEventListener('click', function(e) {
+                var link = e.target.closest('a[href]');
+                if (!link) return;
+                var href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                if (link.getAttribute('target') === '_blank') return;
+                if (link.getAttribute('data-no-loading') === 'true') return;
+                if (link.closest('.modal, .modal-overlay, [style*="position:fixed"]')) return;
+                if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                showLoading('Memuat...');
+            });
+
+            window.addEventListener('pageshow', function(e) {
+                hideOverlay();
+            });
         })();
 
         function updateGreeting() {
