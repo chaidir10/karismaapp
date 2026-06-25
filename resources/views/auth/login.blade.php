@@ -162,6 +162,12 @@
         }
         .btn-submit:hover { background:var(--primary-hover); box-shadow:0 4px 16px rgba(46,151,212,0.3); }
         .btn-submit:active { transform:scale(0.97); }
+        .btn-submit.loading { pointer-events:none; opacity:0.8; }
+        .btn-submit.loading .btn-label { display:none; }
+        .btn-submit .btn-spinner { display:none; }
+        .btn-submit.loading .btn-spinner { display:flex; align-items:center; gap:8px; }
+        .btn-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:btnSpin 0.6s linear infinite; }
+        @keyframes btnSpin { to { transform:rotate(360deg); } }
 
         .auth-footer {
             text-align:center; padding:18px 24px;
@@ -290,8 +296,9 @@
                         @endif
                     </div>
 
-                    <button type="submit" class="btn-submit">
-                        Masuk <i class="fas fa-arrow-right"></i>
+                    <button type="submit" class="btn-submit" id="btnLogin">
+                        <span class="btn-label">Masuk <i class="fas fa-arrow-right"></i></span>
+                        <span class="btn-spinner"><span class="btn-spin"></span> Memproses...</span>
                     </button>
                 </form>
             </div>
@@ -372,6 +379,12 @@
         document.getElementById('installBtn').addEventListener('click', function() {
             if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
             this.style.display = 'none';
+        });
+
+        // Form submit loading
+        document.querySelector('form').addEventListener('submit', function() {
+            var btn = document.getElementById('btnLogin');
+            if (btn) btn.classList.add('loading');
         });
     </script>
 </body>

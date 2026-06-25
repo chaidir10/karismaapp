@@ -175,6 +175,12 @@
         }
         .btn-submit:hover { background:var(--primary-hover); box-shadow:0 4px 16px rgba(46,151,212,0.3); }
         .btn-submit:active { transform:scale(0.97); }
+        .btn-submit.loading { pointer-events:none; opacity:0.8; }
+        .btn-submit.loading .btn-label { display:none; }
+        .btn-submit .btn-spinner { display:none; }
+        .btn-submit.loading .btn-spinner { display:flex; align-items:center; gap:8px; justify-content:center; }
+        .btn-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:btnSpin 0.6s linear infinite; }
+        @keyframes btnSpin { to { transform:rotate(360deg); } }
 
         .auth-footer {
             text-align:center; padding:16px 20px;
@@ -344,8 +350,9 @@
                         @endif
                     </div>
 
-                    <button type="submit" class="btn-submit">
-                        Daftar <i class="fas fa-user-plus"></i>
+                    <button type="submit" class="btn-submit" id="btnRegister">
+                        <span class="btn-label">Daftar <i class="fas fa-user-plus"></i></span>
+                        <span class="btn-spinner"><span class="btn-spin"></span> Mendaftar...</span>
                     </button>
                 </form>
             </div>
@@ -382,6 +389,12 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(function(){});
         }
+
+        // Form submit loading
+        document.querySelector('form').addEventListener('submit', function() {
+            var btn = document.getElementById('btnRegister');
+            if (btn) btn.classList.add('loading');
+        });
     </script>
 </body>
 </html>

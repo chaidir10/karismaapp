@@ -437,24 +437,43 @@
         .loading-overlay {
             position:fixed; inset:0; z-index:9999;
             background:var(--white);
-            display:flex; justify-content:center; align-items:center;
-            opacity:0; visibility:hidden; transition:opacity 0.2s, visibility 0.2s;
+            display:flex; justify-content:center; align-items:center; flex-direction:column;
+            opacity:0; visibility:hidden; transition:opacity 0.25s, visibility 0.25s;
         }
         .loading-overlay.active { opacity:1; visibility:visible; }
-        .loading-content { display:flex; flex-direction:column; align-items:center; gap:16px; }
-        .loader-dots { display:flex; gap:8px; }
-        .loader-dots span {
-            width:10px; height:10px; border-radius:50%;
-            background:var(--primary); opacity:0.3;
-            animation:dotPulse 1.2s ease-in-out infinite;
+        .loading-content { display:flex; flex-direction:column; align-items:center; gap:20px; }
+        .loader-ring {
+            width:48px; height:48px; position:relative;
         }
-        .loader-dots span:nth-child(2) { animation-delay:0.15s; }
-        .loader-dots span:nth-child(3) { animation-delay:0.3s; }
-        @keyframes dotPulse {
-            0%, 80%, 100% { opacity:0.3; transform:scale(0.8); }
-            40% { opacity:1; transform:scale(1.1); }
+        .loader-ring::before, .loader-ring::after {
+            content:''; position:absolute; inset:0;
+            border-radius:50%; border:3px solid transparent;
         }
-        .loading-text { color:var(--gray); font-size:13px; font-weight:500; }
+        .loader-ring::before {
+            border-top-color:var(--primary); border-right-color:var(--primary);
+            animation:loaderSpin 0.8s linear infinite;
+        }
+        .loader-ring::after {
+            inset:6px;
+            border-bottom-color:var(--accent, #f59e0b); border-left-color:var(--accent, #f59e0b);
+            animation:loaderSpin 1.2s linear infinite reverse;
+        }
+        @keyframes loaderSpin { to { transform:rotate(360deg); } }
+        .loader-bar-wrap {
+            width:120px; height:3px; border-radius:3px;
+            background:var(--gray-light); overflow:hidden;
+        }
+        .loader-bar {
+            width:40%; height:100%; border-radius:3px;
+            background:linear-gradient(90deg, var(--primary), var(--accent, #f59e0b));
+            animation:loaderSlide 1.2s ease-in-out infinite;
+        }
+        @keyframes loaderSlide {
+            0% { transform:translateX(-100%); }
+            50% { transform:translateX(200%); }
+            100% { transform:translateX(-100%); }
+        }
+        .loading-text { color:var(--gray); font-size:12px; font-weight:500; letter-spacing:0.3px; }
 
 
         /* Bootstrap modal override — slide up consistently */
@@ -1209,7 +1228,8 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
-            <div class="loader-dots"><span></span><span></span><span></span></div>
+            <div class="loader-ring"></div>
+            <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
             <div class="loading-text">Memuat...</div>
         </div>
     </div>
@@ -1242,10 +1262,19 @@
             window.showLoading = function(msg) {
                 if (!overlay) return;
                 var txt = overlay.querySelector('.loading-text');
-                if (txt) txt.textContent = msg || 'Mengirim...';
+                if (txt) txt.textContent = msg || 'Memproses...';
                 overlay.classList.add('active');
             };
             window.hideLoading = hideOverlay;
+
+            document.addEventListener('submit', function(e) {
+                var form = e.target;
+                if (!form || form.getAttribute('data-no-loading') === 'true') return;
+                var btn = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (btn && !btn.disabled) {
+                    showLoading('Mengirim...');
+                }
+            });
         })();
 
         function updateGreeting() {
