@@ -33,6 +33,11 @@ class CheckRole
             return $next($request);
         }
 
+        // ✅ Superadmin bisa akses semua route admin
+        if ($userRole === 'superadmin' && in_array('admin', array_map('strtolower', $roles))) {
+            return $next($request);
+        }
+
         // ✅ Redirect fallback sesuai role & device
         if ($userRole === 'superadmin') {
             return $device === 'desktop'
