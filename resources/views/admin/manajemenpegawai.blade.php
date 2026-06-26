@@ -272,7 +272,10 @@
         <div style="padding:20px 24px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
                 <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">Email</div>
-                <div id="detailEmail" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);"></div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <span id="detailEmail" style="font-size:13px; font-weight:500; color:var(--dm-text,#1e293b);"></span>
+                    <button onclick="copyText('detailEmail', this)" title="Copy email" style="background:none; border:none; cursor:pointer; color:var(--dm-muted,#94a3b8); font-size:10px; padding:2px 4px; border-radius:4px; transition:all 0.15s;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='var(--dm-muted,#94a3b8)'"><i class="fas fa-copy"></i></button>
+                </div>
             </div>
             <div style="background:var(--dm-bg,#f9fafb); border-radius:10px; padding:10px 14px;">
                 <div style="font-size:9px; font-weight:600; color:var(--dm-muted,#94a3b8); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;">No. Telepon</div>
