@@ -254,11 +254,15 @@
         <div style="display:flex; align-items:center; gap:16px; padding:20px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
             <img id="detailFoto" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:3px solid var(--dm-border,#e2e8f0); flex-shrink:0;">
             <div style="flex:1; min-width:0;">
-                <div id="detailNama" style="font-size:18px; font-weight:700; color:var(--dm-text,#1e293b); margin-bottom:2px;"></div>
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+                    <span id="detailNama" style="font-size:18px; font-weight:700; color:var(--dm-text,#1e293b);"></span>
+                    <button onclick="copyText('detailNama', this)" title="Copy nama" style="background:none; border:none; cursor:pointer; color:var(--dm-muted,#94a3b8); font-size:12px; padding:2px 4px; border-radius:4px; transition:all 0.15s;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='var(--dm-muted,#94a3b8)'"><i class="fas fa-copy"></i></button>
+                </div>
                 <div id="detailJabatan" style="font-size:13px; color:var(--dm-muted,#64748b); margin-bottom:6px;"></div>
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                     <span id="detailJenisPegawai" class="badge badge-primary"></span>
                     <span id="detailNIP" style="font-size:11px; color:var(--dm-muted,#94a3b8);"></span>
+                    <button onclick="copyText('detailNIP', this)" title="Copy NIP" style="background:none; border:none; cursor:pointer; color:var(--dm-muted,#94a3b8); font-size:10px; padding:2px 4px; border-radius:4px; transition:all 0.15s;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='var(--dm-muted,#94a3b8)'"><i class="fas fa-copy"></i></button>
                 </div>
             </div>
             <span class="badge badge-success"><i class="fas fa-circle" style="font-size:6px;"></i> Aktif</span>
@@ -557,6 +561,18 @@
     restoreFilterState();
 
     // Modal functions with animations
+    function copyText(elId, btn) {
+        var el = document.getElementById(elId);
+        if (!el) return;
+        var text = el.textContent.replace(/^NIP:\s*/i, '').trim();
+        navigator.clipboard.writeText(text).then(function() {
+            var icon = btn.querySelector('i');
+            icon.className = 'fas fa-check';
+            btn.style.color = '#10b981';
+            setTimeout(function() { icon.className = 'fas fa-copy'; btn.style.color = 'var(--dm-muted,#94a3b8)'; }, 1500);
+        });
+    }
+
     function openModal(id) {
         var modal = document.getElementById(id);
         if (!modal) return;
