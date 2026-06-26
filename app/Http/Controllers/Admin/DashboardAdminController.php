@@ -158,81 +158,23 @@ class DashboardAdminController extends Controller
                 ->distinct('user_id')->count('user_id');
         }
 
-        // Performa pegawai bulan ini (sinkron dengan halaman Performa)
-        $startMonth = Carbon::now()->startOfMonth();
-        $endToday = Carbon::today();
-
-        $holidays = \App\Helpers\HolidayHelper::getDates($startMonth->year);
-
-        $hariKerjaBulanIni = 0;
-        for ($d = $startMonth->copy(); $d->lte($endToday); $d->addDay()) {
-            if ($d->dayOfWeek != 0 && $d->dayOfWeek != 6 && !in_array($d->format('Y-m-d'), $holidays)) {
-                $hariKerjaBulanIni++;
-            }
-        }
-
-        $allUsers = User::nonTester()->where('role', '!=', 'superadmin')->get();
-        $performaList = [];
-
-        foreach ($allUsers as $u) {
-            $presensiUser = Presensi::where('user_id', $u->id)
-                ->whereBetween('tanggal', [$startMonth->format('Y-m-d'), $endToday->format('Y-m-d')])
-                ->where('status', 'approved')->where('is_lembur', false)
-                ->get()->groupBy('tanggal');
-
-            $hadir = 0; $tepatMasuk = 0; $telat = 0; $pulangTepat = 0; $jamKerjaCukup = 0; $totalMenitKerja = 0;
-
-            for ($d = $startMonth->copy(); $d->lte($endToday); $d->addDay()) {
-                $tgl = $d->format('Y-m-d');
-                if ($d->dayOfWeek == 0 || $d->dayOfWeek == 6 || in_array($tgl, $holidays)) continue;
-
-                $dayP = $presensiUser->get($tgl);
-                if (!$dayP) continue;
-                $msk = $dayP->firstWhere('jenis', 'masuk');
-                $plg = $dayP->firstWhere('jenis', 'pulang');
-                if (!$msk || !$plg) continue;
-
-                $hadir++;
-                $jadwal = $u->getJadwalKerja($d);
-                $jmDefault = Carbon::createFromTimeString($jadwal['jam_masuk']);
-                $jpDefault = Carbon::createFromTimeString($jadwal['jam_pulang']);
-                $jmObj = Carbon::parse($msk->jam);
-                $jpObj = Carbon::parse($plg->jam);
-
-                if ($jmObj->lt($jmDefault->copy()->addMinute())) { $tepatMasuk++; } else { $telat++; }
-                if ($jpObj->gte($jpDefault)) { $pulangTepat++; }
-
-                $dStandar = abs($jmDefault->diffInMinutes($jpDefault));
-                $dAktual = abs($jmObj->copy()->setSeconds(0)->diffInMinutes($jpObj->copy()->setSeconds(0)));
-                $totalMenitKerja += $dAktual;
-                if ($dAktual >= $dStandar) { $jamKerjaCukup++; }
-            }
-
-            if ($hariKerjaBulanIni > 0) {
-                $persen = round(
-                    (($hadir / $hariKerjaBulanIni) * 25) +
-                    (($tepatMasuk / $hariKerjaBulanIni) * 30) +
-                    (($pulangTepat / $hariKerjaBulanIni) * 20) +
-                    (($jamKerjaCukup / $hariKerjaBulanIni) * 25), 1
-                );
-            } else {
-                $persen = 0;
-            }
-
-            $performaList[] = [
-                'user' => $u,
-                'hadir' => $hadir,
-                'telat' => $telat,
-                'persen' => $persen,
-                'total_menit_kerja' => $totalMenitKerja,
-            ];
-        }
-
-        usort($performaList, function ($a, $b) {
-            if ($b['persen'] != $a['persen']) return $b['persen'] <=> $a['persen'];
-            return $b['total_menit_kerja'] <=> $a['total_menit_kerja'];
-        });
-        $performaList = array_slice($performaList, 0, 10);
+        // Performa pegawai bulan ini — pakai PerformaController agar selalu sinkron
+        $performaData = app(\App\Http\Controllers\Admin\PerformaController::class)
+            ->getPerformaData((int) date('m'), (int) date('Y'));
+        $performaList = collect($performaData['performa'] ?? [])
+            ->sortByDesc('performa')
+            ->take(10)
+            ->map(function ($p) {
+                return [
+                    'user' => (object) ['name' => $p['nama'], 'nip' => $p['nip']],
+                    'hadir' => $p['hadir'],
+                    'telat' => $p['telat'],
+                    'persen' => $p['performa'],
+                    'total_menit_kerja' => $p['total_menit_kerja'],
+                ];
+            })
+            ->values()
+            ->all();
 
         return view('admin.dashboard', compact(
             'jumlahHadir',

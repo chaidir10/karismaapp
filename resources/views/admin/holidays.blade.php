@@ -76,7 +76,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Nama Libur</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:80px;">Sumber</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:70px;">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:120px;">Aksi</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:80px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y" style="background:var(--dm-card,#fff); border-color:var(--dm-border,#e2e8f0);">
@@ -103,12 +103,12 @@
                                 </button>
                             </td>
                             <td class="px-4 py-3 text-right">
-                                <div style="display:flex; justify-content:flex-end; gap:6px;">
-                                    <button onclick="editHoliday({{ $h->id }}, '{{ $h->date->format('Y-m-d') }}', '{{ addslashes($h->name) }}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(59,130,246,0.1); color:#3b82f6; border:none; cursor:pointer;">
-                                        <i class="fas fa-pen" style="font-size:10px;"></i> Edit
+                                <div style="display:flex; justify-content:flex-end; gap:4px;">
+                                    <button onclick="editHoliday({{ $h->id }}, '{{ $h->date->format('Y-m-d') }}', '{{ addslashes($h->name) }}')" style="width:30px; height:30px; border-radius:8px; background:rgba(59,130,246,0.1); color:#3b82f6; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px;" title="Edit">
+                                        <i class="fas fa-pen"></i>
                                     </button>
-                                    <button onclick="deleteHoliday({{ $h->id }})" class="text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; cursor:pointer;">
-                                        <i class="fas fa-trash" style="font-size:10px;"></i>
+                                    <button onclick="deleteHoliday({{ $h->id }})" style="width:30px; height:30px; border-radius:8px; background:rgba(239,68,68,0.1); color:#ef4444; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px;" title="Hapus">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </td>

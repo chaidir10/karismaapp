@@ -46,6 +46,11 @@ class PerformaController extends Controller
         return $pdf->download("Performa Pegawai - {$bulanNama}.pdf");
     }
 
+    public function getPerformaData($bulan, $tahun)
+    {
+        return $this->generatePerforma($bulan, $tahun);
+    }
+
     private function generatePerforma($bulan, $tahun)
     {
         $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
