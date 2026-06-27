@@ -16,7 +16,12 @@
     @stack('styles')
     <style>
         * { font-family:'Poppins',sans-serif; -webkit-text-size-adjust:100%; }
-        body { background:#f9fafb; color:#1e293b; }
+        body {
+            font-family:'Poppins',sans-serif;
+            -webkit-text-size-adjust:100%;
+            background:#f9fafb;
+            color:#1e293b;
+        }
 
         .main-container { display:flex; min-height:100vh; }
 
@@ -64,6 +69,7 @@
         .topbar-user-name { font-size:12px; font-weight:600; color:#1e293b; }
 
         .main-content { flex:1; overflow-y:auto; background:#f9fafb; }
+        .main-content > div { max-width:100%; }
 
         .logout-modal {
             display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100;
