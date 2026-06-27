@@ -83,7 +83,16 @@
                         <td style="width:40px; color:#94a3b8;">{{ $i + 1 }}</td>
                         <td>
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <div class="sa-avatar" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);">{{ strtoupper(substr($admin->name, 0, 1)) }}</div>
+                                @php
+                                    $adminFotoPath = $admin->foto_profil ? 'foto_profil/' . ltrim($admin->foto_profil, '/') : null;
+                                    $adminFotoExists = $adminFotoPath ? Storage::disk('public')->exists($adminFotoPath) : false;
+                                @endphp
+                                @if($adminFotoExists)
+                                    <img src="{{ asset('public/storage/' . $adminFotoPath) }}" alt="{{ $admin->name }}" class="sa-avatar" style="object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="sa-avatar" style="display:none; background:linear-gradient(135deg,#3b82f6,#8b5cf6);">{{ strtoupper(substr($admin->name, 0, 1)) }}</div>
+                                @else
+                                    <div class="sa-avatar" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);">{{ strtoupper(substr($admin->name, 0, 1)) }}</div>
+                                @endif
                                 <span style="font-weight:600;">{{ $admin->name }}</span>
                             </div>
                         </td>
@@ -111,7 +120,16 @@
                         <td style="width:40px; color:#94a3b8;">{{ $i + 1 }}</td>
                         <td>
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <div class="sa-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">{{ strtoupper(substr($peng->user->name ?? 'U', 0, 1)) }}</div>
+                                @php
+                                    $userFotoPath = (isset($peng->user) && $peng->user->foto_profil) ? 'foto_profil/' . ltrim($peng->user->foto_profil, '/') : null;
+                                    $userFotoExists = $userFotoPath ? Storage::disk('public')->exists($userFotoPath) : false;
+                                @endphp
+                                @if($userFotoExists)
+                                    <img src="{{ asset('public/storage/' . $userFotoPath) }}" alt="{{ $peng->user->name ?? '-' }}" class="sa-avatar" style="object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="sa-avatar" style="display:none; background:linear-gradient(135deg,#f59e0b,#ef4444);">{{ strtoupper(substr($peng->user->name ?? 'U', 0, 1)) }}</div>
+                                @else
+                                    <div class="sa-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">{{ strtoupper(substr($peng->user->name ?? 'U', 0, 1)) }}</div>
+                                @endif
                                 <span style="font-weight:600;">{{ $peng->user->name ?? '-' }}</span>
                             </div>
                         </td>

@@ -161,8 +161,13 @@
             <div class="topbar">
                 <div class="topbar-title">@yield('title')</div>
                 <div class="topbar-user">
-                    @if(Auth::user()->foto_profil && Storage::disk('public')->exists('foto_profil/' . Auth::user()->foto_profil))
-                        <img src="{{ url('public/storage/foto_profil/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    @php
+                        $fotoProfil = Auth::user()->foto_profil ?? null;
+                        $fotoPath = $fotoProfil ? 'foto_profil/' . ltrim($fotoProfil, '/') : null;
+                        $fotoExists = $fotoPath ? Storage::disk('public')->exists($fotoPath) : false;
+                    @endphp
+                    @if($fotoExists)
+                        <img src="{{ asset('public/storage/' . $fotoPath) }}" class="user-avatar" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="user-avatar" style="display:none; background:linear-gradient(135deg,#5AB6EA,#2E97D4); color:#fff; align-items:center; justify-content:center; font-size:12px; font-weight:700;">
                             {{ substr(Auth::user()->name,0,1) }}
                         </div>
