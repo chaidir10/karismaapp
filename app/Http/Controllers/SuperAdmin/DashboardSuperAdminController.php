@@ -23,11 +23,18 @@ class DashboardSuperAdminController extends Controller
         // Pengajuan pending
         $pengajuanPending = Pengajuan::where('status', 'pending')->count();
 
-        // Daftar admin
-        $admins = User::where('role', 'admin')->orderBy('name')->get();
+        // Daftar admin (paginated)
+        $admins = User::where('role', 'admin')
+            ->orderBy('name')
+            ->paginate(10, ['*'], 'admins_page')
+            ->withQueryString();
 
-        // Daftar pengajuan pending (detail)
-        $pengajuanList = Pengajuan::with('user')->where('status', 'pending')->orderBy('tanggal', 'desc')->get();
+        // Daftar pengajuan pending (detail, paginated)
+        $pengajuanList = Pengajuan::with('user')
+            ->where('status', 'pending')
+            ->orderBy('tanggal', 'desc')
+            ->paginate(10, ['*'], 'pengajuan_page')
+            ->withQueryString();
 
         return view('superadmin.dashboard', compact(
             'totalAdmin',

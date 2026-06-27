@@ -71,6 +71,31 @@
         .main-content { flex:1; overflow-y:auto; background:#f9fafb; }
         .main-content > div { max-width:100%; }
 
+        .layout-footer {
+            margin-top: 14px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, rgba(90,182,234,0.08), rgba(46,151,212,0.04));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .layout-footer strong { color:#1e293b; font-weight:700; }
+        .layout-footer .footer-chip {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:4px 8px; border-radius:999px;
+            background:rgba(90,182,234,0.12); color:#2E97D4;
+            font-weight:600; font-size:10px; white-space:nowrap;
+        }
+        @media (max-width: 640px) {
+            .layout-footer { padding:8px 10px; font-size:10px; gap:8px; }
+            .layout-footer .footer-chip { padding:3px 7px; font-size:9px; }
+        }
+
         .logout-modal {
             display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100;
             align-items:center; justify-content:center;
@@ -182,6 +207,10 @@
 
             <main class="main-content" style="padding:20px 24px;">
                 @yield('content')
+                <footer class="layout-footer">
+                    <span><strong>KARISMA Superadmin</strong> <span style="opacity:.75;">&middot; {{ now()->format('Y') }}</span></span>
+                    <span class="footer-chip"><i class="fas fa-crown"></i> Control Center</span>
+                </footer>
             </main>
         </div>
     </div>

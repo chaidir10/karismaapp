@@ -1,6 +1,7 @@
-# TODO - Perbaikan Lokasi Halaman Riwayat Pegawai
+# TODO - Update Dashboard Superadmin + Footer Layout
 
-- [x] Analisis perbedaan mekanisme deteksi alamat antara `resources/views/pegawai/dashboard.blade.php` (riwayat hari ini) dan `resources/views/pegawai/riwayat.blade.php`.
-- [x] Samakan mekanisme inisialisasi detail map/alamat di `resources/views/pegawai/riwayat.blade.php` agar stabil seperti dashboard.
-- [x] Pastikan trigger inisialisasi berjalan pada load halaman (DOMContentLoaded + fallback turbo) dan geocoding tidak stuck loading.
-- [ ] Verifikasi perubahan script agar alamat muncul untuk status approved (pakai `wilayahAlamat`) dan selain approved pakai reverse geocode.
+- [x] Tambahkan pagination untuk daftar admin di dashboard superadmin (controller + view).
+- [x] Tambahkan pagination untuk daftar pengajuan pending di dashboard superadmin (controller + view).
+- [x] Tambahkan footer modern, ringkas, dan tidak makan tempat pada layout admin.
+- [x] Tambahkan footer modern, ringkas, dan tidak makan tempat pada layout superadmin.
+- [x] Review rendering nomor urut, badge total, dan link pagination agar konsisten.

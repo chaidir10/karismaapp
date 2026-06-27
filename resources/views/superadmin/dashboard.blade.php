@@ -32,6 +32,9 @@
     .sa-badge { font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; }
     .sa-empty { padding:40px 20px; text-align:center; color:#94a3b8; }
     .sa-empty i { font-size:32px; opacity:0.3; display:block; margin-bottom:8px; }
+    .sa-pagination-wrap { padding:12px 16px; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; }
+    .sa-pagination-wrap nav > div:first-child { display:none; }
+    .sa-pagination-wrap nav > div:last-child { margin-left:auto; }
 
     .sa-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
     @media(max-width:768px) { .sa-actions { grid-template-columns:1fr; } }
@@ -73,14 +76,14 @@
         <div class="sa-card">
             <div class="sa-card-header">
                 <div class="sa-card-title"><i class="fas fa-user-shield" style="color:#3b82f6;"></i> Daftar Admin</div>
-                <span class="sa-card-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">{{ count($admins ?? []) }} admin</span>
+                <span class="sa-card-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">{{ $admins->total() ?? 0 }} admin</span>
             </div>
             <table class="sa-table">
                 <thead><tr><th>No</th><th>Nama</th><th>Email</th><th>Status</th></tr></thead>
                 <tbody>
                     @forelse($admins ?? [] as $i => $admin)
                     <tr>
-                        <td style="width:40px; color:#94a3b8;">{{ $i + 1 }}</td>
+                        <td style="width:40px; color:#94a3b8;">{{ ($admins->firstItem() ?? 1) + $i }}</td>
                         <td>
                             <div style="display:flex; align-items:center; gap:10px;">
                                 @php
@@ -104,20 +107,25 @@
                     @endforelse
                 </tbody>
             </table>
+            @if(($admins->hasPages() ?? false))
+            <div class="sa-pagination-wrap">
+                {{ $admins->links() }}
+            </div>
+            @endif
         </div>
 
         {{-- Pengajuan Pending --}}
         <div class="sa-card">
             <div class="sa-card-header">
                 <div class="sa-card-title"><i class="fas fa-paper-plane" style="color:#f59e0b;"></i> Pengajuan Pending</div>
-                <span class="sa-card-badge" style="background:rgba(245,158,11,0.1); color:#d97706;">{{ count($pengajuanList ?? []) }} menunggu</span>
+                <span class="sa-card-badge" style="background:rgba(245,158,11,0.1); color:#d97706;">{{ $pengajuanList->total() ?? 0 }} menunggu</span>
             </div>
             <table class="sa-table">
                 <thead><tr><th>No</th><th>Pegawai</th><th>Tanggal</th><th>Jenis</th></tr></thead>
                 <tbody>
                     @forelse($pengajuanList ?? [] as $i => $peng)
                     <tr>
-                        <td style="width:40px; color:#94a3b8;">{{ $i + 1 }}</td>
+                        <td style="width:40px; color:#94a3b8;">{{ ($pengajuanList->firstItem() ?? 1) + $i }}</td>
                         <td>
                             <div style="display:flex; align-items:center; gap:10px;">
                                 @php
@@ -144,6 +152,11 @@
                     @endforelse
                 </tbody>
             </table>
+            @if(($pengajuanList->hasPages() ?? false))
+            <div class="sa-pagination-wrap">
+                {{ $pengajuanList->links() }}
+            </div>
+            @endif
         </div>
     </div>
 

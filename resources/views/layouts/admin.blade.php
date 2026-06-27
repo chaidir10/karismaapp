@@ -475,6 +475,54 @@
         }
         [data-theme="dark"] .main-content { background: #0b0f19; }
 
+        .layout-footer {
+            margin-top: 14px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--dm-border, #e2e8f0);
+            background: linear-gradient(135deg, rgba(90,182,234,0.08), rgba(46,151,212,0.04));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--dm-muted, #64748b);
+        }
+        .layout-footer strong { color: var(--dm-text, #1e293b); font-weight: 700; }
+        .layout-footer .footer-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(90,182,234,0.12);
+            color: #2E97D4;
+            font-weight: 600;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .layout-footer {
+            background: linear-gradient(135deg, rgba(90,182,234,0.12), rgba(46,151,212,0.05));
+            border-color: rgba(255,255,255,0.08);
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .layout-footer strong { color: #e2e8f0; }
+        [data-theme="dark"] .layout-footer .footer-chip {
+            background: rgba(90,182,234,0.18);
+            color: #7dd3fc;
+        }
+        @media (max-width: 640px) {
+            .layout-footer {
+                padding: 8px 10px;
+                font-size: 10px;
+                gap: 8px;
+            }
+            .layout-footer .footer-chip {
+                padding: 3px 7px;
+                font-size: 9px;
+            }
+        }
+
         /* Modal Konfirmasi Logout */
         .logout-modal {
             display: none;
@@ -837,6 +885,10 @@
             <!-- Main Content -->
             <main class="main-content" style="padding:20px 24px;">
                 @yield('content')
+                <footer class="layout-footer">
+                    <span><strong>KARISMA Admin</strong> <span style="opacity:.75;">&middot; {{ now()->format('Y') }}</span></span>
+                    <span class="footer-chip"><i class="fas fa-shield-halved"></i> Secure Panel</span>
+                </footer>
             </main>
         </div>
     </div>
