@@ -14,8 +14,8 @@ class ManajemenAdminController extends Controller
      */
     public function index()
     {
-        $admins = User::where('role', 'admin')->orderBy('name')->get();
-        $users = User::where('role', '!=', 'admin')->orderBy('name')->get(); // user non-admin
+        $admins = User::whereIn('role', ['admin', 'operator'])->orderBy('name')->get();
+        $users = User::whereNotIn('role', ['admin', 'operator'])->orderBy('name')->get(); // user non-admin/operator
         return view('superadmin.manajemenadmin', compact('admins', 'users'));
     }
 
@@ -26,17 +26,22 @@ class ManajemenAdminController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
+            'role_target' => 'required|in:admin,operator',
             'can_approve_pengajuan' => 'sometimes|boolean',
         ]);
 
         $user = User::findOrFail($request->user_id);
+        $roleTarget = $request->input('role_target', 'admin');
+
         $user->update([
-            'role' => 'admin',
-            'can_approve_pengajuan' => $request->has('can_approve_pengajuan') ? true : false,
+            'role' => $roleTarget,
+            'can_approve_pengajuan' => $roleTarget === 'admin'
+                ? ($request->has('can_approve_pengajuan') ? true : false)
+                : false,
         ]);
 
         return redirect()->route('superadmin.manajemenadmin.index')
-            ->with('success', 'User berhasil dijadikan admin.');
+            ->with('success', 'User berhasil dijadikan ' . $roleTarget . '.');
     }
 
     /**
@@ -46,18 +51,31 @@ class ManajemenAdminController extends Controller
     {
         $admin = User::findOrFail($id);
 
-        // Toggle status
-        $newStatus = $request->input('can_approve_pengajuan') == 1 ? true : false;
-        $admin->update([
-            'can_approve_pengajuan' => $newStatus,
+        $request->validate([
+            'role' => 'nullable|in:admin,operator',
+            'can_approve_pengajuan' => 'nullable|boolean',
         ]);
 
+        if ($request->filled('role')) {
+            $newRole = $request->input('role');
+            $admin->role = $newRole;
+            if ($newRole === 'operator') {
+                $admin->can_approve_pengajuan = false;
+            }
+        }
+
+        if ($request->has('can_approve_pengajuan') && $admin->role === 'admin') {
+            $admin->can_approve_pengajuan = $request->input('can_approve_pengajuan') == 1 ? true : false;
+        }
+
+        $admin->save();
+
         return redirect()->route('superadmin.manajemenadmin.index')
-            ->with('success', 'Status Approve admin berhasil diperbarui.');
+            ->with('success', 'Data role/approve berhasil diperbarui.');
     }
 
     /**
-     * Hapus admin (kembalikan role menjadi pegawai)
+     * Hapus admin/operator (kembalikan role menjadi pegawai)
      */
     public function destroy($id)
     {

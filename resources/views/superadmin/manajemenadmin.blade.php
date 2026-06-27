@@ -8,8 +8,8 @@
     <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-5 shadow-lg">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Admin</h1>
-                <p class="text-blue-100 mt-1">Kelola data seluruh admin</p>
+                <h1 class="text-2xl md:text-2xl font-bold text-white">Manajemen Admin & Operator</h1>
+                <p class="text-blue-100 mt-1">Kelola data akun admin dan operator aplikasi</p>
             </div>
             <button onclick="openModal('modalTambah')" class="w-full sm:w-auto bg-white hover:bg-gray-100 text-blue-600 px-5 py-3 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md">
                 <i class="fas fa-user-plus mr-2"></i>
@@ -25,14 +25,15 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th colspan="5" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
-                            Total Admin: <span id="totalAdmin">{{ $admins->count() }}</span>
+                        <th colspan="6" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+                            Total Admin/Operator: <span id="totalAdmin">{{ $admins->count() }}</span>
                         </th>
                     </tr>
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">No</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Role</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Bisa Approve</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -43,13 +44,29 @@
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $i + 1 }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $admin->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $admin->email }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $admin->role === 'operator' ? 'bg-blue-100 text-blue-800' : 'bg-indigo-100 text-indigo-800' }}">
+                                {{ strtoupper($admin->role) }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $admin->can_approve_pengajuan ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $admin->can_approve_pengajuan ? 'Ya' : 'Tidak' }}
+                                {{ $admin->role === 'operator' ? 'Tidak (Operator)' : ($admin->can_approve_pengajuan ? 'Ya' : 'Tidak') }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <div class="flex justify-end space-x-2">
+                            <div class="flex justify-end space-x-2 flex-wrap gap-y-2">
+                                <!-- Toggle Role -->
+                                <form action="{{ route('superadmin.manajemenadmin.update', $admin->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="role" value="{{ $admin->role === 'admin' ? 'operator' : 'admin' }}">
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200 bg-blue-500 hover:bg-blue-600 text-white">
+                                        Jadi {{ $admin->role === 'admin' ? 'Operator' : 'Admin' }}
+                                    </button>
+                                </form>
+
+                                @if($admin->role === 'admin')
                                 <!-- Toggle Approve -->
                                 <form action="{{ route('superadmin.manajemenadmin.update', $admin->id) }}" method="POST" class="inline">
                                     @csrf
@@ -59,6 +76,7 @@
                                         {{ $admin->can_approve_pengajuan ? 'Non-Approve' : 'Approve' }}
                                     </button>
                                 </form>
+                                @endif
 
                                 <!-- Reset Password -->
                                 <button type="button" onclick="showConfirmResetPassword({{ $admin->id }}, '{{ $admin->name }}')" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors duration-200">
@@ -86,11 +104,19 @@
             <i class="fas fa-times"></i>
         </button>
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Tambah Admin Baru</h2>
-            <p class="text-gray-500 mt-1">Pilih user untuk dijadikan admin</p>
+            <h2 class="text-2xl font-bold text-gray-800">Tambah Admin / Operator</h2>
+            <p class="text-gray-500 mt-1">Pilih user untuk dijadikan admin atau operator</p>
         </div>
         <form action="{{ route('superadmin.manajemenadmin.store') }}" method="POST" id="formTambahAdmin">
             @csrf
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Role</label>
+                <select name="role_target" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="admin">Admin</option>
+                    <option value="operator">Operator</option>
+                </select>
+            </div>
+
             <div class="mb-5">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Pilih User</label>
                 <div class="relative">

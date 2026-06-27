@@ -46,6 +46,12 @@ class CheckRole
                 : redirect()->route('pegawai.dashboard');
         }
 
+        if ($userRole === 'operator') {
+            return $device === 'desktop'
+                ? redirect()->route('operator.dashboard')
+                : redirect()->route('pegawai.dashboard');
+        }
+
         return redirect()->route('pegawai.dashboard');
     }
 }

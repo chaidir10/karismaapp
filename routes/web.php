@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\PerformaController;
 use App\Http\Controllers\Admin\PengumumanController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
+use App\Http\Controllers\Operator\OperatorDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -309,6 +310,13 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
             \App\Models\AppSetting::setValue('absen_darurat_users_only', json_encode($request->input('absen_darurat_users_only', [])));
             return redirect()->route('admin.pengaturan.index')->with('success', 'Pengaturan berhasil disimpan');
         })->name('pengaturan.update');
+    });
+
+    // --------------------
+    // OPERATOR
+    // --------------------
+    Route::prefix('operator')->name('operator.')->middleware('checkrole:operator')->group(function () {
+        Route::get('/dashboard', [OperatorDashboardController::class, 'index'])->name('dashboard');
     });
 
     // --------------------
