@@ -345,48 +345,8 @@
         });
     }
 
-    // Maps
-    document.addEventListener('turbo:load', function() {
-        @foreach($riwayat as $tanggal => $items)
-            @foreach($items as $p)
-                @if($p->lokasi)
-                (function() {
-                    var modal = document.getElementById('detailModal{{ $p->id }}');
-                    var status = @json($p->status);
-                    if (!modal) return;
-
-                    // Init map when modal opens (non-Bootstrap)
-                    var _mapInited{{ $p->id }} = false;
-                    new MutationObserver(function() {
-                        if (modal.style.display !== 'none' && !_mapInited{{ $p->id }}) {
-                            _mapInited{{ $p->id }} = true;
-                            var coords = @json($p->lokasi).split(',');
-                            var lat = parseFloat(coords[0]);
-                            var lng = parseFloat(coords[1]);
-                            var addrEl = document.getElementById('locationAddress{{ $p->id }}');
-                            if (isNaN(lat) || isNaN(lng)) { if (addrEl) addrEl.innerHTML = '<span>Koordinat tidak valid</span>'; return; }
-                            try {
-                                var map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-                                L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(map);
-                                setTimeout(function() { try { map.invalidateSize(); } catch(e){} }, 300);
-                            } catch (e) {}
-                            if (addrEl) {
-                                if (status === 'approved' && wilayahAlamat) {
-                                    addrEl.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + wilayahAlamat;
-                                } else {
-                                    getAddressFromCoordinates(lat, lng, addrEl);
-                                }
-                            }
-                        }
-                    }).observe(modal, { attributes: true, attributeFilter: ['style'] });
-                })();
-                @endif
-            @endforeach
-        @endforeach
-    });
-
     function getAddressFromCoordinates(lat, lng, el) {
+        if (!el) return;
         el.innerHTML = '<div class="loading-address"><i class="fas fa-spinner fa-spin"></i><span>Mendeteksi alamat...</span></div>';
         fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1')
             .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
@@ -396,5 +356,70 @@
             })
             .catch(function() { el.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + lat.toFixed(6) + ', ' + lng.toFixed(6); });
     }
+
+    function initRiwayatDetailModals() {
+        @foreach($riwayat as $tanggal => $items)
+            @foreach($items as $p)
+                @if($p->lokasi)
+                (function() {
+                    var modal = document.getElementById('detailModal{{ $p->id }}');
+                    var status = @json($p->status);
+                    if (!modal) return;
+
+                    var map = null;
+                    var isOpen = false;
+
+                    var observer = new MutationObserver(function() {
+                        var opened = modal.style.display !== 'none';
+                        if (opened && !isOpen) {
+                            isOpen = true;
+
+                            var coords = @json($p->lokasi).split(',');
+                            var lat = parseFloat(coords[0]);
+                            var lng = parseFloat(coords[1]);
+                            var addrEl = document.getElementById('locationAddress{{ $p->id }}');
+
+                            if (isNaN(lat) || isNaN(lng)) {
+                                if (addrEl) addrEl.innerHTML = '<span>Koordinat tidak valid</span>';
+                                return;
+                            }
+
+                            try {
+                                if (map) { try { map.remove(); } catch(e) {} map = null; }
+                                map = L.map('mapDetail{{ $p->id }}').setView([lat, lng], 17);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                                L.marker([lat, lng], { icon: profileMarkerIcon() }).addTo(map);
+                                setTimeout(function() { try { map.invalidateSize(); } catch(e){} }, 300);
+                            } catch (e) {}
+
+                            if (addrEl) {
+                                if (status === 'approved' && wilayahAlamat) {
+                                    addrEl.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> ' + wilayahAlamat;
+                                } else {
+                                    getAddressFromCoordinates(lat, lng, addrEl);
+                                }
+                            }
+                        }
+
+                        if (!opened && isOpen) {
+                            isOpen = false;
+                            if (map) { try { map.remove(); } catch(e) {} map = null; }
+                        }
+                    });
+
+                    observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+                })();
+                @endif
+            @endforeach
+        @endforeach
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initRiwayatDetailModals);
+    } else {
+        initRiwayatDetailModals();
+    }
+
+    document.addEventListener('turbo:load', initRiwayatDetailModals);
 </script>
 @endsection
