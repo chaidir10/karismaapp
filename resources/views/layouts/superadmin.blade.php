@@ -208,8 +208,8 @@
             <main class="main-content" style="padding:20px 24px;">
                 @yield('content')
                 <footer class="layout-footer">
-                    <span><strong>KARISMA Superadmin</strong> <span style="opacity:.75;">&middot; {{ now()->format('Y') }}</span></span>
-                    <span class="footer-chip"><i class="fas fa-crown"></i> Control Center</span>
+                    <span><strong>KARISMA</strong> <span style="opacity:.75;">&middot; Pusat Kendali Superadmin &middot; {{ now()->format('Y') }}</span></span>
+                    <span class="footer-chip"><i class="fas fa-crown"></i> Tata Kelola Sistem Presensi</span>
                 </footer>
             </main>
         </div>

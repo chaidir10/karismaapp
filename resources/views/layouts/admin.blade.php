@@ -886,8 +886,8 @@
             <main class="main-content" style="padding:20px 24px;">
                 @yield('content')
                 <footer class="layout-footer">
-                    <span><strong>KARISMA Admin</strong> <span style="opacity:.75;">&middot; {{ now()->format('Y') }}</span></span>
-                    <span class="footer-chip"><i class="fas fa-shield-halved"></i> Secure Panel</span>
+                    <span><strong>KARISMA</strong> <span style="opacity:.75;">&middot; Panel Administrasi &middot; {{ now()->format('Y') }}</span></span>
+                    <span class="footer-chip"><i class="fas fa-shield-halved"></i> Sistem Manajemen Presensi</span>
                 </footer>
             </main>
         </div>
