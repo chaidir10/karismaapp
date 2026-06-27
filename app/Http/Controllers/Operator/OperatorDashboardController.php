@@ -44,8 +44,13 @@ class OperatorDashboardController extends Controller
             ->take(8)
             ->get();
 
+        $deviceIssueModel = new DeviceIssue();
+        $deviceIssueOrderColumn = in_array('created_at', $deviceIssueModel->getConnection()->getSchemaBuilder()->getColumnListing($deviceIssueModel->getTable()))
+            ? 'created_at'
+            : 'id';
+
         $deviceIssuesTerbaru = DeviceIssue::with('user')
-            ->latest()
+            ->orderByDesc($deviceIssueOrderColumn)
             ->take(8)
             ->get();
 
