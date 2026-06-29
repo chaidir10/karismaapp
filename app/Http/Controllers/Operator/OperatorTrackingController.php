@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Operator;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\User;
+use App\Models\UserLocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OperatorTrackingController extends Controller
@@ -94,5 +96,56 @@ class OperatorTrackingController extends Controller
             ->get();
 
         return view('operator.tracking-detail', compact('user', 'logs', 'devices', 'ipAddresses', 'dailyActivity'));
+    }
+
+    public function ping(Request $request)
+    {
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'accuracy' => 'nullable|numeric',
+        ]);
+
+        UserLocation::updateOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'accuracy' => $request->accuracy,
+                'updated_at' => now(),
+            ]
+        );
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function liveMap()
+    {
+        return view('operator.live-map');
+    }
+
+    public function locationsJson()
+    {
+        $locations = UserLocation::with('user:id,name,nip,jabatan,role')
+            ->whereHas('user', function ($q) {
+                $q->where('is_tester', false)->where('role', '!=', 'operator');
+            })
+            ->get()
+            ->map(function ($loc) {
+                return [
+                    'user_id' => $loc->user_id,
+                    'name' => $loc->user->name ?? '-',
+                    'nip' => $loc->user->nip ?? '-',
+                    'jabatan' => $loc->user->jabatan ?? '-',
+                    'role' => $loc->user->role ?? '-',
+                    'lat' => $loc->latitude,
+                    'lng' => $loc->longitude,
+                    'accuracy' => $loc->accuracy,
+                    'updated_at' => $loc->updated_at->format('d/m/Y H:i:s'),
+                    'minutes_ago' => $loc->updated_at->diffInMinutes(now()),
+                ];
+            });
+
+        return response()->json($locations);
     }
 }

@@ -1425,6 +1425,30 @@
         @endif
     </script>
 
+    <!-- Location ping untuk live tracking -->
+    <script>
+    (function(){
+        var pingUrl = '{{ route("pegawai.location.ping") }}';
+        var token = document.querySelector('meta[name="csrf-token"]').content;
+        function sendPing() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                fetch(pingUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': token },
+                    body: JSON.stringify({
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        accuracy: pos.coords.accuracy
+                    })
+                }).catch(function(){});
+            }, function(){}, { enableHighAccuracy: false, timeout: 10000, maximumAge: 120000 });
+        }
+        sendPing();
+        setInterval(sendPing, 300000);
+    })();
+    </script>
+
     <!-- Push scripts dari child blade -->
     @stack('scripts')
 </body>

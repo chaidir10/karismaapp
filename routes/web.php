@@ -157,6 +157,7 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
         Route::post('/akun/set-wilayah', [AkunController::class, 'setWilayah'])->name('akun.set-wilayah');
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
         Route::post('/report-device-issue', [\App\Http\Controllers\Admin\DeviceIssueController::class, 'report'])->name('report-device-issue');
+        Route::post('/location-ping', [\App\Http\Controllers\Operator\OperatorTrackingController::class, 'ping'])->name('location.ping');
     });
 
     // --------------------
@@ -336,6 +337,8 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
 
         // Tracking User
         Route::get('/tracking', [OperatorTrackingController::class, 'index'])->name('tracking.index');
+        Route::get('/tracking/live-map', [OperatorTrackingController::class, 'liveMap'])->name('tracking.live-map');
+        Route::get('/tracking/locations-json', [OperatorTrackingController::class, 'locationsJson'])->name('tracking.locations-json');
         Route::get('/tracking/{userId}', [OperatorTrackingController::class, 'detail'])->name('tracking.detail');
 
         // Akun Operator

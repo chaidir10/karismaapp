@@ -369,8 +369,11 @@
                         <a href="{{ route('operator.activity-logs.index') }}" class="sidebar-item @if(request()->routeIs('operator.activity-logs.*')) active @endif">
                             <i class="fas fa-clock-rotate-left"></i> Log Aktivitas
                         </a>
-                        <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.*')) active @endif">
+                        <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.index') || request()->routeIs('operator.tracking.detail')) active @endif">
                             <i class="fas fa-satellite-dish"></i> Tracking User
+                        </a>
+                        <a href="{{ route('operator.tracking.live-map') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.live-map')) active @endif">
+                            <i class="fas fa-map-location-dot"></i> Live Map
                         </a>
 
                         <div class="sidebar-title">Akun</div>
@@ -505,7 +508,8 @@
                     <div class="sidebar-title">Sistem</div>
                     <a href="{{ route('operator.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('operator.pengaturan.*')) active @endif"><i class="fas fa-gear"></i> Pengaturan</a>
                     <a href="{{ route('operator.activity-logs.index') }}" class="sidebar-item @if(request()->routeIs('operator.activity-logs.*')) active @endif"><i class="fas fa-clock-rotate-left"></i> Log Aktivitas</a>
-                    <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.*')) active @endif"><i class="fas fa-satellite-dish"></i> Tracking</a>
+                    <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.index') || request()->routeIs('operator.tracking.detail')) active @endif"><i class="fas fa-satellite-dish"></i> Tracking</a>
+                    <a href="{{ route('operator.tracking.live-map') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.live-map')) active @endif"><i class="fas fa-map-location-dot"></i> Live Map</a>
 
                     <div class="sidebar-title">Akun</div>
                     <a href="{{ route('operator.akun') }}" class="sidebar-item @if(request()->routeIs('operator.akun*')) active @endif"><i class="fas fa-user-pen"></i> Akun Saya</a>
