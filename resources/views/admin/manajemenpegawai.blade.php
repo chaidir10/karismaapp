@@ -47,7 +47,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="md:col-span-2">
+            <div class="md:col-span-3">
                 <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Jenis Pegawai</label>
                 <select id="filterJenis" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Jenis</option>
@@ -56,18 +56,7 @@
                     <option value="outsourcing">Outsourcing</option>
                 </select>
             </div>
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Urutkan</label>
-                <select id="sortBy" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
-                    <option value="name-asc">Nama A-Z</option>
-                    <option value="name-desc">Nama Z-A</option>
-                    <option value="nip-asc">NIP Terkecil</option>
-                    <option value="nip-desc">NIP Terbesar</option>
-                    <option value="unit-asc">Unit A-Z</option>
-                    <option value="jenis-asc">Jenis Pegawai</option>
-                </select>
-            </div>
-            <div class="md:col-span-2">
+            <div class="md:col-span-1">
                 <button id="resetFilter" class="w-full h-[42px] px-4 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-center" style="background:var(--dm-bg,#f1f5f9); color:var(--dm-text,#374151);">
                     <i class="fas fa-sync-alt mr-2"></i> Reset
                 </button>
@@ -86,11 +75,11 @@
                         </th>
                     </tr>
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">No</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Foto</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Nama</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Jabatan</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151); width:50px;">No</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151); width:60px;">Foto</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider sortable-th" style="color:var(--dm-text,#374151); cursor:pointer; user-select:none;" data-sort="name" onclick="toggleSort('name')">Nama <i class="fas fa-sort-up" style="font-size:10px; margin-left:4px; color:#2E97D4;"></i></th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider sortable-th" style="color:var(--dm-text,#374151); cursor:pointer; user-select:none;" data-sort="jabatan" onclick="toggleSort('jabatan')">Jabatan <i class="fas fa-sort" style="font-size:10px; margin-left:4px; opacity:0.3;"></i></th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider sortable-th" style="color:var(--dm-text,#374151); cursor:pointer; user-select:none;" data-sort="unit" onclick="toggleSort('unit')">Unit <i class="fas fa-sort" style="font-size:10px; margin-left:4px; opacity:0.3;"></i></th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color:var(--dm-text,#374151);">Shift</th>
                     </tr>
                 </thead>
@@ -102,7 +91,8 @@
                         data-nip="{{ $user->nip }}"
                         data-unit="{{ $user->unit_id ?? '' }}"
                         data-unit-name="{{ strtolower($user->wilayahKerja->nama ?? '') }}"
-                        data-jenis="{{ $user->jenis_pegawai }}">
+                        data-jenis="{{ $user->jenis_pegawai }}"
+                        data-jabatan="{{ strtolower($user->jabatan ?? '') }}">
                         <td class="px-6 py-4 text-sm" style="color:var(--dm-text,#1e293b);">{{ $i+1 }}</td>
                         <td class="px-6 py-4">
                             <div class="flex justify-center">
@@ -515,29 +505,51 @@
     // Store current user ID for detail modal actions
     let currentDetailUserId = null;
 
-    // Sort rows in the table
-    function sortPegawai() {
-        var sortVal = document.getElementById('sortBy').value;
+    // Current sort state
+    var currentSortCol = 'name';
+    var currentSortDir = 'asc';
+
+    function toggleSort(col) {
+        if (currentSortCol === col) {
+            currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSortCol = col;
+            currentSortDir = 'asc';
+        }
+        applySortAndFilter();
+        updateSortIcons();
+        saveFilterState();
+    }
+
+    function updateSortIcons() {
+        document.querySelectorAll('.sortable-th').forEach(function(th) {
+            var icon = th.querySelector('i');
+            if (th.dataset.sort === currentSortCol) {
+                icon.className = currentSortDir === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                icon.style.opacity = '1';
+                icon.style.color = '#2E97D4';
+            } else {
+                icon.className = 'fas fa-sort';
+                icon.style.opacity = '0.3';
+                icon.style.color = '';
+            }
+        });
+    }
+
+    function applySortAndFilter() {
         var tbody = document.getElementById('pegawaiTableBody');
         var rows = Array.from(tbody.querySelectorAll('.pegawai-row'));
 
         rows.sort(function(a, b) {
-            switch(sortVal) {
-                case 'name-asc':
-                    return a.dataset.name.localeCompare(b.dataset.name, 'id');
-                case 'name-desc':
-                    return b.dataset.name.localeCompare(a.dataset.name, 'id');
-                case 'nip-asc':
-                    return (a.dataset.nip || '').localeCompare(b.dataset.nip || '', undefined, {numeric: true});
-                case 'nip-desc':
-                    return (b.dataset.nip || '').localeCompare(a.dataset.nip || '', undefined, {numeric: true});
-                case 'unit-asc':
-                    return (a.dataset.unitName || '').localeCompare(b.dataset.unitName || '', 'id');
-                case 'jenis-asc':
-                    return (a.dataset.jenis || '').localeCompare(b.dataset.jenis || '', 'id');
-                default:
-                    return 0;
+            var valA, valB;
+            switch(currentSortCol) {
+                case 'name': valA = a.dataset.name; valB = b.dataset.name; break;
+                case 'jabatan': valA = a.dataset.jabatan || ''; valB = b.dataset.jabatan || ''; break;
+                case 'unit': valA = a.dataset.unitName || ''; valB = b.dataset.unitName || ''; break;
+                default: valA = ''; valB = '';
             }
+            var cmp = valA.localeCompare(valB, 'id');
+            return currentSortDir === 'desc' ? -cmp : cmp;
         });
 
         rows.forEach(function(row) { tbody.appendChild(row); });
@@ -571,41 +583,43 @@
         document.getElementById('totalPegawai').textContent = visibleCount;
     }
 
-    // Event listeners for live filtering
+    // Persist filter/sort state
     function saveFilterState() {
         sessionStorage.setItem('pgFilter', JSON.stringify({
             search: document.getElementById('searchInput').value,
             unit: document.getElementById('filterUnit').value,
             jenis: document.getElementById('filterJenis').value,
-            sort: document.getElementById('sortBy').value
+            sortCol: currentSortCol,
+            sortDir: currentSortDir
         }));
     }
 
     function restoreFilterState() {
         var saved = sessionStorage.getItem('pgFilter');
-        if (!saved) {
-            sortPegawai();
-            return;
+        if (saved) {
+            var f = JSON.parse(saved);
+            if (f.search) document.getElementById('searchInput').value = f.search;
+            if (f.unit) document.getElementById('filterUnit').value = f.unit;
+            if (f.jenis) document.getElementById('filterJenis').value = f.jenis;
+            if (f.sortCol) currentSortCol = f.sortCol;
+            if (f.sortDir) currentSortDir = f.sortDir;
         }
-        var f = JSON.parse(saved);
-        if (f.search) document.getElementById('searchInput').value = f.search;
-        if (f.unit) document.getElementById('filterUnit').value = f.unit;
-        if (f.jenis) document.getElementById('filterJenis').value = f.jenis;
-        if (f.sort) document.getElementById('sortBy').value = f.sort;
-        sortPegawai();
+        updateSortIcons();
+        applySortAndFilter();
     }
 
     document.getElementById('searchInput').addEventListener('input', function() { filterPegawai(); saveFilterState(); });
     document.getElementById('filterUnit').addEventListener('change', function() { filterPegawai(); saveFilterState(); });
     document.getElementById('filterJenis').addEventListener('change', function() { filterPegawai(); saveFilterState(); });
-    document.getElementById('sortBy').addEventListener('change', function() { sortPegawai(); saveFilterState(); });
 
     document.getElementById('resetFilter').addEventListener('click', function() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterUnit').value = '';
         document.getElementById('filterJenis').value = '';
-        document.getElementById('sortBy').value = 'name-asc';
-        sortPegawai();
+        currentSortCol = 'name';
+        currentSortDir = 'asc';
+        updateSortIcons();
+        applySortAndFilter();
         sessionStorage.removeItem('pgFilter');
     });
 

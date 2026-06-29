@@ -7,9 +7,7 @@
     <p>Kelola email dan password akun operator Anda</p>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:900px;">
-    @media (max-width:768px) { <style>.akun-grid{grid-template-columns:1fr !important;}</style> }
-
+<div class="akun-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:900px;">
     {{-- Ubah Email --}}
     <div style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden;">
         <div style="padding:16px 20px; border-bottom:1px solid var(--dm-border,#e2e8f0); display:flex; align-items:center; gap:10px;">
@@ -103,11 +101,13 @@
     </div>
 </div>
 
+@push('styles')
 <style>
     @media (max-width:768px) {
-        div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+        .akun-grid { grid-template-columns:1fr !important; }
     }
 </style>
+@endpush
 
 @push('scripts')
 <script>
