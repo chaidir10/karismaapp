@@ -14,7 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <script>(function(){ var t=localStorage.getItem('karisma-operator-theme')||'light'; document.documentElement.setAttribute('data-theme',t); })();</script>
+    <script>(function(){ var t=localStorage.getItem('karisma-admin-theme')||'light'; document.documentElement.setAttribute('data-theme',t); })();</script>
 
     @stack('head')
     @stack('styles')
@@ -481,22 +481,26 @@
                     <a href="{{ route('operator.dashboard') }}" class="sidebar-item @if(request()->routeIs('operator.dashboard')) active @endif"><i class="fas fa-gauge-high"></i> Dashboard</a>
 
                     <div class="sidebar-title">Manajemen</div>
-                    <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item"><i class="fas fa-user-group"></i> Pegawai</a>
-                    <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item"><i class="fas fa-clock"></i> Jam Kerja</a>
-                    <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item"><i class="fas fa-calendar-xmark"></i> Hari Libur</a>
-                    <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item"><i class="fas fa-location-dot"></i> Lokasi</a>
-                    <a href="{{ route('operator.presensi.index') }}" class="sidebar-item"><i class="fas fa-database"></i> Database Presensi</a>
+                    <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.*')) active @endif"><i class="fas fa-user-group"></i> Pegawai</a>
+                    <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif"><i class="fas fa-clock"></i> Jam Kerja</a>
+                    <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif"><i class="fas fa-calendar-xmark"></i> Hari Libur</a>
+                    <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif"><i class="fas fa-location-dot"></i> Lokasi</a>
+                    <a href="{{ route('operator.presensi.index') }}" class="sidebar-item @if(request()->routeIs('operator.presensi.*')) active @endif"><i class="fas fa-database"></i> Database Presensi</a>
 
                     <div class="sidebar-title">Tools</div>
-                    <a href="{{ route('admin.laporan.index') }}" class="sidebar-item"><i class="fas fa-chart-column"></i> Laporan</a>
-                    <a href="{{ route('admin.performa.index') }}" class="sidebar-item"><i class="fas fa-ranking-star"></i> Performa</a>
-                    <a href="{{ route('admin.pengumuman.index') }}" class="sidebar-item"><i class="fas fa-bullhorn"></i> Pengumuman</a>
-                    <a href="{{ route('admin.device-issues.index') }}" class="sidebar-item"><i class="fas fa-mobile-screen-button"></i> Kendala Perangkat</a>
+                    <a href="{{ route('admin.laporan.index') }}" class="sidebar-item @if(request()->routeIs('admin.laporan.*')) active @endif"><i class="fas fa-chart-column"></i> Laporan</a>
+                    <a href="{{ route('admin.performa.index') }}" class="sidebar-item @if(request()->routeIs('admin.performa.*')) active @endif"><i class="fas fa-ranking-star"></i> Performa</a>
+                    <a href="{{ route('admin.pengumuman.index') }}" class="sidebar-item @if(request()->routeIs('admin.pengumuman.*')) active @endif"><i class="fas fa-bullhorn"></i> Pengumuman</a>
+                    @php $mdiCount = \App\Models\DeviceIssue::whereNull('resolved_at')->count(); @endphp
+                    <a href="{{ route('admin.device-issues.index') }}" class="sidebar-item @if(request()->routeIs('admin.device-issues.*')) active @endif">
+                        <i class="fas fa-mobile-screen-button"></i> Kendala Perangkat
+                        @if($mdiCount > 0)<span style="margin-left:auto; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px;">{{ $mdiCount }}</span>@endif
+                    </a>
 
                     <div class="sidebar-title">Sistem</div>
-                    <a href="{{ route('operator.pengaturan.index') }}" class="sidebar-item"><i class="fas fa-gear"></i> Pengaturan</a>
-                    <a href="{{ route('operator.activity-logs.index') }}" class="sidebar-item"><i class="fas fa-clock-rotate-left"></i> Log Aktivitas</a>
-                    <a href="{{ route('operator.tracking.index') }}" class="sidebar-item"><i class="fas fa-satellite-dish"></i> Tracking</a>
+                    <a href="{{ route('operator.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('operator.pengaturan.*')) active @endif"><i class="fas fa-gear"></i> Pengaturan</a>
+                    <a href="{{ route('operator.activity-logs.index') }}" class="sidebar-item @if(request()->routeIs('operator.activity-logs.*')) active @endif"><i class="fas fa-clock-rotate-left"></i> Log Aktivitas</a>
+                    <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.*')) active @endif"><i class="fas fa-satellite-dish"></i> Tracking</a>
                     <a href="#" class="sidebar-item logout-trigger"><i class="fas fa-arrow-right-from-bracket"></i> Logout</a>
                 </div>
             </div>
@@ -508,7 +512,7 @@
         function toggleOperatorTheme(){
             var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
             document.documentElement.setAttribute('data-theme',next);
-            localStorage.setItem('karisma-operator-theme',next);
+            localStorage.setItem('karisma-admin-theme',next);
             syncOpThemeIcons();
         }
         function syncOpThemeIcons(){

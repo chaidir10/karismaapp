@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(Auth::user()->role === 'operator' ? 'layouts.operator' : 'layouts.admin')
 @section('title', 'Kendala Perangkat')
 
 @section('content')
