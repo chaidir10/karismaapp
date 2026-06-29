@@ -134,9 +134,5 @@
     @endforelse
 </div>
 
-@if($users->hasPages())
-<div class="pagination-wrap">
-    {{ $users->links('pagination::bootstrap-4') }}
-</div>
-@endif
+@include('operator.partials.pagination', ['paginator' => $users])
 @endsection

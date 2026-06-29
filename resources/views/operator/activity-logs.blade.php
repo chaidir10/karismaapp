@@ -162,10 +162,6 @@
             </tbody>
         </table>
     </div>
-    @if($logs->hasPages())
-    <div class="pagination-wrap">
-        {{ $logs->links('pagination::bootstrap-4') }}
-    </div>
-    @endif
+    @include('operator.partials.pagination', ['paginator' => $logs])
 </div>
 @endsection

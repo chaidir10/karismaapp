@@ -159,11 +159,7 @@
             </tbody>
         </table>
     </div>
-    @if($presensi->hasPages())
-    <div class="pagination-wrap">
-        {{ $presensi->links('pagination::bootstrap-4') }}
-    </div>
-    @endif
+    @include('operator.partials.pagination', ['paginator' => $presensi])
 </div>
 
 <!-- Edit Modal -->
