@@ -35,6 +35,18 @@ class DetectDevice
                     }
                     break;
 
+                case 'operator':
+                    if ($isMobile) {
+                        if (!$request->is('pegawai/*')) {
+                            return redirect()->route('pegawai.dashboard');
+                        }
+                    } else {
+                        if (!$request->is('operator/*') && !$request->is('admin/*')) {
+                            return redirect()->route('operator.dashboard');
+                        }
+                    }
+                    break;
+
                 case 'admin':
                 case 'superadmin':
                     if ($isMobile) {
