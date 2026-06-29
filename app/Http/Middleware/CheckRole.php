@@ -21,11 +21,16 @@ class CheckRole
 
         $userRole = strtolower($user->role);
 
-        // ✅ Pegawai route → admin/superadmin boleh ikut masuk kalau mobile
+        // ✅ Pegawai route → admin/superadmin/operator boleh ikut masuk kalau mobile
         if (in_array('pegawai', $roles)) {
-            if (in_array($userRole, ['pegawai','admin','superadmin'])) {
+            if (in_array($userRole, ['pegawai','admin','superadmin','operator'])) {
                 return $next($request);
             }
+        }
+
+        // ✅ Operator boleh akses route admin (shared features)
+        if (in_array('admin', $roles) && $userRole === 'operator') {
+            return $next($request);
         }
 
         // ✅ Normal role check

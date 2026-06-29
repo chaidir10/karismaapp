@@ -18,6 +18,10 @@ use App\Http\Controllers\Admin\PengumumanController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
 use App\Http\Controllers\Operator\OperatorDashboardController;
+use App\Http\Controllers\Operator\OperatorPengaturanController;
+use App\Http\Controllers\Operator\OperatorActivityLogController;
+use App\Http\Controllers\Operator\OperatorTrackingController;
+use App\Http\Controllers\Operator\OperatorPresensiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -119,7 +123,7 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
 // --------------------
 // Dashboard / Auth-protected routes
 // --------------------
-Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
+Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(function () {
 
     // --------------------
     // PEGAWAI
@@ -315,8 +319,31 @@ Route::middleware(['auth', 'verified', 'detectdevice'])->group(function () {
     // --------------------
     // OPERATOR
     // --------------------
-    Route::prefix('operator')->name('operator.')->middleware('checkrole:operator')->group(function () {
+    Route::prefix('operator')->name('operator.')->middleware(['checkrole:operator', 'logactivity'])->group(function () {
         Route::get('/dashboard', [OperatorDashboardController::class, 'index'])->name('dashboard');
+
+        // Pengaturan (logo, instansi, app settings)
+        Route::prefix('pengaturan')->name('pengaturan.')->group(function () {
+            Route::get('/', [OperatorPengaturanController::class, 'index'])->name('index');
+            Route::post('/instansi', [OperatorPengaturanController::class, 'updateInstansi'])->name('update-instansi');
+            Route::post('/upload-logo', [OperatorPengaturanController::class, 'uploadLogo'])->name('upload-logo');
+            Route::delete('/remove-logo', [OperatorPengaturanController::class, 'removeLogo'])->name('remove-logo');
+            Route::post('/settings', [OperatorPengaturanController::class, 'updateSettings'])->name('update-settings');
+        });
+
+        // Log Aktivitas
+        Route::get('/activity-logs', [OperatorActivityLogController::class, 'index'])->name('activity-logs.index');
+
+        // Tracking User
+        Route::get('/tracking', [OperatorTrackingController::class, 'index'])->name('tracking.index');
+        Route::get('/tracking/{userId}', [OperatorTrackingController::class, 'detail'])->name('tracking.detail');
+
+        // Database Presensi
+        Route::prefix('presensi')->name('presensi.')->group(function () {
+            Route::get('/', [OperatorPresensiController::class, 'index'])->name('index');
+            Route::put('/{id}', [OperatorPresensiController::class, 'update'])->name('update');
+            Route::delete('/{id}', [OperatorPresensiController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // --------------------

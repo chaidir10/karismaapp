@@ -15,6 +15,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\DetectDevice;
+use App\Http\Middleware\LogActivity;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkrole'     => CheckRole::class,
             'detectdevice'  => DetectDevice::class,
             'preventbackhistory' => \App\Http\Middleware\PreventBackHistory::class,
+            'logactivity'   => LogActivity::class,
         ]);
 
         // Global middleware → otomatis jalan di semua request

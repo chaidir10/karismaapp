@@ -1,307 +1,232 @@
 @extends('layouts.operator')
-
 @section('title', 'Dashboard Operator')
 
 @section('content')
 <style>
-    .op-grid-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
-    @media(max-width:1100px){ .op-grid-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    @media(max-width:640px){ .op-grid-stats { grid-template-columns:1fr; } }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+    @media(max-width:1100px){ .stats-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:640px){ .stats-grid { grid-template-columns:1fr; } }
 
-    .op-stat {
-        background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px;
-        display:flex; align-items:center; gap:12px;
+    .stat-card {
+        background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;
+        padding:18px; display:flex; align-items:center; gap:14px;
     }
-    .op-stat-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-    .op-stat-title { font-size:11px; color:#64748b; font-weight:600; margin-bottom:2px; }
-    .op-stat-value { font-size:20px; font-weight:800; color:#0f172a; line-height:1; }
+    .stat-icon {
+        width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+        font-size:18px; flex-shrink:0;
+    }
+    .stat-title { font-size:11px; color:var(--dm-muted,#64748b); font-weight:600; margin-bottom:2px; }
+    .stat-value { font-size:22px; font-weight:800; color:var(--dm-text,#1e293b); line-height:1; }
 
-    .op-grid-main { display:grid; grid-template-columns:1.3fr .9fr; gap:14px; margin-bottom:14px; }
-    @media(max-width:1024px){ .op-grid-main { grid-template-columns:1fr; } }
+    .grid-main { display:grid; grid-template-columns:1.3fr .7fr; gap:14px; margin-bottom:14px; }
+    @media(max-width:1024px){ .grid-main { grid-template-columns:1fr; } }
 
-    .op-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; }
+    .op-card { background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px; overflow:hidden; }
     .op-card-head {
-        padding:12px 14px; border-bottom:1px solid #eef2f7; background:#f8fafc;
+        padding:14px 18px; border-bottom:1px solid var(--dm-border,#eef2f7);
         display:flex; align-items:center; justify-content:space-between;
     }
-    .op-card-title { font-size:13px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px; }
-    .op-card-badge { font-size:10px; padding:3px 8px; border-radius:999px; font-weight:700; background:#e2e8f0; color:#334155; }
+    .op-card-title { font-size:13px; font-weight:700; color:var(--dm-text,#1e293b); display:flex; align-items:center; gap:8px; }
+    .op-card-badge { font-size:10px; padding:3px 8px; border-radius:999px; font-weight:700; background:rgba(90,182,234,0.12); color:#2E97D4; }
+    [data-theme="dark"] .op-card-badge { background:rgba(90,182,234,0.15); color:#7dd3fc; }
 
     .op-table { width:100%; border-collapse:collapse; }
-    .op-table th { font-size:10px; text-transform:uppercase; letter-spacing:.4px; color:#64748b; text-align:left; padding:10px 12px; }
-    .op-table td { font-size:12px; color:#0f172a; padding:10px 12px; border-top:1px solid #f1f5f9; }
-    .op-empty { padding:22px 14px; text-align:center; color:#94a3b8; font-size:12px; }
+    .op-table th { font-size:10px; text-transform:uppercase; letter-spacing:.4px; color:var(--dm-muted,#64748b); text-align:left; padding:10px 14px; background:var(--dm-bg,#f8fafc); }
+    .op-table td { font-size:12px; color:var(--dm-text,#1e293b); padding:10px 14px; border-top:1px solid var(--dm-border,#f1f5f9); }
+    .op-table tbody tr:hover { background:var(--dm-bg,#f8fafc); }
+    [data-theme="dark"] .op-table th { background:rgba(255,255,255,0.02); }
+    [data-theme="dark"] .op-table tbody tr:hover { background:rgba(255,255,255,0.02); }
 
-    .op-tools { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
-    @media(max-width:1024px){ .op-tools { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    @media(max-width:640px){ .op-tools { grid-template-columns:1fr; } }
+    .op-empty { padding:22px 14px; text-align:center; color:var(--dm-muted,#94a3b8); font-size:12px; }
 
-    .op-tool {
-        background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px;
-        text-decoration:none; color:inherit; display:block; transition:all .15s;
+    .kv-row { display:grid; grid-template-columns:1fr auto; gap:8px; padding:10px 14px; border-top:1px solid var(--dm-border,#f1f5f9); font-size:12px; }
+    .kv-row .k { color:var(--dm-muted,#64748b); font-weight:600; }
+    .kv-row .v { color:var(--dm-text,#1e293b); font-weight:700; }
+
+    .quick-tools { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+    @media(max-width:900px){ .quick-tools { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:500px){ .quick-tools { grid-template-columns:1fr; } }
+
+    .quick-tool {
+        background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:12px;
+        padding:14px; text-decoration:none; color:inherit; display:flex; align-items:center; gap:12px;
+        transition:all .15s;
     }
-    .op-tool:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(15,23,42,.08); }
-    .op-tool-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-    .op-tool-icon {
-        width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-        font-size:15px;
-    }
-    .op-tool-title { font-size:14px; font-weight:700; color:#0f172a; margin-bottom:4px; }
-    .op-tool-desc { font-size:12px; color:#64748b; line-height:1.4; min-height:34px; }
-    .op-tool-link { margin-top:10px; font-size:11px; font-weight:700; color:#2563eb; }
+    .quick-tool:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.06); border-color:rgba(90,182,234,0.3); }
+    .quick-tool-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+    .quick-tool-title { font-size:12px; font-weight:700; color:var(--dm-text,#1e293b); }
+    .quick-tool-desc { font-size:10px; color:var(--dm-muted,#64748b); margin-top:1px; }
 
-    .op-kv { display:grid; grid-template-columns:1fr auto; gap:8px; padding:10px 12px; border-top:1px solid #f1f5f9; font-size:12px; }
-    .op-kv .k { color:#64748b; font-weight:600; }
-    .op-kv .v { color:#0f172a; font-weight:700; }
+    .chart-bar { height:100%; border-radius:4px 4px 0 0; background:linear-gradient(180deg,#5AB6EA,#2E97D4); min-height:2px; transition:height .3s; }
+    [data-theme="dark"] .chart-bar { background:linear-gradient(180deg,rgba(90,182,234,0.6),rgba(46,151,212,0.4)); }
 </style>
 
-<div style="margin-bottom:16px;">
-    <h1 style="font-size:22px; font-weight:800; color:#0f172a; margin:0;">Operator Aplikasi / IT Console</h1>
-    <p style="font-size:13px; color:#64748b; margin-top:4px;">Pusat kontrol operasional aplikasi KARISMA secara menyeluruh.</p>
-</div>
-
-<div class="op-grid-stats">
-    <div class="op-stat">
-        <div class="op-stat-icon" style="background:rgba(59,130,246,.12); color:#2563eb;"><i class="fas fa-users"></i></div>
-        <div><div class="op-stat-title">Total Pegawai</div><div class="op-stat-value">{{ $totalPegawai }}</div></div>
-    </div>
-    <div class="op-stat">
-        <div class="op-stat-icon" style="background:rgba(16,185,129,.12); color:#059669;"><i class="fas fa-user-shield"></i></div>
-        <div><div class="op-stat-title">Admin + Operator</div><div class="op-stat-value">{{ $totalAdmin + $totalOperator }}</div></div>
-    </div>
-    <div class="op-stat">
-        <div class="op-stat-icon" style="background:rgba(245,158,11,.12); color:#d97706;"><i class="fas fa-clock"></i></div>
-        <div><div class="op-stat-title">Presensi Hari Ini</div><div class="op-stat-value">{{ $presensiHariIni }}</div></div>
-    </div>
-    <div class="op-stat">
-        <div class="op-stat-icon" style="background:rgba(239,68,68,.12); color:#dc2626;"><i class="fas fa-triangle-exclamation"></i></div>
-        <div><div class="op-stat-title">Issue Perangkat Aktif</div><div class="op-stat-value">{{ $deviceIssuesOpen }}</div></div>
-    </div>
-</div>
-
-<div class="op-grid-main">
-    <div class="op-card">
-        <div class="op-card-head">
-            <div class="op-card-title"><i class="fas fa-screwdriver-wrench"></i> Toolset Operasional Lengkap</div>
-            <span class="op-card-badge">Akses Cepat</span>
+<div class="page-header-glass">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h1>Dashboard Operator</h1>
+            <p>Pusat kontrol operasional aplikasi KARISMA &middot; {{ now()->isoFormat('dddd, D MMMM Y') }}</p>
         </div>
-        <div style="padding:12px;">
-            <div class="op-tools">
-                <a href="{{ route('admin.dashboard') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(59,130,246,.12); color:#2563eb;"><i class="fas fa-chart-line"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
-                    </div>
-                    <div class="op-tool-title">Monitoring Dashboard</div>
-                    <div class="op-tool-desc">Memantau presensi pending, status approval, dan ringkasan operasional harian.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
+        <div style="display:flex; gap:8px;">
+            <span class="badge badge-success"><i class="fas fa-circle" style="font-size:7px;"></i> {{ $onlineUsers }} user online</span>
+        </div>
+    </div>
+</div>
 
-                <a href="{{ route('admin.manajemenpegawai.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(14,165,233,.12); color:#0284c7;"><i class="fas fa-users-cog"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
-                    </div>
-                    <div class="op-tool-title">Manajemen Pengguna</div>
-                    <div class="op-tool-desc">Kelola data pegawai, status akun, akses shift, reset password, dan pemetaan wilayah kerja.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(59,130,246,0.12); color:#2563eb;"><i class="fas fa-users"></i></div>
+        <div><div class="stat-title">Total Pegawai</div><div class="stat-value">{{ $totalPegawai }}</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,0.12); color:#059669;"><i class="fas fa-fingerprint"></i></div>
+        <div><div class="stat-title">Presensi Masuk Hari Ini</div><div class="stat-value">{{ $presensiMasukHariIni }}</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12); color:#d97706;"><i class="fas fa-hourglass-half"></i></div>
+        <div><div class="stat-title">Pending (Presensi + Pengajuan)</div><div class="stat-value">{{ $presensiPending + $pengajuanPending }}</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(239,68,68,0.12); color:#dc2626;"><i class="fas fa-triangle-exclamation"></i></div>
+        <div><div class="stat-title">Issue Perangkat Aktif</div><div class="stat-value">{{ $deviceIssuesOpen }}</div></div>
+    </div>
+</div>
 
-                <a href="{{ route('admin.lokasi.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(34,197,94,.12); color:#16a34a;"><i class="fas fa-location-dot"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
-                    </div>
-                    <div class="op-tool-title">Lokasi & Radius</div>
-                    <div class="op-tool-desc">Atur titik lokasi kerja, radius validasi GPS, dan akurasi cakupan area presensi.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
+<div class="quick-tools">
+    <a href="{{ route('admin.manajemenpegawai.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(14,165,233,0.12); color:#0284c7;"><i class="fas fa-user-group"></i></div>
+        <div><div class="quick-tool-title">Pegawai</div><div class="quick-tool-desc">{{ $totalPegawai }} pegawai</div></div>
+    </a>
+    <a href="{{ route('operator.presensi.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(34,197,94,0.12); color:#16a34a;"><i class="fas fa-database"></i></div>
+        <div><div class="quick-tool-title">Database Presensi</div><div class="quick-tool-desc">Kelola data presensi</div></div>
+    </a>
+    <a href="{{ route('operator.activity-logs.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(168,85,247,0.12); color:#7e22ce;"><i class="fas fa-clock-rotate-left"></i></div>
+        <div><div class="quick-tool-title">Log Aktivitas</div><div class="quick-tool-desc">Audit trail user</div></div>
+    </a>
+    <a href="{{ route('operator.tracking.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(239,68,68,0.12); color:#dc2626;"><i class="fas fa-satellite-dish"></i></div>
+        <div><div class="quick-tool-title">Tracking User</div><div class="quick-tool-desc">{{ $onlineUsers }} online</div></div>
+    </a>
+    <a href="{{ route('admin.jamkerja.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(245,158,11,0.12); color:#d97706;"><i class="fas fa-clock"></i></div>
+        <div><div class="quick-tool-title">Jam Kerja</div><div class="quick-tool-desc">{{ $jamKerjaCount }} hari, {{ $shiftCount }} shift</div></div>
+    </a>
+    <a href="{{ route('admin.lokasi.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(16,185,129,0.12); color:#059669;"><i class="fas fa-location-dot"></i></div>
+        <div><div class="quick-tool-title">Lokasi</div><div class="quick-tool-desc">{{ $wilayahCount }} lokasi</div></div>
+    </a>
+    <a href="{{ route('operator.pengaturan.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(71,85,105,0.12); color:#334155;"><i class="fas fa-gear"></i></div>
+        <div><div class="quick-tool-title">Pengaturan</div><div class="quick-tool-desc">Logo, instansi, fitur</div></div>
+    </a>
+    <a href="{{ route('admin.pengumuman.index') }}" class="quick-tool">
+        <div class="quick-tool-icon" style="background:rgba(139,92,246,0.12); color:#7c3aed;"><i class="fas fa-bullhorn"></i></div>
+        <div><div class="quick-tool-title">Pengumuman</div><div class="quick-tool-desc">{{ $pengumumanAktif }} aktif</div></div>
+    </a>
+</div>
 
-                <a href="{{ route('admin.jamkerja.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(245,158,11,.12); color:#d97706;"><i class="fas fa-business-time"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
+<div class="grid-main">
+    <div style="display:grid; gap:14px;">
+        <!-- Presensi chart -->
+        <div class="op-card">
+            <div class="op-card-head">
+                <div class="op-card-title"><i class="fas fa-chart-bar"></i> Presensi 7 Hari Terakhir</div>
+            </div>
+            <div style="padding:18px; display:flex; align-items:flex-end; gap:10px; height:160px;">
+                @php $maxVal = max(array_column($presensi7Hari, 'masuk')) ?: 1; @endphp
+                @foreach($presensi7Hari as $p)
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end;">
+                    <div style="font-size:11px; font-weight:700; color:var(--dm-text,#1e293b); margin-bottom:4px;">{{ $p['masuk'] }}</div>
+                    <div style="width:100%; background:var(--dm-bg,#f1f5f9); border-radius:6px; overflow:hidden; flex:1; display:flex; flex-direction:column; justify-content:flex-end;">
+                        <div class="chart-bar" style="height:{{ ($p['masuk'] / $maxVal) * 100 }}%;"></div>
                     </div>
-                    <div class="op-tool-title">Jam Kerja & Shift</div>
-                    <div class="op-tool-desc">Konfigurasi jam kerja reguler/shift, sinkronisasi jadwal, serta kontrol hari libur nasional.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
+                    <div style="font-size:9px; color:var(--dm-muted,#94a3b8); margin-top:4px; font-weight:600;">{{ $p['tanggal'] }}</div>
+                </div>
+                @endforeach
+            </div>
+        </div>
 
-                <a href="{{ route('admin.pengumuman.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(168,85,247,.12); color:#7e22ce;"><i class="fas fa-bullhorn"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
+        <!-- Aktivitas Terbaru -->
+        <div class="op-card">
+            <div class="op-card-head">
+                <div class="op-card-title"><i class="fas fa-clock-rotate-left"></i> Aktivitas Terbaru</div>
+                <a href="{{ route('operator.activity-logs.index') }}" style="font-size:11px; color:#2E97D4; font-weight:600; text-decoration:none;">Lihat Semua</a>
+            </div>
+            <div style="max-height:300px; overflow-y:auto;">
+                @forelse($recentActivities as $act)
+                <div style="padding:10px 14px; border-top:1px solid var(--dm-border,#f1f5f9); display:flex; align-items:center; gap:10px;">
+                    <div style="width:30px; height:30px; border-radius:8px; background:rgba(90,182,234,0.1); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        @if($act->action === 'login')
+                            <i class="fas fa-right-to-bracket" style="font-size:11px; color:#10b981;"></i>
+                        @elseif($act->action === 'logout')
+                            <i class="fas fa-right-from-bracket" style="font-size:11px; color:#ef4444;"></i>
+                        @elseif($act->action === 'presensi')
+                            <i class="fas fa-fingerprint" style="font-size:11px; color:#2563eb;"></i>
+                        @else
+                            <i class="fas fa-circle-dot" style="font-size:11px; color:#64748b;"></i>
+                        @endif
                     </div>
-                    <div class="op-tool-title">Pengumuman Sistem</div>
-                    <div class="op-tool-desc">Publikasi informasi penting, pemeliharaan, dan instruksi operasional ke seluruh pengguna.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
-
-                <a href="{{ route('admin.device-issues.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(239,68,68,.12); color:#dc2626;"><i class="fas fa-screwdriver-wrench"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:12px; font-weight:600; color:var(--dm-text,#1e293b); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            {{ $act->user->name ?? '-' }}
+                        </div>
+                        <div style="font-size:10px; color:var(--dm-muted,#94a3b8);">
+                            {{ $act->description }} &middot; {{ $act->device_type ?? '-' }}
+                        </div>
                     </div>
-                    <div class="op-tool-title">Device Issues</div>
-                    <div class="op-tool-desc">Investigasi kendala perangkat pengguna, tindak lanjut insiden, dan penyelesaian ticket.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
-
-                <a href="{{ route('admin.laporan.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(14,116,144,.12); color:#0e7490;"><i class="fas fa-file-chart-column"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
+                    <div style="font-size:10px; color:var(--dm-muted,#94a3b8); white-space:nowrap;">
+                        {{ $act->created_at->diffForHumans() }}
                     </div>
-                    <div class="op-tool-title">Laporan & Audit</div>
-                    <div class="op-tool-desc">Audit data presensi, ekspor PDF/Excel, dan validasi historis aktivitas sistem.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
-
-                <a href="{{ route('admin.pengaturan.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(71,85,105,.12); color:#334155;"><i class="fas fa-sliders"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
-                    </div>
-                    <div class="op-tool-title">Pengaturan Aplikasi</div>
-                    <div class="op-tool-desc">Kontrol fitur global: face detection, work timer, darurat, dan kebijakan presensi.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
-
-                <a href="{{ route('superadmin.manajemenadmin.index') }}" class="op-tool">
-                    <div class="op-tool-top">
-                        <div class="op-tool-icon" style="background:rgba(37,99,235,.12); color:#1d4ed8;"><i class="fas fa-user-lock"></i></div>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size:11px; color:#94a3b8;"></i>
-                    </div>
-                    <div class="op-tool-title">Role & Akses</div>
-                    <div class="op-tool-desc">Koordinasi pengelolaan role admin/operator bersama superadmin untuk governance akses.</div>
-                    <div class="op-tool-link">Buka Modul</div>
-                </a>
+                </div>
+                @empty
+                <div class="op-empty">Belum ada log aktivitas.</div>
+                @endforelse
             </div>
         </div>
     </div>
 
     <div style="display:grid; gap:14px;">
+        <!-- Info Instansi -->
         <div class="op-card">
             <div class="op-card-head">
-                <div class="op-card-title"><i class="fas fa-heart-pulse"></i> Status Konfigurasi Inti</div>
-                <span class="op-card-badge">{{ count($appSettings ?? []) }} item</span>
+                <div class="op-card-title"><i class="fas fa-building"></i> Info Instansi</div>
+                <a href="{{ route('operator.pengaturan.index') }}" style="font-size:11px; color:#2E97D4; font-weight:600; text-decoration:none;">Edit</a>
             </div>
-
-            <div class="op-kv">
-                <div class="k">Disable Presensi Libur</div>
-                <div class="v">{{ ($appSettings['disable_presensi_hari_libur'] ?? '0') === '1' ? 'Aktif' : 'Nonaktif' }}</div>
-            </div>
-            <div class="op-kv">
-                <div class="k">Face Detection</div>
-                <div class="v">{{ ($appSettings['enable_face_detection'] ?? '0') === '1' ? 'Aktif' : 'Nonaktif' }}</div>
-            </div>
-            <div class="op-kv">
-                <div class="k">Mode Face Detection</div>
-                <div class="v">{{ strtoupper($appSettings['face_detection_mode'] ?? '-') }}</div>
-            </div>
-            <div class="op-kv">
-                <div class="k">Require Masuk Before Pulang</div>
-                <div class="v">{{ ($appSettings['require_masuk_before_pulang'] ?? '0') === '1' ? 'Aktif' : 'Nonaktif' }}</div>
-            </div>
-            <div class="op-kv">
-                <div class="k">Work Timer</div>
-                <div class="v">{{ ($appSettings['enable_work_timer'] ?? '0') === '1' ? 'Aktif' : 'Nonaktif' }}</div>
-            </div>
-            <div class="op-kv">
-                <div class="k">Absen Darurat</div>
-                <div class="v">{{ ($appSettings['enable_absen_darurat'] ?? '0') === '1' ? 'Aktif' : 'Nonaktif' }}</div>
-            </div>
-            <div class="op-kv">
-                <div class="k">Mode Darurat</div>
-                <div class="v">{{ strtoupper($appSettings['absen_darurat_mode'] ?? '-') }}</div>
-            </div>
+            @if($instansi)
+            <div class="kv-row"><div class="k">Nama</div><div class="v">{{ $instansi->nama }}</div></div>
+            <div class="kv-row"><div class="k">Kode</div><div class="v">{{ $instansi->kode_instansi }}</div></div>
+            <div class="kv-row"><div class="k">Alamat</div><div class="v" style="font-size:11px;">{{ $instansi->alamat ?? '-' }}</div></div>
+            @else
+            <div class="op-empty">Belum ada data instansi. <a href="{{ route('operator.pengaturan.index') }}" style="color:#2E97D4;">Atur sekarang</a></div>
+            @endif
         </div>
 
+        <!-- Status Konfigurasi -->
         <div class="op-card">
             <div class="op-card-head">
-                <div class="op-card-title"><i class="fas fa-layer-group"></i> Ringkasan Infrastruktur Aplikasi</div>
-                <span class="op-card-badge">Resource</span>
+                <div class="op-card-title"><i class="fas fa-heart-pulse"></i> Konfigurasi Sistem</div>
+                <span class="op-card-badge">{{ count($appSettings) }} item</span>
             </div>
-            <div class="op-kv"><div class="k">Lokasi Kerja</div><div class="v">{{ $wilayahCount }}</div></div>
-            <div class="op-kv"><div class="k">Template Jam Kerja</div><div class="v">{{ $jamKerjaCount }}</div></div>
-            <div class="op-kv"><div class="k">Shift Aktif</div><div class="v">{{ $shiftCount }}</div></div>
-            <div class="op-kv"><div class="k">Pengumuman</div><div class="v">{{ $pengumumanAktif }}</div></div>
-            <div class="op-kv"><div class="k">Presensi Pending</div><div class="v">{{ $presensiPending }}</div></div>
-            <div class="op-kv"><div class="k">Pengajuan Pending</div><div class="v">{{ $pengajuanPending }}</div></div>
+            <div class="kv-row"><div class="k">Presensi Libur</div><div class="v">{{ ($appSettings['disable_presensi_hari_libur'] ?? '0') === '1' ? 'Disable' : 'Aktif' }}</div></div>
+            <div class="kv-row"><div class="k">Face Detection</div><div class="v">{{ ($appSettings['enable_face_detection'] ?? '0') === '1' ? 'ON' : 'OFF' }}</div></div>
+            <div class="kv-row"><div class="k">Wajib Masuk Dulu</div><div class="v">{{ ($appSettings['require_masuk_before_pulang'] ?? '0') === '1' ? 'ON' : 'OFF' }}</div></div>
+            <div class="kv-row"><div class="k">Work Timer</div><div class="v">{{ ($appSettings['enable_work_timer'] ?? '0') === '1' ? 'ON' : 'OFF' }}</div></div>
+            <div class="kv-row"><div class="k">Absen Darurat</div><div class="v">{{ ($appSettings['enable_absen_darurat'] ?? '0') === '1' ? 'ON' : 'OFF' }}</div></div>
+        </div>
+
+        <!-- Infrastruktur -->
+        <div class="op-card">
+            <div class="op-card-head">
+                <div class="op-card-title"><i class="fas fa-layer-group"></i> Infrastruktur</div>
+            </div>
+            <div class="kv-row"><div class="k">Lokasi Kerja</div><div class="v">{{ $wilayahCount }}</div></div>
+            <div class="kv-row"><div class="k">Jam Kerja</div><div class="v">{{ $jamKerjaCount }} hari</div></div>
+            <div class="kv-row"><div class="k">Shift</div><div class="v">{{ $shiftCount }}</div></div>
+            <div class="kv-row"><div class="k">Admin</div><div class="v">{{ $totalAdmin }}</div></div>
+            <div class="kv-row"><div class="k">Operator</div><div class="v">{{ $totalOperator }}</div></div>
         </div>
     </div>
-</div>
-
-<div class="op-grid-main">
-    <div class="op-card">
-        <div class="op-card-head">
-            <div class="op-card-title"><i class="fas fa-list-check"></i> Pengajuan Terbaru</div>
-            <span class="op-card-badge">{{ $pengajuanTerbaru->count() }} item</span>
-        </div>
-        <table class="op-table">
-            <thead>
-                <tr><th>Pegawai</th><th>Tanggal</th><th>Jenis</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                @forelse($pengajuanTerbaru as $p)
-                <tr>
-                    <td>{{ $p->user->name ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($p->tanggal ?? now())->format('d/m/Y') }}</td>
-                    <td>{{ ucfirst($p->jenis ?? '-') }}</td>
-                    <td>{{ ucfirst($p->status ?? '-') }}</td>
-                </tr>
-                @empty
-                <tr><td colspan="4"><div class="op-empty">Belum ada data pengajuan.</div></td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="op-card">
-        <div class="op-card-head">
-            <div class="op-card-title"><i class="fas fa-user-shield"></i> Admin/Operator Terbaru</div>
-            <span class="op-card-badge">{{ $adminTerbaru->count() }} akun</span>
-        </div>
-        <table class="op-table">
-            <thead>
-                <tr><th>Nama</th><th>Role</th><th>Dibuat</th></tr>
-            </thead>
-            <tbody>
-                @forelse($adminTerbaru as $u)
-                <tr>
-                    <td>{{ $u->name }}</td>
-                    <td>{{ strtoupper($u->role) }}</td>
-                    <td>{{ optional($u->created_at)->format('d/m/Y') }}</td>
-                </tr>
-                @empty
-                <tr><td colspan="3"><div class="op-empty">Belum ada data admin/operator.</div></td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="op-card">
-    <div class="op-card-head">
-        <div class="op-card-title"><i class="fas fa-mobile-screen-button"></i> Device Issues Terbaru</div>
-        <span class="op-card-badge">{{ $deviceIssuesTerbaru->count() }} laporan</span>
-    </div>
-    <table class="op-table">
-        <thead>
-            <tr><th>User</th><th>Jenis</th><th>Detail</th><th>Waktu</th></tr>
-        </thead>
-        <tbody>
-            @forelse($deviceIssuesTerbaru as $d)
-            <tr>
-                <td>{{ $d->user->name ?? '-' }}</td>
-                <td>{{ $d->type ?? '-' }}</td>
-                <td>{{ \Illuminate\Support\Str::limit($d->detail ?? '-', 60) }}</td>
-                <td>{{ optional($d->created_at)->format('d/m/Y H:i') }}</td>
-            </tr>
-            @empty
-            <tr><td colspan="4"><div class="op-empty">Belum ada laporan perangkat.</div></td></tr>
-            @endforelse
-        </tbody>
-    </table>
 </div>
 @endsection
