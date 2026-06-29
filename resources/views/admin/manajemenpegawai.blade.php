@@ -28,7 +28,7 @@
     <!-- Search & Filter Card -->
     <div class="p-5 mb-6 text-sm" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div class="md:col-span-5">
+            <div class="md:col-span-4">
                 <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Cari Pegawai</label>
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="Cari nama atau NIP..."
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div class="md:col-span-3">
+            <div class="md:col-span-2">
                 <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Filter Unit</label>
                 <select id="filterUnit" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Unit</option>
@@ -48,12 +48,23 @@
                 </select>
             </div>
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Filter Jenis Pegawai</label>
+                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Jenis Pegawai</label>
                 <select id="filterJenis" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Jenis</option>
                     <option value="asn">ASN</option>
                     <option value="non_asn">Non ASN</option>
                     <option value="outsourcing">Outsourcing</option>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Urutkan</label>
+                <select id="sortBy" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
+                    <option value="name-asc">Nama A-Z</option>
+                    <option value="name-desc">Nama Z-A</option>
+                    <option value="nip-asc">NIP Terkecil</option>
+                    <option value="nip-desc">NIP Terbesar</option>
+                    <option value="unit-asc">Unit A-Z</option>
+                    <option value="jenis-asc">Jenis Pegawai</option>
                 </select>
             </div>
             <div class="md:col-span-2">
@@ -90,6 +101,7 @@
                         data-name="{{ strtolower($user->name) }}"
                         data-nip="{{ $user->nip }}"
                         data-unit="{{ $user->unit_id ?? '' }}"
+                        data-unit-name="{{ strtolower($user->wilayahKerja->nama ?? '') }}"
                         data-jenis="{{ $user->jenis_pegawai }}">
                         <td class="px-6 py-4 text-sm" style="color:var(--dm-text,#1e293b);">{{ $i+1 }}</td>
                         <td class="px-6 py-4">
@@ -503,30 +515,59 @@
     // Store current user ID for detail modal actions
     let currentDetailUserId = null;
 
+    // Sort rows in the table
+    function sortPegawai() {
+        var sortVal = document.getElementById('sortBy').value;
+        var tbody = document.getElementById('pegawaiTableBody');
+        var rows = Array.from(tbody.querySelectorAll('.pegawai-row'));
+
+        rows.sort(function(a, b) {
+            switch(sortVal) {
+                case 'name-asc':
+                    return a.dataset.name.localeCompare(b.dataset.name, 'id');
+                case 'name-desc':
+                    return b.dataset.name.localeCompare(a.dataset.name, 'id');
+                case 'nip-asc':
+                    return (a.dataset.nip || '').localeCompare(b.dataset.nip || '', undefined, {numeric: true});
+                case 'nip-desc':
+                    return (b.dataset.nip || '').localeCompare(a.dataset.nip || '', undefined, {numeric: true});
+                case 'unit-asc':
+                    return (a.dataset.unitName || '').localeCompare(b.dataset.unitName || '', 'id');
+                case 'jenis-asc':
+                    return (a.dataset.jenis || '').localeCompare(b.dataset.jenis || '', 'id');
+                default:
+                    return 0;
+            }
+        });
+
+        rows.forEach(function(row) { tbody.appendChild(row); });
+        filterPegawai();
+    }
+
     // Enhanced Filter Function
     function filterPegawai() {
-        const searchValue = document.getElementById('searchInput').value.toLowerCase();
-        const unitValue = document.getElementById('filterUnit').value;
-        const jenisValue = document.getElementById('filterJenis').value;
-        const rows = document.querySelectorAll('.pegawai-row');
+        var searchValue = document.getElementById('searchInput').value.toLowerCase();
+        var unitValue = document.getElementById('filterUnit').value;
+        var jenisValue = document.getElementById('filterJenis').value;
+        var rows = document.querySelectorAll('.pegawai-row');
 
-        let visibleCount = 0;
+        var visibleCount = 0;
 
-        rows.forEach(row => {
-            const nameMatch = row.dataset.name.includes(searchValue);
-            const nipMatch = row.dataset.nip.includes(searchValue);
-            const unitMatch = unitValue === '' || row.dataset.unit === unitValue;
-            const jenisMatch = jenisValue === '' || row.dataset.jenis === jenisValue;
+        rows.forEach(function(row) {
+            var nameMatch = row.dataset.name.includes(searchValue);
+            var nipMatch = row.dataset.nip.includes(searchValue);
+            var unitMatch = unitValue === '' || row.dataset.unit === unitValue;
+            var jenisMatch = jenisValue === '' || row.dataset.jenis === jenisValue;
 
             if ((nameMatch || nipMatch) && unitMatch && jenisMatch) {
                 row.style.display = '';
                 visibleCount++;
+                row.querySelector('td').textContent = visibleCount;
             } else {
                 row.style.display = 'none';
             }
         });
 
-        // Update total count
         document.getElementById('totalPegawai').textContent = visibleCount;
     }
 
@@ -535,29 +576,36 @@
         sessionStorage.setItem('pgFilter', JSON.stringify({
             search: document.getElementById('searchInput').value,
             unit: document.getElementById('filterUnit').value,
-            jenis: document.getElementById('filterJenis').value
+            jenis: document.getElementById('filterJenis').value,
+            sort: document.getElementById('sortBy').value
         }));
     }
 
     function restoreFilterState() {
         var saved = sessionStorage.getItem('pgFilter');
-        if (!saved) return;
+        if (!saved) {
+            sortPegawai();
+            return;
+        }
         var f = JSON.parse(saved);
         if (f.search) document.getElementById('searchInput').value = f.search;
         if (f.unit) document.getElementById('filterUnit').value = f.unit;
         if (f.jenis) document.getElementById('filterJenis').value = f.jenis;
-        if (f.search || f.unit || f.jenis) filterPegawai();
+        if (f.sort) document.getElementById('sortBy').value = f.sort;
+        sortPegawai();
     }
 
     document.getElementById('searchInput').addEventListener('input', function() { filterPegawai(); saveFilterState(); });
     document.getElementById('filterUnit').addEventListener('change', function() { filterPegawai(); saveFilterState(); });
     document.getElementById('filterJenis').addEventListener('change', function() { filterPegawai(); saveFilterState(); });
+    document.getElementById('sortBy').addEventListener('change', function() { sortPegawai(); saveFilterState(); });
 
     document.getElementById('resetFilter').addEventListener('click', function() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterUnit').value = '';
         document.getElementById('filterJenis').value = '';
-        filterPegawai();
+        document.getElementById('sortBy').value = 'name-asc';
+        sortPegawai();
         sessionStorage.removeItem('pgFilter');
     });
 

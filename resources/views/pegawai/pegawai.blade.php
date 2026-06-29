@@ -17,10 +17,19 @@
         border-radius:14px; font-size:14px; background:var(--card-bg); color:var(--dark); outline:none;
     }
     .search-bar input:focus { border-color:var(--primary); }
-    .search-bar i {
+    .search-bar > i {
         position:absolute; left:14px; top:50%; transform:translateY(-50%);
         color:var(--gray); font-size:14px;
     }
+    .sort-toggle {
+        position:absolute; right:6px; top:50%; transform:translateY(-50%);
+        width:36px; height:36px; border-radius:10px; border:1px solid var(--card-border);
+        background:var(--card-bg); color:var(--gray); cursor:pointer;
+        display:flex; align-items:center; justify-content:center; font-size:13px;
+        transition:all 0.15s; flex-shrink:0;
+    }
+    .sort-toggle:active { transform:translateY(-50%) scale(0.92); }
+    .sort-toggle.active { background:var(--primary-soft); color:var(--primary); border-color:var(--primary); }
 
     .employee-list { display:flex; flex-direction:column; gap:10px; }
 
@@ -90,7 +99,10 @@
 <div class="pegawai-page">
     <div class="search-bar">
         <i class="fas fa-magnifying-glass"></i>
-        <input type="text" placeholder="Cari nama, jabatan..." id="searchInput">
+        <input type="text" placeholder="Cari nama, jabatan..." id="searchInput" style="padding-right:48px;">
+        <button type="button" class="sort-toggle active" id="sortToggle" title="Urutkan A-Z / Z-A">
+            <i class="fas fa-arrow-down-a-z"></i>
+        </button>
     </div>
 
     <div class="employee-list">
@@ -317,6 +329,32 @@
         }
     }
 
+    var sortAsc = true;
+    function sortEmployees() {
+        var list = document.querySelector('.employee-list');
+        if (!list) return;
+        var cards = Array.from(list.querySelectorAll('.e-card'));
+        cards.sort(function(a, b) {
+            var nameA = (a.querySelector('.e-name') || {}).textContent || '';
+            var nameB = (b.querySelector('.e-name') || {}).textContent || '';
+            return sortAsc
+                ? nameA.localeCompare(nameB, 'id')
+                : nameB.localeCompare(nameA, 'id');
+        });
+        cards.forEach(function(c) { list.appendChild(c); });
+    }
+
+    var sortBtn = document.getElementById('sortToggle');
+    if (sortBtn) {
+        sortBtn.onclick = function() {
+            sortAsc = !sortAsc;
+            var icon = this.querySelector('i');
+            icon.className = sortAsc ? 'fas fa-arrow-down-a-z' : 'fas fa-arrow-down-z-a';
+            sortEmployees();
+        };
+    }
+
+    sortEmployees();
     document.addEventListener('turbo:load', initPegawai);
     initPegawai();
 

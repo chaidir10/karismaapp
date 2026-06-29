@@ -372,6 +372,11 @@
                         <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.*')) active @endif">
                             <i class="fas fa-satellite-dish"></i> Tracking User
                         </a>
+
+                        <div class="sidebar-title">Akun</div>
+                        <a href="{{ route('operator.akun') }}" class="sidebar-item @if(request()->routeIs('operator.akun*')) active @endif">
+                            <i class="fas fa-user-pen"></i> Akun Saya
+                        </a>
                         <a href="#" class="sidebar-item logout-trigger">
                             <i class="fas fa-arrow-right-from-bracket"></i> Logout
                         </a>
@@ -501,6 +506,9 @@
                     <a href="{{ route('operator.pengaturan.index') }}" class="sidebar-item @if(request()->routeIs('operator.pengaturan.*')) active @endif"><i class="fas fa-gear"></i> Pengaturan</a>
                     <a href="{{ route('operator.activity-logs.index') }}" class="sidebar-item @if(request()->routeIs('operator.activity-logs.*')) active @endif"><i class="fas fa-clock-rotate-left"></i> Log Aktivitas</a>
                     <a href="{{ route('operator.tracking.index') }}" class="sidebar-item @if(request()->routeIs('operator.tracking.*')) active @endif"><i class="fas fa-satellite-dish"></i> Tracking</a>
+
+                    <div class="sidebar-title">Akun</div>
+                    <a href="{{ route('operator.akun') }}" class="sidebar-item @if(request()->routeIs('operator.akun*')) active @endif"><i class="fas fa-user-pen"></i> Akun Saya</a>
                     <a href="#" class="sidebar-item logout-trigger"><i class="fas fa-arrow-right-from-bracket"></i> Logout</a>
                 </div>
             </div>

@@ -338,6 +338,11 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
         Route::get('/tracking', [OperatorTrackingController::class, 'index'])->name('tracking.index');
         Route::get('/tracking/{userId}', [OperatorTrackingController::class, 'detail'])->name('tracking.detail');
 
+        // Akun Operator
+        Route::get('/akun', [OperatorDashboardController::class, 'akun'])->name('akun');
+        Route::post('/akun/update-email', [OperatorDashboardController::class, 'updateEmail'])->name('akun.update-email');
+        Route::post('/akun/update-password', [OperatorDashboardController::class, 'updatePassword'])->name('akun.update-password');
+
         // Database Presensi
         Route::prefix('presensi')->name('presensi.')->group(function () {
             Route::get('/', [OperatorPresensiController::class, 'index'])->name('index');

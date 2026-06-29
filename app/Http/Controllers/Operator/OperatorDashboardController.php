@@ -8,6 +8,9 @@ use App\Models\AppSetting;
 use App\Models\DeviceIssue;
 use App\Models\Instansi;
 use App\Models\JamKerja;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\JamShift;
 use App\Models\PengajuanPresensi;
 use App\Models\Pengumuman;
@@ -75,5 +78,37 @@ class OperatorDashboardController extends Controller
             'instansi', 'appSettings', 'recentActivities',
             'onlineUsers', 'presensi7Hari'
         ));
+    }
+
+    public function akun()
+    {
+        return view('operator.akun');
+    }
+
+    public function updateEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
+        ]);
+
+        Auth::user()->update(['email' => $request->email]);
+
+        return back()->with('success', 'Email berhasil diperbarui');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, Auth::user()->password)) {
+            return back()->with('error', 'Password lama tidak sesuai');
+        }
+
+        Auth::user()->update(['password' => Hash::make($request->password)]);
+
+        return back()->with('success', 'Password berhasil diperbarui');
     }
 }
