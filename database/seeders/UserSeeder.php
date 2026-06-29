@@ -39,6 +39,19 @@ class UserSeeder extends Seeder
             'can_approve_pengajuan' => true,
         ]);
 
+        // Operator
+        User::create([
+            'nip' => '199800112025061004',
+            'name' => 'Operator Sistem',
+            'email' => 'operator@karisma.test',
+            'password' => Hash::make('password'),
+            'jabatan' => 'Operator IT',
+            'unit_id' => 1,
+            'jenis_pegawai' => 'ASN',
+            'role' => 'operator',
+            'can_approve_pengajuan' => false,
+        ]);
+
         // Pegawai
         User::create([
             'nip' => '199800112025061003',
