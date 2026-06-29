@@ -28,7 +28,7 @@
     <!-- Search & Filter Card -->
     <div class="p-5 mb-6 text-sm" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:14px;">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div class="md:col-span-4">
+            <div class="md:col-span-5">
                 <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Cari Pegawai</label>
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="Cari nama atau NIP..."
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div class="md:col-span-2">
+            <div class="md:col-span-3">
                 <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Filter Unit</label>
                 <select id="filterUnit" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Unit</option>
@@ -47,7 +47,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="md:col-span-3">
+            <div class="md:col-span-2">
                 <label class="block text-sm font-medium mb-1" style="color:var(--dm-text,#374151);">Jenis Pegawai</label>
                 <select id="filterJenis" class="w-full px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none" style="background:var(--dm-card,#fff); color:var(--dm-text); border:1px solid var(--dm-border,#d1d5db); border-radius:10px;">
                     <option value="">Semua Jenis</option>
@@ -56,7 +56,7 @@
                     <option value="outsourcing">Outsourcing</option>
                 </select>
             </div>
-            <div class="md:col-span-1">
+            <div class="md:col-span-2">
                 <button id="resetFilter" class="w-full h-[42px] px-4 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-center" style="background:var(--dm-bg,#f1f5f9); color:var(--dm-text,#374151);">
                     <i class="fas fa-sync-alt mr-2"></i> Reset
                 </button>
