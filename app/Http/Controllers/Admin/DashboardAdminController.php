@@ -17,7 +17,7 @@ class DashboardAdminController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        $excludeTester = function($q) { $q->where('is_tester', false); };
+        $excludeTester = function($q) { $q->where('is_tester', false)->where('role', '!=', 'operator'); };
 
         $jumlahHadir = Presensi::whereHas('user', $excludeTester)
             ->whereDate('tanggal', $today)
@@ -542,7 +542,7 @@ class DashboardAdminController extends Controller
         $format = $days <= 30 ? 'D d/m' : 'd/m';
 
         $allPresensi = Presensi::with('user')
-            ->whereHas('user', function($q) { $q->where('is_tester', false); })
+            ->whereHas('user', function($q) { $q->where('is_tester', false)->where('role', '!=', 'operator'); })
             ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
             ->where('status', 'approved')
             ->get();

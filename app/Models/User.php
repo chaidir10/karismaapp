@@ -67,7 +67,7 @@ class User extends Authenticatable
 
     public function scopeNonTester($query)
     {
-        return $query->where('is_tester', false);
+        return $query->where('is_tester', false)->where('role', '!=', 'operator');
     }
 
     /**
