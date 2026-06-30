@@ -11,6 +11,7 @@
     .sp-row.hidden-row { display:none; }
     .kandidat-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:1px solid var(--dm-border,#e2e8f0); margin-bottom:6px; }
     .kandidat-item.added { opacity:0.35; pointer-events:none; }
+    .sort-th:hover { background:var(--dm-bg,#f1f5f9) !important; }
 </style>
 @endpush
 
@@ -75,9 +76,15 @@
                     </tr>
                     <tr>
                         <th class="px-5 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151); width:45px;">No</th>
-                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Pegawai</th>
-                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Jabatan</th>
-                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Unit</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase sort-th" style="color:var(--dm-text,#374151); cursor:pointer; user-select:none;" onclick="toggleSort('name')">
+                            Pegawai <i id="icon-name" class="fas fa-sort-up" style="font-size:10px; margin-left:4px; color:#2E97D4;"></i>
+                        </th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase sort-th" style="color:var(--dm-text,#374151); cursor:pointer; user-select:none;" onclick="toggleSort('jabatan')">
+                            Jabatan <i id="icon-jabatan" class="fas fa-sort" style="font-size:10px; margin-left:4px; opacity:0.3;"></i>
+                        </th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase sort-th" style="color:var(--dm-text,#374151); cursor:pointer; user-select:none;" onclick="toggleSort('unit')">
+                            Unit <i id="icon-unit" class="fas fa-sort" style="font-size:10px; margin-left:4px; opacity:0.3;"></i>
+                        </th>
                         <th class="px-5 py-3 text-center text-xs font-semibold uppercase" style="color:var(--dm-text,#374151);">Aksi</th>
                     </tr>
                 </thead>
@@ -87,6 +94,8 @@
                         data-id="{{ $user->id }}"
                         data-name="{{ strtolower($user->name) }}"
                         data-nip="{{ $user->nip }}"
+                        data-jabatan="{{ strtolower($user->jabatan ?? '') }}"
+                        data-unit-name="{{ strtolower($user->wilayahKerja->nama ?? '') }}"
                         data-unit-id="{{ $user->unit_id ?? '' }}">
                         <td class="px-5 py-3 text-sm row-num" style="color:var(--dm-muted,#64748b);">{{ $i + 1 }}</td>
                         <td class="px-5 py-3">
@@ -203,6 +212,57 @@ var urlNonShift = '{{ route("admin.shift-pegawai.non-shift-users") }}';
 var urlAssign   = '{{ route("admin.shift-pegawai.assign") }}';
 var allKandidat = [];
 
+// ─── Sort ──────────────────────────────────────────────────────
+var SS_KEY   = 'shiftPegawaiSort';
+var saved    = JSON.parse(sessionStorage.getItem(SS_KEY) || '{"col":"name","dir":"asc"}');
+var sortCol  = saved.col;
+var sortDir  = saved.dir;
+
+function toggleSort(col) {
+    if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortCol = col;
+        sortDir = 'asc';
+    }
+    sessionStorage.setItem(SS_KEY, JSON.stringify({ col: sortCol, dir: sortDir }));
+    updateSortIcons();
+    applySortAndFilter();
+}
+
+function updateSortIcons() {
+    var cols = ['name', 'jabatan', 'unit'];
+    cols.forEach(function(c) {
+        var icon = document.getElementById('icon-' + c);
+        if (!icon) return;
+        if (c === sortCol) {
+            icon.className = sortDir === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+            icon.style.color   = '#2E97D4';
+            icon.style.opacity = '1';
+        } else {
+            icon.className   = 'fas fa-sort';
+            icon.style.color = '';
+            icon.style.opacity = '0.3';
+        }
+    });
+}
+
+function applySortAndFilter() {
+    var tbody = document.getElementById('tableBody');
+    var rows  = Array.from(tbody.querySelectorAll('.sp-row'));
+
+    rows.sort(function(a, b) {
+        var aVal = (a.dataset[sortCol === 'unit' ? 'unitName' : sortCol] || '').toLowerCase();
+        var bVal = (b.dataset[sortCol === 'unit' ? 'unitName' : sortCol] || '').toLowerCase();
+        if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    rows.forEach(function(row) { tbody.appendChild(row); });
+    applyFilter();
+}
+
 // ─── Filter tabel utama ────────────────────────────────────────
 function applyFilter() {
     var search  = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -237,6 +297,10 @@ document.getElementById('resetFilter').addEventListener('click', function() {
     document.getElementById('filterUnit').value = '';
     applyFilter();
 });
+
+// init sort on load
+updateSortIcons();
+applySortAndFilter();
 
 // ─── Modal Tambah ─────────────────────────────────────────────
 function openTambahModal() {
@@ -333,10 +397,12 @@ function addRowToTable(user) {
 
     var tr = document.createElement('tr');
     tr.className = 'sp-row';
-    tr.dataset.id     = user.id;
-    tr.dataset.name   = user.name.toLowerCase();
-    tr.dataset.nip    = user.nip;
-    tr.dataset.unitId = '';
+    tr.dataset.id       = user.id;
+    tr.dataset.name     = user.name.toLowerCase();
+    tr.dataset.nip      = user.nip;
+    tr.dataset.jabatan  = (user.jabatan || '').toLowerCase();
+    tr.dataset.unitName = (user.unit || '').toLowerCase();
+    tr.dataset.unitId   = '';
 
     tr.innerHTML =
         '<td class="px-5 py-3 text-sm row-num" style="color:var(--dm-muted,#64748b);">' + rowCount + '</td>' +
