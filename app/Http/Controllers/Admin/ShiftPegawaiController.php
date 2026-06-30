@@ -12,7 +12,7 @@ class ShiftPegawaiController extends Controller
 {
     public function index()
     {
-        $users = User::nonTester()
+        $users  = User::nonTester()->where('can_shift', true)
             ->with(['wilayahKerja', 'jamShift'])
             ->orderBy('name')
             ->get();
@@ -23,57 +23,77 @@ class ShiftPegawaiController extends Controller
         return view('admin.shift-pegawai', compact('users', 'shifts', 'units'));
     }
 
-    public function update(Request $request, $id)
+    public function nonShiftUsers()
     {
-        $user = User::nonTester()->findOrFail($id);
+        $users = User::nonTester()->where('can_shift', false)
+            ->with('wilayahKerja')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($u) => [
+                'id'     => $u->id,
+                'name'   => $u->name,
+                'nip'    => $u->nip,
+                'unit'   => $u->wilayahKerja->nama ?? '-',
+                'foto'   => $u->foto_profil ? asset('public/storage/foto_profil/' . $u->foto_profil) : null,
+                'inisial'=> strtoupper(substr($u->name, 0, 1)),
+            ]);
 
+        return response()->json($users);
+    }
+
+    public function assign(Request $request)
+    {
         $request->validate([
-            'can_shift'   => 'required|boolean',
-            'jam_shift_id' => 'nullable|exists:jam_shift,id',
+            'user_id'      => 'required|exists:users,id',
+            'jam_shift_id' => 'required|exists:jam_shift,id',
         ]);
 
-        $canShift    = $request->boolean('can_shift');
-        $jamShiftId  = $canShift ? $request->jam_shift_id : null;
+        $user = User::nonTester()->findOrFail($request->user_id);
+        $user->update(['can_shift' => true, 'jam_shift_id' => $request->jam_shift_id]);
 
-        $user->update([
-            'can_shift'    => $canShift,
-            'jam_shift_id' => $jamShiftId,
-        ]);
-
-        $shift = $jamShiftId ? JamShift::find($jamShiftId) : null;
+        $shift = JamShift::find($request->jam_shift_id);
 
         return response()->json([
-            'success'     => true,
-            'message'     => 'Status shift berhasil diperbarui',
-            'can_shift'   => $canShift,
-            'shift_nama'  => $shift->nama ?? null,
-            'jam_masuk'   => $shift->jam_masuk ?? null,
-            'jam_pulang'  => $shift->jam_pulang ?? null,
+            'success'    => true,
+            'user'       => [
+                'id'       => $user->id,
+                'name'     => $user->name,
+                'nip'      => $user->nip,
+                'unit'     => $user->wilayahKerja->nama ?? '-',
+                'foto'     => $user->foto_profil ? asset('public/storage/foto_profil/' . $user->foto_profil) : null,
+                'inisial'  => strtoupper(substr($user->name, 0, 1)),
+                'shift_nama'   => $shift->nama,
+                'jam_masuk'    => $shift->jam_masuk,
+                'jam_pulang'   => $shift->jam_pulang,
+                'jam_shift_id' => $shift->id,
+            ],
         ]);
     }
 
-    public function bulkUpdate(Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'user_ids'    => 'required|array|min:1',
-            'user_ids.*'  => 'exists:users,id',
-            'can_shift'   => 'required|boolean',
-            'jam_shift_id' => 'nullable|exists:jam_shift,id',
+            'jam_shift_id' => 'required|exists:jam_shift,id',
         ]);
 
-        $canShift   = $request->boolean('can_shift');
-        $jamShiftId = $canShift ? $request->jam_shift_id : null;
+        $user = User::nonTester()->findOrFail($id);
+        $user->update(['can_shift' => true, 'jam_shift_id' => $request->jam_shift_id]);
 
-        User::nonTester()
-            ->whereIn('id', $request->user_ids)
-            ->update([
-                'can_shift'    => $canShift,
-                'jam_shift_id' => $jamShiftId,
-            ]);
+        $shift = JamShift::find($request->jam_shift_id);
 
         return response()->json([
-            'success' => true,
-            'message' => count($request->user_ids) . ' pegawai berhasil diperbarui',
+            'success'    => true,
+            'shift_nama' => $shift->nama,
+            'jam_masuk'  => $shift->jam_masuk,
+            'jam_pulang' => $shift->jam_pulang,
         ]);
+    }
+
+    public function remove($id)
+    {
+        $user = User::nonTester()->findOrFail($id);
+        $user->update(['can_shift' => false, 'jam_shift_id' => null]);
+
+        return response()->json(['success' => true]);
     }
 }
