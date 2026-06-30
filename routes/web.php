@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\JamKerjaController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PerformaController;
 use App\Http\Controllers\Admin\PengumumanController;
+use App\Http\Controllers\Admin\ShiftPegawaiController;
 use App\Http\Controllers\SuperAdmin\DashboardSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
 use App\Http\Controllers\Operator\OperatorDashboardController;
@@ -229,6 +230,15 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
             Route::post('/', [JamKerjaController::class, 'store'])->name('store');
             Route::put('/{id}', [JamKerjaController::class, 'update'])->name('update');
             Route::delete('/{id}', [JamKerjaController::class, 'destroy'])->name('destroy');
+        });
+
+        // --------------------
+        // Shift Pegawai
+        // --------------------
+        Route::prefix('shift-pegawai')->name('shift-pegawai.')->group(function () {
+            Route::get('/', [ShiftPegawaiController::class, 'index'])->name('index');
+            Route::put('/{id}', [ShiftPegawaiController::class, 'update'])->name('update');
+            Route::post('/bulk-update', [ShiftPegawaiController::class, 'bulkUpdate'])->name('bulk-update');
         });
 
         // --------------------

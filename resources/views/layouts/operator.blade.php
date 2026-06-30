@@ -336,6 +336,9 @@
                         <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif">
                             <i class="fas fa-clock"></i> Jam Kerja
                         </a>
+                        <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif">
+                            <i class="fas fa-business-time"></i> Shift Pegawai
+                        </a>
                         <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays')) active @endif">
                             <i class="fas fa-calendar-xmark"></i> Hari Libur
                         </a>
@@ -491,6 +494,7 @@
                     <div class="sidebar-title">Manajemen</div>
                     <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.*')) active @endif"><i class="fas fa-user-group"></i> Pegawai</a>
                     <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif"><i class="fas fa-clock"></i> Jam Kerja</a>
+                    <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif"><i class="fas fa-business-time"></i> Shift Pegawai</a>
                     <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif"><i class="fas fa-calendar-xmark"></i> Hari Libur</a>
                     <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif"><i class="fas fa-location-dot"></i> Lokasi</a>
                     <a href="{{ route('operator.presensi.index') }}" class="sidebar-item @if(request()->routeIs('operator.presensi.*')) active @endif"><i class="fas fa-database"></i> Database Presensi</a>

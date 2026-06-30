@@ -822,6 +822,9 @@
                         <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif">
                             <i class="fas fa-clock"></i> Jam Kerja
                         </a>
+                        <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif">
+                            <i class="fas fa-business-time"></i> Shift Pegawai
+                        </a>
                         <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif">
                             <i class="fas fa-calendar-xmark"></i> Hari Libur
                         </a>
@@ -967,6 +970,9 @@
                     </a>
                     <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif">
                         <i class="fas fa-clock"></i> Jam Kerja
+                    </a>
+                    <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif">
+                        <i class="fas fa-business-time"></i> Shift Pegawai
                     </a>
                     <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif">
                         <i class="fas fa-calendar-xmark"></i> Hari Libur
