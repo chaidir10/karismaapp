@@ -239,7 +239,6 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
             Route::get('/', [ShiftPegawaiController::class, 'index'])->name('index');
             Route::get('/non-shift-users', [ShiftPegawaiController::class, 'nonShiftUsers'])->name('non-shift-users');
             Route::post('/assign', [ShiftPegawaiController::class, 'assign'])->name('assign');
-            Route::put('/{id}', [ShiftPegawaiController::class, 'update'])->name('update');
             Route::delete('/{id}', [ShiftPegawaiController::class, 'remove'])->name('remove');
         });
 
