@@ -17,10 +17,18 @@ class ShiftPegawaiController extends Controller
             ->orderBy('name')
             ->get();
 
-        $shifts = JamShift::orderBy('nama')->get();
-        $units  = WilayahKerja::orderBy('nama')->get();
+        $shifts   = JamShift::orderBy('nama')->get();
+        $units    = WilayahKerja::orderBy('nama')->get();
+        $shiftMap = $shifts->mapWithKeys(fn($s) => [
+            $s->id => [
+                'id'        => $s->id,
+                'nama'      => $s->nama,
+                'jam_masuk' => $s->jam_masuk,
+                'jam_pulang'=> $s->jam_pulang,
+            ]
+        ]);
 
-        return view('admin.shift-pegawai', compact('users', 'shifts', 'units'));
+        return view('admin.shift-pegawai', compact('users', 'shifts', 'units', 'shiftMap'));
     }
 
     public function nonShiftUsers()

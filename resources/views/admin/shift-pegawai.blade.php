@@ -242,7 +242,7 @@ var csrfToken  = '{{ csrf_token() }}';
 var urlBase    = '{{ url("admin/shift-pegawai") }}';
 var urlNonShift= '{{ route("admin.shift-pegawai.non-shift-users") }}';
 var urlAssign  = '{{ route("admin.shift-pegawai.assign") }}';
-var shiftMap   = @json($shifts->map(fn($s) => ['id'=>$s->id,'nama'=>$s->nama,'jam_masuk'=>$s->jam_masuk,'jam_pulang'=>$s->jam_pulang])->keyBy('id'));
+var shiftMap   = @json($shiftMap);
 
 var allKandidat = [];
 
