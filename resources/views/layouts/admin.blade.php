@@ -9,7 +9,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <title>Admin | @yield('title')</title>
+    <title>@yield('title') | Karisma</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -771,6 +771,37 @@
         }
         [data-theme="dark"] .admin-theme-btn { border-color: var(--dm-border); color: var(--dm-muted); }
     </style>
+    <style>
+        .badge-baru {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 7px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            background: #2E97D4;
+            color: #fff;
+            margin-left: 6px;
+            vertical-align: middle;
+            animation: baruPulse 1.4s ease-in-out infinite;
+            box-shadow: 0 0 0 0 rgba(46,151,212,0.5);
+        }
+        @keyframes baruPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,151,212,0.4); }
+            50%       { opacity: 0.55; box-shadow: 0 0 0 5px rgba(46,151,212,0); }
+        }
+        [data-theme="dark"] .badge-baru {
+            background: #38bdf8;
+            color: #0c1a2e;
+            box-shadow: 0 0 0 0 rgba(56,189,248,0.5);
+        }
+        @keyframes baruPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,151,212,0.5); }
+            50%       { opacity: 0.5; box-shadow: 0 0 0 6px rgba(46,151,212,0); }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800 text-sm">
@@ -823,7 +854,7 @@
                             <i class="fas fa-clock"></i> Jam Kerja
                         </a>
                         <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif">
-                            <i class="fas fa-business-time"></i> Shift Pegawai
+                            <i class="fas fa-business-time"></i> Shift Pegawai<span class="badge-baru badge-baru-shift">Baru</span>
                         </a>
                         <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif">
                             <i class="fas fa-calendar-xmark"></i> Hari Libur
@@ -972,7 +1003,7 @@
                         <i class="fas fa-clock"></i> Jam Kerja
                     </a>
                     <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif">
-                        <i class="fas fa-business-time"></i> Shift Pegawai
+                        <i class="fas fa-business-time"></i> Shift Pegawai<span class="badge-baru badge-baru-shift">Baru</span>
                     </a>
                     <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif">
                         <i class="fas fa-calendar-xmark"></i> Hari Libur
@@ -1144,6 +1175,15 @@
     </style>
 
     @stack('scripts')
+    <script>
+    (function() {
+        var release = new Date('2026-07-01T00:00:00').getTime();
+        var expired = Date.now() - release > 24 * 60 * 60 * 1000;
+        if (expired) {
+            document.querySelectorAll('.badge-baru-shift').forEach(function(el) { el.remove(); });
+        }
+    })();
+    </script>
 </body>
 
 </html>

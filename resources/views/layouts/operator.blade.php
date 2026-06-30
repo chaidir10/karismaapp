@@ -9,7 +9,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <title>Operator | @yield('title')</title>
+    <title>@yield('title') | Karisma</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -290,6 +290,29 @@
         [data-theme="dark"] .hover\:bg-gray-50:hover { background-color: #1a2332 !important; }
 
         .sr-only { position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; border:0 !important; }
+        .badge-baru {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 7px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            background: #2E97D4;
+            color: #fff;
+            margin-left: 6px;
+            vertical-align: middle;
+            animation: baruPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes baruPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,151,212,0.5); }
+            50%       { opacity: 0.5; box-shadow: 0 0 0 6px rgba(46,151,212,0); }
+        }
+        [data-theme="dark"] .badge-baru {
+            background: #38bdf8;
+            color: #0c1a2e;
+        }
     </style>
 </head>
 
@@ -337,7 +360,7 @@
                             <i class="fas fa-clock"></i> Jam Kerja
                         </a>
                         <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif">
-                            <i class="fas fa-business-time"></i> Shift Pegawai
+                            <i class="fas fa-business-time"></i> Shift Pegawai<span class="badge-baru badge-baru-shift">Baru</span>
                         </a>
                         <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays')) active @endif">
                             <i class="fas fa-calendar-xmark"></i> Hari Libur
@@ -494,7 +517,7 @@
                     <div class="sidebar-title">Manajemen</div>
                     <a href="{{ route('admin.manajemenpegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.manajemenpegawai.*')) active @endif"><i class="fas fa-user-group"></i> Pegawai</a>
                     <a href="{{ route('admin.jamkerja.index') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.index') || request()->routeIs('admin.jamkerja.shift.*')) active @endif"><i class="fas fa-clock"></i> Jam Kerja</a>
-                    <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif"><i class="fas fa-business-time"></i> Shift Pegawai</a>
+                    <a href="{{ route('admin.shift-pegawai.index') }}" class="sidebar-item @if(request()->routeIs('admin.shift-pegawai.*')) active @endif"><i class="fas fa-business-time"></i> Shift Pegawai<span class="badge-baru badge-baru-shift">Baru</span></a>
                     <a href="{{ route('admin.jamkerja.holidays') }}" class="sidebar-item @if(request()->routeIs('admin.jamkerja.holidays') || request()->routeIs('admin.jamkerja.holiday.*')) active @endif"><i class="fas fa-calendar-xmark"></i> Hari Libur</a>
                     <a href="{{ route('admin.lokasi.index') }}" class="sidebar-item @if(request()->routeIs('admin.lokasi.*')) active @endif"><i class="fas fa-location-dot"></i> Lokasi</a>
                     <a href="{{ route('operator.presensi.index') }}" class="sidebar-item @if(request()->routeIs('operator.presensi.*')) active @endif"><i class="fas fa-database"></i> Database Presensi</a>
@@ -581,6 +604,15 @@
     <style>@keyframes acFadeIn{from{opacity:0}to{opacity:1}}@keyframes acSlideUp{from{opacity:0;transform:translateY(12px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}</style>
 
     @stack('scripts')
+    <script>
+    (function() {
+        var release = new Date('2026-07-01T00:00:00').getTime();
+        var expired = Date.now() - release > 24 * 60 * 60 * 1000;
+        if (expired) {
+            document.querySelectorAll('.badge-baru-shift').forEach(function(el) { el.remove(); });
+        }
+    })();
+    </script>
 </body>
 
 </html>
