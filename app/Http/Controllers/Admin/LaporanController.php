@@ -52,12 +52,23 @@ class LaporanController extends Controller
                 $cutiList = collect();
             }
             $cutiDates = [];
+            $cutiDetails = [];
             foreach ($cutiList as $c) {
                 $cStart = $c->tanggal_mulai->max($startDate);
                 $cEnd = $c->tanggal_selesai->min($endDate);
+                $count = 0;
                 for ($d = $cStart->copy(); $d->lte($cEnd); $d->addDay()) {
                     if ($d->dayOfWeek == 0 || $d->dayOfWeek == 6 || isset($holidays[$d->format('Y-m-d')])) continue;
                     $cutiDates[$d->format('Y-m-d')] = $c->label;
+                    $count++;
+                }
+                if ($count > 0) {
+                    $cutiDetails[] = [
+                        'hari'    => $count,
+                        'mulai'   => $c->tanggal_mulai->copy(),
+                        'selesai' => $c->tanggal_selesai->copy(),
+                        'label'   => $c->label,
+                    ];
                 }
             }
 
@@ -223,6 +234,7 @@ class LaporanController extends Controller
                 'total_hari_telat'   => $totalHariTelat,
                 'total_hari_lembur'  => $totalHariLembur,
                 'total_hari_cuti'    => $totalHariCuti,
+                'cuti_details'       => $cutiDetails,
                 'is_shift'         => $isShiftUser,
                 'shift_nama'       => $isShiftUser ? 'Pegawai Shift' : null,
                 'rows'             => $rows,

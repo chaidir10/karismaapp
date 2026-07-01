@@ -104,6 +104,23 @@
                     <td colspan="2"></td>
                     @endif
                 </tr>
+                @if($r[0] === 'Total Hari Cuti/DL' && !empty($item['cuti_details']))
+                    @foreach($item['cuti_details'] as $cd)
+                    @php
+                        $m = $cd['mulai']; $s = $cd['selesai'];
+                        if ($m->month === $s->month && $m->year === $s->year) {
+                            $tgl = $m->translatedFormat('j') . ' s.d ' . $s->translatedFormat('j F Y');
+                        } else {
+                            $tgl = $m->translatedFormat('j F') . ' s.d ' . $s->translatedFormat('j F Y');
+                        }
+                    @endphp
+                    <tr>
+                        <td style="color:#888;"></td>
+                        <td style="padding-left:4px; color:#555;">: {{ $cd['hari'] }} Hari ({{ $tgl }}) <em>{{ $cd['label'] }}</em></td>
+                        <td colspan="2"></td>
+                    </tr>
+                    @endforeach
+                @endif
                 @endforeach
             </table>
         </div>
