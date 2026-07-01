@@ -37,6 +37,7 @@ class LaporanExport implements WithMultipleSheets
 class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, WithStyles
 {
     protected $data;
+    protected $cutiDetailsCount = 0;
 
     public function __construct($data)
     {
@@ -80,6 +81,18 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $rows[] = ['Total Hari Hadir', '', ': ' . ($this->data['total_hari_hadir'] ?? 0) . ' Hari', '', 'Total Keterlambatan', '', ': ' . $this->data['summary']['total_keterlambatan'] . ' menit'];
         $rows[] = ['Total Hari Lembur', '', ': ' . ($this->data['total_hari_lembur'] ?? 0) . ' Hari', '', 'Total Waktu Kurang', '', ': ' . $this->data['summary']['total_kekurangan'] . ' menit'];
         $rows[] = ['Total Hari Cuti/DL', '', ': ' . ($this->data['total_hari_cuti'] ?? 0) . ' Hari'];
+
+        $cutiDetails = $this->data['cuti_details'] ?? [];
+        foreach ($cutiDetails as $cd) {
+            $m = $cd['mulai']; $s = $cd['selesai'];
+            if ($m->month === $s->month && $m->year === $s->year) {
+                $tgl = $m->locale('id')->isoFormat('D') . ' s.d ' . $s->locale('id')->isoFormat('D MMMM YYYY');
+            } else {
+                $tgl = $m->locale('id')->isoFormat('D MMMM') . ' s.d ' . $s->locale('id')->isoFormat('D MMMM YYYY');
+            }
+            $rows[] = ['', '', ': ' . $cd['hari'] . ' Hari (' . $tgl . ') ' . $cd['label']];
+        }
+        $this->cutiDetailsCount = count($cutiDetails);
 
         return $rows;
     }
@@ -172,35 +185,55 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getPageSetup()->setHorizontalCentered(true);
         $sheet->getPageSetup()->setPrintArea("A1:{$lastCol}{$lastRow}");
 
-        // --- Summary: 5 rows (1 header + 4 data) ---
-        $summaryStart = $lastRow - 4;
+        // --- Summary: variable rows based on cuti details ---
+        $summaryStart = $lastRow - (4 + $this->cutiDetailsCount);
         $ds = $summaryStart + 1;
-        $de = $summaryStart + 4; // last data row (Total Keterlambatan)
+        $de = $summaryStart + 4; // Total Hari Cuti/DL row
+        $deDetail = $de + $this->cutiDetailsCount;
 
         // Ringkasan header — merge full row
         $sheet->mergeCells("A{$summaryStart}:{$lastCol}{$summaryStart}");
 
-        // Rows 1-3 of data (ds to de-1): left label A+B, left value C, right label E+F, right value G+H+I
+        // Rows 1-3 (Hari Kerja, Hadir, Lembur): left A+B, value C, right E+F, right value G-I
         for ($r = $ds; $r <= $de - 1; $r++) {
             $sheet->mergeCells("A{$r}:B{$r}");
             $sheet->mergeCells("E{$r}:F{$r}");
             $sheet->mergeCells("G{$r}:{$lastCol}{$r}");
         }
-        // Last row (Total Keterlambatan): label A+B, value C+D+E+F+G+H+I
+        // Total Hari Cuti/DL: A+B merged label, C-lastCol merged value
         $sheet->mergeCells("A{$de}:B{$de}");
         $sheet->mergeCells("C{$de}:{$lastCol}{$de}");
+        // Cuti detail rows: empty A+B, detail text C-lastCol
+        $detailStart = $de + 1;
+        for ($r = $detailStart; $r <= $deDetail; $r++) {
+            $sheet->mergeCells("A{$r}:B{$r}");
+            $sheet->mergeCells("C{$r}:{$lastCol}{$r}");
+        }
 
-        // Font bold + alignment
-        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
+        // Font bold untuk summary header + baris utama
+        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$de}")
             ->getFont()->setBold(true);
-        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$lastRow}")
+        if ($this->cutiDetailsCount > 0) {
+            $sheet->getStyle("A{$detailStart}:{$lastCol}{$deDetail}")
+                ->getFont()->setBold(false)->setItalic(true)->setSize(8);
+            $sheet->getStyle("A{$detailStart}:{$lastCol}{$deDetail}")
+                ->getFill()->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('F5F5F5');
+        }
+        $sheet->getStyle("A{$summaryStart}:{$lastCol}{$deDetail}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Stabilo kuning pada baris Total Hari Hadir
+        $rowHadir = $ds + 1;
+        $sheet->getStyle("A{$rowHadir}:{$lastCol}{$rowHadir}")
+            ->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('FFFF00');
 
         // Border: header row
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$summaryStart}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        // Border: left side (A-C) all data rows
-        $sheet->getStyle("A{$ds}:C{$de}")
+        // Border: left side (A-C) semua baris data termasuk detail
+        $sheet->getStyle("A{$ds}:C{$deDetail}")
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         // Border: right side (E-I) rows 1-3 only
         $deLast3 = $de - 1;
