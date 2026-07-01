@@ -68,9 +68,9 @@
     .history-empty p { font-size:13px; margin:0; }
 
     .info-carousel { margin:0 0 20px; position:relative; overflow:hidden; }
-    .carousel-track { display:flex; will-change:transform; user-select:none; -webkit-user-select:none; }
-    .carousel-slide { min-width:100%; cursor:pointer; padding:0 20px; box-sizing:border-box; }
-    .slide-content { border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center; color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+    .carousel-track { display:flex; will-change:transform; user-select:none; -webkit-user-select:none; padding-left:16px; }
+    .carousel-slide { min-width:calc(100% - 32px); flex-shrink:0; cursor:pointer; padding-right:12px; box-sizing:border-box; }
+    .slide-content { border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center; color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06); height:120px; box-sizing:border-box; }
     .slide-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:rgba(255,255,255,0.2); color:#fff; }
     .slide-body { flex:1; min-width:0; }
     .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
@@ -79,7 +79,7 @@
     .slide-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:3px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .slide-desc { font-size:12px; color:rgba(255,255,255,0.8); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .slide-link { font-size:11px; font-weight:600; margin-top:6px; color:rgba(255,255,255,0.9); }
-    .slide-image { width:100%; height:140px; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+    .slide-image { width:100%; height:160px; border-radius:16px; background-size:cover; background-position:center top; position:relative; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
     .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
     .dot.active { background:var(--primary); width:20px; border-radius:4px; }
@@ -735,7 +735,7 @@
     window.Carousel = (function() {
         var current = 0, track, total, autoTimer, dragging = false, startX, currentX, baseOffset;
 
-        function width() { return track ? track.parentElement.offsetWidth : 1; }
+        function width() { return (track && track.children[0]) ? track.children[0].offsetWidth : (track ? track.parentElement.offsetWidth : 1); }
         function setPos(px, anim) {
             if (!track) return;
             track.style.transition = anim ? 'transform 0.3s ease' : 'none';
