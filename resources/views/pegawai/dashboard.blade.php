@@ -69,8 +69,8 @@
 
     .info-carousel { margin:0 0 20px; position:relative; overflow:hidden; }
     .carousel-track { display:flex; will-change:transform; user-select:none; -webkit-user-select:none; padding-left:16px; }
-    .carousel-slide { min-width:calc(100% - 32px); flex-shrink:0; cursor:pointer; padding-right:12px; box-sizing:border-box; }
-    .slide-content { border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center; color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06); aspect-ratio:8/3; overflow:hidden; box-sizing:border-box; }
+    .carousel-slide { min-width:calc(100% - 32px); flex-shrink:0; cursor:pointer; padding-right:12px; box-sizing:border-box; aspect-ratio:8/3; overflow:hidden; position:relative; }
+    .slide-content { width:100%; height:100%; border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center; color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06); box-sizing:border-box; overflow:hidden; }
     .slide-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; background:rgba(255,255,255,0.2); color:#fff; }
     .slide-body { flex:1; min-width:0; }
     .slide-tag-row { display:flex; align-items:center; gap:8px; margin-bottom:3px; flex-wrap:wrap; }
@@ -79,7 +79,9 @@
     .slide-title { font-size:13px; font-weight:700; color:#fff; margin-bottom:2px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .slide-desc { font-size:11px; color:rgba(255,255,255,0.8); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .slide-link { font-size:11px; font-weight:600; margin-top:4px; color:rgba(255,255,255,0.9); }
-    .slide-image { width:100%; aspect-ratio:8/3; height:auto; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+    .slide-image { width:100%; height:100%; border-radius:16px; background-size:cover; background-position:center; position:relative; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+    .badge-baru { position:absolute; top:8px; right:20px; z-index:2; background:var(--accent); color:#fff; font-size:9px; font-weight:700; padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; animation:baruBlink 1s ease-in-out infinite; }
+    @keyframes baruBlink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.92)} }
     .carousel-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-light); cursor:pointer; transition:all 0.2s; }
     .dot.active { background:var(--primary); width:20px; border-radius:4px; }
@@ -101,8 +103,6 @@
     .ql-content em { font-style:italic; }
     [data-theme="dark"] .ql-content, [data-theme="dark"] .ql-content * { color:var(--dark)!important; }
 
-    .badge-baru { position:absolute; top:8px; right:8px; z-index:2; background:var(--accent); color:#fff; font-size:9px; font-weight:700; padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; animation:baruBlink 1s ease-in-out infinite; }
-    @keyframes baruBlink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.92)} }
 </style>
 
 @section('content')
@@ -183,7 +183,7 @@
             $pmOpt = \App\Models\Pengumuman::jenisOptions()[$pm->jenis] ?? ['icon'=>'fa-circle-info','color'=>'#64748b','label'=>$pm->jenis,'gradient'=>['#64748b','#475569']];
             $g1 = $pmOpt['gradient'][0]; $g2 = $pmOpt['gradient'][1];
         @endphp
-        <div class="carousel-slide" onclick="App.openInfoModal({{ $pm->id }})" style="position:relative;">
+        <div class="carousel-slide" onclick="App.openInfoModal({{ $pm->id }})">
             @if($pm->created_at->diffInHours(now()) < 42)
             <span class="badge-baru" id="badgeBaru{{ $pm->id }}">Baru</span>
             @endif
