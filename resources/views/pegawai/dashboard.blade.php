@@ -69,7 +69,7 @@
 
     .info-carousel { margin:0 0 20px; position:relative; overflow:hidden; }
     .carousel-track { display:flex; will-change:transform; user-select:none; -webkit-user-select:none; padding-left:16px; }
-    .carousel-slide { min-width:calc(100% - 32px); flex-shrink:0; cursor:pointer; padding-right:12px; box-sizing:border-box; }
+    .carousel-slide { min-width:calc(100% - 32px); flex-shrink:0; cursor:pointer; padding-right:12px; box-sizing:border-box; align-self:flex-start; }
     .slide-content { border-radius:16px; padding:16px; display:flex; gap:14px; align-items:center; color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06); aspect-ratio:8/3; overflow:hidden; box-sizing:border-box; }
     .slide-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; background:rgba(255,255,255,0.2); color:#fff; }
     .slide-body { flex:1; min-width:0; }
