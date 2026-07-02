@@ -114,6 +114,7 @@ class PengumumanController extends Controller
         $request->validate([
             'title' => 'required|string|max:100',
             'body'  => 'required|string|max:200',
+            'url'   => 'nullable|string|max:255',
         ]);
 
         $sender = new WebPushSender();
@@ -123,7 +124,7 @@ class PengumumanController extends Controller
                 'title' => $request->title,
                 'body'  => $request->body,
                 'tag'   => 'custom-' . time(),
-                'url'   => '/pegawai/dashboard',
+                'url'   => $request->filled('url') ? $request->url : '/pegawai/dashboard',
             ]);
             if ($code >= 200 && $code < 300) {
                 $sent++;

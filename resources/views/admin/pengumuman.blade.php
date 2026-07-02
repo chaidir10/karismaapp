@@ -270,38 +270,87 @@
 </div>
 
 <!-- Modal Custom Push -->
-<div id="customPushModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
-    <div style="background:var(--dm-card,#fff); border-radius:20px; width:95%; max-width:460px; padding:28px; position:relative;">
-        <button onclick="closeCustomPushModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--dm-muted,#94a3b8); width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px;">
-            <i class="fas fa-times"></i>
-        </button>
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
-            <div style="width:40px; height:40px; border-radius:10px; background:rgba(245,158,11,0.1); display:flex; align-items:center; justify-content:center; color:#f59e0b; font-size:18px;">
-                <i class="fas fa-paper-plane"></i>
-            </div>
-            <div>
-                <div style="font-size:16px; font-weight:700; color:var(--dm-text,#1e293b);">Kirim Notifikasi Custom</div>
-                <div style="font-size:12px; color:var(--dm-muted,#64748b);">Dikirim ke semua pegawai yang aktif notifikasi</div>
-            </div>
-        </div>
-        <div style="margin-bottom:14px;">
-            <label class="form-label">Judul <span style="color:#ef4444;">*</span></label>
-            <input type="text" id="customPushTitle" maxlength="100" placeholder="Contoh: Pengumuman Penting" class="form-control">
-        </div>
-        <div style="margin-bottom:20px;">
-            <label class="form-label">Pesan <span style="color:#ef4444;">*</span></label>
-            <textarea id="customPushBody" maxlength="200" rows="3" placeholder="Isi pesan notifikasi..." class="form-control" style="resize:vertical;"></textarea>
-            <div style="font-size:11px; color:var(--dm-muted,#94a3b8); margin-top:4px; text-align:right;"><span id="customPushBodyCount">0</span>/200</div>
-        </div>
-        <div id="customPushResult" style="display:none; margin-bottom:14px; padding:10px 14px; border-radius:10px; font-size:13px;"></div>
-        <div style="display:flex; gap:10px; justify-content:flex-end;">
-            <button onclick="closeCustomPushModal()" class="btn-secondary">Batal</button>
-            <button onclick="submitCustomPush()" id="customPushSubmitBtn" class="btn-primary">
-                <i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim
+<div id="customPushModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:100; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:16px;">
+    <div style="background:var(--dm-card,#fff); border-radius:24px; width:100%; max-width:480px; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.25); animation:modalSlideIn .2s ease;">
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#f59e0b,#ef4444); padding:24px 24px 20px; position:relative;">
+            <button onclick="closeCustomPushModal()" style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.2); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                <i class="fas fa-times"></i>
             </button>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:44px; height:44px; border-radius:14px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; flex-shrink:0;">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div>
+                    <div style="font-size:17px; font-weight:700; color:#fff; line-height:1.2;">Kirim Notifikasi Custom</div>
+                    <div style="font-size:12px; color:rgba(255,255,255,0.8); margin-top:2px;">Broadcast ke semua pegawai yang aktif notifikasi</div>
+                </div>
+            </div>
+        </div>
+        <!-- Body -->
+        <div style="padding:24px;">
+            <!-- Judul -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--dm-text,#374151); margin-bottom:6px;">
+                    Judul Notifikasi <span style="color:#ef4444;">*</span>
+                </label>
+                <input type="text" id="customPushTitle" maxlength="100"
+                    placeholder="Contoh: Pengumuman Penting"
+                    style="width:100%; padding:10px 14px; border:1.5px solid var(--dm-border,#e2e8f0); border-radius:12px; font-size:14px; background:var(--dm-input,#f8fafc); color:var(--dm-text,#1e293b); outline:none; transition:border-color .2s; box-sizing:border-box;"
+                    onfocus="this.style.borderColor='#f59e0b'; this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.12)'"
+                    onblur="this.style.borderColor='var(--dm-border,#e2e8f0)'; this.style.boxShadow='none'">
+                <div id="customPushTitleCount" style="font-size:11px; color:var(--dm-muted,#94a3b8); text-align:right; margin-top:4px;">0/100</div>
+            </div>
+            <!-- Pesan -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--dm-text,#374151); margin-bottom:6px;">
+                    Isi Pesan <span style="color:#ef4444;">*</span>
+                </label>
+                <textarea id="customPushBody" maxlength="200" rows="4"
+                    placeholder="Tulis isi pesan notifikasi yang akan diterima pegawai..."
+                    style="width:100%; padding:10px 14px; border:1.5px solid var(--dm-border,#e2e8f0); border-radius:12px; font-size:14px; background:var(--dm-input,#f8fafc); color:var(--dm-text,#1e293b); outline:none; resize:none; transition:border-color .2s; box-sizing:border-box; font-family:inherit;"
+                    onfocus="this.style.borderColor='#f59e0b'; this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.12)'"
+                    onblur="this.style.borderColor='var(--dm-border,#e2e8f0)'; this.style.boxShadow='none'"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                    <div style="font-size:11px; color:var(--dm-muted,#94a3b8);">Pesan singkat dan jelas lebih efektif</div>
+                    <div style="font-size:11px; color:var(--dm-muted,#94a3b8);"><span id="customPushBodyCount">0</span>/200</div>
+                </div>
+            </div>
+            <!-- URL target (opsional) -->
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--dm-text,#374151); margin-bottom:6px;">
+                    URL Tujuan <span style="font-size:11px; font-weight:400; color:var(--dm-muted,#94a3b8);">(opsional)</span>
+                </label>
+                <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--dm-muted,#94a3b8); font-size:13px;">
+                        <i class="fas fa-link"></i>
+                    </span>
+                    <input type="text" id="customPushUrl" placeholder="/pegawai/dashboard"
+                        style="width:100%; padding:10px 14px 10px 34px; border:1.5px solid var(--dm-border,#e2e8f0); border-radius:12px; font-size:13px; background:var(--dm-input,#f8fafc); color:var(--dm-text,#1e293b); outline:none; transition:border-color .2s; box-sizing:border-box;"
+                        onfocus="this.style.borderColor='#f59e0b'; this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.12)'"
+                        onblur="this.style.borderColor='var(--dm-border,#e2e8f0)'; this.style.boxShadow='none'">
+                </div>
+            </div>
+            <!-- Result -->
+            <div id="customPushResult" style="display:none; margin-bottom:16px; padding:12px 14px; border-radius:12px; font-size:13px;"></div>
+            <!-- Buttons -->
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeCustomPushModal()" style="flex:1; padding:11px; border:1.5px solid var(--dm-border,#e2e8f0); background:var(--dm-input,#f8fafc); color:var(--dm-text,#64748b); border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='var(--dm-border,#e2e8f0)'" onmouseout="this.style.background='var(--dm-input,#f8fafc)'">
+                    Batal
+                </button>
+                <button onclick="submitCustomPush()" id="customPushSubmitBtn" style="flex:2; padding:11px; background:linear-gradient(135deg,#f59e0b,#ef4444); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:opacity .2s; box-shadow:0 4px 12px rgba(245,158,11,0.3);" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    <i class="fas fa-paper-plane"></i> Kirim Sekarang
+                </button>
+            </div>
         </div>
     </div>
 </div>
+<style>
+@keyframes modalSlideIn {
+    from { opacity:0; transform:translateY(-16px) scale(0.97); }
+    to   { opacity:1; transform:translateY(0)    scale(1); }
+}
+</style>
 
 <form id="deleteForm" method="POST" style="display:none;">@csrf @method('DELETE')</form>
 
@@ -421,45 +470,70 @@
     function openCustomPushModal() {
         document.getElementById('customPushTitle').value = '';
         document.getElementById('customPushBody').value = '';
+        document.getElementById('customPushUrl').value = '';
+        document.getElementById('customPushTitleCount').textContent = '0/100';
         document.getElementById('customPushBodyCount').textContent = '0';
         document.getElementById('customPushResult').style.display = 'none';
+        document.getElementById('customPushSubmitBtn').disabled = false;
+        document.getElementById('customPushSubmitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Sekarang';
         document.getElementById('customPushModal').style.display = 'flex';
+        setTimeout(function() { document.getElementById('customPushTitle').focus(); }, 100);
     }
     function closeCustomPushModal() {
         document.getElementById('customPushModal').style.display = 'none';
     }
+    document.getElementById('customPushTitle') && document.getElementById('customPushTitle').addEventListener('input', function() {
+        document.getElementById('customPushTitleCount').textContent = this.value.length + '/100';
+    });
     document.getElementById('customPushBody') && document.getElementById('customPushBody').addEventListener('input', function() {
         document.getElementById('customPushBodyCount').textContent = this.value.length;
     });
     function submitCustomPush() {
         var title = document.getElementById('customPushTitle').value.trim();
         var body  = document.getElementById('customPushBody').value.trim();
-        if (!title || !body) { alert('Judul dan pesan wajib diisi.'); return; }
-        var btn = document.getElementById('customPushSubmitBtn');
+        var url   = document.getElementById('customPushUrl').value.trim() || '/pegawai/dashboard';
         var result = document.getElementById('customPushResult');
+        if (!title) {
+            document.getElementById('customPushTitle').focus();
+            showPushResult('error', 'Judul notifikasi wajib diisi.');
+            return;
+        }
+        if (!body) {
+            document.getElementById('customPushBody').focus();
+            showPushResult('error', 'Isi pesan wajib diisi.');
+            return;
+        }
+        var btn = document.getElementById('customPushSubmitBtn');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Mengirim...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+        result.style.display = 'none';
         fetch("{{ route('admin.pengumuman.broadcast-custom') }}", {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ title: title, body: body })
+            body: JSON.stringify({ title: title, body: body, url: url })
         }).then(function(r) { return r.json(); }).then(function(d) {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim';
-            result.style.display = 'block';
-            result.style.background = 'rgba(16,185,129,0.1)';
-            result.style.color = '#059669';
-            result.style.border = '1px solid rgba(16,185,129,0.2)';
-            result.textContent = 'Berhasil terkirim ke ' + d.sent + ' perangkat' + (d.failed ? ' (' + d.failed + ' gagal)' : '') + '.';
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Sekarang';
+            showPushResult('success', '✅ Terkirim ke ' + d.sent + ' perangkat' + (d.failed ? ' · ' + d.failed + ' gagal' : ''));
         }).catch(function() {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim';
-            result.style.display = 'block';
-            result.style.background = 'rgba(239,68,68,0.1)';
-            result.style.color = '#dc2626';
-            result.style.border = '1px solid rgba(239,68,68,0.2)';
-            result.textContent = 'Gagal mengirim notifikasi.';
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Sekarang';
+            showPushResult('error', '❌ Gagal menghubungi server. Coba lagi.');
         });
+    }
+    function showPushResult(type, msg) {
+        var el = document.getElementById('customPushResult');
+        el.style.display = 'block';
+        if (type === 'success') {
+            el.style.background = 'rgba(16,185,129,0.1)';
+            el.style.color = '#059669';
+            el.style.border = '1.5px solid rgba(16,185,129,0.25)';
+        } else {
+            el.style.background = 'rgba(239,68,68,0.08)';
+            el.style.color = '#dc2626';
+            el.style.border = '1.5px solid rgba(239,68,68,0.2)';
+        }
+        el.textContent = msg;
     }
 
     function editPengumuman(id) {
