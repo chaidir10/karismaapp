@@ -1240,7 +1240,7 @@
     <script>
         // Daftar service worker utama
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(function() {});
+            navigator.serviceWorker.register('/sw.js?v=4').catch(function() {});
         }
         if ('caches' in window) {
             caches.keys().then(function(names) {

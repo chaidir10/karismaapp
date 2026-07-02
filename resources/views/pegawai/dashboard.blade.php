@@ -1377,7 +1377,7 @@
             }).catch(function(e) { console.error('[Push] doSubscribe error:', e); });
         }
 
-        navigator.serviceWorker.register('/sw.js').then(function(reg) {
+        navigator.serviceWorker.register('/sw.js?v=4').then(function(reg) {
             console.log('[Push] SW terdaftar');
             if (reg.active) {
                 console.log('[Push] SW sudah aktif');
