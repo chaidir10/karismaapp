@@ -1238,21 +1238,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Daftar SW utama, hapus SW lama yang tidak valid
+        // Daftar service worker utama
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
-                regs.forEach(function(r) {
-                    var script = (r.active || r.installing || r.waiting || {}).scriptURL || '';
-                    // Unregister SW lama (bukan /sw.js) supaya tidak konflik
-                    if (script && !script.endsWith('/sw.js')) { r.unregister(); return; }
-                    // Unregister jika scriptURL tidak diketahui (state rusak)
-                    if (!script) { r.unregister(); }
-                });
-                // Baru daftarkan SW utama
-                navigator.serviceWorker.register('/sw.js').catch(function() {});
-            }).catch(function() {
-                navigator.serviceWorker.register('/sw.js').catch(function() {});
-            });
+            navigator.serviceWorker.register('/sw.js').catch(function() {});
         }
         if ('caches' in window) {
             caches.keys().then(function(names) {
