@@ -1339,26 +1339,24 @@
     }
 
     function initPushSubscription() {
-        if (!('serviceWorker' in navigator)) { console.log('[Push] SW tidak didukung browser ini'); return; }
-        if (!('PushManager' in window)) { console.log('[Push] PushManager tidak didukung browser ini'); return; }
-        if (!CFG.vapidKey) { console.log('[Push] VAPID key kosong — pastikan VAPID_PUBLIC_KEY ada di .env server'); return; }
-        console.log('[Push] Mulai... VAPID key: ' + CFG.vapidKey.substring(0, 20) + '...');
-        navigator.serviceWorker.ready.then(function(reg) {
-            console.log('[Push] Service worker aktif, scope: ' + reg.scope);
-            return reg.pushManager.getSubscription().then(function(existing) {
+        if (!('serviceWorker' in navigator)) { console.log('[Push] SW tidak didukung'); return; }
+        if (!('PushManager' in window)) { console.log('[Push] PushManager tidak didukung'); return; }
+        if (!CFG.vapidKey) { console.log('[Push] VAPID key kosong'); return; }
+        console.log('[Push] Mulai... key: ' + CFG.vapidKey.substring(0, 20) + '...');
+
+        function doSubscribe(reg) {
+            reg.pushManager.getSubscription().then(function(existing) {
                 if (existing) { console.log('[Push] Sudah terdaftar sebelumnya'); return; }
-                console.log('[Push] Belum terdaftar, minta izin notifikasi...');
                 return Notification.requestPermission().then(function(perm) {
-                    console.log('[Push] Permission status: ' + perm);
+                    console.log('[Push] Permission: ' + perm);
                     if (perm !== 'granted') return;
-                    console.log('[Push] Mendaftar ke push server...');
                     return reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: urlBase64ToUint8Array(CFG.vapidKey)
                     });
                 }).then(function(sub) {
-                    if (!sub) { console.log('[Push] Subscribe dibatalkan'); return; }
-                    console.log('[Push] Subscribe berhasil! Simpan ke server...');
+                    if (!sub) { console.log('[Push] Subscribe batal'); return; }
+                    console.log('[Push] Subscribe OK, simpan ke server...');
                     var j = sub.toJSON();
                     return fetch(CFG.pushSubUrl, {
                         method: 'POST',
@@ -1372,15 +1370,28 @@
                             auth_token: j.keys.auth
                         })
                     }).then(function(r) {
-                        if (r.ok) {
-                            console.log('[Push] Berhasil disimpan ke database! Status: ' + r.status);
-                        } else {
-                            r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ':', t); });
-                        }
+                        if (r.ok) console.log('[Push] Tersimpan! Status: ' + r.status);
+                        else r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ': ' + t); });
                     });
                 });
+            }).catch(function(e) { console.error('[Push] doSubscribe error:', e); });
+        }
+
+        navigator.serviceWorker.register('/sw.js').then(function(reg) {
+            console.log('[Push] SW terdaftar');
+            if (reg.active) {
+                console.log('[Push] SW sudah aktif');
+                doSubscribe(reg);
+                return;
+            }
+            var worker = reg.installing || reg.waiting;
+            if (!worker) { console.log('[Push] Tidak ada worker'); return; }
+            console.log('[Push] Menunggu SW aktif... state: ' + worker.state);
+            worker.addEventListener('statechange', function() {
+                console.log('[Push] SW state berubah: ' + this.state);
+                if (this.state === 'activated') doSubscribe(reg);
             });
-        }).catch(function(e) { console.error('[Push] Error:', e); });
+        }).catch(function(e) { console.error('[Push] Register error:', e); });
     }
 
     // ══════════════════════════════════════════════════════════════
