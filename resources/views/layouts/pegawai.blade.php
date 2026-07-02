@@ -1476,118 +1476,67 @@
 
 <script>
 var NotifHistory = (function() {
-    var DB_NAME = 'karisma-notif-db', DB_VER = 1, STORE = 'notifications';
+    var CSRF = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '';
 
-    function openDB() {
-        return new Promise(function(resolve) {
-            var req = indexedDB.open(DB_NAME, DB_VER);
-            req.onupgradeneeded = function(e) {
-                e.target.result.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
-            };
-            req.onsuccess = function(e) { resolve(e.target.result); };
-            req.onerror   = function()  { resolve(null); };
-        });
+    function api(method, path, body) {
+        var opts = { method: method, headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' } };
+        if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+        return fetch('/pegawai/notifikasi' + path, opts).then(function(r) { return r.json(); }).catch(function() { return {}; });
     }
 
-    function getAll() {
-        return openDB().then(function(db) {
-            if (!db) return [];
-            return new Promise(function(resolve) {
-                try {
-                    var req = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
-                    req.onsuccess = function(e) { resolve((e.target.result || []).reverse()); };
-                    req.onerror   = function()  { resolve([]); };
-                } catch(e) { resolve([]); }
-            });
-        });
+    function timeAgo(str) {
+        var diff = Math.floor((Date.now() - new Date(str).getTime()) / 1000);
+        if (diff < 60)    return 'Baru saja';
+        if (diff < 3600)  return Math.floor(diff / 60) + ' menit lalu';
+        if (diff < 86400) return Math.floor(diff / 3600) + ' jam lalu';
+        return Math.floor(diff / 86400) + ' hari lalu';
     }
 
-    function countUnread() {
-        return getAll().then(function(items) {
-            return items.filter(function(i) { return !i.read; }).length;
-        });
-    }
-
-    function markRead(id) {
-        return openDB().then(function(db) {
-            if (!db) return;
-            var tx = db.transaction(STORE, 'readwrite');
-            var store = tx.objectStore(STORE);
-            var req = store.get(id);
-            req.onsuccess = function() {
-                var item = req.result;
-                if (item) { item.read = true; store.put(item); }
-            };
-        });
-    }
-
-    function markAllRead() {
-        return openDB().then(function(db) {
-            if (!db) return;
-            var tx = db.transaction(STORE, 'readwrite');
-            var store = tx.objectStore(STORE);
-            store.openCursor().onsuccess = function(e) {
-                var cur = e.target.result;
-                if (cur) { cur.value.read = true; cur.update(cur.value); cur.continue(); }
-            };
-        });
-    }
-
-    function clearAll() {
-        return openDB().then(function(db) {
-            if (!db) return;
-            db.transaction(STORE, 'readwrite').objectStore(STORE).clear();
-        });
-    }
-
-    function timeAgo(ts) {
-        var diff = Math.floor((Date.now() - ts) / 1000);
-        if (diff < 60)   return 'Baru saja';
-        if (diff < 3600) return Math.floor(diff/60) + ' menit lalu';
-        if (diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
-        return Math.floor(diff/86400) + ' hari lalu';
+    function setBadge(n) {
+        var badge = document.getElementById('notifBadge');
+        if (!badge) return;
+        if (n > 0) { badge.textContent = n > 99 ? '99+' : n; badge.style.display = 'block'; }
+        else { badge.style.display = 'none'; }
     }
 
     function updateBadge() {
-        countUnread().then(function(n) {
-            var badge = document.getElementById('notifBadge');
-            if (!badge) return;
-            if (n > 0) {
-                badge.textContent = n > 99 ? '99+' : n;
-                badge.style.display = 'block';
-            } else {
-                badge.style.display = 'none';
-            }
-        });
+        api('GET', '/unread-count').then(function(d) { setBadge(d.count || 0); });
     }
 
     function renderList() {
-        getAll().then(function(items) {
-            var list = document.getElementById('notifHistoryList');
-            var markBtn  = document.getElementById('notifMarkAllBtn');
-            var clearBtn = document.getElementById('notifClearBtn');
-            if (!list) return;
+        var list    = document.getElementById('notifHistoryList');
+        var markBtn = document.getElementById('notifMarkAllBtn');
+        var clrBtn  = document.getElementById('notifClearBtn');
+        if (!list) return;
 
-            var hasUnread = items.some(function(i) { return !i.read; });
-            if (markBtn)  markBtn.style.display  = hasUnread ? 'block' : 'none';
-            if (clearBtn) clearBtn.style.display = items.length ? 'block' : 'none';
+        list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>';
+
+        api('GET', '/').then(function(items) {
+            if (!Array.isArray(items)) items = [];
+            var hasUnread = items.some(function(i) { return !i.is_read; });
+            if (markBtn) markBtn.style.display = hasUnread ? 'block' : 'none';
+            if (clrBtn)  clrBtn.style.display  = items.length ? 'block' : 'none';
 
             if (!items.length) {
-                list.innerHTML = '<div style="text-align:center; padding:60px 20px;"><div style="font-size:40px; margin-bottom:12px;">🔔</div><div style="font-size:14px; font-weight:600; color:var(--gray,#64748b);">Belum ada notifikasi</div><div style="font-size:12px; color:#94a3b8; margin-top:4px;">Notifikasi absensi dan pengumuman akan muncul di sini</div></div>';
+                list.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:40px;margin-bottom:12px;">🔔</div><div style="font-size:14px;font-weight:600;color:var(--gray,#64748b);">Belum ada notifikasi</div><div style="font-size:12px;color:#94a3b8;margin-top:4px;">Notifikasi absensi dan pengumuman akan muncul di sini</div></div>';
                 return;
             }
 
             list.innerHTML = items.map(function(item) {
-                return '<div onclick="NotifHistory.tapItem(' + item.id + ', \'' + (item.url||'/pegawai/dashboard') + '\')" style="display:flex; gap:12px; padding:14px 20px; cursor:pointer; background:' + (item.read ? 'transparent' : 'rgba(90,182,234,0.06)') + '; border-bottom:1px solid var(--card-border,#f1f5f9);">' +
-                    '<div style="width:40px; height:40px; border-radius:12px; background:' + (item.read ? 'var(--light,#f1f5f9)' : 'rgba(90,182,234,0.15)') + '; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;">' +
-                        (item.read ? '<i class="far fa-bell" style="color:#94a3b8;"></i>' : '<i class="fas fa-bell" style="color:var(--primary,#5AB6EA);"></i>') +
+                var unread = !item.is_read;
+                var safeTitle = (item.title || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                var safeBody  = (item.body  || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                var safeUrl   = (item.url   || '/pegawai/dashboard').replace(/'/g, "\\'");
+                return '<div onclick="NotifHistory.tapItem(' + item.id + ',\'' + safeUrl + '\')" style="display:flex;gap:12px;padding:14px 20px;cursor:pointer;background:' + (unread ? 'rgba(90,182,234,0.06)' : 'transparent') + ';border-bottom:1px solid var(--card-border,#f1f5f9);">' +
+                    '<div style="width:40px;height:40px;border-radius:12px;background:' + (unread ? 'rgba(90,182,234,0.15)' : 'var(--light,#f1f5f9)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">' +
+                        (unread ? '<i class="fas fa-bell" style="color:var(--primary,#5AB6EA);"></i>' : '<i class="far fa-bell" style="color:#94a3b8;"></i>') +
                     '</div>' +
-                    '<div style="flex:1; min-width:0;">' +
-                        '<div style="font-size:13px; font-weight:' + (item.read ? '500' : '700') + '; color:var(--dark,#1e293b); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (item.title || '') + '</div>' +
-                        '<div style="font-size:12px; color:var(--gray,#64748b); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">' + (item.body || '') + '</div>' +
-                        '<div style="font-size:11px; color:#94a3b8; margin-top:4px;">' + timeAgo(item.time) + '</div>' +
+                    '<div style="flex:1;min-width:0;">' +
+                        '<div style="font-size:13px;font-weight:' + (unread ? '700' : '500') + ';color:var(--dark,#1e293b);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeTitle + '</div>' +
+                        '<div style="font-size:12px;color:var(--gray,#64748b);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + safeBody + '</div>' +
+                        '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">' + timeAgo(item.created_at) + '</div>' +
                     '</div>' +
-                    (!item.read ? '<div style="width:8px; height:8px; border-radius:50%; background:var(--primary,#5AB6EA); flex-shrink:0; margin-top:6px;"></div>' : '') +
+                    (unread ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--primary,#5AB6EA);flex-shrink:0;margin-top:6px;"></div>' : '') +
                 '</div>';
             }).join('');
         });
@@ -1596,7 +1545,7 @@ var NotifHistory = (function() {
     function positionModal() {
         var modal = document.getElementById('notifHistoryModal');
         if (!modal) return;
-        var hc = document.querySelector('.header-content');
+        var hc  = document.querySelector('.header-content');
         var top = hc ? Math.round(hc.getBoundingClientRect().bottom) : 64;
         modal.style.top = top + 'px';
     }
@@ -1617,37 +1566,37 @@ var NotifHistory = (function() {
             if (overlay) overlay.style.display = 'none';
         },
         markAllRead: function() {
-            markAllRead().then(function() { renderList(); updateBadge(); });
+            api('POST', '/baca-semua').then(function() { renderList(); updateBadge(); });
         },
         clear: function() {
             if (!confirm('Hapus semua riwayat notifikasi?')) return;
-            clearAll().then(function() { renderList(); updateBadge(); });
+            api('DELETE', '/').then(function() { renderList(); updateBadge(); });
         },
         tapItem: function(id, url) {
-            markRead(id).then(function() { renderList(); updateBadge(); });
-        },
-        save: function(title, body, tag, url) {
-            openDB().then(function(db) {
-                if (!db) return;
-                try {
-                    var tx = db.transaction(STORE, 'readwrite');
-                    tx.objectStore(STORE).add({
-                        title: title || 'Karisma',
-                        body:  body  || '',
-                        tag:   tag   || '',
-                        url:   url   || '/pegawai/dashboard',
-                        time:  Date.now(),
-                        read:  false
-                    });
-                    tx.oncomplete = function() { updateBadge(); };
-                    tx.onerror    = function(e) { console.warn('[NotifHistory] save error', e); };
-                } catch(e) { console.warn('[NotifHistory] save exception', e); }
+            api('POST', '/' + id + '/baca').then(function() { updateBadge(); });
+            // Update UI lokal seketika tanpa fetch ulang
+            var el = event && event.currentTarget;
+            document.querySelectorAll('#notifHistoryList [onclick*="tapItem(' + id + '"]').forEach(function(row) {
+                row.style.background = 'transparent';
+                var dot = row.querySelector('[style*="border-radius:50%"]');
+                if (dot) dot.remove();
+                var icon = row.querySelector('i');
+                if (icon) { icon.className = 'far fa-bell'; icon.style.color = '#94a3b8'; }
+                var iconWrap = row.querySelector('[style*="border-radius:12px"]');
+                if (iconWrap) iconWrap.style.background = 'var(--light,#f1f5f9)';
+                var title = row.querySelector('[style*="font-weight"]');
+                if (title) title.style.fontWeight = '500';
             });
+        },
+        // Simpan notifikasi lokal (bell di pengumuman) ke server
+        save: function(title, body, tag, url) {
+            api('POST', '/', { title: title, body: body, tag: tag, url: url })
+                .then(function() { updateBadge(); });
         },
         updateBadge: updateBadge,
         init: function() {
             updateBadge();
-            // Dengarkan pesan dari SW saat push baru masuk
+            // Update badge real-time saat SW menerima push
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.addEventListener('message', function(e) {
                     if (e.data && e.data.type === 'NOTIF_RECEIVED') {

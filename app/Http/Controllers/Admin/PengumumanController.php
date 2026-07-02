@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use App\Models\PushSubscription;
+use App\Services\NotificationLogger;
 use App\Services\WebPushSender;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -117,17 +118,17 @@ class PengumumanController extends Controller
             'url'   => 'nullable|string|max:255',
         ]);
 
+        $tag    = 'custom-' . time();
+        $url    = $request->filled('url') ? $request->url : '/pegawai/dashboard';
+        $payload = ['title' => $request->title, 'body' => $request->body, 'tag' => $tag, 'url' => $url];
+
         $sender = new WebPushSender();
         $sent = $failed = 0;
-        foreach (PushSubscription::all() as $sub) {
-            $code = $sender->send($sub->endpoint, $sub->public_key, $sub->auth_token, [
-                'title' => $request->title,
-                'body'  => $request->body,
-                'tag'   => 'custom-' . time(),
-                'url'   => $request->filled('url') ? $request->url : '/pegawai/dashboard',
-            ]);
+        foreach (PushSubscription::with('user')->get() as $sub) {
+            $code = $sender->send($sub->endpoint, $sub->public_key, $sub->auth_token, $payload);
             if ($code >= 200 && $code < 300) {
                 $sent++;
+                NotificationLogger::log($sub->user_id, $request->title, $request->body, $url, $tag);
             } elseif (in_array($code, [404, 410])) {
                 $sub->delete();
             } else {
@@ -140,17 +141,19 @@ class PengumumanController extends Controller
 
     private function pushPengumuman(Pengumuman $pengumuman): array
     {
+        $title   = '📢 ' . $pengumuman->judul;
+        $body    = Str::limit(strip_tags($pengumuman->isi), 100);
+        $tag     = 'pengumuman-' . $pengumuman->id;
+        $url     = '/pegawai/dashboard';
+        $payload = compact('title', 'body', 'tag', 'url');
+
         $sender = new WebPushSender();
         $sent = $failed = 0;
         foreach (PushSubscription::all() as $sub) {
-            $code = $sender->send($sub->endpoint, $sub->public_key, $sub->auth_token, [
-                'title' => '📢 ' . $pengumuman->judul,
-                'body'  => Str::limit(strip_tags($pengumuman->isi), 100),
-                'tag'   => 'pengumuman-' . $pengumuman->id,
-                'url'   => '/pegawai/dashboard',
-            ]);
+            $code = $sender->send($sub->endpoint, $sub->public_key, $sub->auth_token, $payload);
             if ($code >= 200 && $code < 300) {
                 $sent++;
+                NotificationLogger::log($sub->user_id, $title, $body, $url, $tag);
             } elseif (in_array($code, [404, 410])) {
                 $sub->delete();
             } else {

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\PushSubscription;
 use App\Models\User;
 use App\Models\Presensi;
+use App\Services\NotificationLogger;
 use App\Services\WebPushSender;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -49,6 +50,15 @@ class SendAbsensiReminders extends Command
                     if (in_array($code, [404, 410])) {
                         $sub->delete();
                         break;
+                    }
+                    if ($code >= 200 && $code < 300) {
+                        NotificationLogger::log(
+                            $user->id,
+                            $msg['title'],
+                            $msg['body'] ?? '',
+                            $msg['url'] ?? '/pegawai/dashboard',
+                            $msg['tag'] ?? ''
+                        );
                     }
                 }
             }

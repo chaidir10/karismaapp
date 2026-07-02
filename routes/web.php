@@ -164,6 +164,16 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
         // Push notification subscriptions
         Route::post('/push-subscription', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
         Route::delete('/push-subscription', [PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
+
+        // Riwayat notifikasi (server-side DB)
+        Route::prefix('notifikasi')->name('notifikasi.')->group(function () {
+            Route::get('/',              [\App\Http\Controllers\Pegawai\NotifikasiController::class, 'index'])->name('index');
+            Route::get('/unread-count', [\App\Http\Controllers\Pegawai\NotifikasiController::class, 'unreadCount'])->name('unread-count');
+            Route::post('/',             [\App\Http\Controllers\Pegawai\NotifikasiController::class, 'store'])->name('store');
+            Route::post('/{id}/baca',    [\App\Http\Controllers\Pegawai\NotifikasiController::class, 'markRead'])->name('mark-read');
+            Route::post('/baca-semua',   [\App\Http\Controllers\Pegawai\NotifikasiController::class, 'markAllRead'])->name('mark-all-read');
+            Route::delete('/',           [\App\Http\Controllers\Pegawai\NotifikasiController::class, 'clear'])->name('clear');
+        });
     });
 
     // --------------------
