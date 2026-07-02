@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\PushSubscription;
+use App\Services\WebPushSender;
 use Illuminate\Console\Command;
-use Minishlink\WebPush\WebPush;
-use Minishlink\WebPush\Subscription;
 
 class TestPushNotification extends Command
 {
@@ -15,62 +14,40 @@ class TestPushNotification extends Command
     public function handle(): void
     {
         $message = $this->argument('message') ?? 'Selamat bekerja dan beraktifitas!';
-
-        $subs = PushSubscription::all();
+        $subs    = PushSubscription::all();
 
         if ($subs->isEmpty()) {
-            $this->error('Tidak ada subscriber. Buka dashboard di HP dulu dan izinkan notifikasi.');
+            $this->error('Tidak ada subscriber.');
             return;
         }
 
         $this->info("Mengirim ke {$subs->count()} subscriber...");
 
-        $auth = [
-            'VAPID' => [
-                'subject'    => config('services.vapid.subject'),
-                'publicKey'  => config('services.vapid.public_key'),
-                'privateKey' => config('services.vapid.private_key'),
-            ],
-        ];
-
-        $webPush = new WebPush($auth);
-        $webPush->setReuseVAPIDHeaders(true);
-
-        $payload = json_encode([
-            'title' => '📢 Karisma',
-            'body'  => $message,
-            'tag'   => 'karisma-test-'.time(),
-            'url'   => '/pegawai/dashboard',
-        ]);
+        $sender = new WebPushSender();
+        $sent   = 0;
+        $failed = 0;
 
         foreach ($subs as $sub) {
-            $webPush->queueNotification(
-                Subscription::create([
-                    'endpoint'  => $sub->endpoint,
-                    'publicKey' => $sub->public_key,
-                    'authToken' => $sub->auth_token,
-                ]),
-                $payload
+            $code = $sender->send(
+                $sub->endpoint,
+                $sub->public_key,
+                $sub->auth_token,
+                ['title' => '📢 Karisma', 'body' => $message, 'tag' => 'karisma-test-' . time(), 'url' => '/pegawai/dashboard']
             );
-        }
 
-        $sent = 0;
-        $failed = 0;
-        foreach ($webPush->flush() as $report) {
-            if ($report->isSuccess()) {
+            if ($code >= 200 && $code < 300) {
                 $sent++;
-            } else {
+                $this->info("Terkirim ({$code})");
+            } elseif (in_array($code, [404, 410])) {
+                $sub->delete();
+                $this->warn("Subscription kadaluarsa dihapus ({$code})");
                 $failed++;
-                // Hapus subscription tidak valid
-                if (in_array($report->getResponse()?->getStatusCode(), [404, 410])) {
-                    PushSubscription::where('endpoint', $report->getEndpoint())->delete();
-                    $this->warn('Subscription expired dihapus: '.$report->getEndpoint());
-                } else {
-                    $this->error('Gagal: '.$report->getReason());
-                }
+            } else {
+                $this->error("Gagal ({$code}): " . $sub->endpoint);
+                $failed++;
             }
         }
 
-        $this->info("Terkirim: {$sent} | Gagal: {$failed}");
+        $this->info("Selesai — Terkirim: {$sent} | Gagal: {$failed}");
     }
 }
