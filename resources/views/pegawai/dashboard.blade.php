@@ -1344,9 +1344,32 @@
         if (!CFG.vapidKey) { console.log('[Push] VAPID key kosong'); return; }
         console.log('[Push] Mulai... key: ' + CFG.vapidKey.substring(0, 20) + '...');
 
+        function saveSubToServer(sub) {
+            var j = sub.toJSON();
+            return fetch(CFG.pushSubUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    endpoint:   j.endpoint,
+                    public_key: j.keys.p256dh,
+                    auth_token: j.keys.auth
+                })
+            }).then(function(r) {
+                if (r.ok) console.log('[Push] Tersimpan di server. Status: ' + r.status);
+                else r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ': ' + t); });
+            });
+        }
+
         function doSubscribe(reg) {
             reg.pushManager.getSubscription().then(function(existing) {
-                if (existing) { console.log('[Push] Sudah terdaftar sebelumnya'); return; }
+                if (existing) {
+                    // Selalu sync ke server — bisa jadi DB terhapus tapi browser masih punya subscription
+                    console.log('[Push] Subscription sudah ada di browser, sync ke server...');
+                    return saveSubToServer(existing);
+                }
                 return Notification.requestPermission().then(function(perm) {
                     console.log('[Push] Permission: ' + perm);
                     if (perm !== 'granted') return;
@@ -1356,23 +1379,8 @@
                     });
                 }).then(function(sub) {
                     if (!sub) { console.log('[Push] Subscribe batal'); return; }
-                    console.log('[Push] Subscribe OK, simpan ke server...');
-                    var j = sub.toJSON();
-                    return fetch(CFG.pushSubUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            endpoint:   j.endpoint,
-                            public_key: j.keys.p256dh,
-                            auth_token: j.keys.auth
-                        })
-                    }).then(function(r) {
-                        if (r.ok) console.log('[Push] Tersimpan! Status: ' + r.status);
-                        else r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ': ' + t); });
-                    });
+                    console.log('[Push] Subscribe baru OK, simpan ke server...');
+                    return saveSubToServer(sub);
                 });
             }).catch(function(e) { console.error('[Push] doSubscribe error:', e); });
         }

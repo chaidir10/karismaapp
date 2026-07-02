@@ -44,9 +44,17 @@ class WebPushSender
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_SSL_VERIFYPEER => true,
         ]);
-        curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $responseBody = curl_exec($ch);
+        $code         = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        if ($code !== 201) {
+            \Log::warning('[WebPush] Gagal kirim push', [
+                'code'     => $code,
+                'endpoint' => substr($endpoint, 0, 80) . '...',
+                'response' => substr((string) $responseBody, 0, 300),
+            ]);
+        }
 
         return $code;
     }
