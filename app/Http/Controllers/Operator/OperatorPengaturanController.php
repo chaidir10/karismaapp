@@ -76,6 +76,7 @@ class OperatorPengaturanController extends Controller
         AppSetting::setValue('face_detection_users_except', json_encode($request->input('face_detection_users_except', [])));
         AppSetting::setValue('face_detection_users_only', json_encode($request->input('face_detection_users_only', [])));
         AppSetting::setValue('require_masuk_before_pulang', $request->boolean('require_masuk_before_pulang') ? '1' : '0');
+        AppSetting::setValue('show_notif_banner', $request->boolean('show_notif_banner') ? '1' : '0');
         AppSetting::setValue('enable_work_timer', $request->boolean('enable_work_timer') ? '1' : '0');
         AppSetting::setValue('enable_absen_darurat', $request->boolean('enable_absen_darurat') ? '1' : '0');
         AppSetting::setValue('absen_darurat_mode', $request->input('absen_darurat_mode', 'all'));

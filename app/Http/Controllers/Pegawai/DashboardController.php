@@ -158,6 +158,7 @@ class DashboardController extends Controller
             }
         }
         $requireMasukBeforePulang = AppSetting::getBool('require_masuk_before_pulang', true);
+        $showNotifBanner          = AppSetting::getBool('show_notif_banner', true);
 
         return view('pegawai.dashboard', compact(
             'riwayatHariIni',
@@ -180,7 +181,8 @@ class DashboardController extends Controller
             'namaLibur',
             'disablePresensiLibur',
             'enableFaceDetection',
-            'requireMasukBeforePulang'
+            'requireMasukBeforePulang',
+            'showNotifBanner'
         ));
     }
 }

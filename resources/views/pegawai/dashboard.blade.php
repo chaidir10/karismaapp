@@ -107,6 +107,23 @@
 
 @section('content')
 
+{{-- ═══════════ BANNER AKTIFKAN NOTIFIKASI ═══════════ --}}
+@if($showNotifBanner)
+<div id="notifBanner" style="display:none; margin:12px 16px 0; border-radius:14px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; padding:14px 16px; box-shadow:0 4px 16px rgba(59,130,246,0.35);">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <div style="font-size:26px; flex-shrink:0;">🔔</div>
+        <div style="flex:1; min-width:0;">
+            <div style="font-size:13px; font-weight:700; margin-bottom:2px;">Aktifkan Notifikasi Absensi</div>
+            <div style="font-size:11px; opacity:0.9; line-height:1.4;">Dapatkan reminder otomatis jam masuk & pulang langsung di HP Anda.</div>
+        </div>
+        <button id="notifBannerClose" style="background:none; border:none; color:rgba(255,255,255,0.7); font-size:18px; cursor:pointer; padding:4px; flex-shrink:0; line-height:1;">✕</button>
+    </div>
+    <button id="notifBannerBtn" style="margin-top:10px; width:100%; background:rgba(255,255,255,0.2); border:1.5px solid rgba(255,255,255,0.4); color:#fff; border-radius:10px; padding:9px; font-size:13px; font-weight:700; cursor:pointer; backdrop-filter:blur(4px);">
+        Aktifkan Sekarang
+    </button>
+</div>
+@endif
+
 {{-- ═══════════ CARD ABSENSI ═══════════ --}}
 <div class="attendance-card" style="padding:0; overflow:hidden; border:none; box-shadow:0 8px 30px rgba(0,0,0,0.08);">
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--white);">
@@ -1342,6 +1359,25 @@
         if (!('serviceWorker' in navigator)) { console.log('[Push] SW tidak didukung'); return; }
         if (!('PushManager' in window)) { console.log('[Push] PushManager tidak didukung'); return; }
         if (!CFG.vapidKey) { console.log('[Push] VAPID key kosong'); return; }
+
+        var banner      = document.getElementById('notifBanner');
+        var bannerBtn   = document.getElementById('notifBannerBtn');
+        var bannerClose = document.getElementById('notifBannerClose');
+        var dismissed   = localStorage.getItem('karisma-notif-banner-dismissed');
+
+        function showBanner() {
+            if (!dismissed && banner) banner.style.display = 'block';
+        }
+        function hideBanner() {
+            if (banner) banner.style.display = 'none';
+        }
+
+        if (bannerClose) {
+            bannerClose.addEventListener('click', function() {
+                localStorage.setItem('karisma-notif-banner-dismissed', '1');
+                hideBanner();
+            });
+        }
         console.log('[Push] Mulai... key: ' + CFG.vapidKey.substring(0, 20) + '...');
 
         function saveSubToServer(sub) {
@@ -1358,21 +1394,37 @@
                     auth_token: j.keys.auth
                 })
             }).then(function(r) {
-                if (r.ok) console.log('[Push] Tersimpan di server. Status: ' + r.status);
-                else r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ': ' + t); });
+                if (r.ok) {
+                    console.log('[Push] Tersimpan di server. Status: ' + r.status);
+                    hideBanner();
+                } else {
+                    r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ': ' + t); });
+                }
             });
         }
 
-        function doSubscribe(reg) {
+        function doSubscribe(reg, fromBannerBtn) {
             reg.pushManager.getSubscription().then(function(existing) {
                 if (existing) {
-                    // Selalu sync ke server — bisa jadi DB terhapus tapi browser masih punya subscription
                     console.log('[Push] Subscription sudah ada di browser, sync ke server...');
                     return saveSubToServer(existing);
                 }
+                // Kalau bukan dari tombol banner, cek dulu permission — jangan minta izin sendiri saat pertama load
+                if (!fromBannerBtn && Notification.permission === 'default') {
+                    showBanner();
+                    return;
+                }
+                if (Notification.permission === 'denied') {
+                    showBanner();
+                    if (bannerBtn) bannerBtn.textContent = 'Buka Pengaturan Browser untuk Aktifkan';
+                    bannerBtn && bannerBtn.addEventListener('click', function() {
+                        alert('Notifikasi diblokir. Buka Pengaturan browser → izin situs → ubah Notifikasi ke "Izinkan".');
+                    });
+                    return;
+                }
                 return Notification.requestPermission().then(function(perm) {
                     console.log('[Push] Permission: ' + perm);
-                    if (perm !== 'granted') return;
+                    if (perm !== 'granted') { showBanner(); return; }
                     return reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: urlBase64ToUint8Array(CFG.vapidKey)
@@ -1385,11 +1437,31 @@
             }).catch(function(e) { console.error('[Push] doSubscribe error:', e); });
         }
 
+        // Tombol banner diklik → minta izin
+        if (bannerBtn) {
+            bannerBtn.addEventListener('click', function() {
+                bannerBtn.textContent = 'Memproses...';
+                bannerBtn.disabled = true;
+                navigator.serviceWorker.register('/sw.js?v=4').then(function(reg) {
+                    var trySubscribe = function(r) { doSubscribe(r, true); };
+                    if (reg.active) { trySubscribe(reg); return; }
+                    var w = reg.installing || reg.waiting;
+                    if (!w) return;
+                    w.addEventListener('statechange', function() {
+                        if (this.state === 'activated') trySubscribe(reg);
+                    });
+                }).catch(function(e) {
+                    bannerBtn.textContent = 'Gagal, coba lagi';
+                    bannerBtn.disabled = false;
+                });
+            });
+        }
+
         navigator.serviceWorker.register('/sw.js?v=4').then(function(reg) {
             console.log('[Push] SW terdaftar');
             if (reg.active) {
                 console.log('[Push] SW sudah aktif');
-                doSubscribe(reg);
+                doSubscribe(reg, false);
                 return;
             }
             var worker = reg.installing || reg.waiting;
@@ -1398,15 +1470,14 @@
             worker.addEventListener('statechange', function() {
                 console.log('[Push] SW state berubah: ' + this.state);
                 if (this.state === 'activated') {
-                    doSubscribe(reg);
+                    doSubscribe(reg, false);
                 } else if (this.state === 'redundant') {
-                    // SW ini digantikan versi baru — ambil yang aktif sekarang
                     console.log('[Push] SW lama redundant, cari SW aktif baru...');
                     setTimeout(function() {
                         navigator.serviceWorker.getRegistration('/').then(function(r) {
                             if (r && r.active) {
                                 console.log('[Push] Pakai SW aktif baru');
-                                doSubscribe(r);
+                                doSubscribe(r, false);
                             } else {
                                 console.log('[Push] Tidak ada SW aktif');
                             }
