@@ -1357,7 +1357,6 @@
 
     function initPushSubscription() {
         if (!('serviceWorker' in navigator)) { console.log('[Push] SW tidak didukung'); return; }
-        if (!('PushManager' in window)) { console.log('[Push] PushManager tidak didukung'); return; }
         if (!CFG.vapidKey) { console.log('[Push] VAPID key kosong'); return; }
 
         var banner      = document.getElementById('notifBanner');
@@ -1365,12 +1364,13 @@
         var bannerClose = document.getElementById('notifBannerClose');
         var dismissed   = localStorage.getItem('karisma-notif-banner-dismissed');
 
-        function showBanner() {
-            if (!dismissed && banner) banner.style.display = 'block';
-        }
-        function hideBanner() {
-            if (banner) banner.style.display = 'none';
-        }
+        // ── Deteksi iOS ──────────────────────────────────────────────
+        var isIos  = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        var isPwa  = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+        var iosVer = isIos ? parseInt((navigator.userAgent.match(/OS (\d+)_/) || [0,0])[1]) : 0;
+
+        function showBanner() { if (!dismissed && banner) banner.style.display = 'block'; }
+        function hideBanner()  { if (banner) banner.style.display = 'none'; }
 
         if (bannerClose) {
             bannerClose.addEventListener('click', function() {
@@ -1378,6 +1378,35 @@
                 hideBanner();
             });
         }
+
+        // iOS di Safari biasa (bukan PWA) → tidak bisa subscribe, tampilkan panduan
+        if (isIos && !isPwa) {
+            if (iosVer < 16) {
+                // iOS lama — tidak didukung sama sekali
+                if (!dismissed && banner) {
+                    banner.style.background = 'linear-gradient(135deg,#64748b,#475569)';
+                    banner.querySelector('[id="notifBannerBtn"]') && (bannerBtn.textContent = 'iPhone Anda tidak mendukung (perlu iOS 16.4+)');
+                    if (bannerBtn) { bannerBtn.disabled = true; bannerBtn.style.opacity = '0.6'; }
+                    banner.style.display = 'block';
+                }
+            } else {
+                // iOS 16.4+ tapi buka dari Safari — perlu install ke Home Screen
+                if (!dismissed && banner) {
+                    if (bannerBtn) {
+                        bannerBtn.textContent = 'Lihat Cara Install ke Home Screen';
+                        bannerBtn.onclick = function() {
+                            alert('Agar iPhone bisa terima notifikasi:\n\n1. Tap ikon Bagikan \u{1F4E4} di bawah Safari\n2. Pilih "Tambahkan ke Layar Utama"\n3. Tap "Tambahkan"\n4. Buka KARISMA dari ikon di Home Screen\n5. Izinkan notifikasi saat diminta');
+                        };
+                    }
+                    banner.style.display = 'block';
+                }
+            }
+            return; // Tidak bisa lanjut subscribe dari Safari biasa
+        }
+
+        // Cek PushManager (Android/Desktop)
+        if (!('PushManager' in window)) { console.log('[Push] PushManager tidak didukung'); return; }
+
         console.log('[Push] Mulai... key: ' + CFG.vapidKey.substring(0, 20) + '...');
 
         function saveSubToServer(sub) {
