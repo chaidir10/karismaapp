@@ -1389,7 +1389,22 @@
             console.log('[Push] Menunggu SW aktif... state: ' + worker.state);
             worker.addEventListener('statechange', function() {
                 console.log('[Push] SW state berubah: ' + this.state);
-                if (this.state === 'activated') doSubscribe(reg);
+                if (this.state === 'activated') {
+                    doSubscribe(reg);
+                } else if (this.state === 'redundant') {
+                    // SW ini digantikan versi baru — ambil yang aktif sekarang
+                    console.log('[Push] SW lama redundant, cari SW aktif baru...');
+                    setTimeout(function() {
+                        navigator.serviceWorker.getRegistration('/').then(function(r) {
+                            if (r && r.active) {
+                                console.log('[Push] Pakai SW aktif baru');
+                                doSubscribe(r);
+                            } else {
+                                console.log('[Push] Tidak ada SW aktif');
+                            }
+                        });
+                    }, 500);
+                }
             });
         }).catch(function(e) { console.error('[Push] Register error:', e); });
     }

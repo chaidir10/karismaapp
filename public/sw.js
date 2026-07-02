@@ -1,20 +1,5 @@
-self.addEventListener('install', function(event) {
-    event.waitUntil(self.skipWaiting());
-});
-
-self.addEventListener('activate', function(event) {
-    event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', function(event) {
-    if (event.request.method !== 'GET') return;
-    if (!event.request.url.startsWith(self.location.origin)) return;
-    event.respondWith(
-        fetch(event.request).catch(function() {
-            return caches.match(event.request);
-        })
-    );
-});
+// Karisma SW v3
+self.addEventListener('install', function() { self.skipWaiting(); });
 
 self.addEventListener('push', function(event) {
     var data = {};
