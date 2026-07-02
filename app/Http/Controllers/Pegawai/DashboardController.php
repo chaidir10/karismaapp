@@ -11,6 +11,7 @@ use App\Models\JamShift;
 use App\Models\Pengumuman;
 use App\Models\AppSetting;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {

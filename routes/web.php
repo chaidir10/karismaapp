@@ -276,6 +276,8 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
             Route::put('/{id}', [PengumumanController::class, 'update'])->name('update');
             Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/toggle', [PengumumanController::class, 'toggle'])->name('toggle');
+            Route::post('/{id}/push', [PengumumanController::class, 'sendPush'])->name('push');
+            Route::post('/broadcast-custom', [PengumumanController::class, 'broadcastCustom'])->name('broadcast-custom');
             Route::post('/upload-image', [PengumumanController::class, 'uploadImage'])->name('upload-image');
             Route::post('/reorder', [PengumumanController::class, 'reorder'])->name('reorder');
         });

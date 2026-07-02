@@ -242,6 +242,7 @@
 
 {{-- Modal Info Detail --}}
 @foreach($pengumumans as $pm)
+@php $pmJudul = addslashes($pm->judul); $pmIsi = addslashes(Str::limit(strip_tags($pm->isi), 100)); @endphp
 <div id="infoModal{{ $pm->id }}" style="display:none; position:fixed; inset:0; z-index:100; background:var(--card-bg);">
     <div style="display:flex; flex-direction:column; height:100%;">
         <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--card-border); flex-shrink:0;">
@@ -249,7 +250,11 @@
                 <i class="fas fa-chevron-left"></i> Kembali
             </button>
             <span style="font-size:13px; font-weight:600; color:var(--gray);">{{ \App\Models\Pengumuman::jenisOptions()[$pm->jenis]['label'] ?? 'Info' }}</span>
-            <div style="width:60px;"></div>
+            <button onclick="notifPengumuman({{ $pm->id }}, '{{ $pmJudul }}', '{{ $pmIsi }}', this)"
+                title="Kirim notifikasi ini ke HP saya"
+                style="width:36px; height:36px; border-radius:10px; border:none; background:rgba(245,158,11,0.1); color:#f59e0b; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-bell"></i>
+            </button>
         </div>
         <div style="flex:1; overflow-y:auto;">
             @if($pm->gambar)
@@ -1267,6 +1272,43 @@
     }
 
     // ══════════════════════════════════════════════════════════════
+    // NOTIFIKASI PENGUMUMAN (lokal via SW)
+    // ══════════════════════════════════════════════════════════════
+    function notifPengumuman(id, judul, isi, btn) {
+        if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+            alert('Browser Anda tidak mendukung notifikasi.'); return;
+        }
+        if (Notification.permission === 'denied') {
+            alert('Notifikasi diblokir. Aktifkan izin notifikasi di pengaturan browser.'); return;
+        }
+        var doShow = function(reg) {
+            reg.showNotification('📢 ' + judul, {
+                body: isi,
+                icon: '/public/pwa/icons/icon-192x192.png',
+                badge: '/public/pwa/icons/icon-192x192.png',
+                tag: 'pengumuman-' + id,
+                data: { url: '/pegawai/dashboard' }
+            });
+            if (btn) {
+                btn.style.background = 'rgba(16,185,129,0.15)';
+                btn.style.color = '#10b981';
+                setTimeout(function() {
+                    btn.style.background = 'rgba(245,158,11,0.1)';
+                    btn.style.color = '#f59e0b';
+                }, 2500);
+            }
+        };
+        Notification.requestPermission().then(function(perm) {
+            if (perm !== 'granted') return;
+            navigator.serviceWorker.register('/sw.js?v=5').then(function(reg) {
+                var sw = reg.active || reg.installing || reg.waiting;
+                if (reg.active) { doShow(reg); return; }
+                if (sw) { sw.addEventListener('statechange', function() { if (this.state === 'activated') doShow(reg); }); }
+            });
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
     // NETWORK DETECTION
     // ══════════════════════════════════════════════════════════════
     function initNetworkDetection() {
@@ -1471,7 +1513,7 @@
             bannerBtn.addEventListener('click', function() {
                 bannerBtn.textContent = 'Memproses...';
                 bannerBtn.disabled = true;
-                navigator.serviceWorker.register('/sw.js?v=4').then(function(reg) {
+                navigator.serviceWorker.register('/sw.js?v=5').then(function(reg) {
                     var trySubscribe = function(r) { doSubscribe(r, true); };
                     if (reg.active) { trySubscribe(reg); return; }
                     var w = reg.installing || reg.waiting;
@@ -1486,7 +1528,7 @@
             });
         }
 
-        navigator.serviceWorker.register('/sw.js?v=4').then(function(reg) {
+        navigator.serviceWorker.register('/sw.js?v=5').then(function(reg) {
             console.log('[Push] SW terdaftar');
             if (reg.active) {
                 console.log('[Push] SW sudah aktif');

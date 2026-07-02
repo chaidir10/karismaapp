@@ -92,6 +92,7 @@
                 <p>Kelola pengumuman dan informasi untuk pegawai</p>
             </div>
             <div class="header-actions">
+                <button onclick="openCustomPushModal()" class="btn-secondary" style="display:flex; align-items:center; gap:6px;"><i class="fas fa-paper-plane"></i> Kirim Notifikasi</button>
                 <button onclick="openModal()" class="btn-header"><i class="fas fa-plus"></i> Tambah Pengumuman</button>
             </div>
         </div>
@@ -144,6 +145,9 @@
                 <div class="p-actions">
                     <button onclick="toggleActive({{ $p->id }})" title="{{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}" class="{{ $p->is_active ? 'btn-toggle-on' : 'btn-toggle-off' }}" id="toggleBtn{{ $p->id }}">
                         <i class="fas {{ $p->is_active ? 'fa-eye' : 'fa-eye-slash' }}"></i>
+                    </button>
+                    <button onclick="kirimPushPengumuman({{ $p->id }}, this)" title="Kirim Notifikasi Push" style="background:rgba(245,158,11,0.1); color:#f59e0b; width:34px; height:34px; border-radius:8px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all 0.15s;">
+                        <i class="fas fa-bell"></i>
                     </button>
                     <button onclick="editPengumuman({{ $p->id }})" title="Edit" class="btn-edit"><i class="fas fa-pen"></i></button>
                     <button onclick="hapusPengumuman({{ $p->id }})" title="Hapus" class="btn-delete"><i class="fas fa-trash"></i></button>
@@ -243,6 +247,17 @@
                 <input type="hidden" name="isi" id="inputIsi">
             </div>
 
+            <!-- Auto Push -->
+            <div id="autoPushRow" style="margin-bottom:20px; padding:12px 16px; border-radius:12px; background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.2);">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                    <input type="checkbox" name="kirim_push" value="1" id="checkKirimPush" style="width:16px; height:16px; accent-color:#f59e0b;">
+                    <div>
+                        <div style="font-size:13px; font-weight:600; color:var(--dm-text,#1e293b);">Kirim notifikasi push ke semua pegawai</div>
+                        <div style="font-size:11px; color:var(--dm-muted,#64748b);">Hanya muncul saat membuat pengumuman baru</div>
+                    </div>
+                </label>
+            </div>
+
             <!-- Actions -->
             <div style="display:flex; gap:10px; justify-content:flex-end;">
                 <button type="button" onclick="closeModal()" class="btn-secondary">Batal</button>
@@ -251,6 +266,40 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Modal Custom Push -->
+<div id="customPushModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
+    <div style="background:var(--dm-card,#fff); border-radius:20px; width:95%; max-width:460px; padding:28px; position:relative;">
+        <button onclick="closeCustomPushModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--dm-muted,#94a3b8); width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px;">
+            <i class="fas fa-times"></i>
+        </button>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(245,158,11,0.1); display:flex; align-items:center; justify-content:center; color:#f59e0b; font-size:18px;">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <div>
+                <div style="font-size:16px; font-weight:700; color:var(--dm-text,#1e293b);">Kirim Notifikasi Custom</div>
+                <div style="font-size:12px; color:var(--dm-muted,#64748b);">Dikirim ke semua pegawai yang aktif notifikasi</div>
+            </div>
+        </div>
+        <div style="margin-bottom:14px;">
+            <label class="form-label">Judul <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="customPushTitle" maxlength="100" placeholder="Contoh: Pengumuman Penting" class="form-control">
+        </div>
+        <div style="margin-bottom:20px;">
+            <label class="form-label">Pesan <span style="color:#ef4444;">*</span></label>
+            <textarea id="customPushBody" maxlength="200" rows="3" placeholder="Isi pesan notifikasi..." class="form-control" style="resize:vertical;"></textarea>
+            <div style="font-size:11px; color:var(--dm-muted,#94a3b8); margin-top:4px; text-align:right;"><span id="customPushBodyCount">0</span>/200</div>
+        </div>
+        <div id="customPushResult" style="display:none; margin-bottom:14px; padding:10px 14px; border-radius:10px; font-size:13px;"></div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button onclick="closeCustomPushModal()" class="btn-secondary">Batal</button>
+            <button onclick="submitCustomPush()" id="customPushSubmitBtn" class="btn-primary">
+                <i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim
+            </button>
+        </div>
     </div>
 </div>
 
@@ -334,11 +383,83 @@
         document.getElementById('inputHapusGambar').checked = false;
         document.getElementById('inputSembunyikan').checked = false;
         document.getElementById('coverPreview').style.display = 'none';
+        document.getElementById('autoPushRow').style.display = 'block';
+        document.getElementById('checkKirimPush').checked = false;
         quill.root.innerHTML = '';
     }
 
     function closeModal() {
         document.getElementById('formModal').style.display = 'none';
+    }
+
+    // ── Kirim push untuk satu pengumuman ─────────────────────────
+    function kirimPushPengumuman(id, btn) {
+        if (!confirm('Kirim notifikasi push pengumuman ini ke semua pegawai?')) return;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        fetch("{{ url('/admin/pengumuman') }}/" + id + "/push", {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-bell"></i>';
+            btn.style.background = 'rgba(16,185,129,0.1)';
+            btn.style.color = '#10b981';
+            alert('Notifikasi terkirim ke ' + d.sent + ' perangkat' + (d.failed ? ' (' + d.failed + ' gagal)' : '') + '.');
+            setTimeout(function() {
+                btn.style.background = 'rgba(245,158,11,0.1)';
+                btn.style.color = '#f59e0b';
+            }, 3000);
+        }).catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-bell"></i>';
+            alert('Gagal mengirim notifikasi.');
+        });
+    }
+
+    // ── Custom push modal ─────────────────────────────────────────
+    function openCustomPushModal() {
+        document.getElementById('customPushTitle').value = '';
+        document.getElementById('customPushBody').value = '';
+        document.getElementById('customPushBodyCount').textContent = '0';
+        document.getElementById('customPushResult').style.display = 'none';
+        document.getElementById('customPushModal').style.display = 'flex';
+    }
+    function closeCustomPushModal() {
+        document.getElementById('customPushModal').style.display = 'none';
+    }
+    document.getElementById('customPushBody') && document.getElementById('customPushBody').addEventListener('input', function() {
+        document.getElementById('customPushBodyCount').textContent = this.value.length;
+    });
+    function submitCustomPush() {
+        var title = document.getElementById('customPushTitle').value.trim();
+        var body  = document.getElementById('customPushBody').value.trim();
+        if (!title || !body) { alert('Judul dan pesan wajib diisi.'); return; }
+        var btn = document.getElementById('customPushSubmitBtn');
+        var result = document.getElementById('customPushResult');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Mengirim...';
+        fetch("{{ route('admin.pengumuman.broadcast-custom') }}", {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ title: title, body: body })
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim';
+            result.style.display = 'block';
+            result.style.background = 'rgba(16,185,129,0.1)';
+            result.style.color = '#059669';
+            result.style.border = '1px solid rgba(16,185,129,0.2)';
+            result.textContent = 'Berhasil terkirim ke ' + d.sent + ' perangkat' + (d.failed ? ' (' + d.failed + ' gagal)' : '') + '.';
+        }).catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim';
+            result.style.display = 'block';
+            result.style.background = 'rgba(239,68,68,0.1)';
+            result.style.color = '#dc2626';
+            result.style.border = '1px solid rgba(239,68,68,0.2)';
+            result.textContent = 'Gagal mengirim notifikasi.';
+        });
     }
 
     function editPengumuman(id) {
@@ -366,6 +487,7 @@
                     preview.style.display = 'none';
                 }
 
+                document.getElementById('autoPushRow').style.display = 'none';
                 document.getElementById('formModal').style.display = 'flex';
             });
     }

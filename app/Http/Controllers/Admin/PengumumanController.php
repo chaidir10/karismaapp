@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
+use App\Models\PushSubscription;
+use App\Services\WebPushSender;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PengumumanController extends Controller
 {
@@ -39,7 +42,11 @@ class PengumumanController extends Controller
             $data['gambar'] = $request->file('gambar')->store('pengumuman', 'public');
         }
 
-        Pengumuman::create($data);
+        $pengumuman = Pengumuman::create($data);
+
+        if ($request->boolean('kirim_push')) {
+            $this->pushPengumuman($pengumuman);
+        }
 
         return redirect()->route('admin.pengumuman.index')->with('success', 'Pengumuman berhasil ditambahkan');
     }
@@ -93,6 +100,63 @@ class PengumumanController extends Controller
         $pengumuman->delete();
 
         return redirect()->route('admin.pengumuman.index')->with('success', 'Pengumuman berhasil dihapus');
+    }
+
+    public function sendPush(int $id)
+    {
+        $pengumuman = Pengumuman::findOrFail($id);
+        [$sent, $failed] = $this->pushPengumuman($pengumuman);
+        return response()->json(['success' => true, 'sent' => $sent, 'failed' => $failed]);
+    }
+
+    public function broadcastCustom(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'body'  => 'required|string|max:200',
+        ]);
+
+        $sender = new WebPushSender();
+        $sent = $failed = 0;
+        foreach (PushSubscription::all() as $sub) {
+            $code = $sender->send($sub->endpoint, $sub->public_key, $sub->auth_token, [
+                'title' => $request->title,
+                'body'  => $request->body,
+                'tag'   => 'custom-' . time(),
+                'url'   => '/pegawai/dashboard',
+            ]);
+            if ($code >= 200 && $code < 300) {
+                $sent++;
+            } elseif (in_array($code, [404, 410])) {
+                $sub->delete();
+            } else {
+                $failed++;
+            }
+        }
+
+        return response()->json(['success' => true, 'sent' => $sent, 'failed' => $failed]);
+    }
+
+    private function pushPengumuman(Pengumuman $pengumuman): array
+    {
+        $sender = new WebPushSender();
+        $sent = $failed = 0;
+        foreach (PushSubscription::all() as $sub) {
+            $code = $sender->send($sub->endpoint, $sub->public_key, $sub->auth_token, [
+                'title' => '📢 ' . $pengumuman->judul,
+                'body'  => Str::limit(strip_tags($pengumuman->isi), 100),
+                'tag'   => 'pengumuman-' . $pengumuman->id,
+                'url'   => '/pegawai/dashboard',
+            ]);
+            if ($code >= 200 && $code < 300) {
+                $sent++;
+            } elseif (in_array($code, [404, 410])) {
+                $sub->delete();
+            } else {
+                $failed++;
+            }
+        }
+        return [$sent, $failed];
     }
 
     public function toggle($id)

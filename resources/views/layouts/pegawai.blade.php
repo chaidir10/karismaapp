@@ -1145,9 +1145,10 @@
                         <h1 class="user-name" id="user-name">{{ Auth::user()->name ?? 'User' }}</h1>
                     </div>
                 </div>
-                <div style="width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff;">
+                <button id="notifBellBtn" onclick="NotifHistory.open()" style="position:relative; width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.15); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff;">
                     <i class="far fa-bell"></i>
-                </div>
+                    <span id="notifBadge" style="display:none; position:absolute; top:5px; right:5px; min-width:16px; height:16px; border-radius:8px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; line-height:16px; text-align:center; padding:0 4px; pointer-events:none;"></span>
+                </button>
             </div>
             @else
             {{-- Sub pages: icon + title --}}
@@ -1240,7 +1241,7 @@
     <script>
         // Daftar service worker utama
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=4').catch(function() {});
+            navigator.serviceWorker.register('/sw.js?v=5').catch(function() {});
         }
         if ('caches' in window) {
             caches.keys().then(function(names) {
@@ -1445,6 +1446,205 @@
     </script>
 
     <!-- Push scripts dari child blade -->
+    @stack('scripts')
+
+<!-- ══ MODAL RIWAYAT NOTIFIKASI ══════════════════════════════ -->
+<div id="notifHistoryModal" style="display:none; position:fixed; left:0; right:0; bottom:0; z-index:98; background:var(--card-bg,#fff); flex-direction:column; box-shadow:0 -4px 24px rgba(0,0,0,0.12);">
+    <!-- Header modal -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--card-border,#e2e8f0); flex-shrink:0;">
+        <div style="font-size:15px; font-weight:700; color:var(--dark,#1e293b); display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-bell" style="color:var(--primary,#5AB6EA);"></i> Notifikasi
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button onclick="NotifHistory.markAllRead()" id="notifMarkAllBtn" style="display:none; font-size:11px; font-weight:600; color:var(--primary,#5AB6EA); background:none; border:none; cursor:pointer; padding:4px 8px;">
+                Tandai semua dibaca
+            </button>
+            <button onclick="NotifHistory.clear()" id="notifClearBtn" style="display:none; font-size:11px; font-weight:600; color:#ef4444; background:none; border:none; cursor:pointer; padding:4px 8px;">
+                Hapus semua
+            </button>
+            <button onclick="NotifHistory.close()" style="width:32px; height:32px; border-radius:10px; background:var(--light,#f1f5f9); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--gray,#64748b); font-size:14px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <!-- List -->
+    <div id="notifHistoryList" style="flex:1; overflow-y:auto; padding:8px 0;"></div>
+</div>
+<!-- Overlay -->
+<div id="notifHistoryOverlay" onclick="NotifHistory.close()" style="display:none; position:fixed; inset:0; z-index:97; background:rgba(0,0,0,0.3);"></div>
+
+<script>
+var NotifHistory = (function() {
+    var DB_NAME = 'karisma-notif-db', DB_VER = 1, STORE = 'notifications';
+
+    function openDB() {
+        return new Promise(function(resolve) {
+            var req = indexedDB.open(DB_NAME, DB_VER);
+            req.onupgradeneeded = function(e) {
+                e.target.result.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+            };
+            req.onsuccess = function(e) { resolve(e.target.result); };
+            req.onerror   = function()  { resolve(null); };
+        });
+    }
+
+    function getAll() {
+        return openDB().then(function(db) {
+            if (!db) return [];
+            return new Promise(function(resolve) {
+                var items = [];
+                db.transaction(STORE).objectStore(STORE).openCursor(null, 'prev').onsuccess = function(e) {
+                    var cur = e.target.result;
+                    if (cur) { items.push(cur.value); cur.continue(); }
+                    else resolve(items);
+                };
+            });
+        });
+    }
+
+    function countUnread() {
+        return getAll().then(function(items) {
+            return items.filter(function(i) { return !i.read; }).length;
+        });
+    }
+
+    function markRead(id) {
+        return openDB().then(function(db) {
+            if (!db) return;
+            var tx = db.transaction(STORE, 'readwrite');
+            var store = tx.objectStore(STORE);
+            var req = store.get(id);
+            req.onsuccess = function() {
+                var item = req.result;
+                if (item) { item.read = true; store.put(item); }
+            };
+        });
+    }
+
+    function markAllRead() {
+        return openDB().then(function(db) {
+            if (!db) return;
+            var tx = db.transaction(STORE, 'readwrite');
+            var store = tx.objectStore(STORE);
+            store.openCursor().onsuccess = function(e) {
+                var cur = e.target.result;
+                if (cur) { cur.value.read = true; cur.update(cur.value); cur.continue(); }
+            };
+        });
+    }
+
+    function clearAll() {
+        return openDB().then(function(db) {
+            if (!db) return;
+            db.transaction(STORE, 'readwrite').objectStore(STORE).clear();
+        });
+    }
+
+    function timeAgo(ts) {
+        var diff = Math.floor((Date.now() - ts) / 1000);
+        if (diff < 60)   return 'Baru saja';
+        if (diff < 3600) return Math.floor(diff/60) + ' menit lalu';
+        if (diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
+        return Math.floor(diff/86400) + ' hari lalu';
+    }
+
+    function updateBadge() {
+        countUnread().then(function(n) {
+            var badge = document.getElementById('notifBadge');
+            if (!badge) return;
+            if (n > 0) {
+                badge.textContent = n > 99 ? '99+' : n;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+    }
+
+    function renderList() {
+        getAll().then(function(items) {
+            var list = document.getElementById('notifHistoryList');
+            var markBtn  = document.getElementById('notifMarkAllBtn');
+            var clearBtn = document.getElementById('notifClearBtn');
+            if (!list) return;
+
+            var hasUnread = items.some(function(i) { return !i.read; });
+            if (markBtn)  markBtn.style.display  = hasUnread ? 'block' : 'none';
+            if (clearBtn) clearBtn.style.display = items.length ? 'block' : 'none';
+
+            if (!items.length) {
+                list.innerHTML = '<div style="text-align:center; padding:60px 20px;"><div style="font-size:40px; margin-bottom:12px;">🔔</div><div style="font-size:14px; font-weight:600; color:var(--gray,#64748b);">Belum ada notifikasi</div><div style="font-size:12px; color:#94a3b8; margin-top:4px;">Notifikasi absensi dan pengumuman akan muncul di sini</div></div>';
+                return;
+            }
+
+            list.innerHTML = items.map(function(item) {
+                return '<div onclick="NotifHistory.tapItem(' + item.id + ', \'' + (item.url||'/pegawai/dashboard') + '\')" style="display:flex; gap:12px; padding:14px 20px; cursor:pointer; background:' + (item.read ? 'transparent' : 'rgba(90,182,234,0.06)') + '; border-bottom:1px solid var(--card-border,#f1f5f9);">' +
+                    '<div style="width:40px; height:40px; border-radius:12px; background:' + (item.read ? 'var(--light,#f1f5f9)' : 'rgba(90,182,234,0.15)') + '; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;">' +
+                        (item.read ? '<i class="far fa-bell" style="color:#94a3b8;"></i>' : '<i class="fas fa-bell" style="color:var(--primary,#5AB6EA);"></i>') +
+                    '</div>' +
+                    '<div style="flex:1; min-width:0;">' +
+                        '<div style="font-size:13px; font-weight:' + (item.read ? '500' : '700') + '; color:var(--dark,#1e293b); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (item.title || '') + '</div>' +
+                        '<div style="font-size:12px; color:var(--gray,#64748b); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">' + (item.body || '') + '</div>' +
+                        '<div style="font-size:11px; color:#94a3b8; margin-top:4px;">' + timeAgo(item.time) + '</div>' +
+                    '</div>' +
+                    (!item.read ? '<div style="width:8px; height:8px; border-radius:50%; background:var(--primary,#5AB6EA); flex-shrink:0; margin-top:6px;"></div>' : '') +
+                '</div>';
+            }).join('');
+        });
+    }
+
+    function positionModal() {
+        var modal = document.getElementById('notifHistoryModal');
+        if (!modal) return;
+        var hc = document.querySelector('.header-content');
+        var top = hc ? Math.round(hc.getBoundingClientRect().bottom) : 64;
+        modal.style.top = top + 'px';
+    }
+
+    return {
+        open: function() {
+            positionModal();
+            var modal   = document.getElementById('notifHistoryModal');
+            var overlay = document.getElementById('notifHistoryOverlay');
+            if (modal)   modal.style.display   = 'flex';
+            if (overlay) overlay.style.display = 'block';
+            renderList();
+        },
+        close: function() {
+            var modal   = document.getElementById('notifHistoryModal');
+            var overlay = document.getElementById('notifHistoryOverlay');
+            if (modal)   modal.style.display   = 'none';
+            if (overlay) overlay.style.display = 'none';
+        },
+        markAllRead: function() {
+            markAllRead().then(function() { renderList(); updateBadge(); });
+        },
+        clear: function() {
+            if (!confirm('Hapus semua riwayat notifikasi?')) return;
+            clearAll().then(function() { renderList(); updateBadge(); });
+        },
+        tapItem: function(id, url) {
+            markRead(id).then(function() { renderList(); updateBadge(); });
+        },
+        updateBadge: updateBadge,
+        init: function() {
+            updateBadge();
+            // Dengarkan pesan dari SW saat push baru masuk
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.addEventListener('message', function(e) {
+                    if (e.data && e.data.type === 'NOTIF_RECEIVED') {
+                        updateBadge();
+                        var modal = document.getElementById('notifHistoryModal');
+                        if (modal && modal.style.display === 'flex') renderList();
+                    }
+                });
+            }
+        }
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', function() { NotifHistory.init(); });
+</script>
     @stack('scripts')
 </body>
 
