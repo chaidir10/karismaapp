@@ -1289,6 +1289,10 @@
                 tag: 'pengumuman-' + id,
                 data: { url: '/pegawai/dashboard' }
             });
+            // Simpan ke riwayat notifikasi
+            if (typeof NotifHistory !== 'undefined') {
+                NotifHistory.save('📢 ' + judul, isi, 'pengumuman-' + id, '/pegawai/dashboard');
+            }
             if (btn) {
                 btn.style.background = 'rgba(16,185,129,0.15)';
                 btn.style.color = '#10b981';

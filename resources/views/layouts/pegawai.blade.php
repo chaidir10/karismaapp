@@ -18,6 +18,7 @@
     <link rel="manifest" href="/manifest.json">
 
     <!-- iOS Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="KARISMA">
@@ -1625,6 +1626,21 @@ var NotifHistory = (function() {
         },
         tapItem: function(id, url) {
             markRead(id).then(function() { renderList(); updateBadge(); });
+        },
+        save: function(title, body, tag, url) {
+            openDB().then(function(db) {
+                if (!db) return;
+                var tx = db.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).add({
+                    title: title || 'Karisma',
+                    body:  body  || '',
+                    tag:   tag   || '',
+                    url:   url   || '/pegawai/dashboard',
+                    time:  Date.now(),
+                    read:  false
+                });
+                tx.oncomplete = function() { updateBadge(); };
+            });
         },
         updateBadge: updateBadge,
         init: function() {
