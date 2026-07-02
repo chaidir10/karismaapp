@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Pegawai\AkunController;
 use App\Http\Controllers\Pegawai\DashboardController as PegawaiDashboardController;
 use App\Http\Controllers\Pegawai\PresensiController;
+use App\Http\Controllers\Pegawai\PushSubscriptionController;
 use App\Http\Controllers\Pegawai\PengajuanController;
 use App\Http\Controllers\Pegawai\PegawaiController as PegawaiListController;
 use App\Http\Controllers\Pegawai\CutiController;
@@ -159,6 +160,10 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
         Route::post('/akun/logout', [AkunController::class, 'logout'])->name('akun.logout');
         Route::post('/report-device-issue', [\App\Http\Controllers\Admin\DeviceIssueController::class, 'report'])->name('report-device-issue');
         Route::post('/location-ping', [\App\Http\Controllers\Operator\OperatorTrackingController::class, 'ping'])->name('location.ping');
+
+        // Push notification subscriptions
+        Route::post('/push-subscription', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
+        Route::delete('/push-subscription', [PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
     });
 
     // --------------------

@@ -579,7 +579,9 @@
         wilayah       : @json($wilayahJson),
         profilePhoto  : @json($profilePhotoUrl),
         wilayahAlamat : @json($wilayahJson[0]['alamat'] ?? ''),
-        shiftId       : @json($shiftHariIni->id ?? '')
+        shiftId       : @json($shiftHariIni->id ?? ''),
+        vapidKey      : '{{ config("services.vapid.public_key") }}',
+        pushSubUrl    : '{{ route("pegawai.push.subscribe") }}'
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -1296,8 +1298,19 @@
         function sendNotif(title, body, tag) {
             if (Notification.permission !== 'granted') return;
             if (sessionStorage.getItem('notif-' + tag)) return;
-            new Notification(title, { body: body, icon: '{{ asset("public/pwa/icons/icon-192x192.png") }}', tag: tag });
             sessionStorage.setItem('notif-' + tag, '1');
+            var icon = '{{ asset("public/pwa/icons/icon-192x192.png") }}';
+            var opts = { body: body, icon: icon, badge: icon, tag: tag };
+            // Pakai SW registration.showNotification() — wajib di Android Chrome
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(function(reg) {
+                    reg.showNotification(title, opts);
+                }).catch(function() {
+                    try { new Notification(title, opts); } catch(e) {}
+                });
+            } else {
+                try { new Notification(title, opts); } catch(e) {}
+            }
         }
 
         function check() {
@@ -1311,6 +1324,49 @@
         }
         check();
         setInterval(check, 30000);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // WEB PUSH SUBSCRIPTION
+    // ══════════════════════════════════════════════════════════════
+    function urlBase64ToUint8Array(base64String) {
+        var padding = '='.repeat((4 - base64String.length % 4) % 4);
+        var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        var raw = window.atob(base64);
+        var arr = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+        return arr;
+    }
+
+    function initPushSubscription() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window) || !CFG.vapidKey) return;
+        navigator.serviceWorker.ready.then(function(reg) {
+            reg.pushManager.getSubscription().then(function(existing) {
+                if (existing) return; // sudah subscribe, tidak perlu ulang
+                return Notification.requestPermission().then(function(perm) {
+                    if (perm !== 'granted') return;
+                    return reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(CFG.vapidKey)
+                    });
+                }).then(function(sub) {
+                    if (!sub) return;
+                    var j = sub.toJSON();
+                    fetch(CFG.pushSubUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            endpoint:   j.endpoint,
+                            public_key: j.keys.p256dh,
+                            auth_token: j.keys.auth
+                        })
+                    });
+                });
+            });
+        }).catch(function(e) { console.error('Push subscription error:', e); });
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -1335,6 +1391,7 @@
         try { initDetailModals(); } catch(e) { console.error('DetailModals error:', e); }
         try { initNetworkDetection(); } catch(e) { console.error('Network error:', e); }
         try { initReminders(); } catch(e) { console.error('Reminders error:', e); }
+        try { initPushSubscription(); } catch(e) { console.error('Push subscription error:', e); }
 
         // Hide badges pengumuman yang sudah dibaca
         var read = JSON.parse(localStorage.getItem('karisma-read-pengumuman') || '[]');
