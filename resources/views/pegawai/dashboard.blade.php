@@ -1339,20 +1339,28 @@
     }
 
     function initPushSubscription() {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window) || !CFG.vapidKey) return;
+        if (!('serviceWorker' in navigator)) { console.log('[Push] SW tidak didukung browser ini'); return; }
+        if (!('PushManager' in window)) { console.log('[Push] PushManager tidak didukung browser ini'); return; }
+        if (!CFG.vapidKey) { console.log('[Push] VAPID key kosong — pastikan VAPID_PUBLIC_KEY ada di .env server'); return; }
+        console.log('[Push] Mulai... VAPID key: ' + CFG.vapidKey.substring(0, 20) + '...');
         navigator.serviceWorker.ready.then(function(reg) {
-            reg.pushManager.getSubscription().then(function(existing) {
-                if (existing) return; // sudah subscribe, tidak perlu ulang
+            console.log('[Push] Service worker aktif, scope: ' + reg.scope);
+            return reg.pushManager.getSubscription().then(function(existing) {
+                if (existing) { console.log('[Push] Sudah terdaftar sebelumnya'); return; }
+                console.log('[Push] Belum terdaftar, minta izin notifikasi...');
                 return Notification.requestPermission().then(function(perm) {
+                    console.log('[Push] Permission status: ' + perm);
                     if (perm !== 'granted') return;
+                    console.log('[Push] Mendaftar ke push server...');
                     return reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: urlBase64ToUint8Array(CFG.vapidKey)
                     });
                 }).then(function(sub) {
-                    if (!sub) return;
+                    if (!sub) { console.log('[Push] Subscribe dibatalkan'); return; }
+                    console.log('[Push] Subscribe berhasil! Simpan ke server...');
                     var j = sub.toJSON();
-                    fetch(CFG.pushSubUrl, {
+                    return fetch(CFG.pushSubUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1363,10 +1371,16 @@
                             public_key: j.keys.p256dh,
                             auth_token: j.keys.auth
                         })
+                    }).then(function(r) {
+                        if (r.ok) {
+                            console.log('[Push] Berhasil disimpan ke database! Status: ' + r.status);
+                        } else {
+                            r.text().then(function(t) { console.error('[Push] Server error ' + r.status + ':', t); });
+                        }
                     });
                 });
             });
-        }).catch(function(e) { console.error('Push subscription error:', e); });
+        }).catch(function(e) { console.error('[Push] Error:', e); });
     }
 
     // ══════════════════════════════════════════════════════════════
