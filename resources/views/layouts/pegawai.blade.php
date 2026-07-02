@@ -1493,12 +1493,11 @@ var NotifHistory = (function() {
         return openDB().then(function(db) {
             if (!db) return [];
             return new Promise(function(resolve) {
-                var items = [];
-                db.transaction(STORE).objectStore(STORE).openCursor(null, 'prev').onsuccess = function(e) {
-                    var cur = e.target.result;
-                    if (cur) { items.push(cur.value); cur.continue(); }
-                    else resolve(items);
-                };
+                try {
+                    var req = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
+                    req.onsuccess = function(e) { resolve((e.target.result || []).reverse()); };
+                    req.onerror   = function()  { resolve([]); };
+                } catch(e) { resolve([]); }
             });
         });
     }
@@ -1630,16 +1629,19 @@ var NotifHistory = (function() {
         save: function(title, body, tag, url) {
             openDB().then(function(db) {
                 if (!db) return;
-                var tx = db.transaction(STORE, 'readwrite');
-                tx.objectStore(STORE).add({
-                    title: title || 'Karisma',
-                    body:  body  || '',
-                    tag:   tag   || '',
-                    url:   url   || '/pegawai/dashboard',
-                    time:  Date.now(),
-                    read:  false
-                });
-                tx.oncomplete = function() { updateBadge(); };
+                try {
+                    var tx = db.transaction(STORE, 'readwrite');
+                    tx.objectStore(STORE).add({
+                        title: title || 'Karisma',
+                        body:  body  || '',
+                        tag:   tag   || '',
+                        url:   url   || '/pegawai/dashboard',
+                        time:  Date.now(),
+                        read:  false
+                    });
+                    tx.oncomplete = function() { updateBadge(); };
+                    tx.onerror    = function(e) { console.warn('[NotifHistory] save error', e); };
+                } catch(e) { console.warn('[NotifHistory] save exception', e); }
             });
         },
         updateBadge: updateBadge,

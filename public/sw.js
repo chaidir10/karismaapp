@@ -1,5 +1,6 @@
-// Karisma SW v4
+// Karisma SW v5
 self.addEventListener('install', function() { self.skipWaiting(); });
+self.addEventListener('activate', function(e) { e.waitUntil(self.clients.claim()); });
 
 // ── IndexedDB helpers ─────────────────────────────────────────
 function openNotifDB() {
@@ -13,17 +14,22 @@ function openNotifDB() {
     });
 }
 
+// Menunggu transaksi benar-benar commit sebelum resolve
 function saveNotif(data) {
     return openNotifDB().then(function(db) {
         if (!db) return;
-        var tx = db.transaction('notifications', 'readwrite');
-        tx.objectStore('notifications').add({
-            title : data.title || 'Karisma',
-            body  : data.body  || '',
-            tag   : data.tag   || '',
-            url   : data.url   || '/pegawai/dashboard',
-            time  : Date.now(),
-            read  : false
+        return new Promise(function(resolve) {
+            var tx = db.transaction('notifications', 'readwrite');
+            tx.objectStore('notifications').add({
+                title : data.title || 'Karisma',
+                body  : data.body  || '',
+                tag   : data.tag   || '',
+                url   : data.url   || '/pegawai/dashboard',
+                time  : Date.now(),
+                read  : false
+            });
+            tx.oncomplete = function() { resolve(); };
+            tx.onerror    = function() { resolve(); }; // tetap lanjut walau gagal simpan
         });
     });
 }
@@ -34,20 +40,22 @@ self.addEventListener('push', function(event) {
     try { data = event.data ? event.data.json() : {}; } catch(e) {}
 
     event.waitUntil(
-        saveNotif(data).then(function() {
-            return self.registration.showNotification(data.title || 'Karisma', {
-                body  : data.body || '',
-                icon  : '/public/pwa/icons/icon-192x192.png',
-                badge : '/public/pwa/icons/icon-192x192.png',
-                tag   : data.tag || 'karisma',
-                data  : { url: data.url || '/pegawai/dashboard' }
-            });
-        }).then(function() {
-            // Beritahu semua tab yang terbuka agar update badge
-            return self.clients.matchAll({ type: 'window' }).then(function(list) {
-                list.forEach(function(c) { c.postMessage({ type: 'NOTIF_RECEIVED' }); });
-            });
-        })
+        saveNotif(data)
+            .then(function() {
+                return self.registration.showNotification(data.title || 'Karisma', {
+                    body  : data.body || '',
+                    icon  : '/public/pwa/icons/icon-192x192.png',
+                    badge : '/public/pwa/icons/icon-192x192.png',
+                    tag   : data.tag || 'karisma',
+                    data  : { url: data.url || '/pegawai/dashboard' }
+                });
+            })
+            .then(function() {
+                // Beritahu semua tab agar update badge — setelah IDB commit
+                return self.clients.matchAll({ type: 'window' }).then(function(list) {
+                    list.forEach(function(c) { c.postMessage({ type: 'NOTIF_RECEIVED' }); });
+                });
+            })
     );
 });
 
@@ -58,7 +66,7 @@ self.addEventListener('notificationclick', function(event) {
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
             for (var i = 0; i < list.length; i++) {
-                if ('focus' in list[i]) return list[i].focus();
+                if (list[i].url.indexOf(target) !== -1 && 'focus' in list[i]) return list[i].focus();
             }
             if (clients.openWindow) return clients.openWindow(target);
         })
