@@ -12,73 +12,78 @@
     .ql-toolbar .ql-picker-label { color: var(--text-muted) !important; }
     .ql-editor.ql-blank::before { color: var(--gray) !important; }
 
+    /* ── Card list ───────────────────────────────────────────── */
     .p-card {
-        background: var(--dm-card, #fff); border-radius: 14px; margin-bottom: 12px;
-        border: 1px solid var(--dm-border, #e2e8f0);
-        overflow: hidden; transition: box-shadow 0.2s, transform 0.15s;
-        cursor: default;
+        background: var(--dm-card,#fff); border-radius:16px; margin-bottom:10px;
+        border: 1px solid var(--dm-border,#e2e8f0);
+        overflow:hidden; transition:box-shadow .2s,transform .15s,border-color .2s;
     }
-    .p-card:hover { box-shadow: none; }
-    .p-card.dragging { opacity:0.5; transform:scale(0.98); }
+    .p-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.07); border-color:rgba(90,182,234,0.3); }
+    .p-card.dragging { opacity:.5; transform:scale(0.98); }
     .p-card.drag-over { border-top:2px solid #3b82f6; }
-    .p-card-inner { display: flex; gap: 12px; padding: 16px 20px; align-items: center; }
+    .p-card-inner { display:flex; gap:14px; padding:14px 16px; align-items:center; }
     .drag-handle {
-        cursor: grab; color: #cbd5e1; font-size: 16px; flex-shrink: 0;
-        display: flex; align-items: center; padding: 4px;
-        -webkit-tap-highlight-color: transparent;
+        cursor:grab; color:#cbd5e1; font-size:15px; flex-shrink:0;
+        display:flex; align-items:center; padding:6px 2px;
+        -webkit-tap-highlight-color:transparent; transition:color .15s;
     }
-    .drag-handle:active { cursor: grabbing; color: #94a3b8; }
-    .p-card .p-thumb {
-        width: 180px; height: 90px; border-radius: 12px; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 24px; color: #fff; background-size: cover; background-position: center; background-repeat: no-repeat;
-        background-color: var(--dm-card, #f1f5f9); overflow: hidden;
+    .drag-handle:hover { color:#94a3b8; }
+    .drag-handle:active { cursor:grabbing; }
+
+    .p-thumb {
+        width:100px; height:64px; border-radius:10px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-size:22px; color:#fff; background-size:cover;
+        background-position:center; background-repeat:no-repeat;
+        background-color:var(--dm-border,#f1f5f9); overflow:hidden;
     }
-    .p-card .p-info { flex: 1; min-width: 0; }
-    .p-card .p-title { font-size: 15px; font-weight: 700; color: var(--dm-text, #1e293b); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .p-card .p-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
-    .p-card .p-meta .p-tag { padding: 2px 10px; border-radius: 8px; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: #fff; }
-    .p-card .p-excerpt { font-size: 12px; color: var(--dm-muted, #64748b); line-height: 1.4; max-height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-    .p-card .p-badge-inactive { display: inline-block; background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
-    .p-card .p-actions { flex-shrink: 0; display: flex; gap: 4px; }
-    .p-card .p-actions { display:flex; gap:4px; }
-    .p-card .p-actions button {
-        width: 34px; height: 34px; border-radius: 8px; border: none;
-        cursor: pointer; display: flex; align-items: center;
-        justify-content: center; font-size: 13px; transition: all 0.15s;
+    .p-info { flex:1; min-width:0; }
+    .p-title { font-size:14px; font-weight:700; color:var(--dm-text,#1e293b); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .p-meta { display:flex; flex-wrap:wrap; gap:5px; align-items:center; font-size:11px; color:#94a3b8; margin-bottom:4px; }
+    .p-tag { padding:2px 8px; border-radius:6px; font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:.3px; color:#fff; }
+    .p-excerpt { font-size:12px; color:var(--dm-muted,#64748b); line-height:1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; }
+    .p-badge-inactive { display:inline-flex; align-items:center; gap:3px; background:rgba(239,68,68,0.1); color:#ef4444; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; }
+
+    .p-actions { flex-shrink:0; display:flex; gap:4px; align-items:center; }
+    .p-actions button {
+        width:32px; height:32px; border-radius:8px; border:none;
+        cursor:pointer; display:flex; align-items:center;
+        justify-content:center; font-size:12px; transition:all .15s;
     }
-    .btn-toggle-on { background:rgba(16,185,129,0.1); color:#10b981; }
-    .btn-toggle-on:hover { background:#10b981; color:#fff; }
+    .btn-toggle-on  { background:rgba(16,185,129,0.1); color:#10b981; }
+    .btn-toggle-on:hover  { background:#10b981; color:#fff; }
     .btn-toggle-off { background:rgba(239,68,68,0.1); color:#ef4444; }
     .btn-toggle-off:hover { background:#ef4444; color:#fff; }
-    [data-theme="dark"] .btn-toggle-on { background:rgba(16,185,129,0.15); color:#34d399; }
-    [data-theme="dark"] .btn-toggle-on:hover { background:#10b981; color:#fff; }
+    [data-theme="dark"] .btn-toggle-on  { background:rgba(16,185,129,0.15); color:#34d399; }
     [data-theme="dark"] .btn-toggle-off { background:rgba(239,68,68,0.15); color:#f87171; }
-    [data-theme="dark"] .btn-toggle-off:hover { background:#ef4444; color:#fff; }
-    /* btn-edit, btn-delete inherited from layout */
 
-    /* Form field */
-    .form-label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 6px; }
-    .form-label .optional { font-weight: 400; color: #94a3b8; }
+    /* ── Form fields ─────────────────────────────────────────── */
+    .form-label { font-size:13px; font-weight:600; color:var(--dm-text,#374151); display:block; margin-bottom:6px; }
+    .form-label .optional { font-weight:400; color:#94a3b8; }
     .form-input {
-        width: 100%; border: 1px solid #e2e8f0; border-radius: 12px;
-        padding: 10px 14px; font-size: 14px; outline: none; transition: border-color 0.2s;
+        width:100%; border:1.5px solid var(--dm-border,#e2e8f0); border-radius:12px;
+        padding:10px 14px; font-size:14px; outline:none; transition:border-color .2s,box-shadow .2s;
+        background:var(--dm-input,#f8fafc); color:var(--dm-text,#1e293b); box-sizing:border-box;
     }
-    .form-input:focus { border-color: #3b82f6; }
+    .form-input:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
 
-    /* Preview gambar */
     .cover-preview {
-        margin-top: 10px; border-radius: 12px; overflow: hidden;
-        border: 2px dashed #e2e8f0; position: relative; display: none;
+        margin-top:10px; border-radius:12px; overflow:hidden;
+        border:2px dashed var(--dm-border,#e2e8f0); position:relative; display:none;
     }
-    .cover-preview img {
-        width: 100%; height: auto; display: block;
-    }
+    .cover-preview img { width:100%; height:auto; display:block; }
     .cover-preview .preview-remove {
-        position: absolute; top: 8px; right: 8px; width: 28px; height: 28px;
-        border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none;
-        cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px;
+        position:absolute; top:8px; right:8px; width:28px; height:28px;
+        border-radius:50%; background:rgba(0,0,0,0.5); color:#fff; border:none;
+        cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px;
     }
+
+    /* ── Confirm modal ───────────────────────────────────────── */
+    #confirmModal { display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); padding:16px; }
+    #confirmModal .cm-box { background:var(--dm-card,#fff); border-radius:20px; width:100%; max-width:360px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.2); animation:modalSlideIn .18s ease; }
+    #confirmModal .cm-icon { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 12px; }
+    #confirmModal .cm-title { font-size:16px; font-weight:700; color:var(--dm-text,#1e293b); margin-bottom:6px; }
+    #confirmModal .cm-body  { font-size:13px; color:var(--dm-muted,#64748b); line-height:1.5; }
 </style>
 @endpush
 
@@ -99,9 +104,9 @@
     </div>
 
     <!-- Note -->
-    <div style="background:var(--dm-card, #f0f9ff); border:1px solid var(--dm-border, #bae6fd); border-radius:12px; padding:10px 14px; margin-bottom:16px; display:flex; align-items:center; gap:10px; font-size:12px; color:var(--dm-muted, #0369a1);">
-        <i class="fas fa-grip-vertical" style="font-size:14px; opacity:0.5;"></i>
-        <span>Geser card untuk mengatur urutan. Urutan paling atas akan muncul pertama di slider pegawai.</span>
+    <div style="background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.15); border-radius:12px; padding:10px 16px; margin-bottom:14px; display:flex; align-items:center; gap:10px; font-size:12px; color:#3b82f6;">
+        <i class="fas fa-grip-vertical" style="opacity:0.6;"></i>
+        <span>Geser card untuk mengatur urutan tampil di slider pegawai.</span>
     </div>
 
     <!-- List -->
@@ -112,14 +117,12 @@
         @endphp
         <div class="p-card" data-id="{{ $p->id }}" draggable="true">
             <div class="p-card-inner">
-                <div class="drag-handle" title="Geser untuk ubah urutan">
-                    <i class="fas fa-grip-vertical"></i>
-                </div>
+                <div class="drag-handle" title="Geser untuk ubah urutan"><i class="fas fa-grip-vertical"></i></div>
 
                 @if($p->gambar)
                 <div class="p-thumb" style="background-image:url('{{ asset('public/storage/'.$p->gambar) }}');"></div>
                 @else
-                <div class="p-thumb" style="background:{{ $opt['color'] }};">
+                <div class="p-thumb" style="background:linear-gradient(135deg,{{ $opt['color'] }},{{ $opt['color'] }}cc);">
                     <i class="fas {{ $opt['icon'] }}"></i>
                 </div>
                 @endif
@@ -129,24 +132,28 @@
                     <div class="p-meta">
                         <span class="p-tag" style="background:{{ $opt['color'] }};">{{ $opt['label'] }}</span>
                         @if($p->tanggal_mulai)
-                        <span><i class="far fa-calendar-alt" style="margin-right:2px;"></i> {{ $p->tanggal_mulai->format('d M Y') }}@if($p->tanggal_selesai && $p->tanggal_selesai->ne($p->tanggal_mulai)) - {{ $p->tanggal_selesai->format('d M Y') }}@endif</span>
+                        <span><i class="far fa-calendar-alt" style="margin-right:3px;"></i>{{ $p->tanggal_mulai->format('d M Y') }}@if($p->tanggal_selesai && $p->tanggal_selesai->ne($p->tanggal_mulai)) – {{ $p->tanggal_selesai->format('d M Y') }}@endif</span>
                         @endif
                         @if($p->waktu)
-                        <span><i class="far fa-clock" style="margin-right:2px;"></i> {{ \Carbon\Carbon::parse($p->waktu)->format('H:i') }}</span>
+                        <span><i class="far fa-clock" style="margin-right:3px;"></i>{{ \Carbon\Carbon::parse($p->waktu)->format('H:i') }}</span>
                         @endif
                         <span>{{ $p->created_at->diffForHumans() }}</span>
                         @if(!$p->is_active)
-                        <span class="p-badge-inactive"><i class="fas fa-eye-slash" style="margin-right:2px;"></i> Nonaktif</span>
+                        <span class="p-badge-inactive"><i class="fas fa-eye-slash"></i> Nonaktif</span>
                         @endif
                     </div>
                     <div class="p-excerpt">{!! strip_tags($p->isi) !!}</div>
                 </div>
 
                 <div class="p-actions">
-                    <button onclick="toggleActive({{ $p->id }})" title="{{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}" class="{{ $p->is_active ? 'btn-toggle-on' : 'btn-toggle-off' }}" id="toggleBtn{{ $p->id }}">
+                    <button onclick="toggleActive({{ $p->id }})" title="{{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
+                        class="{{ $p->is_active ? 'btn-toggle-on' : 'btn-toggle-off' }}" id="toggleBtn{{ $p->id }}">
                         <i class="fas {{ $p->is_active ? 'fa-eye' : 'fa-eye-slash' }}"></i>
                     </button>
-                    <button onclick="kirimPushPengumuman({{ $p->id }}, this)" title="Kirim Notifikasi Push" style="background:rgba(245,158,11,0.1); color:#f59e0b; width:34px; height:34px; border-radius:8px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all 0.15s;">
+                    <button onclick="kirimPushPengumuman({{ $p->id }}, this)" title="Kirim Notifikasi Push"
+                        style="background:rgba(245,158,11,0.1);color:#f59e0b;width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;"
+                        onmouseover="this.style.background='#f59e0b';this.style.color='#fff'"
+                        onmouseout="this.style.background='rgba(245,158,11,0.1)';this.style.color='#f59e0b'">
                         <i class="fas fa-bell"></i>
                     </button>
                     <button onclick="editPengumuman({{ $p->id }})" title="Edit" class="btn-edit"><i class="fas fa-pen"></i></button>
@@ -167,13 +174,26 @@
 </div>
 
 <!-- Modal Form -->
-<div id="formModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
-    <div style="background:var(--dm-card, #fff); border-radius:20px; width:95%; max-width:700px; max-height:90vh; overflow-y:auto; padding:28px; position:relative;">
-        <button onclick="closeModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--dm-muted, #94a3b8); width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px;"
-            onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
-            <i class="fas fa-times"></i>
-        </button>
-        <h3 id="modalTitle" style="font-size:18px; font-weight:700; margin-bottom:24px; color:var(--dm-text, #1e293b);">Tambah Pengumuman</h3>
+<div id="formModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:100; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:16px;">
+    <div style="background:var(--dm-card,#fff); border-radius:24px; width:100%; max-width:700px; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 25px 50px rgba(0,0,0,0.25); animation:modalSlideIn .2s ease;">
+        <!-- Header bergradien -->
+        <div style="background:linear-gradient(135deg,#3b82f6,#6366f1); padding:20px 24px; position:relative; flex-shrink:0;">
+            <button onclick="closeModal()" style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.2); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:background .2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                <i class="fas fa-times"></i>
+            </button>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff; flex-shrink:0;">
+                    <i id="modalHeaderIcon" class="fas fa-bullhorn"></i>
+                </div>
+                <div>
+                    <div id="modalTitle" style="font-size:16px; font-weight:700; color:#fff; line-height:1.2;">Tambah Pengumuman</div>
+                    <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:2px;">Isi informasi pengumuman di bawah ini</div>
+                </div>
+            </div>
+        </div>
+        <!-- Body scrollable -->
+        <div style="overflow-y:auto; padding:24px; flex:1;">
 
         <form id="pengumumanForm" method="POST" enctype="multipart/form-data">
             @csrf
@@ -259,13 +279,29 @@
             </div>
 
             <!-- Actions -->
-            <div style="display:flex; gap:10px; justify-content:flex-end;">
-                <button type="button" onclick="closeModal()" class="btn-secondary">Batal</button>
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-save" style="margin-right:6px;"></i> Simpan
+            <div style="display:flex; gap:10px; justify-content:flex-end; padding-top:4px;">
+                <button type="button" onclick="closeModal()" style="padding:10px 20px; border:1.5px solid var(--dm-border,#e2e8f0); background:var(--dm-input,#f8fafc); color:var(--dm-text,#64748b); border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Batal</button>
+                <button type="submit" style="padding:10px 24px; background:linear-gradient(135deg,#3b82f6,#6366f1); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                    <i class="fas fa-save"></i> Simpan
                 </button>
             </div>
         </form>
+        </div>{{-- end body scrollable --}}
+    </div>
+</div>
+
+<!-- Confirm Modal (pengganti browser confirm()) -->
+<div id="confirmModal" style="display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); padding:16px;">
+    <div class="cm-box">
+        <div style="padding:28px 24px 20px; text-align:center;">
+            <div id="cmIcon" class="cm-icon"></div>
+            <div id="cmTitle" class="cm-title"></div>
+            <div id="cmBody"  class="cm-body"></div>
+        </div>
+        <div style="display:flex; gap:10px; padding:0 24px 24px;">
+            <button id="cmCancel" style="flex:1; padding:11px; border:1.5px solid var(--dm-border,#e2e8f0); background:var(--dm-input,#f8fafc); color:var(--dm-text,#64748b); border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Batal</button>
+            <button id="cmOk"     style="flex:1; padding:11px; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; color:#fff;"></button>
+        </div>
     </div>
 </div>
 
@@ -421,6 +457,7 @@
     function openModal() {
         document.getElementById('formModal').style.display = 'flex';
         document.getElementById('modalTitle').textContent = 'Tambah Pengumuman';
+        document.getElementById('modalHeaderIcon').className = 'fas fa-bullhorn';
         document.getElementById('pengumumanForm').action = "{{ route('admin.pengumuman.store') }}";
         document.getElementById('formMethod').value = 'POST';
         document.getElementById('inputJudul').value = '';
@@ -441,28 +478,58 @@
         document.getElementById('formModal').style.display = 'none';
     }
 
+    // ── Custom confirm modal ──────────────────────────────────────
+    function showConfirm(opts) {
+        // opts: { icon, iconBg, iconColor, title, body, okLabel, okBg, onOk }
+        var m = document.getElementById('confirmModal');
+        document.getElementById('cmIcon').innerHTML  = '<i class="fas ' + opts.icon + '" style="color:' + opts.iconColor + ';"></i>';
+        document.getElementById('cmIcon').style.background = opts.iconBg;
+        document.getElementById('cmTitle').textContent = opts.title;
+        document.getElementById('cmBody').textContent  = opts.body || '';
+        var okBtn = document.getElementById('cmOk');
+        okBtn.textContent = opts.okLabel || 'OK';
+        okBtn.style.background = opts.okBg || '#3b82f6';
+        m.style.display = 'flex';
+        var close = function() { m.style.display = 'none'; };
+        document.getElementById('cmCancel').onclick = close;
+        okBtn.onclick = function() { close(); opts.onOk && opts.onOk(); };
+        m.onclick = function(e) { if (e.target === m) close(); };
+    }
+
     // ── Kirim push untuk satu pengumuman ─────────────────────────
     function kirimPushPengumuman(id, btn) {
-        if (!confirm('Kirim notifikasi push pengumuman ini ke semua pegawai?')) return;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        fetch("{{ url('/admin/pengumuman') }}/" + id + "/push", {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-        }).then(function(r) { return r.json(); }).then(function(d) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-bell"></i>';
-            btn.style.background = 'rgba(16,185,129,0.1)';
-            btn.style.color = '#10b981';
-            alert('Notifikasi terkirim ke ' + d.sent + ' perangkat' + (d.failed ? ' (' + d.failed + ' gagal)' : '') + '.');
-            setTimeout(function() {
-                btn.style.background = 'rgba(245,158,11,0.1)';
-                btn.style.color = '#f59e0b';
-            }, 3000);
-        }).catch(function() {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-bell"></i>';
-            alert('Gagal mengirim notifikasi.');
+        showConfirm({
+            icon:'fa-bell', iconBg:'rgba(245,158,11,0.12)', iconColor:'#f59e0b',
+            title:'Kirim Notifikasi Push?',
+            body:'Notifikasi pengumuman ini akan dikirim ke semua pegawai yang aktif.',
+            okLabel:'Kirim', okBg:'linear-gradient(135deg,#f59e0b,#ef4444)',
+            onOk: function() {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                fetch("{{ url('/admin/pengumuman') }}/" + id + "/push", {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                }).then(function(r) { return r.json(); }).then(function(d) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bell"></i>';
+                    btn.style.background = 'rgba(16,185,129,0.1)';
+                    btn.style.color = '#10b981';
+                    showConfirm({
+                        icon:'fa-check-circle', iconBg:'rgba(16,185,129,0.12)', iconColor:'#10b981',
+                        title:'Notifikasi Terkirim',
+                        body:'Berhasil ke ' + d.sent + ' perangkat' + (d.failed ? ' · ' + d.failed + ' gagal' : '') + '.',
+                        okLabel:'OK', okBg:'#10b981', onOk: function() {}
+                    });
+                    document.getElementById('cmCancel').style.display = 'none';
+                    setTimeout(function() {
+                        btn.style.background = 'rgba(245,158,11,0.1)';
+                        btn.style.color = '#f59e0b';
+                    }, 3000);
+                }).catch(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bell"></i>';
+                });
+            }
         });
     }
 
@@ -541,6 +608,7 @@
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 document.getElementById('modalTitle').textContent = 'Edit Pengumuman';
+                document.getElementById('modalHeaderIcon').className = 'fas fa-pen';
                 document.getElementById('pengumumanForm').action = "{{ url('/admin/pengumuman') }}/" + id;
                 document.getElementById('formMethod').value = 'PUT';
                 document.getElementById('inputJudul').value = data.judul;
@@ -567,10 +635,17 @@
     }
 
     function hapusPengumuman(id) {
-        if (!confirm('Yakin ingin menghapus pengumuman ini?')) return;
-        var form = document.getElementById('deleteForm');
-        form.action = "{{ url('/admin/pengumuman') }}/" + id;
-        form.submit();
+        showConfirm({
+            icon:'fa-trash', iconBg:'rgba(239,68,68,0.1)', iconColor:'#ef4444',
+            title:'Hapus Pengumuman?',
+            body:'Pengumuman ini akan dihapus permanen dan tidak bisa dikembalikan.',
+            okLabel:'Hapus', okBg:'linear-gradient(135deg,#ef4444,#dc2626)',
+            onOk: function() {
+                var form = document.getElementById('deleteForm');
+                form.action = "{{ url('/admin/pengumuman') }}/" + id;
+                form.submit();
+            }
+        });
     }
 
     function toggleActive(id) {
