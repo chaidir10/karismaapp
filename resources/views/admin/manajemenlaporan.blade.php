@@ -221,6 +221,7 @@
     var ts = new TomSelect('#user_id', {
         placeholder: 'Ketik nama atau NIP...',
         allowEmptyOption: true,
+        maxOptions: false,
         onFocus: function() {
             this.clear();
         },
