@@ -1,4 +1,4 @@
-// Karisma SW v6
+// Karisma SW v7
 self.addEventListener('install', function() { self.skipWaiting(); });
 self.addEventListener('activate', function(e) { e.waitUntil(self.clients.claim()); });
 
@@ -15,7 +15,6 @@ self.addEventListener('push', function(event) {
             tag   : data.tag || 'karisma',
             data  : { url: data.url || '/pegawai/dashboard' }
         }).then(function() {
-            // Beritahu page agar update badge dari API (server sudah log saat kirim push)
             return self.clients.matchAll({ type: 'window' }).then(function(list) {
                 list.forEach(function(c) { c.postMessage({ type: 'NOTIF_RECEIVED' }); });
             });
@@ -27,12 +26,26 @@ self.addEventListener('push', function(event) {
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     var target = (event.notification.data && event.notification.data.url) || '/pegawai/dashboard';
+    var isExternal = target.startsWith('http://') || target.startsWith('https://');
+
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
-            for (var i = 0; i < list.length; i++) {
-                if (list[i].url.indexOf(target) !== -1 && 'focus' in list[i]) return list[i].focus();
+            // Untuk URL internal: cari tab dashboard yang sudah terbuka
+            if (!isExternal) {
+                for (var i = 0; i < list.length; i++) {
+                    var c = list[i];
+                    if (c.url.indexOf('/pegawai/dashboard') !== -1 && 'focus' in c) {
+                        c.focus();
+                        // Kirim perintah buka modal ke halaman
+                        c.postMessage({ type: 'OPEN_URL', url: target });
+                        return;
+                    }
+                }
+                // Tidak ada tab terbuka, buka baru
+                return clients.openWindow(target);
             }
-            if (clients.openWindow) return clients.openWindow(target);
+            // URL eksternal: buka tab baru
+            return clients.openWindow(target);
         })
     );
 });

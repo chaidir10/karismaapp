@@ -1291,7 +1291,7 @@
             });
             // Simpan ke riwayat notifikasi
             if (typeof NotifHistory !== 'undefined') {
-                NotifHistory.save('📢 ' + judul, isi, 'pengumuman-' + id, '/pegawai/dashboard');
+                NotifHistory.save('📢 ' + judul, isi, 'pengumuman-' + id, '/pegawai/dashboard?buka=' + id);
             }
             if (btn) {
                 btn.style.background = 'rgba(16,185,129,0.15)';

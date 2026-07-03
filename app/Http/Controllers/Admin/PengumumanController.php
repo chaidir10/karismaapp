@@ -144,7 +144,7 @@ class PengumumanController extends Controller
         $title   = '📢 ' . $pengumuman->judul;
         $body    = Str::limit(strip_tags($pengumuman->isi), 100);
         $tag     = 'pengumuman-' . $pengumuman->id;
-        $url     = '/pegawai/dashboard';
+        $url     = '/pegawai/dashboard?buka=' . $pengumuman->id;
         $payload = compact('title', 'body', 'tag', 'url');
 
         $sender = new WebPushSender();

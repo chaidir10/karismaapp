@@ -1565,35 +1565,58 @@ var NotifHistory = (function() {
         },
         tapItem: function(id, url) {
             api('POST', '/' + id + '/baca').then(function() { updateBadge(); });
-            // Update UI lokal seketika tanpa fetch ulang
-            var el = event && event.currentTarget;
-            document.querySelectorAll('#notifHistoryList [onclick*="tapItem(' + id + '"]').forEach(function(row) {
-                row.style.background = 'transparent';
-                var dot = row.querySelector('[style*="border-radius:50%"]');
-                if (dot) dot.remove();
-                var icon = row.querySelector('i');
-                if (icon) { icon.className = 'far fa-bell'; icon.style.color = '#94a3b8'; }
-                var iconWrap = row.querySelector('[style*="border-radius:12px"]');
-                if (iconWrap) iconWrap.style.background = 'var(--light,#f1f5f9)';
-                var title = row.querySelector('[style*="font-weight"]');
-                if (title) title.style.fontWeight = '500';
-            });
+            NotifHistory.close();
+            NotifHistory.navigate(url);
         },
         // Simpan notifikasi lokal (bell di pengumuman) ke server
         save: function(title, body, tag, url) {
             api('POST', '/', { title: title, body: body, tag: tag, url: url })
                 .then(function() { updateBadge(); });
         },
+        // Navigasi ke URL notifikasi (internal atau eksternal)
+        navigate: function(url) {
+            if (!url || url === '/pegawai/dashboard') return;
+            var isExternal = /^https?:\/\//i.test(url);
+            if (isExternal) { window.open(url, '_blank', 'noopener'); return; }
+            try {
+                var u = new URL(url, window.location.origin);
+                var bukaId = u.searchParams.get('buka');
+                if (bukaId && typeof Pengumuman !== 'undefined' && Pengumuman.openInfoModal) {
+                    history.replaceState({}, '', window.location.pathname);
+                    Pengumuman.openInfoModal(parseInt(bukaId));
+                } else {
+                    window.location.href = url;
+                }
+            } catch(e) { window.location.href = url; }
+        },
         updateBadge: updateBadge,
         init: function() {
             updateBadge();
-            // Update badge real-time saat SW menerima push
+
+            // Auto-buka modal jika URL mengandung ?buka=ID (misal dari klik notifikasi HP)
+            try {
+                var bukaId = new URLSearchParams(window.location.search).get('buka');
+                if (bukaId) {
+                    history.replaceState({}, '', window.location.pathname);
+                    setTimeout(function() {
+                        if (typeof Pengumuman !== 'undefined' && Pengumuman.openInfoModal) {
+                            Pengumuman.openInfoModal(parseInt(bukaId));
+                        }
+                    }, 500);
+                }
+            } catch(e) {}
+
+            // Tangani pesan dari SW
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.addEventListener('message', function(e) {
-                    if (e.data && e.data.type === 'NOTIF_RECEIVED') {
+                    if (!e.data) return;
+                    if (e.data.type === 'NOTIF_RECEIVED') {
                         updateBadge();
                         var modal = document.getElementById('notifHistoryModal');
                         if (modal && modal.style.display === 'flex') renderList();
+                    }
+                    if (e.data.type === 'OPEN_URL') {
+                        NotifHistory.navigate(e.data.url);
                     }
                 });
             }
