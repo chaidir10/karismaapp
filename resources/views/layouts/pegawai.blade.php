@@ -1460,9 +1460,6 @@
             <button onclick="NotifHistory.markAllRead()" id="notifMarkAllBtn" style="display:none; font-size:11px; font-weight:600; color:var(--primary,#5AB6EA); background:none; border:none; cursor:pointer; padding:4px 8px;">
                 Tandai semua dibaca
             </button>
-            <button onclick="NotifHistory.clear()" id="notifClearBtn" style="display:none; font-size:11px; font-weight:600; color:#ef4444; background:none; border:none; cursor:pointer; padding:4px 8px;">
-                Hapus semua
-            </button>
             <button onclick="NotifHistory.close()" style="width:32px; height:32px; border-radius:10px; background:var(--light,#f1f5f9); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--gray,#64748b); font-size:14px;">
                 <i class="fas fa-times"></i>
             </button>
@@ -1506,7 +1503,6 @@ var NotifHistory = (function() {
     function renderList() {
         var list    = document.getElementById('notifHistoryList');
         var markBtn = document.getElementById('notifMarkAllBtn');
-        var clrBtn  = document.getElementById('notifClearBtn');
         if (!list) return;
 
         list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>';
@@ -1515,7 +1511,6 @@ var NotifHistory = (function() {
             if (!Array.isArray(items)) items = [];
             var hasUnread = items.some(function(i) { return !i.is_read; });
             if (markBtn) markBtn.style.display = hasUnread ? 'block' : 'none';
-            if (clrBtn)  clrBtn.style.display  = items.length ? 'block' : 'none';
 
             if (!items.length) {
                 list.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:40px;margin-bottom:12px;">🔔</div><div style="font-size:14px;font-weight:600;color:var(--gray,#64748b);">Belum ada notifikasi</div><div style="font-size:12px;color:#94a3b8;margin-top:4px;">Notifikasi absensi dan pengumuman akan muncul di sini</div></div>';
@@ -1567,10 +1562,6 @@ var NotifHistory = (function() {
         },
         markAllRead: function() {
             api('POST', '/baca-semua').then(function() { renderList(); updateBadge(); });
-        },
-        clear: function() {
-            if (!confirm('Hapus semua riwayat notifikasi?')) return;
-            api('DELETE', '/').then(function() { renderList(); updateBadge(); });
         },
         tapItem: function(id, url) {
             api('POST', '/' + id + '/baca').then(function() { updateBadge(); });

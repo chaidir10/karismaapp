@@ -480,20 +480,21 @@
 
     // ── Custom confirm modal ──────────────────────────────────────
     function showConfirm(opts) {
-        // opts: { icon, iconBg, iconColor, title, body, okLabel, okBg, onOk }
-        var m = document.getElementById('confirmModal');
-        document.getElementById('cmIcon').innerHTML  = '<i class="fas ' + opts.icon + '" style="color:' + opts.iconColor + ';"></i>';
+        var m      = document.getElementById('confirmModal');
+        var cancel = document.getElementById('cmCancel');
+        var okBtn  = document.getElementById('cmOk');
+        document.getElementById('cmIcon').innerHTML     = '<i class="fas ' + opts.icon + '" style="color:' + opts.iconColor + ';"></i>';
         document.getElementById('cmIcon').style.background = opts.iconBg;
-        document.getElementById('cmTitle').textContent = opts.title;
-        document.getElementById('cmBody').textContent  = opts.body || '';
-        var okBtn = document.getElementById('cmOk');
-        okBtn.textContent = opts.okLabel || 'OK';
-        okBtn.style.background = opts.okBg || '#3b82f6';
+        document.getElementById('cmTitle').textContent  = opts.title;
+        document.getElementById('cmBody').textContent   = opts.body || '';
+        okBtn.textContent   = opts.okLabel || 'OK';
+        okBtn.style.cssText = 'flex:1;padding:11px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;background:' + (opts.okBg || '#3b82f6') + ';';
+        cancel.style.display = opts.hideCancel ? 'none' : '';
         m.style.display = 'flex';
         var close = function() { m.style.display = 'none'; };
-        document.getElementById('cmCancel').onclick = close;
-        okBtn.onclick = function() { close(); opts.onOk && opts.onOk(); };
-        m.onclick = function(e) { if (e.target === m) close(); };
+        cancel.onclick = close;
+        okBtn.onclick  = function() { close(); opts.onOk && opts.onOk(); };
+        m.onclick      = function(e) { if (e.target === m) close(); };
     }
 
     // ── Kirim push untuk satu pengumuman ─────────────────────────
@@ -509,25 +510,36 @@
                 fetch("{{ url('/admin/pengumuman') }}/" + id + "/push", {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                }).then(function(r) { return r.json(); }).then(function(d) {
+                }).then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                }).then(function(d) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-bell"></i>';
+                    if (!d.success) throw new Error(d.message || 'Gagal');
+                    var sent   = d.sent   !== undefined ? d.sent   : '?';
+                    var failed = d.failed !== undefined ? d.failed : 0;
                     btn.style.background = 'rgba(16,185,129,0.1)';
                     btn.style.color = '#10b981';
                     showConfirm({
                         icon:'fa-check-circle', iconBg:'rgba(16,185,129,0.12)', iconColor:'#10b981',
                         title:'Notifikasi Terkirim',
-                        body:'Berhasil ke ' + d.sent + ' perangkat' + (d.failed ? ' · ' + d.failed + ' gagal' : '') + '.',
-                        okLabel:'OK', okBg:'#10b981', onOk: function() {}
+                        body:'Berhasil ke ' + sent + ' perangkat' + (failed ? ' · ' + failed + ' gagal' : '') + '.',
+                        okLabel:'OK', okBg:'#10b981', hideCancel: true, onOk: function() {}
                     });
-                    document.getElementById('cmCancel').style.display = 'none';
                     setTimeout(function() {
                         btn.style.background = 'rgba(245,158,11,0.1)';
                         btn.style.color = '#f59e0b';
                     }, 3000);
-                }).catch(function() {
+                }).catch(function(err) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-bell"></i>';
+                    showConfirm({
+                        icon:'fa-exclamation-circle', iconBg:'rgba(239,68,68,0.1)', iconColor:'#ef4444',
+                        title:'Gagal Mengirim',
+                        body:'Terjadi kesalahan saat mengirim notifikasi. Pastikan server sudah diupdate.',
+                        okLabel:'OK', okBg:'#ef4444', hideCancel: true, onOk: function() {}
+                    });
                 });
             }
         });
@@ -578,14 +590,20 @@
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({ title: title, body: body, url: url })
-        }).then(function(r) { return r.json(); }).then(function(d) {
+        }).then(function(r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        }).then(function(d) {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Sekarang';
-            showPushResult('success', '✅ Terkirim ke ' + d.sent + ' perangkat' + (d.failed ? ' · ' + d.failed + ' gagal' : ''));
-        }).catch(function() {
+            if (!d.success) throw new Error(d.message || 'Gagal');
+            var sent   = d.sent   !== undefined ? d.sent   : '?';
+            var failed = d.failed !== undefined ? d.failed : 0;
+            showPushResult('success', '✅ Terkirim ke ' + sent + ' perangkat' + (failed ? ' · ' + failed + ' gagal' : ''));
+        }).catch(function(err) {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Sekarang';
-            showPushResult('error', '❌ Gagal menghubungi server. Coba lagi.');
+            showPushResult('error', '❌ ' + (err.message || 'Gagal menghubungi server. Coba lagi.'));
         });
     }
     function showPushResult(type, msg) {
