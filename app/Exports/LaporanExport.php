@@ -223,9 +223,9 @@ class LaporanPerPegawaiSheet implements FromArray, WithHeadings, WithTitle, With
         $sheet->getStyle("A{$summaryStart}:{$lastCol}{$deDetail}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        // Stabilo kuning pada baris Total Hari Hadir
+        // Stabilo kuning hanya pada kolom kiri baris Total Hari Hadir (A-C)
         $rowHadir = $ds + 1;
-        $sheet->getStyle("A{$rowHadir}:{$lastCol}{$rowHadir}")
+        $sheet->getStyle("A{$rowHadir}:C{$rowHadir}")
             ->getFill()->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setRGB('FFFF00');
 

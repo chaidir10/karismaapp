@@ -150,15 +150,13 @@ class LaporanController extends Controller
                     $jamKerja = $this->calculateMinutesWithoutSeconds($jamMasukObj, $jamPulangObj);
 
                     if ($isLibur) {
-                        if (!$hasExplicitLembur) {
-                            $row['lembur']       = $jamKerja;
-                            $row['lembur_waktu'] = $jamMasukObj->format('H:i') . '-' . $jamPulangObj->format('H:i');
-                            $minLembur = $isHoliday ? 300 : 300;
-                            $row['status_masuk'] = $jamKerja < $minLembur ? 'Lembur (Pulang Cepat)' : 'Lembur';
-                            $totalLembur += $jamKerja;
-                            $totalHariLembur++;
-                        }
-                        $row['jam_kerja'] = '-';
+                        // Sabtu/Minggu/Libur nasional + absen reguler = jam kerja biasa (tanpa cek terlambat)
+                        $row['masuk']        = $jamMasukObj->format('H:i');
+                        $row['pulang']       = $jamPulangObj->format('H:i');
+                        $row['jam_kerja']    = $jamKerja ?: '-';
+                        $row['status_masuk'] = 'Hadir';
+                        $totalJamKerja += $jamKerja;
+                        $totalHariHadir++;
                     } else {
                         $row['masuk']  = $jamMasukObj->format('H:i');
                         $row['pulang'] = $jamPulangObj->format('H:i');
@@ -192,11 +190,9 @@ class LaporanController extends Controller
                         $totalHariHadir++;
                     }
                 } elseif ($masuk || $pulang) {
-                    if (!$isLibur) {
-                        $totalHariHadir++;
-                        $row['masuk']  = $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-';
-                        $row['pulang'] = $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-';
-                    }
+                    $totalHariHadir++;
+                    $row['masuk']        = $masuk ? Carbon::parse($masuk->jam)->format('H:i') : '-';
+                    $row['pulang']       = $pulang ? Carbon::parse($pulang->jam)->format('H:i') : '-';
                     $row['status_masuk'] = 'Data Tidak Lengkap';
                 }
 
