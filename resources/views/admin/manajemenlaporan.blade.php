@@ -324,14 +324,9 @@
                         // Format jam kerja
                         let jamKerja = row.jam_kerja;
                         if(!isNaN(jamKerja)) {
-                            if(row.is_weekend){
-                                const jam = Math.floor(jamKerja/60);
-                                jamKerja = `${jam} jam (lembur)`;
-                            } else {
-                                const jam = Math.floor(jamKerja/60);
-                                const menit = jamKerja % 60;
-                                jamKerja = `${jam > 0 ? jam+' jam ' : ''}${menit > 0 ? menit+' menit' : (jam > 0 ? '' : '0 menit')}`;
-                            }
+                            const jam = Math.floor(jamKerja/60);
+                            const menit = jamKerja % 60;
+                            jamKerja = `${jam > 0 ? jam+' jam ' : ''}${menit > 0 ? menit+' menit' : (jam > 0 ? '' : '0 menit')}`;
                         }
 
                         // Format status dengan warna
