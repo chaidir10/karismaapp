@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Operator;
 
 use App\Http\Controllers\Controller;
+use App\Models\JamShift;
 use App\Models\Presensi;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -48,25 +49,30 @@ class OperatorPresensiController extends Controller
 
         $presensi = $query->latest('tanggal')->latest('jam')->paginate(25)->withQueryString();
         $pegawai = User::where('role', 'pegawai')->orderBy('name')->get(['id', 'name', 'nip']);
+        $jamShifts = JamShift::orderBy('nama')->get();
 
-        return view('operator.manajemen-presensi', compact('presensi', 'pegawai'));
+        return view('operator.manajemen-presensi', compact('presensi', 'pegawai', 'jamShifts'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'tanggal' => 'required|date',
-            'jam' => 'required',
-            'jenis' => 'required|in:masuk,pulang',
-            'status' => 'required|in:pending,approved,rejected',
+            'tanggal'      => 'required|date',
+            'jam'          => 'required',
+            'jenis'        => 'required|in:masuk,pulang',
+            'status'       => 'required|in:pending,approved,rejected',
+            'is_lembur'    => 'boolean',
+            'jam_shift_id' => 'nullable|exists:jam_shift,id',
         ]);
 
         $presensi = Presensi::findOrFail($id);
         $presensi->update([
-            'tanggal' => $request->tanggal,
-            'jam' => $request->jam,
-            'jenis' => $request->jenis,
-            'status' => $request->status,
+            'tanggal'      => $request->tanggal,
+            'jam'          => $request->jam,
+            'jenis'        => $request->jenis,
+            'status'       => $request->status,
+            'is_lembur'    => $request->boolean('is_lembur'),
+            'jam_shift_id' => $request->filled('jam_shift_id') ? $request->jam_shift_id : null,
         ]);
 
         return redirect()->route('operator.presensi.index')->with('success', 'Data presensi berhasil diperbarui');

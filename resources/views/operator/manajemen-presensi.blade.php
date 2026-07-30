@@ -177,11 +177,29 @@
                 <label>Jam</label>
                 <input type="time" name="jam" id="editJam" step="1" required>
             </div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Jenis</label>
+                    <select name="jenis" id="editJenis">
+                        <option value="masuk">Masuk</option>
+                        <option value="pulang">Pulang</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Tipe</label>
+                    <select name="is_lembur" id="editIsLembur">
+                        <option value="0">Reguler</option>
+                        <option value="1">Lembur</option>
+                    </select>
+                </div>
+            </div>
             <div class="form-group">
-                <label>Jenis</label>
-                <select name="jenis" id="editJenis">
-                    <option value="masuk">Masuk</option>
-                    <option value="pulang">Pulang</option>
+                <label>Shift</label>
+                <select name="jam_shift_id" id="editJamShift">
+                    <option value="">Tidak (Reguler)</option>
+                    @foreach($jamShifts as $shift)
+                    <option value="{{ $shift->id }}">{{ $shift->nama }} ({{ $shift->jam_masuk }} – {{ $shift->jam_pulang }})</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-group">
@@ -214,6 +232,8 @@
         document.getElementById('editTanggal').value = data.tanggal;
         document.getElementById('editJam').value = data.jam;
         document.getElementById('editJenis').value = data.jenis;
+        document.getElementById('editIsLembur').value = data.is_lembur ? '1' : '0';
+        document.getElementById('editJamShift').value = data.jam_shift_id || '';
         document.getElementById('editStatus').value = data.status;
         document.getElementById('editModal').classList.add('active');
         document.body.style.overflow = 'hidden';
