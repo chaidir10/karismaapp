@@ -14,7 +14,8 @@ class PegawaiController extends Controller
 {
     public function index()
     {
-        $pegawai = User::nonTester()->with('wilayahKerja')->get();
+        $pegawai = User::nonTester()->with(['wilayahKerja', 'wilayahKerjaList'])->get();
+        $units = WilayahKerja::orderBy('nama')->get();
         $today = Carbon::today()->format('Y-m-d');
         $userRole = Auth::user()->role ?? 'pegawai';
         $kehadiranHariIni = [];
@@ -78,6 +79,6 @@ class PegawaiController extends Controller
             }
         }
 
-        return view('pegawai.pegawai', compact('pegawai', 'kehadiranHariIni', 'riwayatHariIni', 'userRole'));
+        return view('pegawai.pegawai', compact('pegawai', 'kehadiranHariIni', 'riwayatHariIni', 'userRole', 'units'));
     }
 }

@@ -116,7 +116,8 @@
             data-employee-status="{{ isset($kehadiranHariIni[$p->id]) ? $kehadiranHariIni[$p->id]['text'] : 'Belum Masuk' }}"
             data-employee-status-type="{{ isset($kehadiranHariIni[$p->id]) ? $kehadiranHariIni[$p->id]['status'] : 'belum' }}"
             data-employee-dept="{{ $p->wilayahKerja->nama ?? 'Belum ditetapkan' }}"
-            data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}">
+            data-employee-avatar="{{ $p->foto_profil ? asset('public/storage/foto_profil/' . $p->foto_profil) : '' }}"
+            data-wilayah-ids="{{ json_encode($p->wilayahKerjaList->pluck('id')->toArray()) }}">
 
             <div class="e-avatar">
                 @if($p->foto_profil && Storage::disk('public')->exists('foto_profil/' . $p->foto_profil))
@@ -212,6 +213,23 @@
                 </div>
             </div>
 
+            @if(in_array(strtolower($userRole), ['admin', 'superadmin']))
+            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border); margin-bottom:16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <div style="font-size:10px; color:var(--gray); text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">
+                        <i class="fas fa-map-marker-alt" style="color:var(--primary); margin-right:4px;"></i>Titik Presensi
+                    </div>
+                    <button onclick="openTitikSheet()" style="padding:5px 12px; border-radius:8px; border:1.5px solid var(--primary); background:transparent; color:var(--primary); font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; -webkit-tap-highlight-color:transparent;">
+                        <i class="fas fa-pen" style="font-size:10px;"></i> Edit
+                    </button>
+                </div>
+                <div id="modalTitikList" style="display:flex; flex-direction:column; gap:6px;"></div>
+                <div id="modalTitikEmpty" style="text-align:center; padding:14px 0 6px; color:var(--gray); font-size:12px; display:none;">
+                    Belum ada titik presensi ditetapkan
+                </div>
+            </div>
+            @endif
+
             <!-- Riwayat Presensi Hari Ini -->
             @if(!empty($riwayatHariIni))
             <div id="modalRiwayatSection" style="display:none;">
@@ -225,6 +243,80 @@
         </div>
     </div>
 </div>
+
+@if(in_array(strtolower($userRole), ['admin', 'superadmin']))
+<style>
+    #titikPrsOverlay {
+        display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.45);
+        backdrop-filter:blur(2px);
+    }
+    #titikPrsSheet {
+        display:none; position:fixed; left:0; right:0; bottom:0; z-index:201;
+        background:var(--card-bg);
+        border-radius:20px 20px 0 0;
+        max-height:82vh; overflow:hidden;
+        flex-direction:column;
+        transform:translateY(100%); transition:transform 0.3s cubic-bezier(.32,1,.23,1);
+        box-shadow:0 -8px 40px rgba(0,0,0,0.18);
+    }
+    #titikPrsSheet.open { transform:translateY(0); }
+    .tprs-drag { width:40px; height:4px; border-radius:2px; background:var(--card-border); margin:12px auto 0; flex-shrink:0; }
+    .tprs-header { padding:14px 18px 12px; border-bottom:1px solid var(--card-border); flex-shrink:0; }
+    .tprs-body { flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+    .tprs-footer { padding:12px 16px 24px; border-top:1px solid var(--card-border); flex-shrink:0; display:flex; gap:10px; }
+    .tprs-card {
+        display:flex; align-items:center; gap:12px;
+        padding:13px 14px; border-radius:13px; cursor:pointer;
+        border:2px solid var(--card-border); background:var(--card-bg);
+        transition:all 0.15s; -webkit-tap-highlight-color:transparent;
+    }
+    .tprs-card.sel { border-color:#10b981; background:rgba(16,185,129,0.06); }
+    .tprs-icon {
+        width:38px; height:38px; border-radius:10px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center; font-size:15px;
+        background:var(--primary-soft); color:var(--primary); transition:all 0.15s;
+    }
+    .tprs-card.sel .tprs-icon { background:rgba(16,185,129,0.15); color:#10b981; }
+    .tprs-check {
+        width:22px; height:22px; border-radius:50%; border:2px solid var(--card-border);
+        flex-shrink:0; display:flex; align-items:center; justify-content:center;
+        font-size:10px; color:#fff; background:transparent; transition:all 0.15s;
+    }
+    .tprs-card.sel .tprs-check { background:#10b981; border-color:#10b981; }
+</style>
+<div id="titikPrsOverlay" onclick="closeTitikSheet()"></div>
+<div id="titikPrsSheet" style="display:flex;">
+    <div class="tprs-drag"></div>
+    <div class="tprs-header">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:36px; height:36px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:14px;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div>
+                    <div style="font-size:14px; font-weight:700; color:var(--dark);" id="titikPrsNama">-</div>
+                    <div style="font-size:11px; color:var(--gray);">Pilih titik presensi yang berlaku</div>
+                </div>
+            </div>
+            <button onclick="closeTitikSheet()" style="width:30px; height:30px; border-radius:8px; border:none; background:var(--light); color:var(--gray); cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="titikPrsInfo" style="margin-top:8px; font-size:11px; color:#10b981; font-weight:600; display:none;">
+            <i class="fas fa-check-circle"></i> <span id="titikPrsCount">0</span> titik dipilih
+        </div>
+    </div>
+    <div class="tprs-body" id="titikPrsBody"></div>
+    <div class="tprs-footer">
+        <button onclick="closeTitikSheet()" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--card-border); background:var(--light); color:var(--dark); font-size:14px; font-weight:600; cursor:pointer;">
+            Batal
+        </button>
+        <button onclick="saveTitikPresensi()" id="titikPrsSaveBtn" style="flex:2; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <i class="fas fa-save"></i> Simpan
+        </button>
+    </div>
+</div>
+@endif
 
 <script>
     var _riwayatData = @json($riwayatHariIni ?? []);
@@ -313,6 +405,14 @@
                 }
 
                 renderRiwayat(this.dataset.employeeId);
+
+                if (typeof _currentEmployeeId !== 'undefined') {
+                    _currentEmployeeId = parseInt(this.dataset.employeeId);
+                    var rawIds = this.dataset.wilayahIds;
+                    _currentWilayahIds = rawIds ? JSON.parse(rawIds) : [];
+                    renderModalTitikList(_currentWilayahIds);
+                }
+
                 document.getElementById('employeeDetailModal').style.display = 'block';
             };
         });
@@ -362,5 +462,143 @@
         img.style.display = 'none';
         img.parentElement.innerHTML = '<div class="e-avatar-placeholder">' + name.split(' ').map(function(w){return w[0]}).join('').toUpperCase() + '</div>';
     };
+
+    @if(in_array(strtolower($userRole), ['admin', 'superadmin']))
+    var _currentEmployeeId = null;
+    var _currentWilayahIds = [];
+    var _titikSelected = new Set();
+    var _titikNamaCache = '';
+    var _allTitik = @json($units->map(fn($u) => ['id' => $u->id, 'nama' => $u->nama, 'alamat' => $u->alamat ?? '']));
+
+    function renderModalTitikList(ids) {
+        var list = document.getElementById('modalTitikList');
+        var empty = document.getElementById('modalTitikEmpty');
+        if (!list) return;
+        list.innerHTML = '';
+        var numIds = (ids || []).map(Number);
+        var matched = _allTitik.filter(function(t) { return numIds.indexOf(t.id) >= 0; });
+        if (matched.length === 0) {
+            list.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+        list.style.display = 'flex';
+        empty.style.display = 'none';
+        matched.forEach(function(t) {
+            list.innerHTML += '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card-bg);border-radius:10px;border:1px solid var(--card-border);">' +
+                '<div style="width:30px;height:30px;border-radius:8px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;"><i class="fas fa-map-marker-alt"></i></div>' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-size:13px;font-weight:600;color:var(--dark);">' + t.nama + '</div>' +
+                    (t.alamat ? '<div style="font-size:10px;color:var(--gray);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + t.alamat + '</div>' : '') +
+                '</div>' +
+                '</div>';
+        });
+    }
+
+    function openTitikSheet() {
+        if (!_currentEmployeeId) return;
+        _titikSelected = new Set((_currentWilayahIds || []).map(Number));
+        document.getElementById('titikPrsNama').textContent = _titikNamaCache || 'Pegawai';
+        renderTitikSheetCards();
+        var overlay = document.getElementById('titikPrsOverlay');
+        var sheet = document.getElementById('titikPrsSheet');
+        overlay.style.display = 'block';
+        sheet.style.display = 'flex';
+        requestAnimationFrame(function() { sheet.classList.add('open'); });
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeTitikSheet() {
+        var overlay = document.getElementById('titikPrsOverlay');
+        var sheet = document.getElementById('titikPrsSheet');
+        sheet.classList.remove('open');
+        setTimeout(function() {
+            overlay.style.display = 'none';
+            sheet.style.display = 'none';
+        }, 300);
+        document.body.style.overflow = '';
+    }
+
+    function renderTitikSheetCards() {
+        var body = document.getElementById('titikPrsBody');
+        body.innerHTML = '';
+        if (!_allTitik.length) {
+            body.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--gray);font-size:13px;"><i class="fas fa-map-marker-alt" style="font-size:30px;display:block;margin-bottom:10px;opacity:0.3;"></i>Belum ada titik presensi</div>';
+            return;
+        }
+        _allTitik.forEach(function(t) {
+            var sel = _titikSelected.has(t.id);
+            var card = document.createElement('div');
+            card.className = 'tprs-card' + (sel ? ' sel' : '');
+            card.dataset.id = t.id;
+            card.innerHTML =
+                '<div class="tprs-icon"><i class="fas fa-map-marker-alt"></i></div>' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-size:13px;font-weight:600;color:var(--dark);">' + t.nama + '</div>' +
+                    (t.alamat ? '<div style="font-size:11px;color:var(--gray);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + t.alamat + '</div>' : '') +
+                '</div>' +
+                '<div class="tprs-check">' + (sel ? '<i class="fas fa-check"></i>' : '') + '</div>';
+            card.onclick = function() { toggleTitikCard(t.id); };
+            body.appendChild(card);
+        });
+        updateTitikSheetInfo();
+    }
+
+    function toggleTitikCard(id) {
+        if (_titikSelected.has(id)) { _titikSelected.delete(id); } else { _titikSelected.add(id); }
+        var card = document.querySelector('.tprs-card[data-id="' + id + '"]');
+        if (card) {
+            var sel = _titikSelected.has(id);
+            card.classList.toggle('sel', sel);
+            card.querySelector('.tprs-check').innerHTML = sel ? '<i class="fas fa-check"></i>' : '';
+        }
+        updateTitikSheetInfo();
+    }
+
+    function updateTitikSheetInfo() {
+        var n = _titikSelected.size;
+        document.getElementById('titikPrsCount').textContent = n;
+        document.getElementById('titikPrsInfo').style.display = n > 0 ? 'block' : 'none';
+    }
+
+    function saveTitikPresensi() {
+        if (!_currentEmployeeId) return;
+        var btn = document.getElementById('titikPrsSaveBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+        var formData = new FormData();
+        formData.append('_method', 'PATCH');
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+        _titikSelected.forEach(function(id) { formData.append('wilayah_ids[]', id); });
+        fetch('/admin/manajemen-pegawai/' + _currentEmployeeId + '/lokasi', {
+            method: 'POST', body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success) {
+                var newIds = Array.from(_titikSelected);
+                _currentWilayahIds = newIds;
+                // Update data attribute on card
+                var card = document.querySelector('.e-card[data-employee-id="' + _currentEmployeeId + '"]');
+                if (card) card.dataset.wilayahIds = JSON.stringify(newIds);
+                renderModalTitikList(newIds);
+                closeTitikSheet();
+            }
+        })
+        .catch(function() {})
+        .finally(function() {
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+            btn.disabled = false;
+        });
+    }
+
+    // Store employee name when modal opens (for sheet header)
+    document.querySelectorAll('.e-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            _titikNamaCache = (this.querySelector('.e-name') || {}).textContent || '';
+        }, true);
+    });
+    @endif
 </script>
 @endsection

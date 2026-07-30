@@ -157,6 +157,20 @@ class ManajemenPegawaiController extends Controller
     }
 
     /**
+     * Update hanya titik presensi (wilayah kerja) pegawai
+     */
+    public function updateLokasi(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $request->validate([
+            'wilayah_ids'   => 'nullable|array',
+            'wilayah_ids.*' => 'exists:wilayah_kerja,id',
+        ]);
+        $user->wilayahKerjaList()->sync($request->wilayah_ids ?? []);
+        return response()->json(['success' => true, 'message' => 'Titik presensi berhasil diperbarui']);
+    }
+
+    /**
      * Reset password ke NIP
      */
     public function resetPassword($id)

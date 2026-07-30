@@ -207,6 +207,7 @@ Route::middleware(['auth', 'verified', 'detectdevice', 'logactivity'])->group(fu
             Route::put('/{id}', [ManajemenPegawaiController::class, 'update'])->name('update');
             Route::delete('/{id}', [ManajemenPegawaiController::class, 'destroy'])->name('destroy');
             Route::put('/{id}/reset-password', [ManajemenPegawaiController::class, 'resetPassword'])->name('reset-password');
+            Route::patch('/{id}/lokasi', [ManajemenPegawaiController::class, 'updateLokasi'])->name('update-lokasi');
         });
 
         // --------------------
