@@ -163,7 +163,7 @@ class LaporanController extends Controller
                         $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
                         $keterlambatan = $jamMasukObj->gte($jamMasukDefault)
-                            ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
+                            ? $this->calculateMinutesWithoutSeconds($jamMasukDefault->copy()->subMinute(), $jamMasukObj, true)
                             : 0;
 
                         if ($keterlambatan > 0) $totalHariTelat++;

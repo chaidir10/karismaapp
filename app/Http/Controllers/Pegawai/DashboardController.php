@@ -35,7 +35,7 @@ class DashboardController extends Controller
             $p->waktu_kurang_menit = 0;
             if ($p->jenis === 'masuk' && $p->jam >= $jadwalKerjaHariIni['jam_masuk']) {
                 $p->terlambat = true;
-                $p->waktu_kurang_menit = intval((strtotime($p->jam) - strtotime($jadwalKerjaHariIni['jam_masuk'])) / 60);
+                $p->waktu_kurang_menit = intval((strtotime($p->jam) - strtotime($jadwalKerjaHariIni['jam_masuk']) + 60) / 60);
             }
             if ($p->jenis === 'pulang' && $p->jam < $jadwalKerjaHariIni['jam_pulang']) {
                 $p->waktu_kurang_menit = intval((strtotime($jadwalKerjaHariIni['jam_pulang']) - strtotime($p->jam)) / 60);

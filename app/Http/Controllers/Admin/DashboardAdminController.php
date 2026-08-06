@@ -52,7 +52,7 @@ class DashboardAdminController extends Controller
 
             if ($presensi->jenis === 'masuk' && $presensi->jam >= $jamMasuk) {
                 $presensi->terlambat = true;
-                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasuk)) / 60);
+                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasuk) + 60) / 60);
             }
 
             if ($presensi->jenis === 'pulang' && $presensi->jam < $jamPulang) {
@@ -425,7 +425,7 @@ class DashboardAdminController extends Controller
             $jadwal = $presensi->user->getJadwalKerja($presensi->tanggal);
             if ($presensi->jenis === 'masuk' && $presensi->jam >= $jadwal['jam_masuk']) {
                 $presensi->terlambat = true;
-                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jadwal['jam_masuk'])) / 60);
+                $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jadwal['jam_masuk']) + 60) / 60);
             }
 
             if ($presensi->jenis === 'pulang' && $presensi->jam < $jadwal['jam_pulang']) {
