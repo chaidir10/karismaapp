@@ -65,8 +65,7 @@ class PegawaiController extends Controller
                                 $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Sudah Pulang'];
                             }
                         } else {
-                            $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-                            if ($lastActivity->jam > $batas) {
+                            if ($lastActivity->jam >= $jadwal['jam_masuk']) {
                                 $kehadiranHariIni[$p->id] = ['status' => 'telat', 'text' => 'Terlambat'];
                             } else {
                                 $kehadiranHariIni[$p->id] = ['status' => 'tepat', 'text' => 'Masuk'];

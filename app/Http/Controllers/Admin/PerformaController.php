@@ -143,13 +143,12 @@ class PerformaController extends Controller
 
                 $jadwal = $user->getJadwalKerja($d);
                 $jamMasukDefault = Carbon::createFromTimeString($jadwal['jam_masuk']);
-                $jamToleransi = $jamMasukDefault->copy()->addMinute();
                 $jamPulangDefault = Carbon::createFromTimeString($jadwal['jam_pulang']);
 
                 $jamMasukObj = Carbon::parse($masuk->jam);
                 $jamPulangObj = Carbon::parse($pulang->jam);
 
-                if ($jamMasukObj->lt($jamToleransi)) {
+                if ($jamMasukObj->lt($jamMasukDefault)) {
                     $tepatMasuk++;
                 } else {
                     $telat++;

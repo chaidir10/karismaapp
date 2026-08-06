@@ -109,8 +109,7 @@ class PresensiController extends Controller
             } else {
                 $jadwal = $user->getJadwalKerja($p->tanggal);
                 if ($p->jenis === 'masuk') {
-                    $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-                    if ($p->jam > $batas) {
+                    if ($p->jam >= $jadwal['jam_masuk']) {
                         $p->badge_text = 'Terlambat';
                         $p->badge_type = 'danger';
                     } else {

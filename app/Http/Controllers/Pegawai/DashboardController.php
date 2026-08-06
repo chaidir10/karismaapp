@@ -30,11 +30,10 @@ class DashboardController extends Controller
             ->orderBy('jam', 'asc')
             ->get();
 
-        $batasTelat = date('H:i:s', strtotime($jadwalKerjaHariIni['jam_masuk']) + 60);
         foreach ($riwayatHariIni as $p) {
             $p->terlambat = false;
             $p->waktu_kurang_menit = 0;
-            if ($p->jenis === 'masuk' && $p->jam > $batasTelat) {
+            if ($p->jenis === 'masuk' && $p->jam >= $jadwalKerjaHariIni['jam_masuk']) {
                 $p->terlambat = true;
                 $p->waktu_kurang_menit = intval((strtotime($p->jam) - strtotime($jadwalKerjaHariIni['jam_masuk'])) / 60);
             }

@@ -50,9 +50,7 @@ class DashboardAdminController extends Controller
             $jamMasuk = $jadwal['jam_masuk'];
             $jamPulang = $jadwal['jam_pulang'];
 
-            $batasTelat = date('H:i:s', strtotime($jamMasuk) + 60);
-
-            if ($presensi->jenis === 'masuk' && $presensi->jam > $batasTelat) {
+            if ($presensi->jenis === 'masuk' && $presensi->jam >= $jamMasuk) {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jamMasuk)) / 60);
             }
@@ -140,8 +138,7 @@ class DashboardAdminController extends Controller
                 ->where('status', 'approved')->get();
             foreach ($masukRecords as $m) {
                 $jadwal = $m->user->getJadwalKerja($date);
-                $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-                if ($m->jam > $batas) $telatCount++;
+                if ($m->jam >= $jadwal['jam_masuk']) $telatCount++;
             }
             $chartTelat[] = $telatCount;
 
@@ -426,9 +423,7 @@ class DashboardAdminController extends Controller
             $presensi->waktu_kurang_menit = 0;
 
             $jadwal = $presensi->user->getJadwalKerja($presensi->tanggal);
-            $batasTelat = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-
-            if ($presensi->jenis === 'masuk' && $presensi->jam > $batasTelat) {
+            if ($presensi->jenis === 'masuk' && $presensi->jam >= $jadwal['jam_masuk']) {
                 $presensi->terlambat = true;
                 $presensi->waktu_kurang_menit = intval((strtotime($presensi->jam) - strtotime($jadwal['jam_masuk'])) / 60);
             }
@@ -571,8 +566,7 @@ class DashboardAdminController extends Controller
             foreach ($dayReguler as $m) {
                 if (!$m->user) continue;
                 $jadwal = $m->user->getJadwalKerja($date);
-                $batas = date('H:i:s', strtotime($jadwal['jam_masuk']) + 60);
-                if ($m->jam > $batas) $telatCount++;
+                if ($m->jam >= $jadwal['jam_masuk']) $telatCount++;
             }
             $telat[] = $telatCount;
 

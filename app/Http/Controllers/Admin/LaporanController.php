@@ -113,7 +113,6 @@ class LaporanController extends Controller
 
                 $jadwal = $user->getJadwalKerja($date);
                 $jamMasukDefault  = Carbon::createFromTimeString($jadwal['jam_masuk']);
-                $jamToleransi     = $jamMasukDefault->copy()->addMinute();
                 $jamPulangDefault = Carbon::createFromTimeString($jadwal['jam_pulang']);
 
                 $row = [
@@ -163,7 +162,7 @@ class LaporanController extends Controller
 
                         $jamKerjaWajib = $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamPulangDefault);
 
-                        $keterlambatan = $jamMasukObj->gte($jamToleransi)
+                        $keterlambatan = $jamMasukObj->gte($jamMasukDefault)
                             ? $this->calculateMinutesWithoutSeconds($jamMasukDefault, $jamMasukObj, true)
                             : 0;
 
