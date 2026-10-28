@@ -26,6 +26,10 @@ class DetectDevice
             'path' => $request->path(),
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return $next($request);
+        }
+
         if ($user) {
             switch ($user->role) {
                 case 'pegawai':
