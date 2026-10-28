@@ -8,6 +8,9 @@
     .modal-pg.show { opacity:1; }
     .modal-pg .modal-inner { transform:translateY(12px); opacity:0; transition:transform 0.2s ease, opacity 0.2s ease; }
     .modal-pg.show .modal-inner { transform:translateY(0); opacity:1; }
+    .edit-form-grid { display:grid; grid-template-columns:1fr; gap:12px; padding:20px 24px; }
+    @media (min-width:640px) { .edit-form-grid { grid-template-columns:1fr 1fr; } }
+    @media (min-width:900px) { .edit-form-grid { grid-template-columns:1fr 1fr 1fr; } }
 </style>
 @endpush
 
@@ -321,7 +324,7 @@
 </div>
 
 <!-- Edit Employee Modal -->
-<div id="modalEdit" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-4">
+<div id="modalEdit" class="modal-pg hidden fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 overflow-y-auto py-4">
     <div class="modal-inner w-full max-w-4xl relative mx-4 my-auto" id="modalEditContent" style="background:var(--dm-card,#fff); border:1px solid var(--dm-border,#e2e8f0); border-radius:16px; overflow:hidden;">
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--dm-border,#e2e8f0);">
@@ -335,7 +338,7 @@
             @php $inputStyle = 'width:100%; padding:9px 12px; border:1px solid var(--dm-border,#d1d5db); border-radius:8px; font-size:13px; background:var(--dm-card,#fff); color:var(--dm-text); outline:none;'; $labelStyle = 'display:block; font-size:11px; font-weight:600; color:var(--dm-muted,#64748b); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.3px;'; @endphp
 
             <!-- Form Grid -->
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding:20px 24px;">
+            <div class="edit-form-grid">
                 <div>
                     <label style="{{ $labelStyle }}">NIP</label>
                     <input type="number" name="nip" id="edit_nip" style="{{ $inputStyle }}" required>
