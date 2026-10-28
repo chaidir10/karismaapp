@@ -228,6 +228,24 @@
                     Belum ada titik presensi ditetapkan
                 </div>
             </div>
+
+            <!-- Reset Password -->
+            <div style="background:var(--light); border-radius:14px; padding:14px 16px; border:1px solid var(--card-border); margin-bottom:16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:rgba(239,68,68,0.1); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:13px; font-weight:600; color:var(--dark);">Reset Password</div>
+                            <div style="font-size:11px; color:var(--gray);">Reset ke NIP pegawai</div>
+                        </div>
+                    </div>
+                    <button onclick="doResetPassword()" style="padding:5px 12px; border-radius:8px; border:1.5px solid #ef4444; background:transparent; color:#ef4444; font-size:11px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent;">
+                        <i class="fas fa-sync-alt" style="font-size:10px;"></i> Reset
+                    </button>
+                </div>
+            </div>
             @endif
 
             <!-- Riwayat Presensi Hari Ini -->
@@ -458,6 +476,44 @@
     document.addEventListener('turbo:load', initPegawai);
     initPegawai();
 
+    // Long press to copy: name, position, NIP
+    var _lpTimer = null;
+    function initLongPress(elId) {
+        var el = document.getElementById(elId);
+        if (!el) return;
+        function doCopy() {
+            var text = el.textContent.trim();
+            if (!text || text === '-') return;
+            var short = text.length > 40 ? text.substring(0, 40) + '…' : text;
+            function onCopied() {
+                var orig = el.style.opacity;
+                el.style.opacity = '0.4';
+                setTimeout(function() { el.style.opacity = orig; }, 250);
+                if (typeof showSuccess === 'function') showSuccess('Disalin: ' + short);
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(onCopied).catch(function() {});
+            } else {
+                var ta = document.createElement('textarea');
+                ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); onCopied(); } catch(e) {}
+                ta.remove();
+            }
+        }
+        el.addEventListener('touchstart', function() {
+            _lpTimer = setTimeout(doCopy, 600);
+        }, { passive: true });
+        el.addEventListener('touchend',  function() { clearTimeout(_lpTimer); });
+        el.addEventListener('touchmove', function() { clearTimeout(_lpTimer); });
+        el.addEventListener('dblclick', doCopy);
+        el.style.webkitUserSelect = 'none';
+        el.style.userSelect = 'none';
+    }
+    initLongPress('modalEmployeeName');
+    initLongPress('modalEmployeePosition');
+    initLongPress('modalEmployeeNip');
+
     window.handleAvatarError = function(img, name) {
         img.style.display = 'none';
         img.parentElement.innerHTML = '<div class="e-avatar-placeholder">' + name.split(' ').map(function(w){return w[0]}).join('').toUpperCase() + '</div>';
@@ -609,6 +665,43 @@
             _titikNamaCache = (this.querySelector('.e-name') || {}).textContent || '';
         }, true);
     });
+
+    function doResetPassword() {
+        if (!_currentEmployeeId) return;
+        var name = (document.getElementById('modalEmployeeName') || {}).textContent || 'pegawai ini';
+        showConfirm({
+            type: 'warning',
+            icon: 'fa-key',
+            title: 'Reset Password',
+            message: 'Password <strong>' + name + '</strong> akan direset ke NIP. Lanjutkan?',
+            confirmText: 'Ya, Reset',
+            cancelText: 'Batal',
+            onConfirm: function() {
+                var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                fetch('/admin/manajemen-pegawai/' + _currentEmployeeId + '/reset-password', {
+                    method: 'PUT',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfMeta ? csrfMeta.content : ''
+                    }
+                })
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(d) {
+                    if (d.success) {
+                        if (typeof showSuccess === 'function') showSuccess(d.message || 'Password berhasil direset');
+                    } else {
+                        if (typeof showError === 'function') showError(d.message || 'Gagal reset password');
+                    }
+                })
+                .catch(function(err) {
+                    if (typeof showError === 'function') showError('Gagal: ' + (err.message || 'coba lagi'));
+                });
+            }
+        });
+    }
     @endif
 </script>
 @endsection
