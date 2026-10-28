@@ -574,19 +574,26 @@
             method: 'POST', body: formData,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
         .then(function(d) {
             if (d.success) {
                 var newIds = Array.from(_titikSelected);
                 _currentWilayahIds = newIds;
-                // Update data attribute on card
                 var card = document.querySelector('.e-card[data-employee-id="' + _currentEmployeeId + '"]');
                 if (card) card.dataset.wilayahIds = JSON.stringify(newIds);
                 renderModalTitikList(newIds);
                 closeTitikSheet();
+                if (typeof showSuccess === 'function') showSuccess('Titik presensi berhasil disimpan');
+            } else {
+                if (typeof showError === 'function') showError(d.message || 'Gagal menyimpan perubahan');
             }
         })
-        .catch(function() {})
+        .catch(function(err) {
+            if (typeof showError === 'function') showError('Gagal menyimpan. Coba lagi.');
+        })
         .finally(function() {
             btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
             btn.disabled = false;
