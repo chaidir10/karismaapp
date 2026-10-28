@@ -567,12 +567,15 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         btn.disabled = true;
         var formData = new FormData();
-        formData.append('_method', 'PATCH');
-        formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
         _titikSelected.forEach(function(id) { formData.append('wilayah_ids[]', id); });
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
         fetch('/admin/manajemen-pegawai/' + _currentEmployeeId + '/lokasi', {
-            method: 'POST', body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfMeta ? csrfMeta.content : ''
+            }
         })
         .then(function(r) {
             if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -592,7 +595,7 @@
             }
         })
         .catch(function(err) {
-            if (typeof showError === 'function') showError('Gagal menyimpan. Coba lagi.');
+            if (typeof showError === 'function') showError('Gagal: ' + (err.message || 'coba lagi'));
         })
         .finally(function() {
             btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
